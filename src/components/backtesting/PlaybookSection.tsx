@@ -96,7 +96,7 @@ export function PlaybookSection({ onBlueprintAdded }: PlaybookSectionProps) {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Add New Playbook</DialogTitle>
+              <DialogTitle>Add New Trading Blueprint</DialogTitle>
             </DialogHeader>
             <AddBlueprintForm onSuccess={handleSuccess} />
           </DialogContent>
