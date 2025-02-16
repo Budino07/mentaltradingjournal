@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -114,7 +113,6 @@ export function PlaybookSection({ onBlueprintAdded }: PlaybookSectionProps) {
                 key={blueprint.id}
                 id={blueprint.id}
                 name={blueprint.name}
-                instrument={blueprint.rules[0]?.replace("Instrument: ", "") || "N/A"}
                 emoji={blueprint.emoji}
                 winRate={winRates[blueprint.id] || 0}
                 onDelete={handleDelete}

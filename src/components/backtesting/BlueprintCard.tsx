@@ -1,5 +1,5 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { 
   DropdownMenu,
@@ -25,7 +25,6 @@ import { useToast } from "@/hooks/use-toast";
 
 interface BlueprintCardProps {
   name: string;
-  instrument: string;
   winRate?: number;
   id: string;
   emoji?: string;
@@ -40,7 +39,7 @@ const emojis = [
   { icon: Trophy, label: "Trophy", color: "#FEC6A1" },
 ];
 
-export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initialEmoji, onDelete }: BlueprintCardProps) {
+export function BlueprintCard({ name, winRate = 0, id, emoji: initialEmoji, onDelete }: BlueprintCardProps) {
   const navigate = useNavigate();
   const [selectedEmoji, setSelectedEmoji] = useState(initialEmoji || "Smile");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -142,10 +141,7 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Badge variant="outline" className="bg-primary/10">
-              {instrument}
-            </Badge>
+          <div className="flex items-center justify-end">
             <span className="text-sm text-muted-foreground">
               Win Rate: {winRate}%
             </span>
