@@ -91,8 +91,24 @@ export function useBacktestingForm(userId: string | undefined, navigate: (path: 
       setValidationError("Please enter an entry price");
       return false;
     }
+    if (!formData.entryDate) {
+      setValidationError("Please enter an entry date");
+      return false;
+    }
     setValidationError("");
     return true;
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return null;
+    try {
+      // Ensure the date is in ISO format and includes timezone
+      const date = new Date(dateString);
+      return date.toISOString();
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return null;
+    }
   };
 
   const handleSubmit = async () => {
@@ -115,6 +131,9 @@ export function useBacktestingForm(userId: string | undefined, navigate: (path: 
 
       if (blueprintError) throw blueprintError;
 
+      const entryDate = formatDate(formData.entryDate);
+      const exitDate = formatDate(formData.exitDate);
+
       const { error } = await supabase
         .from("backtesting_sessions")
         .insert({
@@ -125,9 +144,10 @@ export function useBacktestingForm(userId: string | undefined, navigate: (path: 
           market_type: "forex",
           symbol: formData.instrument,
           start_balance: 10000,
-          start_date: formData.entryDate || new Date().toISOString(),
-          end_date: formData.exitDate || new Date().toISOString(),
-          entry_date: formData.entryDate,
+          start_date: entryDate || new Date().toISOString(),
+          end_date: exitDate || new Date().toISOString(),
+          entry_date: entryDate,
+          exit_date: exitDate,
           instrument: formData.instrument,
           setup: formData.setup,
           direction: direction,
