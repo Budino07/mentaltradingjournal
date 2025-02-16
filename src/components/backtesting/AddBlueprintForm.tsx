@@ -80,7 +80,7 @@ export function AddBlueprintForm({ onSuccess }: AddBlueprintFormProps) {
 
       <div className="flex gap-4 pt-4">
         <Button type="submit" className="flex-1" disabled={loading}>
-          {loading ? "Creating..." : "Create Blueprint"}
+          {loading ? "Creating..." : "Create Playbook"}
         </Button>
       </div>
     </form>
