@@ -93,9 +93,11 @@ export const TradeDuration = () => {
     };
   }).filter(item => item.tradeCount > 0); // Only show ranges with trades
 
-  const bestDuration = data.reduce((prev, current) => 
-    current.winRate > prev.winRate && current.tradeCount > 0 ? current : prev
-  );
+  const bestDuration = data.length > 0 ? 
+    data.reduce((prev, current) => 
+      current.winRate > prev.winRate && current.tradeCount > 0 ? current : prev, 
+      data[0]
+    ) : { duration: "No data", winRate: 0, tradeCount: 0 };
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -107,39 +109,51 @@ export const TradeDuration = () => {
       </div>
 
       <div className="h-[250px] md:h-[300px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="duration" tick={{ fontSize: 12 }} />
-            <YAxis 
-              tick={{ fontSize: 12 }} 
-              domain={[0, 100]}
-              label={{ 
-                value: 'Win Rate (%)', 
-                angle: -90, 
-                position: 'insideLeft',
-                style: { fontSize: '12px' }
-              }}
-            />
-            <Tooltip 
-              content={<CustomTooltip />}
-              cursor={{ fill: 'transparent' }}
-            />
-            <Bar 
-              dataKey="winRate" 
-              fill="#6E59A5" 
-              name="Win Rate" 
-              radius={[4, 4, 0, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
+        {data.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="duration" tick={{ fontSize: 12 }} />
+              <YAxis 
+                tick={{ fontSize: 12 }} 
+                domain={[0, 100]}
+                label={{ 
+                  value: 'Win Rate (%)', 
+                  angle: -90, 
+                  position: 'insideLeft',
+                  style: { fontSize: '12px' }
+                }}
+              />
+              <Tooltip 
+                content={<CustomTooltip />}
+                cursor={{ fill: 'transparent' }}
+              />
+              <Bar 
+                dataKey="winRate" 
+                fill="#6E59A5" 
+                name="Win Rate" 
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-full flex items-center justify-center">
+            <p className="text-muted-foreground">No trade data available</p>
+          </div>
+        )}
       </div>
 
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
-          <p>Your {bestDuration.duration} trades have a {bestDuration.winRate.toFixed(1)}% win rate.</p>
-          <p>Consider focusing more on trades within this duration range for optimal results.</p>
+          {data.length > 0 ? (
+            <>
+              <p>Your {bestDuration.duration} trades have a {bestDuration.winRate.toFixed(1)}% win rate.</p>
+              <p>Consider focusing more on trades within this duration range for optimal results.</p>
+            </>
+          ) : (
+            <p>Add some trades to see duration-based performance insights.</p>
+          )}
         </div>
       </div>
     </Card>
