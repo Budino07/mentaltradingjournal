@@ -49,7 +49,7 @@ export function GeneralSection({ formData, direction, onInputChange, onDirection
       
       <div className="space-y-2">
         <Label htmlFor="entryDate">Entry Date & Time *</Label>
-        <div className="flex gap-2">
+        <div className="flex gap-3 items-start">
           <Input
             type="datetime-local"
             id="entryDate"
@@ -59,8 +59,12 @@ export function GeneralSection({ formData, direction, onInputChange, onDirection
           />
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Calendar className="h-4 w-4" />
+              <Button 
+                variant="outline" 
+                size="icon"
+                className="h-10 w-10 rounded-lg bg-white hover:bg-accent hover:text-accent-foreground transition-colors"
+              >
+                <Calendar className="h-5 w-5 text-muted-foreground" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="end">
@@ -69,6 +73,7 @@ export function GeneralSection({ formData, direction, onInputChange, onDirection
                 selected={formData.entryDate ? new Date(formData.entryDate) : undefined}
                 onSelect={handleDateSelect}
                 initialFocus
+                className="rounded-lg border shadow-lg"
               />
             </PopoverContent>
           </Popover>
