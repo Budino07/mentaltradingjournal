@@ -71,7 +71,7 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
   const tradeDurations = analyzeTradeDurations(allTrades);
   const emotionTrend = calculateEmotionTrend(journalEntries);
 
-  // Process market volatility data
+  // Process market volatility data with default values
   const volatilityData = journalEntries.map(entry => ({
     volatility: entry.market_conditions?.includes('high') ? 75 :
       entry.market_conditions?.includes('medium') ? 50 : 25,
@@ -83,7 +83,7 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     emotional: entry.emotion
   }));
 
-  // Calculate risk/reward data
+  // Calculate risk/reward data with proper initial values
   const riskRewardData = allTrades
     .filter(trade => trade.entryPrice && trade.stopLoss && trade.takeProfit)
     .map(trade => ({
@@ -98,7 +98,7 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     tradingResult: trend.pnl
   }));
 
-  // Calculate performance by emotion
+  // Calculate performance by emotion with initial values
   const performanceByEmotion = journalEntries.reduce((acc, entry) => {
     if (entry.trades && entry.trades.length > 0) {
       const totalPnL = entry.trades.reduce((sum, trade) => {
@@ -120,6 +120,20 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     performanceByEmotion,
   });
 
+  const emotionalStateInsight = emotionTrendWithScores.length > 0 
+    ? `Your emotional resilience has ${
+        emotionTrendWithScores[emotionTrendWithScores.length - 1]?.emotionalScore > emotionTrendWithScores[0]?.emotionalScore 
+          ? 'improved' 
+          : 'decreased'
+      } over the last month.`
+    : 'Start tracking your emotional state to see insights.';
+
+  const tradingImpactInsight = emotionTrendWithScores.length > 0
+    ? `Trading results show ${
+        Math.abs(emotionTrendWithScores.reduce((sum, day) => sum + (day.tradingResult || 0), 0))
+      }$ impact on your P&L.`
+    : 'Add trades to see their impact on your performance.';
+
   return {
     journalEntries,
     performanceByEmotion,
@@ -129,17 +143,15 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     },
     emotionTrend: emotionTrendWithScores,
     emotionTrendInsights: {
-      improvement: `Your emotional resilience has ${
-        emotionTrendWithScores[emotionTrendWithScores.length - 1]?.emotionalScore > emotionTrendWithScores[0]?.emotionalScore 
-          ? 'improved' 
-          : 'decreased'
-      } over the last month.`,
-      impact: `Trading results show ${
-        Math.abs(emotionTrendWithScores.reduce((sum, day) => sum + (day.tradingResult || 0), 0))
-      }$ impact on your P&L.`,
+      improvement: emotionalStateInsight,
+      impact: tradingImpactInsight,
     },
-    mainInsight: "Based on your journal entries, there's a strong correlation between emotional state and trading performance.",
-    recommendedAction: "Focus on maintaining emotional balance during trading sessions.",
+    mainInsight: journalEntries.length > 0 
+      ? "Based on your journal entries, there's a strong correlation between emotional state and trading performance."
+      : "Start journaling to get insights about your trading performance.",
+    recommendedAction: journalEntries.length > 0
+      ? "Focus on maintaining emotional balance during trading sessions."
+      : "Create your first journal entry to begin tracking your progress.",
     dataRequirements,
     mistakeFrequencies,
     assetPairStats,
