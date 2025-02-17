@@ -76,7 +76,8 @@ const CustomTooltip = ({ active, payload }: any) => {
           {new Date(data.date).toLocaleDateString('en-US', { 
             month: 'short', 
             day: 'numeric',
-            year: 'numeric'
+            year: 'numeric',
+            timeZone: 'UTC' // Ensure we display the date in UTC
           })}
         </p>
         <div className="space-y-1">
@@ -127,17 +128,25 @@ export const EmotionTrend = () => {
   const preSessionEmotions = analytics.journalEntries
     .filter(entry => entry.session_type === 'pre')
     .reduce((acc, entry) => {
-      const date = new Date(entry.created_at).toISOString().split('T')[0];
-      acc[date] = entry.emotion;
+      // Ensure we're using UTC date
+      const date = new Date(entry.created_at);
+      const utcDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+      const dateKey = utcDate.toISOString().split('T')[0];
+      acc[dateKey] = entry.emotion;
       return acc;
     }, {} as Record<string, string>);
 
   const tradesByDate = analytics.journalEntries
     .flatMap(entry => 
-      entry.trades?.map(trade => ({
-        date: new Date(trade.entryDate || entry.created_at).toISOString().split('T')[0],
-        pnl: Number(trade.pnl) || 0,
-      })) || []
+      entry.trades?.map(trade => {
+        // Use entry date for trades, ensuring UTC
+        const date = new Date(trade.entryDate || entry.created_at);
+        const utcDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+        return {
+          date: utcDate.toISOString().split('T')[0],
+          pnl: Number(trade.pnl) || 0,
+        };
+      }) || []
     )
     .reduce((acc, { date, pnl }) => {
       if (!acc[date]) acc[date] = [];
@@ -199,7 +208,8 @@ export const EmotionTrend = () => {
               name="Time"
               tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { 
                 month: 'short', 
-                day: 'numeric' 
+                day: 'numeric',
+                timeZone: 'UTC' // Ensure we display dates in UTC
               })}
               type="number"
             />
