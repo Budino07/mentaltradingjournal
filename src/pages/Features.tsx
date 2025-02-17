@@ -201,7 +201,15 @@ const Features = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
-          <div className="space-y-8">
+          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12 order-1 lg:order-1">
+            <img 
+              src="/lovable-uploads/871474ba-41ef-4e5d-ad53-f98502fd473b.png"
+              alt="Analytics Charts"
+              className="w-full h-auto"
+            />
+          </div>
+
+          <div className="space-y-8 order-2 lg:order-2">
             <h2 className="text-3xl md:text-4xl font-semibold">
               Cutting Edge Trading Analytics
             </h2>
@@ -215,14 +223,6 @@ const Features = () => {
             <Button size="lg" className="mt-6" asChild>
               <Link to="/login">Get Started</Link>
             </Button>
-          </div>
-
-          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
-            <img 
-              src="/lovable-uploads/871474ba-41ef-4e5d-ad53-f98502fd473b.png"
-              alt="Analytics Charts"
-              className="w-full h-auto"
-            />
           </div>
         </div>
 
