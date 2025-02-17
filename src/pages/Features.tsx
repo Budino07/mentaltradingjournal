@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
@@ -202,7 +201,7 @@ const Features = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
-          <div className="space-y-8 order-1 lg:order-2">
+          <div className="space-y-8">
             <h2 className="text-3xl md:text-4xl font-semibold">
               Cutting Edge Trading Analytics
             </h2>
@@ -218,7 +217,7 @@ const Features = () => {
             </Button>
           </div>
 
-          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12 order-2 lg:order-1">
+          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
             <img 
               src="/lovable-uploads/871474ba-41ef-4e5d-ad53-f98502fd473b.png"
               alt="Analytics Charts"
@@ -246,8 +245,8 @@ const Features = () => {
 
           <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
             <img 
-              src="/lovable-uploads/e9c68a6a-c499-475b-9518-7ba15509fc57.png"
-              alt="Insights Preview"
+              src="/lovable-uploads/96f163b4-4cee-480d-bc9e-986594419582.png"
+              alt="Backtesting Journal Interface"
               className="w-full h-auto"
             />
           </div>
