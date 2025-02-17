@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
@@ -25,8 +26,23 @@ export const PerformanceBreakdown = () => {
   const emotionPerformance = analytics.journalEntries.reduce((acc, entry) => {
     if (!entry.trades || entry.trades.length === 0) return acc;
     
-    const totalPnL = entry.trades.reduce((sum, trade) => sum + (Number(trade.pnl) || 0), 0);
-    const avgPnL = totalPnL / entry.trades.length;
+    // Get today's date in user's local timezone
+    const entryDate = new Date(entry.created_at);
+    const today = new Date();
+    
+    // Compare dates ignoring time
+    const isToday = entryDate.getFullYear() === today.getFullYear() &&
+                    entryDate.getMonth() === today.getMonth() &&
+                    entryDate.getDate() === today.getDate();
+
+    const totalPnL = entry.trades.reduce((sum, trade) => {
+      const tradeDate = trade.entryDate ? new Date(trade.entryDate) : entryDate;
+      const isTradeToday = tradeDate.getFullYear() === today.getFullYear() &&
+                          tradeDate.getMonth() === today.getMonth() &&
+                          tradeDate.getDate() === today.getDate();
+
+      return sum + (Number(trade.pnl) || 0);
+    }, 0);
     
     if (!acc[entry.emotion]) {
       acc[entry.emotion] = {
@@ -35,8 +51,16 @@ export const PerformanceBreakdown = () => {
       };
     }
     
-    acc[entry.emotion].totalPnL += avgPnL;
+    acc[entry.emotion].totalPnL += totalPnL;
     acc[entry.emotion].count += 1;
+    
+    console.log(`Processing entry for ${entry.emotion}:`, {
+      date: entryDate,
+      isToday,
+      totalPnL,
+      currentTotal: acc[entry.emotion].totalPnL,
+      count: acc[entry.emotion].count
+    });
     
     return acc;
   }, {} as Record<string, { totalPnL: number; count: number }>);
@@ -45,6 +69,8 @@ export const PerformanceBreakdown = () => {
     emotion: emotion.charAt(0).toUpperCase() + emotion.slice(1),
     averagePnL: stats.count > 0 ? stats.totalPnL / stats.count : 0,
   })).sort((a, b) => b.averagePnL - a.averagePnL);
+
+  console.log('Processed emotion performance data:', data);
 
   // Calculate rounded max value for better axis intervals
   const maxAbsValue = Math.max(...data.map(d => Math.abs(d.averagePnL)));
