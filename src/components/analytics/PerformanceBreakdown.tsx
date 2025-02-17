@@ -22,48 +22,56 @@ export const PerformanceBreakdown = () => {
     );
   }
 
+  // First, create a map of dates to pre-session emotions
+  const dateToEmotion = analytics.journalEntries
+    .filter(entry => entry.session_type === 'pre')
+    .reduce((acc, entry) => {
+      const date = new Date(entry.created_at);
+      const dateKey = date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      acc[dateKey] = entry.emotion;
+      return acc;
+    }, {} as Record<string, string>);
+
   // Process journal entries to calculate average P&L for each emotion
-  const emotionPerformance = analytics.journalEntries.reduce((acc, entry) => {
-    if (!entry.trades || entry.trades.length === 0) return acc;
-    
-    // Get today's date in user's local timezone
-    const entryDate = new Date(entry.created_at);
-    const today = new Date();
-    
-    // Compare dates ignoring time
-    const isToday = entryDate.getFullYear() === today.getFullYear() &&
-                    entryDate.getMonth() === today.getMonth() &&
-                    entryDate.getDate() === today.getDate();
-
-    const totalPnL = entry.trades.reduce((sum, trade) => {
-      const tradeDate = trade.entryDate ? new Date(trade.entryDate) : entryDate;
-      const isTradeToday = tradeDate.getFullYear() === today.getFullYear() &&
-                          tradeDate.getMonth() === today.getMonth() &&
-                          tradeDate.getDate() === today.getDate();
-
-      return sum + (Number(trade.pnl) || 0);
-    }, 0);
-    
-    if (!acc[entry.emotion]) {
-      acc[entry.emotion] = {
-        totalPnL: 0,
-        count: 0,
-      };
-    }
-    
-    acc[entry.emotion].totalPnL += totalPnL;
-    acc[entry.emotion].count += 1;
-    
-    console.log(`Processing entry for ${entry.emotion}:`, {
-      date: entryDate,
-      isToday,
-      totalPnL,
-      currentTotal: acc[entry.emotion].totalPnL,
-      count: acc[entry.emotion].count
-    });
-    
-    return acc;
-  }, {} as Record<string, { totalPnL: number; count: number }>);
+  const emotionPerformance = analytics.journalEntries
+    .filter(entry => entry.trades && entry.trades.length > 0)
+    .reduce((acc, entry) => {
+      entry.trades.forEach(trade => {
+        const tradeDate = new Date(trade.entryDate || entry.created_at);
+        const dateKey = tradeDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        });
+        
+        // Use the pre-session emotion for this date, or the entry emotion as fallback
+        const emotion = dateToEmotion[dateKey] || entry.emotion;
+        
+        if (!acc[emotion]) {
+          acc[emotion] = {
+            totalPnL: 0,
+            count: 0,
+          };
+        }
+        
+        const pnl = Number(trade.pnl) || 0;
+        acc[emotion].totalPnL += pnl;
+        acc[emotion].count += 1;
+        
+        console.log(`Processing trade for ${emotion}:`, {
+          date: dateKey,
+          pnl,
+          currentTotal: acc[emotion].totalPnL,
+          count: acc[emotion].count
+        });
+      });
+      
+      return acc;
+    }, {} as Record<string, { totalPnL: number; count: number }>);
 
   const data = Object.entries(emotionPerformance).map(([emotion, stats]) => ({
     emotion: emotion.charAt(0).toUpperCase() + emotion.slice(1),
