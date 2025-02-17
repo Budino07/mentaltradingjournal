@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   ScatterChart,
@@ -75,9 +74,7 @@ const CustomTooltip = ({ active, payload }: any) => {
         <p className="font-medium text-sm text-foreground mb-2">
           {new Date(data.date).toLocaleDateString('en-US', { 
             month: 'short', 
-            day: 'numeric',
-            year: 'numeric',
-            timeZone: 'UTC' // Ensure we display the date in UTC
+            day: 'numeric'
           })}
         </p>
         <div className="space-y-1">
@@ -128,22 +125,26 @@ export const EmotionTrend = () => {
   const preSessionEmotions = analytics.journalEntries
     .filter(entry => entry.session_type === 'pre')
     .reduce((acc, entry) => {
-      // Ensure we're using UTC date
       const date = new Date(entry.created_at);
-      const utcDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-      const dateKey = utcDate.toISOString().split('T')[0];
-      acc[dateKey] = entry.emotion;
+      const localDate = date.toLocaleDateString('en-US', { 
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+      acc[localDate] = entry.emotion;
       return acc;
     }, {} as Record<string, string>);
 
   const tradesByDate = analytics.journalEntries
     .flatMap(entry => 
       entry.trades?.map(trade => {
-        // Use entry date for trades, ensuring UTC
         const date = new Date(trade.entryDate || entry.created_at);
-        const utcDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
         return {
-          date: utcDate.toISOString().split('T')[0],
+          date: date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          }),
           pnl: Number(trade.pnl) || 0,
         };
       }) || []
@@ -154,11 +155,15 @@ export const EmotionTrend = () => {
       return acc;
     }, {} as Record<string, number[]>);
 
-  const scatterData = Object.entries(tradesByDate).map(([date, pnls]) => ({
-    date: new Date(date).getTime(),
-    pnl: pnls.reduce((sum, pnl) => sum + pnl, 0),
-    emotion: preSessionEmotions[date] || 'neutral'
-  })).sort((a, b) => a.date - b.date);
+  const scatterData = Object.entries(tradesByDate).map(([dateStr, pnls]) => {
+    const [month, day, year] = dateStr.split('/');
+    const date = new Date(Number(year), Number(month) - 1, Number(day));
+    return {
+      date: date.getTime(),
+      pnl: pnls.reduce((sum, pnl) => sum + pnl, 0),
+      emotion: preSessionEmotions[dateStr] || 'neutral'
+    };
+  }).sort((a, b) => a.date - b.date);
 
   const positiveData = scatterData.filter(d => d.emotion === 'positive');
   const neutralData = scatterData.filter(d => d.emotion === 'neutral');
@@ -208,8 +213,7 @@ export const EmotionTrend = () => {
               name="Time"
               tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { 
                 month: 'short', 
-                day: 'numeric',
-                timeZone: 'UTC' // Ensure we display dates in UTC
+                day: 'numeric'
               })}
               type="number"
             />
