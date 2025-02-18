@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,6 +24,7 @@ const Login = () => {
   const searchParams = new URLSearchParams(location.search);
   const returnTo = searchParams.get('returnTo') || '/dashboard';
 
+  // Don't redirect if we're resetting password
   useEffect(() => {
     if (user && !isResetPassword) {
       navigate(returnTo);
@@ -32,20 +34,12 @@ const Login = () => {
   useEffect(() => {
     const checkForRecoveryToken = async () => {
       try {
-        if (window.location.hash === '#recovery') {
-          setIsResetPassword(true);
-          toast({
-            title: "Reset Password",
-            description: "Please enter your new password below.",
-          });
-          return;
-        }
-
+        // Extract the hash and type from URL
         const fragments = new URLSearchParams(window.location.hash.substring(1));
-        const accessToken = fragments.get('access_token');
         const type = fragments.get('type');
         
-        if (accessToken && type === 'recovery') {
+        // Check if this is a recovery flow
+        if (type === 'recovery') {
           setIsResetPassword(true);
           toast({
             title: "Reset Password",
@@ -93,8 +87,10 @@ const Login = () => {
       setConfirmPassword("");
       setIsResetPassword(false);
       
+      // Clear the recovery hash from the URL
       window.history.replaceState({}, document.title, window.location.pathname);
       
+      // Sign out to ensure security
       await supabase.auth.signOut();
     } catch (error) {
       console.error('Reset password error:', error);
@@ -119,7 +115,7 @@ const Login = () => {
 
       if (isForgotPassword) {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/login#recovery`,
+          redirectTo: `${window.location.origin}/login`, // The redirect URL
         });
         if (error) throw error;
         toast({
