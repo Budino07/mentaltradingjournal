@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { AnalyticsInsight, JournalEntry, Trade } from "@/types/analytics";
 import { calculateDataRequirements } from "./dataRequirements";
@@ -14,11 +15,12 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
   if (!user) {
     throw new Error('User not authenticated');
   }
-  
+
+  // Fetch only the current user's entries
   const { data: entries, error } = await supabase
     .from('journal_entries')
     .select('*')
-    .eq('user_id', user.id) // Filter by current user's ID
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -51,7 +53,7 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     };
   }
 
-  // Ensure trades array exists and is properly formatted
+  // Process only the current user's entries
   const journalEntries = entries.map(entry => ({
     ...entry,
     trades: Array.isArray(entry.trades) ? entry.trades.map(trade => {

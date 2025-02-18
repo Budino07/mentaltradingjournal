@@ -30,7 +30,7 @@ export const useTradeActions = (user: User | null) => {
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
         .select('*')
-        .eq('user_id', user.id) // Only look for entries owned by current user
+        .eq('user_id', user.id)
         .eq('session_type', 'trade');
 
       if (fetchError) {
@@ -114,7 +114,8 @@ export const useTradeActions = (user: User | null) => {
       await supabase
         .from('journal_entries')
         .update({ trades: updatedTrades })
-        .eq('id', entryWithTrade?.id);
+        .eq('id', entryWithTrade?.id)
+        .eq('user_id', user.id); // Add user_id check for extra security
 
       toast.success('Trade updated successfully!');
       setIsEditDialogOpen(false);
