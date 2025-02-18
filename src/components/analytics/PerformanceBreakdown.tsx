@@ -4,10 +4,12 @@ import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 import { PerformanceChart } from "./performance/PerformanceChart";
 import { PerformanceInsight } from "./performance/PerformanceInsight";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const PerformanceBreakdown = () => {
+  const { user } = useAuth();
   const { data: analytics, isLoading } = useQuery({
-    queryKey: ['analytics'],
+    queryKey: ['analytics', user?.id],
     queryFn: generateAnalytics,
   });
   
@@ -22,8 +24,11 @@ export const PerformanceBreakdown = () => {
     );
   }
 
-  // First, create a map of dates to pre-session emotions
-  const dateToEmotion = analytics.journalEntries
+  // Filter entries to only include those belonging to the current user
+  const userEntries = analytics.journalEntries.filter(entry => entry.user_id === user?.id);
+
+  // First, create a map of dates to pre-session emotions for the current user
+  const dateToEmotion = userEntries
     .filter(entry => entry.session_type === 'pre')
     .reduce((acc, entry) => {
       const date = new Date(entry.created_at);
@@ -36,8 +41,8 @@ export const PerformanceBreakdown = () => {
       return acc;
     }, {} as Record<string, string>);
 
-  // Process journal entries to calculate average P&L for each emotion
-  const emotionPerformance = analytics.journalEntries
+  // Process journal entries to calculate average P&L for each emotion (only for current user)
+  const emotionPerformance = userEntries
     .filter(entry => entry.trades && entry.trades.length > 0)
     .reduce((acc, entry) => {
       entry.trades.forEach(trade => {
@@ -66,7 +71,8 @@ export const PerformanceBreakdown = () => {
           date: dateKey,
           pnl,
           currentTotal: acc[emotion].totalPnL,
-          count: acc[emotion].count
+          count: acc[emotion].count,
+          userId: user?.id
         });
       });
       
