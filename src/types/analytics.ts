@@ -1,7 +1,9 @@
+
 export interface JournalEntry {
   id: string;
+  user_id: string;
   created_at: string;
-  session_type: "pre" | "post";
+  session_type: "pre" | "post" | "trade";
   emotion: string;
   emotion_detail: string;
   notes: string;
