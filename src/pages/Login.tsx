@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,22 +20,27 @@ const Login = () => {
   const location = useLocation();
   const { toast } = useToast();
 
-  // Get the return URL from the query parameters
   const searchParams = new URLSearchParams(location.search);
   const returnTo = searchParams.get('returnTo') || '/dashboard';
 
-  // Only redirect if user is logged in and NOT in reset password mode
   useEffect(() => {
     if (user && !isResetPassword) {
-      // Redirect to the return URL if authenticated
       navigate(returnTo);
     }
   }, [user, navigate, isResetPassword, returnTo]);
 
-  // Check for recovery token in URL
   useEffect(() => {
     const checkForRecoveryToken = async () => {
       try {
+        if (window.location.hash === '#recovery') {
+          setIsResetPassword(true);
+          toast({
+            title: "Reset Password",
+            description: "Please enter your new password below.",
+          });
+          return;
+        }
+
         const fragments = new URLSearchParams(window.location.hash.substring(1));
         const accessToken = fragments.get('access_token');
         const type = fragments.get('type');
@@ -85,17 +89,13 @@ const Login = () => {
         description: "Please sign in with your new password.",
       });
       
-      // Clear passwords
       setPassword("");
       setConfirmPassword("");
       setIsResetPassword(false);
       
-      // Clear the URL
       window.history.replaceState({}, document.title, window.location.pathname);
       
-      // Force logout to ensure security
       await supabase.auth.signOut();
-      
     } catch (error) {
       console.error('Reset password error:', error);
       toast({
@@ -119,7 +119,7 @@ const Login = () => {
 
       if (isForgotPassword) {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/login`,
+          redirectTo: `${window.location.origin}/login#recovery`,
         });
         if (error) throw error;
         toast({
