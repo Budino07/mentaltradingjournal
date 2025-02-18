@@ -1,3 +1,4 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -27,20 +28,6 @@ const Journal = () => {
     filteredEntries
   } = useJournalFilters(entries);
 
-  useEffect(() => {
-    if (locationState?.selectedDate) {
-      setSelectedDate(new Date(locationState.selectedDate));
-      
-      // Scroll to journal entries section after a short delay to ensure the DOM is ready
-      setTimeout(() => {
-        const journalEntriesSection = document.querySelector('#journal-entries');
-        if (journalEntriesSection) {
-          journalEntriesSection.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    }
-  }, [locationState?.selectedDate, setSelectedDate]);
-
   const fetchEntries = async () => {
     if (!user) return;
     
@@ -48,6 +35,7 @@ const Journal = () => {
     const { data, error } = await supabase
       .from('journal_entries')
       .select('*')
+      .eq('user_id', user.id) // Only fetch current user's entries
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -64,7 +52,7 @@ const Journal = () => {
 
     fetchEntries();
 
-    // Subscribe to real-time updates
+    // Subscribe to real-time updates for current user's entries only
     const channel = supabase
       .channel('journal_entries_changes')
       .on(
@@ -73,6 +61,7 @@ const Journal = () => {
           event: '*',
           schema: 'public',
           table: 'journal_entries',
+          filter: `user_id=eq.${user.id}` // Only listen to changes for current user's entries
         },
         (payload) => {
           console.log('Realtime update received:', payload);
@@ -95,6 +84,20 @@ const Journal = () => {
       supabase.removeChannel(channel);
     };
   }, [user]);
+
+  useEffect(() => {
+    if (locationState?.selectedDate) {
+      setSelectedDate(new Date(locationState.selectedDate));
+      
+      // Scroll to journal entries section after a short delay to ensure the DOM is ready
+      setTimeout(() => {
+        const journalEntriesSection = document.querySelector('#journal-entries');
+        if (journalEntriesSection) {
+          journalEntriesSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, [locationState?.selectedDate, setSelectedDate]);
 
   // Display all entries if no date is selected, otherwise filter by date
   const displayedEntries = selectedDate
