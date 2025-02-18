@@ -30,7 +30,8 @@ export const useTradeActions = (user: User | null) => {
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
         .select('*')
-        .eq('user_id', user.id);
+        .eq('user_id', user.id) // Only look for entries owned by current user
+        .eq('session_type', 'trade');
 
       if (fetchError) {
         console.error('Error fetching entries:', fetchError);
@@ -42,15 +43,17 @@ export const useTradeActions = (user: User | null) => {
       );
 
       if (!entryWithTrade) {
-        console.error('No entry found containing the trade');
-        throw new Error('Journal entry not found');
+        toast.error("Cannot delete trade: Trade not found in your entries");
+        setIsDeleteDialogOpen(false);
+        return;
       }
 
-      // Instead of updating the trades array, delete the entire journal entry
+      // Delete the journal entry only if it belongs to the current user
       const { error: deleteError } = await supabase
         .from('journal_entries')
         .delete()
-        .eq('id', entryWithTrade.id);
+        .eq('id', entryWithTrade.id)
+        .eq('user_id', user.id); // Add user_id check for extra security
 
       if (deleteError) {
         console.error('Error deleting entry:', deleteError);

@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { AnalyticsInsight, JournalEntry, Trade } from "@/types/analytics";
 import { calculateDataRequirements } from "./dataRequirements";
@@ -9,10 +8,17 @@ import { analyzeTradeDurations } from "./analytics/tradeDurationAnalysis";
 
 export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
   console.log('Fetching journal entries...');
+
+  // Get the current user's ID
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
   
   const { data: entries, error } = await supabase
     .from('journal_entries')
     .select('*')
+    .eq('user_id', user.id) // Filter by current user's ID
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -135,7 +141,7 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     : 'Add trades to see their impact on your performance.';
 
   return {
-    journalEntries,
+    journalEntries: entries as JournalEntry[],
     performanceByEmotion,
     emotionalImpact: {
       winRate: [],
