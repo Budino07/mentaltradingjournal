@@ -34,17 +34,29 @@ const Login = () => {
   useEffect(() => {
     const checkForRecoveryToken = async () => {
       try {
-        // Extract the hash and type from URL
+        // First check if we have an access_token in the URL
         const fragments = new URLSearchParams(window.location.hash.substring(1));
         const type = fragments.get('type');
-        
-        // Check if this is a recovery flow
-        if (type === 'recovery') {
-          setIsResetPassword(true);
-          toast({
-            title: "Reset Password",
-            description: "Please enter your new password below.",
+        const accessToken = fragments.get('access_token');
+
+        if (type === 'recovery' && accessToken) {
+          // Set the session using the access token
+          const { data: { session }, error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: '',
           });
+
+          if (sessionError) {
+            throw sessionError;
+          }
+
+          if (session) {
+            setIsResetPassword(true);
+            toast({
+              title: "Reset Password",
+              description: "Please enter your new password below.",
+            });
+          }
         }
       } catch (error) {
         console.error('Error checking recovery token:', error);
