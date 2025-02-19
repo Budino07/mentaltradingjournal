@@ -61,21 +61,9 @@ const Login = () => {
         throw new Error("Password must be at least 6 characters long");
       }
 
-      // Get the access token from the URL
-      const fragments = new URLSearchParams(window.location.hash.substring(1));
-      const accessToken = fragments.get('access_token');
-
-      if (!accessToken) {
-        throw new Error("Invalid reset link. Please request a new one.");
-      }
-
-      // Update the user's password using the access token
+      // Update the user's password
       const { error } = await supabase.auth.updateUser({ 
         password: password 
-      }, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
       });
 
       if (error) throw error;
@@ -91,6 +79,9 @@ const Login = () => {
       
       // Clear the recovery hash from the URL
       window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // Sign out after password reset
+      await supabase.auth.signOut();
     } catch (error) {
       console.error('Reset password error:', error);
       toast({
