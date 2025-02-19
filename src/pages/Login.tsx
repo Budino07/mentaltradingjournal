@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -33,37 +32,15 @@ const Login = () => {
 
   useEffect(() => {
     const checkForRecoveryToken = async () => {
-      try {
-        // First check if we have an access_token in the URL
-        const fragments = new URLSearchParams(window.location.hash.substring(1));
-        const type = fragments.get('type');
-        const accessToken = fragments.get('access_token');
+      // Check if this is a recovery flow by looking at the URL hash
+      const fragments = new URLSearchParams(window.location.hash.substring(1));
+      const type = fragments.get('type');
 
-        if (type === 'recovery' && accessToken) {
-          // Set the session using the access token
-          const { data: { session }, error: sessionError } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: '',
-          });
-
-          if (sessionError) {
-            throw sessionError;
-          }
-
-          if (session) {
-            setIsResetPassword(true);
-            toast({
-              title: "Reset Password",
-              description: "Please enter your new password below.",
-            });
-          }
-        }
-      } catch (error) {
-        console.error('Error checking recovery token:', error);
+      if (type === 'recovery') {
+        setIsResetPassword(true);
         toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Unable to process password reset. Please try again.",
+          title: "Reset Password",
+          description: "Please enter your new password below.",
         });
       }
     };
@@ -84,8 +61,21 @@ const Login = () => {
         throw new Error("Password must be at least 6 characters long");
       }
 
-      const { error } = await supabase.auth.updateUser({
-        password: password
+      // Get the access token from the URL
+      const fragments = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = fragments.get('access_token');
+
+      if (!accessToken) {
+        throw new Error("Invalid reset link. Please request a new one.");
+      }
+
+      // Update the user's password using the access token
+      const { error } = await supabase.auth.updateUser({ 
+        password: password 
+      }, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
       });
 
       if (error) throw error;
@@ -101,9 +91,6 @@ const Login = () => {
       
       // Clear the recovery hash from the URL
       window.history.replaceState({}, document.title, window.location.pathname);
-      
-      // Sign out to ensure security
-      await supabase.auth.signOut();
     } catch (error) {
       console.error('Reset password error:', error);
       toast({
