@@ -32,11 +32,15 @@ export const TradesList = ({ trades }: TradesListProps) => {
     <>
       <Accordion type="single" collapsible className="w-full space-y-2">
         {trades.map((trade, index) => (
-          <AccordionItem key={trade.id || index} value={`trade-${index}`} className="border rounded-lg px-4">
-            <AccordionTrigger className="hover:no-underline py-3">
+          <AccordionItem 
+            key={trade.id || index} 
+            value={`trade-${index}`} 
+            className="border rounded-lg px-2 md:px-4"
+          >
+            <AccordionTrigger className="hover:no-underline py-2 md:py-3">
               <TradeHeader trade={trade} />
             </AccordionTrigger>
-            <AccordionContent className="pb-4">
+            <AccordionContent className="pb-3 md:pb-4 space-y-4">
               <TradeActions
                 trade={trade}
                 onEdit={handleEditClick}
