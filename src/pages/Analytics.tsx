@@ -25,7 +25,9 @@ export default function Analytics() {
   return (
     <AppLayout>
       <SubscriptionGuard>
-        <AnalyticsDashboard />
+        <div className="container mx-auto px-4 sm:px-6">
+          <AnalyticsDashboard />
+        </div>
       </SubscriptionGuard>
     </AppLayout>
   );

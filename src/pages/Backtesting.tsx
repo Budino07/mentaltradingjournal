@@ -15,9 +15,9 @@ export default function Backtesting() {
   return (
     <AppLayout>
       <SubscriptionGuard>
-        <div className="container mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold mb-6 text-gradient">Backtesting</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="container mx-auto px-4 py-4 sm:py-8">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-gradient">Backtesting</h1>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <BacktestingForm ref={backtestingFormRef} />
             <PlaybookSection onBlueprintAdded={handleBlueprintAdded} />
           </div>

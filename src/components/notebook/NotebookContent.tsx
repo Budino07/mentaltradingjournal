@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -199,9 +200,9 @@ export const NotebookContent = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)]">
-      {/* Folders Section (20%) */}
-      <div className="w-1/5 min-w-[200px] border-r bg-background/50 flex flex-col">
+    <div className="flex h-full flex-col md:flex-row">
+      {/* Folders Section (20% on desktop, full width dropdown on mobile) */}
+      <div className="w-full md:w-1/5 md:min-w-[200px] border-b md:border-r bg-background/50 flex flex-col">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-semibold">Folders</h2>
           <FolderList 
@@ -214,10 +215,12 @@ export const NotebookContent = () => {
         </div>
       </div>
 
-      <Separator orientation="vertical" className="mx-0" />
+      <Separator orientation="vertical" className="hidden md:block mx-0" />
 
-      {/* Notes Section (30%) */}
-      <div className="w-[30%] min-w-[280px] border-r bg-background/30 flex flex-col">
+      {/* Notes Section (30% on desktop, full width on mobile when no note is selected) */}
+      <div className={`w-full md:w-[30%] md:min-w-[280px] border-b md:border-r bg-background/30 flex flex-col ${
+        selectedNoteId ? 'hidden md:flex' : 'flex'
+      }`}>
         <div className="p-4 border-b bg-background/50">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-lg font-semibold">Notes</h2>
@@ -260,11 +263,16 @@ export const NotebookContent = () => {
         />
       </div>
 
-      <Separator orientation="vertical" className="mx-0" />
+      <Separator orientation="vertical" className="hidden md:block mx-0" />
 
-      {/* Editor Section (50%) */}
-      <div className="flex-1 bg-background">
-        <NoteView noteId={selectedNoteId} />
+      {/* Editor Section (50% on desktop, full width on mobile when a note is selected) */}
+      <div className={`flex-1 bg-background ${
+        !selectedNoteId ? 'hidden md:block' : 'block'
+      }`}>
+        <NoteView 
+          noteId={selectedNoteId} 
+          onBack={() => setSelectedNoteId(null)}
+        />
       </div>
     </div>
   );
