@@ -1,11 +1,14 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { LoginForm } from "@/components/login/LoginForm";
+import { PasswordResetForm } from "@/components/login/PasswordResetForm";
+import { ForgotPasswordForm } from "@/components/login/ForgotPasswordForm";
+import { AuthLinks } from "@/components/login/AuthLinks";
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -23,7 +26,6 @@ const Login = () => {
   const searchParams = new URLSearchParams(location.search);
   const returnTo = searchParams.get('returnTo') || '/dashboard';
 
-  // Don't redirect if we're resetting password
   useEffect(() => {
     if (user && !isResetPassword) {
       navigate(returnTo);
@@ -32,7 +34,6 @@ const Login = () => {
 
   useEffect(() => {
     const checkForRecoveryToken = async () => {
-      // Check if this is a recovery flow by looking at the URL hash
       const fragments = new URLSearchParams(window.location.hash.substring(1));
       const type = fragments.get('type');
 
@@ -61,7 +62,6 @@ const Login = () => {
         throw new Error("Password must be at least 6 characters long");
       }
 
-      // Update the user's password
       const { error } = await supabase.auth.updateUser({ 
         password: password 
       });
@@ -77,10 +77,7 @@ const Login = () => {
       setConfirmPassword("");
       setIsResetPassword(false);
       
-      // Clear the recovery hash from the URL
       window.history.replaceState({}, document.title, window.location.pathname);
-      
-      // Sign out after password reset
       await supabase.auth.signOut();
     } catch (error) {
       console.error('Reset password error:', error);
@@ -105,7 +102,7 @@ const Login = () => {
 
       if (isForgotPassword) {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/login`, // The redirect URL
+          redirectTo: `${window.location.origin}/login`,
         });
         if (error) throw error;
         toast({
@@ -151,90 +148,46 @@ const Login = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {!isResetPassword && (
-            <div className="space-y-2">
-              <Input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-          )}
-          {!isForgotPassword && (
-            <div className="space-y-2">
-              <Input
-                type="password"
-                placeholder={isResetPassword ? "New Password" : "Password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-              />
-              {isResetPassword && (
-                <Input
-                  type="password"
-                  placeholder="Confirm New Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  minLength={6}
-                />
-              )}
-            </div>
-          )}
-          <Button className="w-full" type="submit" disabled={loading}>
-            {loading ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-            ) : isResetPassword ? (
-              "Set New Password"
-            ) : isForgotPassword ? (
-              "Send Reset Link"
-            ) : isSignUp ? (
-              "Sign Up"
-            ) : (
-              "Sign In"
-            )}
-          </Button>
-        </form>
+        {isResetPassword ? (
+          <PasswordResetForm
+            password={password}
+            confirmPassword={confirmPassword}
+            loading={loading}
+            onPasswordChange={(e) => setPassword(e.target.value)}
+            onConfirmPasswordChange={(e) => setConfirmPassword(e.target.value)}
+            onSubmit={handleSubmit}
+          />
+        ) : isForgotPassword ? (
+          <ForgotPasswordForm
+            email={email}
+            loading={loading}
+            onEmailChange={(e) => setEmail(e.target.value)}
+            onSubmit={handleSubmit}
+          />
+        ) : (
+          <LoginForm
+            email={email}
+            password={password}
+            isSignUp={isSignUp}
+            loading={loading}
+            onEmailChange={(e) => setEmail(e.target.value)}
+            onPasswordChange={(e) => setPassword(e.target.value)}
+            onSubmit={handleSubmit}
+          />
+        )}
 
-        <div className="space-y-2 text-center">
-          {!isResetPassword && !isForgotPassword && (
-            <Button
-              variant="link"
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm"
-            >
-              {isSignUp
-                ? "Already have an account? Sign In"
-                : "Don't have an account? Sign Up"}
-            </Button>
-          )}
-          {!isSignUp && !isForgotPassword && !isResetPassword && (
-            <Button
-              variant="link"
-              onClick={() => setIsForgotPassword(true)}
-              className="text-sm block mx-auto"
-            >
-              Forgot your password?
-            </Button>
-          )}
-          {(isForgotPassword || isResetPassword) && (
-            <Button
-              variant="link"
-              onClick={() => {
-                setIsForgotPassword(false);
-                setIsResetPassword(false);
-                window.history.replaceState({}, document.title, window.location.pathname);
-              }}
-              className="text-sm"
-            >
-              Back to Sign In
-            </Button>
-          )}
-        </div>
+        <AuthLinks
+          isSignUp={isSignUp}
+          isForgotPassword={isForgotPassword}
+          isResetPassword={isResetPassword}
+          onSignUpToggle={() => setIsSignUp(!isSignUp)}
+          onForgotPassword={() => setIsForgotPassword(true)}
+          onBackToSignIn={() => {
+            setIsForgotPassword(false);
+            setIsResetPassword(false);
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }}
+        />
       </Card>
     </div>
   );
