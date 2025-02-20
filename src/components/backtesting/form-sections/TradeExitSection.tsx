@@ -47,22 +47,15 @@ export function TradeExitSection({ formData, onInputChange }: TradeExitSectionPr
       <h3 className="text-lg font-semibold">Trade Exit</h3>
       
       <div className="space-y-2">
-        <Label htmlFor="exitDate">Exit Date & Time</Label>
-        <div className="flex gap-2">
-          <Input
-            type="datetime-local"
-            id="exitDate"
-            value={formData.exitDate}
-            onChange={onInputChange}
-            className="flex-1"
-          />
+        <div className="flex items-center gap-2">
+          <Label htmlFor="exitDate">Exit Date & Time</Label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="ghost" size="icon" className="h-4 w-4 p-0">
                 <Calendar className="h-4 w-4" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
+            <PopoverContent className="w-auto p-0" align="start">
               <CalendarComponent
                 mode="single"
                 selected={formData.exitDate ? new Date(formData.exitDate) : undefined}
@@ -72,6 +65,13 @@ export function TradeExitSection({ formData, onInputChange }: TradeExitSectionPr
             </PopoverContent>
           </Popover>
         </div>
+        <Input
+          type="datetime-local"
+          id="exitDate"
+          value={formData.exitDate}
+          onChange={onInputChange}
+          className="w-full"
+        />
       </div>
 
       <div className="space-y-2">
