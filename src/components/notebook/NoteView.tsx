@@ -10,12 +10,15 @@ import { EmptyNoteState } from "./EmptyNoteState";
 import { useNote } from "@/hooks/useNote";
 import { useState } from "react";
 import { ColorPickerDialog } from "./ColorPickerDialog";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
 
 interface NoteViewProps {
   noteId: string | null;
+  onBack?: () => void;
 }
 
-export const NoteView = ({ noteId }: NoteViewProps) => {
+export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
   const { user } = useAuth();
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
   const {
@@ -68,33 +71,46 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   }
 
   return (
-    <div className="h-full bg-background p-8">
-      <div className="max-w-3xl mx-auto space-y-4">
-        <NoteTitle title={title} onTitleChange={handleTitleChange} />
-        <NoteTags 
-          tags={tags} 
-          tagColors={tagColors}
-          onAddTag={handleAddTag} 
-          onRemoveTag={handleRemoveTag} 
-          onUpdateTagColor={handleUpdateTagColor}
-        />
-        <FormatToolbar 
-          onBold={handleBold}
-          onItalic={handleItalic}
-          onUnderline={handleUnderline}
-          onStrikethrough={handleStrikethrough}
-          onColorChange={handleColorChange}
-        />
-        <Separator className="my-4" />
-        <NoteContent 
-          content={content} 
-          onContentChange={handleContentChange} 
-        />
-        <ColorPickerDialog
-          isOpen={isColorPickerOpen}
-          onClose={() => setIsColorPickerOpen(false)}
-          onColorSelect={handleColorSelect}
-        />
+    <div className="h-full bg-background">
+      {onBack && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onBack}
+          className="md:hidden m-4"
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Back to Notes
+        </Button>
+      )}
+      <div className="p-8">
+        <div className="max-w-3xl mx-auto space-y-4">
+          <NoteTitle title={title} onTitleChange={handleTitleChange} />
+          <NoteTags 
+            tags={tags} 
+            tagColors={tagColors}
+            onAddTag={handleAddTag} 
+            onRemoveTag={handleRemoveTag} 
+            onUpdateTagColor={handleUpdateTagColor}
+          />
+          <FormatToolbar 
+            onBold={handleBold}
+            onItalic={handleItalic}
+            onUnderline={handleUnderline}
+            onStrikethrough={handleStrikethrough}
+            onColorChange={handleColorChange}
+          />
+          <Separator className="my-4" />
+          <NoteContent 
+            content={content} 
+            onContentChange={handleContentChange} 
+          />
+          <ColorPickerDialog
+            isOpen={isColorPickerOpen}
+            onClose={() => setIsColorPickerOpen(false)}
+            onColorSelect={handleColorSelect}
+          />
+        </div>
       </div>
     </div>
   );
