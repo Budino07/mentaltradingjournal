@@ -49,7 +49,7 @@ export function GeneralSection({ formData, direction, onInputChange, onDirection
       
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <Label htmlFor="entryDate">Entry Date & Time *</Label>
+          <Label htmlFor="entryDate">Entry Date & Time</Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon" className="h-4 w-4 p-0">
