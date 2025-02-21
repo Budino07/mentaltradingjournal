@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
@@ -201,15 +202,15 @@ const Features = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
-          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12 order-1 lg:order-1">
+          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12 order-2 lg:order-1">
             <img 
-              src="/lovable-uploads/871474ba-41ef-4e5d-ad53-f98502fd473b.png"
+              src="/lovable-uploads/a32bb899-4b99-4c2b-b6fc-431be6694e55.png"
               alt="Analytics Charts"
               className="w-full h-auto"
             />
           </div>
 
-          <div className="space-y-8 order-2 lg:order-2">
+          <div className="space-y-8 order-1 lg:order-2">
             <h2 className="text-3xl md:text-4xl font-semibold">
               Cutting Edge Trading Analytics
             </h2>
@@ -264,3 +265,4 @@ const FeatureItem = ({ icon: Icon, text }: { icon: any; text: string }) => (
 );
 
 export default Features;
+
