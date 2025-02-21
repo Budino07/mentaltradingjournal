@@ -151,8 +151,8 @@ const Features = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
           <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12 order-2 lg:order-1">
             <img 
-              src="/lovable-uploads/e9c68a6a-c499-475b-9518-7ba15509fc57.png"
-              alt="Analytics Preview"
+              src="/lovable-uploads/de242c5d-0542-40eb-8e59-2f098cac49b6.png"
+              alt="Post-Session Review Interface"
               className="w-full h-auto"
             />
           </div>
