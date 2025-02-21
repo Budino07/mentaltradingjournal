@@ -117,12 +117,8 @@ const Features = () => {
       </header>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-center mb-16 pt-12">
-          Everything In One Location
-        </h1>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-8">
+      <div className="container mx-auto px-4 py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-16">
           <div className="space-y-8">
             <h2 className="text-3xl md:text-4xl font-semibold">
               Pre-Session Check In
@@ -141,7 +137,7 @@ const Features = () => {
 
           <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
             <img 
-              src="/lovable-uploads/b06d7989-09be-4722-818f-0ba153938e66.png"
+              src="/lovable-uploads/6dc0af88-bdd4-4e40-bac9-41e9c628210c.png"
               alt="Pre-Session Check In Interface"
               className="w-full h-auto"
             />
