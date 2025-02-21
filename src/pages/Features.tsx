@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
@@ -142,7 +141,7 @@ const Features = () => {
 
           <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
             <img 
-              src="/lovable-uploads/b70a5c45-5d2d-4a9c-a885-3841b19ed6c2.png"
+              src="/lovable-uploads/b06d7989-09be-4722-818f-0ba153938e66.png"
               alt="Pre-Session Check In Interface"
               className="w-full h-auto"
             />
@@ -194,7 +193,7 @@ const Features = () => {
 
           <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
             <img 
-              src="/lovable-uploads/e9c68a6a-c499-475b-9518-7ba15509fc57.png"
+              src="/lovable-uploads/b06d7989-09be-4722-818f-0ba153938e66.png"
               alt="Notes Preview"
               className="w-full h-auto"
             />
@@ -265,4 +264,3 @@ const FeatureItem = ({ icon: Icon, text }: { icon: any; text: string }) => (
 );
 
 export default Features;
-
