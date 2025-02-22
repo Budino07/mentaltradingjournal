@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { NotepadText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { startOfWeek, addWeeks, startOfYear } from "date-fns";
+import { startOfWeek, addWeeks, subWeeks } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface WeeklyReviewDialogProps {
@@ -28,14 +28,15 @@ export const WeeklyReviewDialog = ({
   const { user } = useAuth();
 
   const getCurrentWeekStartDate = () => {
-    // Get the start of the current year
-    const yearStart = startOfYear(new Date());
+    // Get current week's start date
+    const currentWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
     
-    // Get the first week start of the year
-    const firstWeekStart = startOfWeek(yearStart, { weekStartsOn: 1 });
+    // Calculate the difference between current week and target week
+    // weekNumber is 1-based (1 is current week, 2 is next week, 0 is last week)
+    const weekDiff = weekNumber - 1;
     
-    // Add the required number of weeks
-    const targetWeek = addWeeks(firstWeekStart, weekNumber - 1);
+    // Add or subtract weeks based on the week number
+    const targetWeek = addWeeks(currentWeekStart, weekDiff);
     
     // Return the date in YYYY-MM-DD format
     return targetWeek.toISOString().split('T')[0];
