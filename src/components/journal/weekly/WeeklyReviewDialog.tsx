@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { NotepadText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { startOfWeek, addWeeks, subWeeks } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface WeeklyReviewDialogProps {
@@ -26,15 +27,19 @@ export const WeeklyReviewDialog = ({
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const getCurrentWeekKey = () => {
-    // Get current date info
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth() + 1; // JavaScript months are 0-based
+  const getCurrentWeekStartDate = () => {
+    // Get current week's start date
+    const currentWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
     
-    // Create a unique key for this week that includes year and month
-    // Format: YYYY-MM-WW
-    return `${year}-${month.toString().padStart(2, '0')}-${weekNumber.toString().padStart(2, '0')}`;
+    // Calculate the difference between current week and target week
+    // weekNumber is 1-based (1 is current week, 2 is next week, 0 is last week)
+    const weekDiff = weekNumber - 1;
+    
+    // Add or subtract weeks based on the week number
+    const targetWeek = addWeeks(currentWeekStart, weekDiff);
+    
+    // Return the date in YYYY-MM-DD format
+    return targetWeek.toISOString().split('T')[0];
   };
 
   const loadReview = async () => {
@@ -42,14 +47,15 @@ export const WeeklyReviewDialog = ({
     
     try {
       setLoading(true);
-      const weekKey = getCurrentWeekKey();
+      const weekStartDate = getCurrentWeekStartDate();
       
-      console.log('Loading review for week key:', weekKey);
+      console.log('Loading review for week:', weekNumber);
+      console.log('Week start date:', weekStartDate);
       
       const { data, error } = await supabase
         .from('weekly_reviews')
         .select('*')
-        .eq('week_start_date', weekKey)
+        .eq('week_start_date', weekStartDate)
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -97,15 +103,16 @@ export const WeeklyReviewDialog = ({
 
     try {
       setLoading(true);
-      const weekKey = getCurrentWeekKey();
+      const weekStartDate = getCurrentWeekStartDate();
 
-      console.log('Saving review for week key:', weekKey);
+      console.log('Saving review for week:', weekNumber);
+      console.log('Week start date:', weekStartDate);
 
       // First try to get an existing review
       const { data: existingReview, error: fetchError } = await supabase
         .from('weekly_reviews')
         .select('id')
-        .eq('week_start_date', weekKey)
+        .eq('week_start_date', weekStartDate)
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -130,7 +137,7 @@ export const WeeklyReviewDialog = ({
           .from('weekly_reviews')
           .insert({
             user_id: user.id,
-            week_start_date: weekKey,
+            week_start_date: weekStartDate,
             strength,
             weakness,
             improvement,
@@ -163,7 +170,7 @@ export const WeeklyReviewDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <NotepadText className="h-5 w-5" />
-            Weekly Review - Week {weekNumber}
+            Weekly Review
           </DialogTitle>
           <DialogDescription>
             Review your trading performance and set goals for improvement
