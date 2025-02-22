@@ -27,17 +27,27 @@ export const WeeklyReviewDialog = ({
   const { toast } = useToast();
   const { user } = useAuth();
 
+  const getCurrentWeekStartDate = () => {
+    const now = new Date();
+    const weekStart = startOfWeek(now, { weekStartsOn: 1 }); // Start week on Monday
+    
+    // Adjust week start based on weekNumber
+    const targetWeek = new Date(weekStart);
+    targetWeek.setDate(weekStart.getDate() + (7 * (weekNumber - 1)));
+    return targetWeek.toISOString().split('T')[0];
+  };
+
   const loadReview = async () => {
     if (!user) return;
     
     try {
       setLoading(true);
-      const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 }); // Start week on Monday
+      const weekStartDate = getCurrentWeekStartDate();
       
       const { data, error } = await supabase
         .from('weekly_reviews')
         .select('*')
-        .eq('week_start_date', weekStart.toISOString().split('T')[0])
+        .eq('week_start_date', weekStartDate)
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -47,6 +57,11 @@ export const WeeklyReviewDialog = ({
         setStrength(data.strength || '');
         setWeakness(data.weakness || '');
         setImprovement(data.improvement || '');
+      } else {
+        // Reset form if no data exists for this week
+        setStrength('');
+        setWeakness('');
+        setImprovement('');
       }
     } catch (error) {
       console.error('Error loading review:', error);
@@ -64,7 +79,7 @@ export const WeeklyReviewDialog = ({
     if (open && user) {
       loadReview();
     }
-  }, [open, user]);
+  }, [open, user, weekNumber]); // Added weekNumber to dependencies
 
   const handleSave = async () => {
     if (!user) {
@@ -78,8 +93,7 @@ export const WeeklyReviewDialog = ({
 
     try {
       setLoading(true);
-      const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-      const weekStartDate = weekStart.toISOString().split('T')[0];
+      const weekStartDate = getCurrentWeekStartDate();
 
       // First try to get an existing review
       const { data: existingReview, error: fetchError } = await supabase
@@ -207,3 +221,4 @@ export const WeeklyReviewDialog = ({
     </Dialog>
   );
 };
+
