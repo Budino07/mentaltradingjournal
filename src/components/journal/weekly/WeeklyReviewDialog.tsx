@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { NotepadText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { startOfWeek } from "date-fns";
+import { startOfWeek, addWeeks, startOfYear } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface WeeklyReviewDialogProps {
@@ -28,12 +28,16 @@ export const WeeklyReviewDialog = ({
   const { user } = useAuth();
 
   const getCurrentWeekStartDate = () => {
-    const now = new Date();
-    const weekStart = startOfWeek(now, { weekStartsOn: 1 }); // Start week on Monday
+    // Get the start of the current year
+    const yearStart = startOfYear(new Date());
     
-    // Adjust week start based on weekNumber
-    const targetWeek = new Date(weekStart);
-    targetWeek.setDate(weekStart.getDate() + (7 * (weekNumber - 1)));
+    // Get the first week start of the year
+    const firstWeekStart = startOfWeek(yearStart, { weekStartsOn: 1 });
+    
+    // Add the required number of weeks
+    const targetWeek = addWeeks(firstWeekStart, weekNumber - 1);
+    
+    // Return the date in YYYY-MM-DD format
     return targetWeek.toISOString().split('T')[0];
   };
 
@@ -44,6 +48,9 @@ export const WeeklyReviewDialog = ({
       setLoading(true);
       const weekStartDate = getCurrentWeekStartDate();
       
+      console.log('Loading review for week:', weekNumber);
+      console.log('Week start date:', weekStartDate);
+      
       const { data, error } = await supabase
         .from('weekly_reviews')
         .select('*')
@@ -52,6 +59,8 @@ export const WeeklyReviewDialog = ({
         .maybeSingle();
 
       if (error) throw error;
+
+      console.log('Loaded review data:', data);
 
       if (data) {
         setStrength(data.strength || '');
@@ -79,7 +88,7 @@ export const WeeklyReviewDialog = ({
     if (open && user) {
       loadReview();
     }
-  }, [open, user, weekNumber]); // Added weekNumber to dependencies
+  }, [open, user, weekNumber]);
 
   const handleSave = async () => {
     if (!user) {
@@ -94,6 +103,9 @@ export const WeeklyReviewDialog = ({
     try {
       setLoading(true);
       const weekStartDate = getCurrentWeekStartDate();
+
+      console.log('Saving review for week:', weekNumber);
+      console.log('Week start date:', weekStartDate);
 
       // First try to get an existing review
       const { data: existingReview, error: fetchError } = await supabase
