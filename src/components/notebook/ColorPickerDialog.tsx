@@ -9,6 +9,7 @@ interface ColorPickerDialogProps {
 }
 
 const COLORS = [
+  { name: 'White', value: '#FFFFFF' },
   { name: 'Black', value: '#000000' },
   { name: 'Gray', value: '#8E9196' },
   { name: 'Red', value: '#ea384c' },
@@ -29,7 +30,7 @@ export const ColorPickerDialog = ({ isOpen, onClose, onColorSelect }: ColorPicke
           {COLORS.map((color) => (
             <Button
               key={color.value}
-              className="h-12 w-full rounded-md border"
+              className={`h-12 w-full rounded-md border ${color.value === '#FFFFFF' ? 'border-gray-200' : ''}`}
               style={{ backgroundColor: color.value }}
               onClick={() => {
                 onColorSelect(color.value);
