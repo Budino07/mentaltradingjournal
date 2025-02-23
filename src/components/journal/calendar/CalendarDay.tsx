@@ -122,7 +122,8 @@ export const CalendarDay = ({
       <WeeklyReviewDialog 
         open={isWeeklyReviewOpen}
         onOpenChange={setIsWeeklyReviewOpen}
-        weekNumber={1}
+        weekNumber={Math.ceil(dayDate.getDate() / 7)}
+        selectedDate={dayDate}
       />
     </div>
   );
