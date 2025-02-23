@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,14 +12,14 @@ interface WeeklyReviewDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   weekNumber: number;
-  selectedDate?: Date; // Add selectedDate prop
+  selectedDate?: Date;
 }
 
 export const WeeklyReviewDialog = ({
   open,
   onOpenChange,
   weekNumber,
-  selectedDate, // Use the selected date
+  selectedDate,
 }: WeeklyReviewDialogProps) => {
   const [strength, setStrength] = useState("");
   const [weakness, setWeakness] = useState("");
@@ -31,7 +30,6 @@ export const WeeklyReviewDialog = ({
 
   const getWeekDate = () => {
     if (!selectedDate) return null;
-    // Format the date as YYYY-MM-DD
     return format(selectedDate, 'yyyy-MM-dd');
   };
 
@@ -65,7 +63,6 @@ export const WeeklyReviewDialog = ({
         setWeakness(data.weakness || '');
         setImprovement(data.improvement || '');
       } else {
-        // Reset form if no data exists for this week
         setStrength('');
         setWeakness('');
         setImprovement('');
@@ -86,7 +83,6 @@ export const WeeklyReviewDialog = ({
     if (open && user && selectedDate) {
       loadReview();
     } else {
-      // Clear form when dialog is closed or no date is selected
       setStrength('');
       setWeakness('');
       setImprovement('');
@@ -113,7 +109,6 @@ export const WeeklyReviewDialog = ({
 
       console.log('Saving review for date:', weekDate);
 
-      // First try to get an existing review
       const { data: existingReview, error: fetchError } = await supabase
         .from('weekly_reviews')
         .select('id')
@@ -126,7 +121,6 @@ export const WeeklyReviewDialog = ({
       let error;
 
       if (existingReview) {
-        // Update existing review
         const { error: updateError } = await supabase
           .from('weekly_reviews')
           .update({
@@ -137,7 +131,6 @@ export const WeeklyReviewDialog = ({
           .eq('id', existingReview.id);
         error = updateError;
       } else {
-        // Insert new review
         const { error: insertError } = await supabase
           .from('weekly_reviews')
           .insert({
@@ -175,7 +168,7 @@ export const WeeklyReviewDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <NotepadText className="h-5 w-5" />
-            Weekly Review - {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : ''}
+            Weekly Review
           </DialogTitle>
           <DialogDescription>
             Review your trading performance and set goals for improvement
@@ -239,4 +232,3 @@ export const WeeklyReviewDialog = ({
     </Dialog>
   );
 };
-
