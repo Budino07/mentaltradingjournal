@@ -108,18 +108,6 @@ const Landing = () => {
                   Try Demo
                 </Button>
               </div>
-              
-              {/* Featured Section */}
-              <div className="pt-12">
-                <p className="text-sm uppercase tracking-wider text-gray-400 mb-4">
-                  Featured in
-                </p>
-                <div className="flex flex-wrap gap-8 items-center opacity-60">
-                  <img src="/placeholder.svg" alt="Featured Logo 1" className="h-6 grayscale" />
-                  <img src="/placeholder.svg" alt="Featured Logo 2" className="h-6 grayscale" />
-                  <img src="/placeholder.svg" alt="Featured Logo 3" className="h-6 grayscale" />
-                </div>
-              </div>
             </div>
 
             {/* Right Content - App Preview */}
@@ -204,4 +192,3 @@ const Landing = () => {
 };
 
 export default Landing;
-
