@@ -6,19 +6,21 @@ import { Button } from "@/components/ui/button";
 import { NotepadText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { startOfWeek, addWeeks, subWeeks } from "date-fns";
+import { format } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface WeeklyReviewDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   weekNumber: number;
+  selectedDate?: Date; // Add selectedDate prop
 }
 
 export const WeeklyReviewDialog = ({
   open,
   onOpenChange,
   weekNumber,
+  selectedDate, // Use the selected date
 }: WeeklyReviewDialogProps) => {
   const [strength, setStrength] = useState("");
   const [weakness, setWeakness] = useState("");
@@ -27,35 +29,30 @@ export const WeeklyReviewDialog = ({
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const getCurrentWeekStartDate = () => {
-    // Get current week's start date
-    const currentWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-    
-    // Calculate the difference between current week and target week
-    // weekNumber is 1-based (1 is current week, 2 is next week, 0 is last week)
-    const weekDiff = weekNumber - 1;
-    
-    // Add or subtract weeks based on the week number
-    const targetWeek = addWeeks(currentWeekStart, weekDiff);
-    
-    // Return the date in YYYY-MM-DD format
-    return targetWeek.toISOString().split('T')[0];
+  const getWeekDate = () => {
+    if (!selectedDate) return null;
+    // Format the date as YYYY-MM-DD
+    return format(selectedDate, 'yyyy-MM-dd');
   };
 
   const loadReview = async () => {
-    if (!user) return;
+    if (!user || !selectedDate) return;
     
     try {
       setLoading(true);
-      const weekStartDate = getCurrentWeekStartDate();
+      const weekDate = getWeekDate();
       
-      console.log('Loading review for week:', weekNumber);
-      console.log('Week start date:', weekStartDate);
+      if (!weekDate) {
+        console.error('No valid date available');
+        return;
+      }
+
+      console.log('Loading review for date:', weekDate);
       
       const { data, error } = await supabase
         .from('weekly_reviews')
         .select('*')
-        .eq('week_start_date', weekStartDate)
+        .eq('week_start_date', weekDate)
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -86,16 +83,21 @@ export const WeeklyReviewDialog = ({
   };
 
   useEffect(() => {
-    if (open && user) {
+    if (open && user && selectedDate) {
       loadReview();
+    } else {
+      // Clear form when dialog is closed or no date is selected
+      setStrength('');
+      setWeakness('');
+      setImprovement('');
     }
-  }, [open, user, weekNumber]);
+  }, [open, user, selectedDate]);
 
   const handleSave = async () => {
-    if (!user) {
+    if (!user || !selectedDate) {
       toast({
-        title: "Authentication Required",
-        description: "You must be logged in to save a review.",
+        title: "Error",
+        description: "Missing required information to save the review.",
         variant: "destructive",
       });
       return;
@@ -103,16 +105,19 @@ export const WeeklyReviewDialog = ({
 
     try {
       setLoading(true);
-      const weekStartDate = getCurrentWeekStartDate();
+      const weekDate = getWeekDate();
 
-      console.log('Saving review for week:', weekNumber);
-      console.log('Week start date:', weekStartDate);
+      if (!weekDate) {
+        throw new Error('No valid date available');
+      }
+
+      console.log('Saving review for date:', weekDate);
 
       // First try to get an existing review
       const { data: existingReview, error: fetchError } = await supabase
         .from('weekly_reviews')
         .select('id')
-        .eq('week_start_date', weekStartDate)
+        .eq('week_start_date', weekDate)
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -137,7 +142,7 @@ export const WeeklyReviewDialog = ({
           .from('weekly_reviews')
           .insert({
             user_id: user.id,
-            week_start_date: weekStartDate,
+            week_start_date: weekDate,
             strength,
             weakness,
             improvement,
@@ -170,7 +175,7 @@ export const WeeklyReviewDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <NotepadText className="h-5 w-5" />
-            Weekly Review
+            Weekly Review - {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : ''}
           </DialogTitle>
           <DialogDescription>
             Review your trading performance and set goals for improvement
