@@ -78,6 +78,17 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
       const link = `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${url}</a>`;
       document.execCommand('insertHTML', false, link);
     }
+
+    // Re-apply the makeLinksClickable function to ensure proper styling
+    const editor = document.querySelector('[contenteditable="true"]');
+    if (editor) {
+      const links = editor.getElementsByTagName('a');
+      Array.from(links).forEach(link => {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+        link.classList.add('text-primary', 'hover:text-primary-dark', 'underline');
+      });
+    }
   };
 
   if (!noteId) {
