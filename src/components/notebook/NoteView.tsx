@@ -70,11 +70,13 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
     
     if (range && !range.collapsed) {
       // If text is selected, wrap it in a link
-      execCommand('createLink', url);
+      const selectedText = range.toString();
+      const link = `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${selectedText}</a>`;
+      document.execCommand('insertHTML', false, link);
     } else {
       // If no text is selected, insert the URL as a link
       const link = `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${url}</a>`;
-      execCommand('insertHTML', link);
+      document.execCommand('insertHTML', false, link);
     }
   };
 

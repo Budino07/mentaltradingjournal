@@ -13,6 +13,14 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
     const editor = editorRef.current;
     if (!editor) return;
 
+    // Find all links and ensure they have the correct attributes
+    const links = editor.getElementsByTagName('a');
+    Array.from(links).forEach(link => {
+      link.setAttribute('target', '_blank');
+      link.setAttribute('rel', 'noopener noreferrer');
+      link.classList.add('text-primary', 'hover:text-primary-dark', 'underline');
+    });
+
     // Find text nodes containing URLs
     const walk = document.createTreeWalker(
       editor,
@@ -29,7 +37,10 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
       const matches = node.textContent?.match(urlRegex);
       
       if (matches) {
-        nodesToReplace.push({ node, urls: matches });
+        // Only process nodes that aren't already inside a link
+        if (node.parentElement?.tagName !== 'A') {
+          nodesToReplace.push({ node, urls: matches });
+        }
       }
     }
 
@@ -85,6 +96,15 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
     makeLinksClickable();
   };
 
+  // Prevent default handling of clicking links inside contentEditable
+  const handleClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'A') {
+      e.preventDefault();
+      window.open(target.getAttribute('href'), '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <div
       ref={editorRef}
@@ -93,6 +113,13 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
       role="textbox"
       aria-multiline="true"
       onPaste={handlePaste}
+      onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          document.execCommand('insertLineBreak');
+          e.preventDefault();
+        }
+      }}
     />
   );
 };
