@@ -1,7 +1,7 @@
 
 import { DayProps } from "react-day-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { calculateDayStats, formatCurrency, getEmotionStyle } from "./calendarUtils";
+import { calculateDayStats, formatCurrency } from "./calendarUtils";
 import { Trade } from "@/types/trade";
 import { Circle } from "lucide-react";
 import { useState } from "react";
@@ -37,7 +37,6 @@ export const CalendarDay = ({
     })
   );
   
-  const style = getEmotionStyle(stats);
   const isToday = dayDate.toDateString() === new Date().toDateString();
   const hasEntries = stats !== null;
   const isSaturday = dayDate.getDay() === 6;
@@ -47,16 +46,21 @@ export const CalendarDay = ({
     return amount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400';
   };
 
+  const getBorderColor = (amount: number | null) => {
+    if (!amount) return 'border-gray-200 dark:border-gray-700';
+    if (amount > 0) return 'border-emerald-500 dark:border-emerald-500';
+    if (amount < 0) return 'border-red-500 dark:border-red-500';
+    return 'border-gray-200 dark:border-gray-700';
+  };
+
   const dayButton = (
     <button 
       onClick={() => onSelect(dayDate)}
       className={`
         ${className || ''} 
-        ${style?.bg || 'hover:bg-gray-50 dark:hover:bg-gray-800'}
-        ${style?.border || ''}
-        ${style?.shadow || ''}
         relative flex flex-col h-full w-full
-        border-2 border-gray-200 dark:border-gray-700 rounded-lg
+        border-2 ${getBorderColor(stats?.totalPL || null)}
+        rounded-lg
         hover:border-primary hover:shadow-lg
         transition-all duration-200 ease-in-out
         overflow-hidden
