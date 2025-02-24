@@ -1,5 +1,5 @@
 
-import { Bold, Italic, Underline, Strikethrough, Palette } from "lucide-react";
+import { Bold, Italic, Underline, Strikethrough, Palette, Link2 } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
 
 interface FormatToolbarProps {
@@ -8,6 +8,7 @@ interface FormatToolbarProps {
   onUnderline: () => void;
   onStrikethrough: () => void;
   onColorChange: () => void;
+  onLink: () => void;
 }
 
 export const FormatToolbar = ({
@@ -15,7 +16,8 @@ export const FormatToolbar = ({
   onItalic,
   onUnderline,
   onStrikethrough,
-  onColorChange
+  onColorChange,
+  onLink
 }: FormatToolbarProps) => {
   return (
     <div className="flex items-center gap-1 mt-2 opacity-70 hover:opacity-100 transition-opacity duration-200">
@@ -33,6 +35,9 @@ export const FormatToolbar = ({
       </Toggle>
       <Toggle size="sm" onClick={onColorChange} aria-label="Change text color" pressed={false}>
         <Palette className="h-4 w-4" />
+      </Toggle>
+      <Toggle size="sm" onClick={onLink} aria-label="Insert link" pressed={false}>
+        <Link2 className="h-4 w-4" />
       </Toggle>
     </div>
   );

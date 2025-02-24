@@ -10,6 +10,7 @@ import { EmptyNoteState } from "./EmptyNoteState";
 import { useNote } from "@/hooks/useNote";
 import { useState } from "react";
 import { ColorPickerDialog } from "./ColorPickerDialog";
+import { LinkDialog } from "./LinkDialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 
@@ -21,6 +22,7 @@ interface NoteViewProps {
 export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
   const { user } = useAuth();
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
+  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   const {
     isLoading,
     title,
@@ -58,8 +60,22 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
     setIsColorPickerOpen(true);
   };
 
-  const handleColorSelect = (color: string) => {
-    execCommand('foreColor', color);
+  const handleLink = () => {
+    setIsLinkDialogOpen(true);
+  };
+
+  const handleLinkSubmit = (url: string) => {
+    const selection = window.getSelection();
+    const range = selection?.getRangeAt(0);
+    
+    if (range && !range.collapsed) {
+      // If text is selected, wrap it in a link
+      execCommand('createLink', url);
+    } else {
+      // If no text is selected, insert the URL as a link
+      const link = `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${url}</a>`;
+      execCommand('insertHTML', link);
+    }
   };
 
   if (!noteId) {
@@ -99,6 +115,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
             onUnderline={handleUnderline}
             onStrikethrough={handleStrikethrough}
             onColorChange={handleColorChange}
+            onLink={handleLink}
           />
           <Separator className="my-4" />
           <NoteContent 
@@ -108,7 +125,14 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
           <ColorPickerDialog
             isOpen={isColorPickerOpen}
             onClose={() => setIsColorPickerOpen(false)}
-            onColorSelect={handleColorSelect}
+            onColorSelect={(color) => {
+              execCommand('foreColor', color);
+            }}
+          />
+          <LinkDialog
+            isOpen={isLinkDialogOpen}
+            onClose={() => setIsLinkDialogOpen(false)}
+            onSubmit={handleLinkSubmit}
           />
         </div>
       </div>
