@@ -1,101 +1,154 @@
+
+import { useAuth } from "@/contexts/AuthContext";
+import { NoteTitle } from "./NoteTitle";
+import { NoteTags } from "./NoteTags";
+import { NoteContent } from "./NoteContent";
+import { FormatToolbar } from "./FormatToolbar";
+import { Separator } from "@/components/ui/separator";
+import { NoteViewSkeleton } from "./NoteViewSkeleton";
+import { EmptyNoteState } from "./EmptyNoteState";
+import { useNote } from "@/hooks/useNote";
 import { useState } from "react";
-import { NoteTitle } from "@/components/notebook/NoteTitle";
-import { NoteContent } from "@/components/notebook/NoteContent";
-import { NoteTags } from "@/components/notebook/NoteTags";
-import { NoteViewSkeleton } from "@/components/notebook/NoteViewSkeleton";
-import { EmptyNoteState } from "@/components/notebook/EmptyNoteState";
-import { FormatToolbar } from "@/components/notebook/FormatToolbar";
-import { ColorPickerDialog } from "@/components/notebook/ColorPickerDialog";
-import { LinkDialog } from "@/components/notebook/LinkDialog";
+import { ColorPickerDialog } from "./ColorPickerDialog";
+import { LinkDialog } from "./LinkDialog";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
 
 interface NoteViewProps {
-  note: any;
-  isLoading: boolean;
+  noteId: string | null;
+  onBack?: () => void;
 }
 
-export const NoteView = ({ note, isLoading }: NoteViewProps) => {
+export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
+  const { user } = useAuth();
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
-  const [selectedRange, setSelectedRange] = useState<Range | null>(null);
+  const {
+    isLoading,
+    title,
+    content,
+    tags,
+    tagColors,
+    handleTitleChange,
+    handleContentChange,
+    handleAddTag,
+    handleRemoveTag,
+    handleUpdateTagColor,
+  } = useNote(noteId, user);
 
-  const handleFormat = (command: string) => () => {
-    document.execCommand(command, false);
+  const execCommand = (command: string, value: string | undefined = undefined) => {
+    document.execCommand(command, false, value);
   };
 
-  const handleColorChange = (color: string) => {
-    document.execCommand('foreColor', false, color);
-    setIsColorPickerOpen(false);
+  const handleBold = () => {
+    execCommand('bold');
   };
 
-  const handleLinkClick = () => {
-    const selection = window.getSelection();
-    if (selection) {
-      setSelectedRange(selection.getRangeAt(0));
-      setIsLinkDialogOpen(true);
-    }
+  const handleItalic = () => {
+    execCommand('italic');
+  };
+
+  const handleUnderline = () => {
+    execCommand('underline');
+  };
+
+  const handleStrikethrough = () => {
+    execCommand('strikeThrough');
+  };
+
+  const handleColorChange = () => {
+    setIsColorPickerOpen(true);
+  };
+
+  const handleLink = () => {
+    setIsLinkDialogOpen(true);
   };
 
   const handleLinkSubmit = (url: string) => {
-    if (selectedRange) {
-      const selection = window.getSelection();
-      if (selection) {
-        selection.removeAllRanges();
-        selection.addRange(selectedRange);
-        document.execCommand('createLink', false, url);
-        const links = document.querySelectorAll('a');
-        links.forEach(link => {
-          link.target = '_blank';
-          link.rel = 'noopener noreferrer';
-          link.className = 'text-primary hover:text-primary-dark underline';
-        });
-      }
+    const selection = window.getSelection();
+    const range = selection?.getRangeAt(0);
+    
+    if (range && !range.collapsed) {
+      // If text is selected, wrap it in a link
+      const selectedText = range.toString();
+      const link = `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${selectedText}</a>`;
+      document.execCommand('insertHTML', false, link);
+    } else {
+      // If no text is selected, insert the URL as a link
+      const link = `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${url}</a>`;
+      document.execCommand('insertHTML', false, link);
     }
-    setIsLinkDialogOpen(false);
+
+    // Re-apply the makeLinksClickable function to ensure proper styling
+    const editor = document.querySelector('[contenteditable="true"]');
+    if (editor) {
+      const links = editor.getElementsByTagName('a');
+      Array.from(links).forEach(link => {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+        link.classList.add('text-primary', 'hover:text-primary-dark', 'underline');
+      });
+    }
   };
+
+  if (!noteId) {
+    return <EmptyNoteState />;
+  }
 
   if (isLoading) {
     return <NoteViewSkeleton />;
   }
 
-  if (!note) {
-    return <EmptyNoteState />;
-  }
-
   return (
-    <div className="h-full flex flex-col">
-      <NoteTitle
-        title={note.title}
-        onTitleChange={note.handleTitleChange}
-      />
-      <FormatToolbar
-        onBold={handleFormat('bold')}
-        onItalic={handleFormat('italic')}
-        onUnderline={handleFormat('underline')}
-        onStrikethrough={handleFormat('strikeThrough')}
-        onColorChange={() => setIsColorPickerOpen(true)}
-        onLink={handleLinkClick}
-      />
-      <NoteTags
-        tags={note.tags}
-        tagColors={note.tagColors}
-        onAddTag={note.handleAddTag}
-        onRemoveTag={note.handleRemoveTag}
-        onUpdateTagColor={note.handleUpdateTagColor}
-      />
-      <NoteContent
-        content={note.content}
-        onContentChange={note.handleContentChange}
-      />
-      <ColorPickerDialog
-        isOpen={isColorPickerOpen}
-        onClose={() => setIsColorPickerOpen(false)}
-        onColorSelect={handleColorChange}
-      />
-      <LinkDialog
-        isOpen={isLinkDialogOpen}
-        onClose={() => setIsLinkDialogOpen(false)}
-        onSubmit={handleLinkSubmit}
-      />
+    <div className="h-full bg-background">
+      {onBack && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onBack}
+          className="md:hidden m-4"
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Back to Notes
+        </Button>
+      )}
+      <div className="p-8">
+        <div className="max-w-3xl mx-auto space-y-4">
+          <NoteTitle title={title} onTitleChange={handleTitleChange} />
+          <NoteTags 
+            tags={tags} 
+            tagColors={tagColors}
+            onAddTag={handleAddTag} 
+            onRemoveTag={handleRemoveTag} 
+            onUpdateTagColor={handleUpdateTagColor}
+          />
+          <FormatToolbar 
+            onBold={handleBold}
+            onItalic={handleItalic}
+            onUnderline={handleUnderline}
+            onStrikethrough={handleStrikethrough}
+            onColorChange={handleColorChange}
+            onLink={handleLink}
+          />
+          <Separator className="my-4" />
+          <NoteContent 
+            content={content} 
+            onContentChange={handleContentChange} 
+          />
+          <ColorPickerDialog
+            isOpen={isColorPickerOpen}
+            onClose={() => setIsColorPickerOpen(false)}
+            onColorSelect={(color) => {
+              execCommand('foreColor', color);
+            }}
+          />
+          <LinkDialog
+            isOpen={isLinkDialogOpen}
+            onClose={() => setIsLinkDialogOpen(false)}
+            onSubmit={handleLinkSubmit}
+          />
+        </div>
+      </div>
     </div>
   );
 };
