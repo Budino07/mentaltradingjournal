@@ -96,6 +96,42 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
     makeLinksClickable();
   };
 
+  // Properly handle link insertion
+  const createLink = (url: string) => {
+    const selection = window.getSelection();
+    const range = selection?.getRangeAt(0);
+    
+    if (range && !range.collapsed) {
+      // If text is selected, wrap it in a link
+      const selectedText = range.toString();
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = selectedText;
+      link.classList.add('text-primary', 'hover:text-primary-dark', 'underline');
+      
+      range.deleteContents();
+      range.insertNode(link);
+      
+      // Update content
+      onContentChange(editorRef.current?.innerHTML || '');
+    } else {
+      // If no text is selected, insert the URL as a link
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = url;
+      link.classList.add('text-primary', 'hover:text-primary-dark', 'underline');
+      
+      range?.insertNode(link);
+      
+      // Update content
+      onContentChange(editorRef.current?.innerHTML || '');
+    }
+  };
+
   // Prevent default handling of clicking links inside contentEditable
   const handleClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
