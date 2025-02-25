@@ -4,9 +4,10 @@ import { useEffect, useRef } from "react";
 interface NoteContentProps {
   content: string;
   onContentChange: (newContent: string) => void;
+  onLinkSubmit?: (url: string) => void;
 }
 
-export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
+export const NoteContent = ({ content, onContentChange, onLinkSubmit }: NoteContentProps) => {
   const editorRef = useRef<HTMLDivElement>(null);
 
   const makeLinksClickable = () => {
@@ -130,7 +131,22 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
       // Update content
       onContentChange(editorRef.current?.innerHTML || '');
     }
+
+    // Ensure we maintain focus after link insertion
+    const editor = editorRef.current;
+    if (editor) {
+      editor.focus();
+    }
   };
+
+  // Set up the onLinkSubmit handler
+  useEffect(() => {
+    if (onLinkSubmit) {
+      onLinkSubmit = (url: string) => {
+        createLink(url);
+      };
+    }
+  }, []);
 
   // Prevent default handling of clicking links inside contentEditable
   const handleClick = (e: React.MouseEvent) => {
