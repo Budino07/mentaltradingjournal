@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -103,9 +102,9 @@ const Landing = () => {
                   variant="outline"
                   size="lg"
                   className="text-lg px-8 py-6 border-gray-700 hover:bg-gray-800/50 backdrop-blur-lg"
-                  onClick={() => navigate("/login")}
+                  onClick={() => navigate("/features")}
                 >
-                  Try Demo
+                  Features
                 </Button>
               </div>
             </div>
