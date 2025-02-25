@@ -27,14 +27,6 @@ interface PostSessionSectionProps {
   setFourHourUrl: (url: string) => void;
   oneHourUrl: string;
   setOneHourUrl: (url: string) => void;
-  weeklyTitle: string;
-  setWeeklyTitle: (title: string) => void;
-  dailyTitle: string;
-  setDailyTitle: (title: string) => void;
-  fourHourTitle: string;
-  setFourHourTitle: (title: string) => void;
-  oneHourTitle: string;
-  setOneHourTitle: (title: string) => void;
 }
 
 export const PostSessionSection = ({
@@ -56,14 +48,6 @@ export const PostSessionSection = ({
   setFourHourUrl,
   oneHourUrl,
   setOneHourUrl,
-  weeklyTitle,
-  setWeeklyTitle,
-  dailyTitle,
-  setDailyTitle,
-  fourHourTitle,
-  setFourHourTitle,
-  oneHourTitle,
-  setOneHourTitle,
 }: PostSessionSectionProps) => {
   return (
     <div className="space-y-6">
@@ -99,18 +83,10 @@ export const PostSessionSection = ({
             dailyUrl={dailyUrl}
             fourHourUrl={fourHourUrl}
             oneHourUrl={oneHourUrl}
-            weeklyTitle={weeklyTitle}
-            dailyTitle={dailyTitle}
-            fourHourTitle={fourHourTitle}
-            oneHourTitle={oneHourTitle}
             onWeeklyUrlChange={setWeeklyUrl}
             onDailyUrlChange={setDailyUrl}
             onFourHourUrlChange={setFourHourUrl}
             onOneHourUrlChange={setOneHourUrl}
-            onWeeklyTitleChange={setWeeklyTitle}
-            onDailyTitleChange={setDailyTitle}
-            onFourHourTitleChange={setFourHourTitle}
-            onOneHourTitleChange={setOneHourTitle}
           />
         </div>
       </Card>

@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Trade } from "@/types/trade";
@@ -21,10 +22,6 @@ interface EntryContentProps {
   dailyUrl?: string;
   fourHourUrl?: string;
   oneHourUrl?: string;
-  weeklyTitle?: string;
-  dailyTitle?: string;
-  fourHourTitle?: string;
-  oneHourTitle?: string;
 }
 
 export const EntryContent = ({
@@ -39,15 +36,12 @@ export const EntryContent = ({
   dailyUrl,
   fourHourUrl,
   oneHourUrl,
-  weeklyTitle = 'Weekly',
-  dailyTitle = 'Daily',
-  fourHourTitle = '4HR',
-  oneHourTitle = '1HR/15m',
 }: EntryContentProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedNotes, setEditedNotes] = useState(notes);
   const hasObservationLinks = weeklyUrl || dailyUrl || fourHourUrl || oneHourUrl;
 
+  // Update local state when props change
   useEffect(() => {
     setEditedNotes(notes);
   }, [notes]);
@@ -138,64 +132,19 @@ export const EntryContent = ({
         </>
       )}
 
-      {(weeklyUrl || dailyUrl || fourHourUrl || oneHourUrl) && (
-        <div>
-          <h4 className="font-medium mb-2">Observations</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {weeklyUrl && (
-              <div>
-                <p className="text-sm font-medium mb-1">{weeklyTitle} Chart</p>
-                <a
-                  href={weeklyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline break-all"
-                >
-                  {weeklyUrl}
-                </a>
-              </div>
-            )}
-            {dailyUrl && (
-              <div>
-                <p className="text-sm font-medium mb-1">{dailyTitle} Chart</p>
-                <a
-                  href={dailyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline break-all"
-                >
-                  {dailyUrl}
-                </a>
-              </div>
-            )}
-            {fourHourUrl && (
-              <div>
-                <p className="text-sm font-medium mb-1">{fourHourTitle} Chart</p>
-                <a
-                  href={fourHourUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline break-all"
-                >
-                  {fourHourUrl}
-                </a>
-              </div>
-            )}
-            {oneHourUrl && (
-              <div>
-                <p className="text-sm font-medium mb-1">{oneHourTitle} Chart</p>
-                <a
-                  href={oneHourUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline break-all"
-                >
-                  {oneHourUrl}
-                </a>
-              </div>
-            )}
+      {hasObservationLinks && (
+        <>
+          <Separator />
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Observations</h3>
+            <div className="grid grid-cols-2 gap-4">
+              {renderChartButton(weeklyUrl, "Weekly Chart")}
+              {renderChartButton(dailyUrl, "Daily Chart")}
+              {renderChartButton(fourHourUrl, "4HR Chart")}
+              {renderChartButton(oneHourUrl, "1HR Chart")}
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {trades && trades.length > 0 && (
