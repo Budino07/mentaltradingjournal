@@ -114,7 +114,7 @@ const Landing = () => {
               <div className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-2xl">
                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-accent/20 backdrop-blur-2xl" />
                 <img
-                  src="/lovable-uploads/fe65c6a8-f463-4074-9175-5c9c2204e46a.png"
+                  src="/lovable-uploads/dc625dd1-482c-4f7d-9312-361ea2ab9041.png"
                   alt="Trading Calendar Preview"
                   className="w-full h-full object-cover rounded-lg transform hover:scale-105 transition-transform duration-500"
                 />
