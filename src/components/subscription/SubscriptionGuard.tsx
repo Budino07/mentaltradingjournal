@@ -1,18 +1,19 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
+import { SubscriptionDialog } from "./SubscriptionDialog";
 
 // List of public routes that don't require subscription
-const PUBLIC_ROUTES = ['/', '/login', '/pricing', '/features'];
+const PUBLIC_ROUTES = ['/', '/login', '/pricing', '/features', '/journal-entry', '/dashboard'];
 
 export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) => {
   const { user, session } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { data: hasActiveSubscription, isLoading, error } = useSubscription();
+  const [showDialog, setShowDialog] = useState(false);
 
   const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
 
@@ -30,23 +31,16 @@ export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) =
     // Only show error if we have a session and there's a subscription check error
     if (error) {
       console.error("Subscription check error:", error);
-      // Don't show error toast for subscription check failures
       return;
     }
 
-    // Only redirect if:
+    // Show dialog if:
     // 1. Not on a public route
     // 2. User is authenticated
     // 3. Not loading
     // 4. No subscription found
     if (!isPublicRoute && user && !isLoading && hasActiveSubscription === false) {
-      toast.error(
-        "Active subscription required",
-        {
-          description: "Please subscribe to access this feature."
-        }
-      );
-      navigate("/pricing");
+      setShowDialog(true);
     }
   }, [hasActiveSubscription, isLoading, navigate, user, session, error, isPublicRoute]);
 
@@ -68,7 +62,15 @@ export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) =
 
   // For protected routes, require subscription
   if (!hasActiveSubscription) {
-    return null;
+    return (
+      <SubscriptionDialog
+        open={showDialog}
+        onClose={() => {
+          setShowDialog(false);
+          navigate('/dashboard');
+        }}
+      />
+    );
   }
 
   return <>{children}</>;
