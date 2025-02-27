@@ -28,35 +28,59 @@ const Login = () => {
 
   useEffect(() => {
     const checkForRecoveryToken = async () => {
-      // First check the URL parameters for recovery type
-      const fragments = new URLSearchParams(window.location.hash.substring(1));
-      const type = fragments.get('type');
-      const accessToken = fragments.get('access_token');
+      // Check URL hash for errors
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const error = hashParams.get('error');
+      const errorDescription = hashParams.get('error_description');
 
-      console.log("URL Fragments:", { type, accessToken, hash: window.location.hash });
-
-      // If we have an access token, verify it
-      if (accessToken) {
-        const { data: { user }, error } = await supabase.auth.getUser(accessToken);
-        console.log("User data from token:", { user, error });
-        
-        if (!error && user) {
-          setIsResetPassword(true);
-          toast({
-            title: "Reset Password",
-            description: "Please enter your new password below.",
-          });
-          return;
-        }
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: errorDescription || "An error occurred during password reset",
+        });
+        // Clear the hash
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
       }
 
-      // Check for recovery type
-      if (type === 'recovery') {
+      // First check query parameters for recovery type
+      const queryParams = new URLSearchParams(window.location.search);
+      const queryType = queryParams.get('type');
+
+      // Then check hash fragments
+      const type = hashParams.get('type');
+      const accessToken = hashParams.get('access_token');
+
+      console.log("Recovery check:", { 
+        queryType, 
+        hashType: type, 
+        accessToken, 
+        hash: window.location.hash,
+        search: window.location.search 
+      });
+
+      if (queryType === 'recovery' || type === 'recovery') {
         setIsResetPassword(true);
         toast({
           title: "Reset Password",
           description: "Please enter your new password below.",
         });
+        return;
+      }
+
+      // Check for access token
+      if (accessToken) {
+        const { data: { user }, error: userError } = await supabase.auth.getUser(accessToken);
+        console.log("User data from token:", { user, error: userError });
+        
+        if (!userError && user) {
+          setIsResetPassword(true);
+          toast({
+            title: "Reset Password",
+            description: "Please enter your new password below.",
+          });
+        }
       }
     };
 
@@ -122,7 +146,7 @@ const Login = () => {
 
       if (isForgotPassword) {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/login?type=recovery`,
+          redirectTo: `${window.location.origin}/login`,
         });
         if (error) throw error;
         toast({
