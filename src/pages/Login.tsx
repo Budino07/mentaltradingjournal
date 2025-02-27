@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -27,7 +26,7 @@ const Login = () => {
   const returnTo = searchParams.get('returnTo') || '/dashboard';
 
   useEffect(() => {
-    const checkForRecoveryToken = async () => {
+    const checkForAuthToken = async () => {
       // Check URL hash for errors
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       const error = hashParams.get('error');
@@ -37,54 +36,45 @@ const Login = () => {
         toast({
           variant: "destructive",
           title: "Error",
-          description: errorDescription || "An error occurred during password reset",
+          description: errorDescription || "An error occurred during authentication",
         });
         // Clear the hash
         window.history.replaceState({}, document.title, window.location.pathname);
         return;
       }
 
-      // First check query parameters for recovery type
+      // Check for email confirmation vs password reset
       const queryParams = new URLSearchParams(window.location.search);
-      const queryType = queryParams.get('type');
+      const type = queryParams.get('type');
 
-      // Then check hash fragments
-      const type = hashParams.get('type');
-      const accessToken = hashParams.get('access_token');
-
-      console.log("Recovery check:", { 
-        queryType, 
-        hashType: type, 
-        accessToken, 
+      console.log("Auth check:", { 
+        type,
         hash: window.location.hash,
         search: window.location.search 
       });
 
-      if (queryType === 'recovery' || type === 'recovery') {
+      // Handle email confirmation
+      if (type === 'signup' || hashParams.get('type') === 'signup') {
+        toast({
+          title: "Email confirmed",
+          description: "Your email has been confirmed. You can now sign in.",
+        });
+        // Clear the URL parameters
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+
+      // Handle password reset
+      if (type === 'recovery' || hashParams.get('type') === 'recovery') {
         setIsResetPassword(true);
         toast({
           title: "Reset Password",
           description: "Please enter your new password below.",
         });
-        return;
-      }
-
-      // Check for access token
-      if (accessToken) {
-        const { data: { user }, error: userError } = await supabase.auth.getUser(accessToken);
-        console.log("User data from token:", { user, error: userError });
-        
-        if (!userError && user) {
-          setIsResetPassword(true);
-          toast({
-            title: "Reset Password",
-            description: "Please enter your new password below.",
-          });
-        }
       }
     };
 
-    checkForRecoveryToken();
+    checkForAuthToken();
   }, [toast]);
 
   useEffect(() => {
