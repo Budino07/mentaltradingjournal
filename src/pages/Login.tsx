@@ -34,10 +34,25 @@ const Login = () => {
 
   useEffect(() => {
     const checkForRecoveryToken = async () => {
+      // Get the access_token from the URL fragment
       const fragments = new URLSearchParams(window.location.hash.substring(1));
       const type = fragments.get('type');
+      const accessToken = fragments.get('access_token');
 
-      if (type === 'recovery') {
+      if (accessToken) {
+        const { data: { user }, error } = await supabase.auth.getUser(accessToken);
+        if (error) {
+          console.error('Error getting user:', error);
+          return;
+        }
+        if (user) {
+          setIsResetPassword(true);
+          toast({
+            title: "Reset Password",
+            description: "Please enter your new password below.",
+          });
+        }
+      } else if (type === 'recovery') {
         setIsResetPassword(true);
         toast({
           title: "Reset Password",
@@ -101,6 +116,7 @@ const Login = () => {
       }
 
       if (isForgotPassword) {
+        // The key change is here - we're now using the full URL including '/login'
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/login#type=recovery`,
         });
