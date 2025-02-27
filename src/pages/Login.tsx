@@ -27,32 +27,31 @@ const Login = () => {
   const returnTo = searchParams.get('returnTo') || '/dashboard';
 
   useEffect(() => {
-    if (user && !isResetPassword) {
-      navigate(returnTo);
-    }
-  }, [user, navigate, isResetPassword, returnTo]);
-
-  useEffect(() => {
     const checkForRecoveryToken = async () => {
-      // Get the access_token from the URL fragment
+      // First check the URL parameters for recovery type
       const fragments = new URLSearchParams(window.location.hash.substring(1));
       const type = fragments.get('type');
       const accessToken = fragments.get('access_token');
 
+      console.log("URL Fragments:", { type, accessToken, hash: window.location.hash });
+
+      // If we have an access token, verify it
       if (accessToken) {
         const { data: { user }, error } = await supabase.auth.getUser(accessToken);
-        if (error) {
-          console.error('Error getting user:', error);
-          return;
-        }
-        if (user) {
+        console.log("User data from token:", { user, error });
+        
+        if (!error && user) {
           setIsResetPassword(true);
           toast({
             title: "Reset Password",
             description: "Please enter your new password below.",
           });
+          return;
         }
-      } else if (type === 'recovery') {
+      }
+
+      // Check for recovery type
+      if (type === 'recovery') {
         setIsResetPassword(true);
         toast({
           title: "Reset Password",
@@ -63,6 +62,12 @@ const Login = () => {
 
     checkForRecoveryToken();
   }, [toast]);
+
+  useEffect(() => {
+    if (user && !isResetPassword) {
+      navigate(returnTo);
+    }
+  }, [user, navigate, isResetPassword, returnTo]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,9 +121,8 @@ const Login = () => {
       }
 
       if (isForgotPassword) {
-        // The key change is here - we're now using the full URL including '/login'
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/login#type=recovery`,
+          redirectTo: `${window.location.origin}/login?type=recovery`,
         });
         if (error) throw error;
         toast({
