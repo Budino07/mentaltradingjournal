@@ -14,39 +14,61 @@ export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) =
   const location = useLocation();
   const { data: hasActiveSubscription, isLoading, error } = useSubscription();
   const [showDialog, setShowDialog] = useState(false);
+  const [showPricingPlans, setShowPricingPlans] = useState(false);
 
   const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
 
   useEffect(() => {
-    // Always allow access to public routes
+    // Check if user just confirmed email and is on journal-entry page
+    const isNewUser = location.pathname === '/journal-entry' && 
+                     !hasActiveSubscription && 
+                     !isLoading && 
+                     user && 
+                     session;
+
+    if (isNewUser) {
+      setShowPricingPlans(true);
+      setShowDialog(true);
+      return;
+    }
+
+    // Regular subscription guard logic
     if (isPublicRoute) {
       return;
     }
 
-    // Skip subscription check if user is not authenticated
     if (!user || !session) {
       return;
     }
 
-    // Only show error if we have a session and there's a subscription check error
     if (error) {
       console.error("Subscription check error:", error);
       return;
     }
 
-    // Show dialog if:
-    // 1. Not on a public route
-    // 2. User is authenticated
-    // 3. Not loading
-    // 4. No subscription found
     if (!isPublicRoute && user && !isLoading && hasActiveSubscription === false) {
+      setShowPricingPlans(false);
       setShowDialog(true);
     }
-  }, [hasActiveSubscription, isLoading, navigate, user, session, error, isPublicRoute]);
+  }, [hasActiveSubscription, isLoading, navigate, user, session, error, isPublicRoute, location.pathname]);
 
   // Always render content for public routes
   if (isPublicRoute) {
-    return <>{children}</>;
+    return (
+      <>
+        {children}
+        <SubscriptionDialog
+          open={showDialog}
+          showPricingPlans={showPricingPlans}
+          onClose={() => {
+            setShowDialog(false);
+            if (!hasActiveSubscription) {
+              navigate('/dashboard');
+            }
+          }}
+        />
+      </>
+    );
   }
 
   // Show nothing while loading or if not authenticated
@@ -65,6 +87,7 @@ export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) =
     return (
       <SubscriptionDialog
         open={showDialog}
+        showPricingPlans={showPricingPlans}
         onClose={() => {
           setShowDialog(false);
           navigate('/dashboard');
