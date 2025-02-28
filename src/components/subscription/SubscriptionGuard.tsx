@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { SubscriptionDialog } from "./SubscriptionDialog";
 
 // List of public routes that don't require subscription
-const PUBLIC_ROUTES = ['/', '/login', '/pricing', '/features', '/journal-entry', '/dashboard'];
+const PUBLIC_ROUTES = ['/', '/login', '/pricing', '/features', '/journal-entry'];
 
 export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) => {
   const { user, session } = useAuth();

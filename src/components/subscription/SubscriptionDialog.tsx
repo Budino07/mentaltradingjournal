@@ -121,10 +121,13 @@ export const SubscriptionDialog = ({ open, onClose, showPricingPlans = false }: 
             This feature requires a subscription. Upgrade to our premium plan to access all features including analytics, backtesting, and advanced journaling tools.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
+        <AlertDialogFooter className="flex flex-col space-y-2 sm:space-y-0">
           <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleUpgrade}>
-            View Pricing
+          <AlertDialogAction 
+            onClick={handleUpgrade}
+            className="bg-primary hover:bg-primary/90"
+          >
+            Subscribe to Access
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
