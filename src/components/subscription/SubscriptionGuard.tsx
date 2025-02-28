@@ -85,14 +85,31 @@ export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) =
   // For protected routes, require subscription
   if (!hasActiveSubscription) {
     return (
-      <SubscriptionDialog
-        open={showDialog}
-        showPricingPlans={showPricingPlans}
-        onClose={() => {
-          setShowDialog(false);
-          navigate('/dashboard');
-        }}
-      />
+      <>
+        <div className="flex flex-col items-center justify-center min-h-[70vh] p-6">
+          <div className="max-w-md text-center">
+            <h2 className="text-2xl font-bold text-primary mb-4">Subscribe to Access Features</h2>
+            <p className="text-muted-foreground mb-6">
+              This premium feature requires a subscription. Upgrade to get access to all advanced trading tools and analytics.
+            </p>
+            <button 
+              onClick={() => navigate('/pricing')}
+              className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-md font-medium transition-colors"
+            >
+              View Pricing Plans
+            </button>
+          </div>
+        </div>
+        
+        <SubscriptionDialog
+          open={showDialog}
+          showPricingPlans={showPricingPlans}
+          onClose={() => {
+            setShowDialog(false);
+            navigate('/dashboard');
+          }}
+        />
+      </>
     );
   }
 
