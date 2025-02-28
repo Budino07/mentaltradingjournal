@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link } from "react-router-dom";
@@ -173,7 +174,7 @@ const Pricing = () => {
                 className="w-full bg-white/10 hover:bg-white/20 text-white"
                 onClick={() => handleSubscribe("price_1Qs2QGI2A6O6E8LHv6mgd8nT")}
               >
-                Get Started
+                Get Monthly Plan
               </Button>
             </div>
 
