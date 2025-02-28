@@ -88,7 +88,7 @@ export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) =
       <>
         <div className="flex flex-col items-center justify-center min-h-[70vh] p-6">
           <div className="max-w-md text-center">
-            <h2 className="text-2xl font-bold text-primary mb-4">Subscribe to Access Features</h2>
+            <h2 className="text-2xl font-bold text-gradient mb-4">Subscribe to Access Features</h2>
             <p className="text-muted-foreground mb-6">
               This premium feature requires a subscription. Upgrade to get access to all advanced trading tools and analytics.
             </p>
