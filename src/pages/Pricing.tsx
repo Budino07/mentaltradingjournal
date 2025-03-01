@@ -46,15 +46,22 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen relative bg-[#1A1F2C] overflow-hidden">
-      {/* Background effects */}
+      {/* Enhanced background effects with stronger glows */}
       <div className="fixed inset-0">
         <div className="absolute inset-0 bg-[#1A1F2C]" />
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 opacity-40" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent opacity-30" />
-        <div className="absolute inset-0">
-          <div className="absolute top-0 -left-40 w-80 h-80 bg-primary/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
-          <div className="absolute top-0 -right-40 w-80 h-80 bg-accent/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000" />
-        </div>
+        
+        {/* Left side glow - purple/primary color */}
+        <div className="absolute -left-20 top-1/4 w-96 h-[800px] bg-primary-light/30 rounded-full mix-blend-screen filter blur-[120px] opacity-60 animate-pulse" />
+        <div className="absolute -left-40 top-2/3 w-80 h-96 bg-primary/40 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-pulse delay-1000" />
+        
+        {/* Right side glow - accent/orange color */}
+        <div className="absolute -right-20 top-1/3 w-96 h-[700px] bg-accent/30 rounded-full mix-blend-screen filter blur-[120px] opacity-60 animate-pulse" />
+        <div className="absolute -right-40 bottom-1/4 w-80 h-96 bg-primary-light/30 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-pulse delay-700" />
+        
+        {/* Additional central glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-96 bg-secondary-light/10 rounded-full mix-blend-screen filter blur-[150px] opacity-20" />
+        
         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02]" />
         <div className="absolute inset-0 backdrop-blur-[100px]" />
       </div>
@@ -144,7 +151,7 @@ const Pricing = () => {
 
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Monthly Plan */}
-            <div className="relative p-8 rounded-xl backdrop-blur-sm bg-white/5 border border-white/10">
+            <div className="relative p-8 rounded-xl backdrop-blur-sm bg-white/5 border border-white/10 hover:border-primary/30 transition-all duration-300 shadow-[0_0_25px_rgba(110,89,165,0.1)]">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold text-white">Monthly Plan</h3>
                 <div className="text-right">
@@ -179,8 +186,8 @@ const Pricing = () => {
             </div>
 
             {/* Yearly Plan */}
-            <div className="relative p-8 rounded-xl backdrop-blur-sm bg-primary/10 border border-primary/20">
-              <div className="absolute -top-4 right-4 bg-primary/20 text-primary-light px-4 py-1 rounded-full text-sm">
+            <div className="relative p-8 rounded-xl backdrop-blur-sm bg-primary/10 border border-primary/20 hover:border-primary/40 transition-all duration-300 shadow-[0_0_35px_rgba(110,89,165,0.2)]">
+              <div className="absolute -top-4 right-4 bg-gradient-to-r from-primary to-accent/80 px-4 py-1 rounded-full text-sm font-medium text-white shadow-lg">
                 Save 20%
               </div>
               <div className="flex items-center justify-between mb-6">
@@ -209,7 +216,7 @@ const Pricing = () => {
                 ))}
               </ul>
               <Button
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                className="w-full bg-gradient-to-r from-primary to-accent/80 hover:opacity-90 text-white shadow-lg"
                 onClick={() => handleSubscribe("price_1Qs2QaI2A6O6E8LH8YdwlxiE")}
               >
                 Get Yearly Plan
