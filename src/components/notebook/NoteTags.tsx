@@ -74,7 +74,7 @@ export const NoteTags = ({
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem className="hover:bg-transparent focus:bg-transparent">
                   <div className="w-full">
                     <p className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Colors</p>
                     <div className="flex flex-wrap gap-2">

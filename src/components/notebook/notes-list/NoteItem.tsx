@@ -1,3 +1,4 @@
+
 import { MoreVertical, Edit2, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
@@ -85,7 +86,7 @@ export const NoteItem = ({
           <DropdownMenuContent align="end" className="w-[240px]">
             <Dialog open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
               <DialogTrigger asChild>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="hover:bg-gray-100 dark:hover:bg-gray-800">
                   <Edit2 className="mr-2 h-4 w-4" />
                   Change Icon
                 </DropdownMenuItem>
@@ -98,7 +99,7 @@ export const NoteItem = ({
             <DropdownMenuSeparator />
             <DropdownMenuItem 
               onClick={() => onDelete(note.id)}
-              className="text-destructive focus:text-destructive"
+              className="text-destructive hover:bg-gray-100 dark:hover:bg-gray-800 focus:text-destructive"
             >
               <Trash2 className="mr-2 h-4 w-4" />
               Delete
