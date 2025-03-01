@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -69,7 +68,7 @@ export const NoteTags = ({
               <DropdownMenuContent align="end" className="w-[180px] bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border border-gray-200 dark:border-gray-700">
                 <DropdownMenuItem 
                   onClick={() => onRemoveTag(tag)}
-                  className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 focus:text-red-600 dark:focus:text-red-300 cursor-pointer"
+                  className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 focus:text-red-600 dark:focus:text-red-300 cursor-pointer hover:bg-transparent focus:bg-transparent"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete
