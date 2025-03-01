@@ -20,12 +20,12 @@ interface NoteTagsProps {
 }
 
 const TAG_COLORS = {
-  purple: "bg-purple-100 hover:bg-purple-200 text-purple-800 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 dark:text-purple-300",
-  blue: "bg-blue-100 hover:bg-blue-200 text-blue-800 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-300",
-  green: "bg-green-100 hover:bg-green-200 text-green-800 dark:bg-green-900/30 dark:hover:bg-green-900/50 dark:text-green-300",
-  yellow: "bg-yellow-100 hover:bg-yellow-200 text-yellow-800 dark:bg-yellow-900/30 dark:hover:bg-yellow-900/50 dark:text-yellow-300",
-  red: "bg-red-100 hover:bg-red-200 text-red-800 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:text-red-300",
-  pink: "bg-pink-100 hover:bg-pink-200 text-pink-800 dark:bg-pink-900/30 dark:hover:bg-pink-900/50 dark:text-pink-300",
+  purple: "bg-purple-100 hover:bg-purple-200 text-purple-800 dark:bg-purple-700/60 dark:hover:bg-purple-700/80 dark:text-purple-200",
+  blue: "bg-blue-100 hover:bg-blue-200 text-blue-800 dark:bg-blue-700/60 dark:hover:bg-blue-700/80 dark:text-blue-200",
+  green: "bg-green-100 hover:bg-green-200 text-green-800 dark:bg-green-700/60 dark:hover:bg-green-700/80 dark:text-green-200",
+  yellow: "bg-yellow-100 hover:bg-yellow-200 text-yellow-800 dark:bg-yellow-600/60 dark:hover:bg-yellow-600/80 dark:text-yellow-200",
+  red: "bg-red-100 hover:bg-red-200 text-red-800 dark:bg-red-700/60 dark:hover:bg-red-700/80 dark:text-red-200",
+  pink: "bg-pink-100 hover:bg-pink-200 text-pink-800 dark:bg-pink-700/60 dark:hover:bg-pink-700/80 dark:text-pink-200",
 };
 
 export const NoteTags = ({ 
@@ -66,27 +66,33 @@ export const NoteTags = ({
                   <MoreHorizontal className="h-3 w-3" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[180px]">
+              <DropdownMenuContent align="end" className="w-[180px] bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border border-gray-200 dark:border-gray-700">
                 <DropdownMenuItem 
                   onClick={() => onRemoveTag(tag)}
-                  className="text-destructive focus:text-destructive cursor-pointer"
+                  className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 focus:text-red-600 dark:focus:text-red-300 cursor-pointer"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <div className="w-full">
-                    <p className="text-xs text-muted-foreground mb-2">Colors</p>
-                    <div className="flex flex-wrap gap-1">
+                    <p className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Colors</p>
+                    <div className="flex flex-wrap gap-2">
                       {Object.keys(TAG_COLORS).map((color) => (
                         <button
                           key={color}
                           onClick={() => onUpdateTagColor(tag, color)}
                           className={cn(
-                            "w-5 h-5 rounded-full transition-all",
-                            TAG_COLORS[color as keyof typeof TAG_COLORS],
+                            "w-6 h-6 rounded-full transition-all transform hover:scale-110 shadow-sm",
+                            color === 'purple' && "bg-purple-500 dark:bg-purple-400",
+                            color === 'blue' && "bg-blue-500 dark:bg-blue-400",
+                            color === 'green' && "bg-green-500 dark:bg-green-400",
+                            color === 'yellow' && "bg-yellow-400 dark:bg-yellow-300",
+                            color === 'red' && "bg-red-500 dark:bg-red-400",
+                            color === 'pink' && "bg-pink-500 dark:bg-pink-400",
                             tagColors[tag] === color && "ring-2 ring-offset-2 ring-primary"
                           )}
+                          aria-label={`Set tag color to ${color}`}
                         />
                       ))}
                     </div>
@@ -110,4 +116,3 @@ export const NoteTags = ({
     </div>
   );
 };
-
