@@ -185,11 +185,18 @@ const Pricing = () => {
               </Button>
             </div>
 
-            {/* Yearly Plan */}
-            <div className="relative p-8 rounded-xl backdrop-blur-sm bg-primary/10 border border-primary/20 hover:border-primary/40 transition-all duration-300 shadow-[0_0_35px_rgba(110,89,165,0.2)]">
+            {/* Yearly Plan - Enhanced with more eye-catching border */}
+            <div className="relative p-8 rounded-xl backdrop-blur-sm bg-primary/10 border-2 border-[#8B5CF6] hover:border-[#D946EF] transition-all duration-300 shadow-[0_0_35px_rgba(110,89,165,0.3)] animate-pulse-slow">
               <div className="absolute -top-4 right-4 bg-gradient-to-r from-primary to-accent/80 px-4 py-1 rounded-full text-sm font-medium text-white shadow-lg">
                 Save 20%
               </div>
+              
+              {/* Decorative corner accents to enhance the visual appeal */}
+              <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-[#D946EF] rounded-tl-lg"></div>
+              <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-[#D946EF] rounded-tr-lg"></div>
+              <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-[#D946EF] rounded-bl-lg"></div>
+              <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#D946EF] rounded-br-lg"></div>
+              
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold text-white">Yearly Plan</h3>
                 <div className="text-right">
