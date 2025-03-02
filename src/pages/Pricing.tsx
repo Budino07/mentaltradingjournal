@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link } from "react-router-dom";
@@ -46,27 +45,22 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen relative bg-[#1A1F2C] overflow-hidden">
-      {/* Enhanced background effects with stronger glows */}
       <div className="fixed inset-0">
         <div className="absolute inset-0 bg-[#1A1F2C]" />
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 opacity-40" />
         
-        {/* Left side glow - purple/primary color */}
         <div className="absolute -left-20 top-1/4 w-96 h-[800px] bg-primary-light/30 rounded-full mix-blend-screen filter blur-[120px] opacity-60 animate-pulse" />
         <div className="absolute -left-40 top-2/3 w-80 h-96 bg-primary/40 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-pulse delay-1000" />
         
-        {/* Right side glow - accent/orange color */}
         <div className="absolute -right-20 top-1/3 w-96 h-[700px] bg-accent/30 rounded-full mix-blend-screen filter blur-[120px] opacity-60 animate-pulse" />
         <div className="absolute -right-40 bottom-1/4 w-80 h-96 bg-primary-light/30 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-pulse delay-700" />
         
-        {/* Additional central glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-96 bg-secondary-light/10 rounded-full mix-blend-screen filter blur-[150px] opacity-20" />
         
         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02]" />
         <div className="absolute inset-0 backdrop-blur-[100px]" />
       </div>
 
-      {/* Header matching Features page */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#1A1F2C]/80 backdrop-blur-sm border-b border-white/10">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="text-xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
@@ -137,7 +131,6 @@ const Pricing = () => {
         </div>
       </header>
 
-      {/* Pricing Content */}
       <div className="relative z-10 pt-32 pb-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
@@ -150,7 +143,6 @@ const Pricing = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {/* Monthly Plan */}
             <div className="relative p-8 rounded-xl backdrop-blur-sm bg-white/5 border border-white/10 hover:border-primary/30 transition-all duration-300 shadow-[0_0_25px_rgba(110,89,165,0.1)]">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold text-white">Monthly Plan</h3>
@@ -185,17 +177,10 @@ const Pricing = () => {
               </Button>
             </div>
 
-            {/* Yearly Plan - Enhanced with more eye-catching border */}
-            <div className="relative p-8 rounded-xl backdrop-blur-sm bg-primary/10 border-2 border-[#8B5CF6] hover:border-[#D946EF] transition-all duration-300 shadow-[0_0_35px_rgba(110,89,165,0.3)] animate-pulse-slow">
+            <div className="relative p-8 rounded-xl backdrop-blur-sm bg-primary/10 border-2 border-[#8B5CF6] hover:border-[#D946EF] transition-all duration-300 shadow-[0_0_35px_rgba(110,89,165,0.3)]">
               <div className="absolute -top-4 right-4 bg-gradient-to-r from-primary to-accent/80 px-4 py-1 rounded-full text-sm font-medium text-white shadow-lg">
                 Save 20%
               </div>
-              
-              {/* Decorative corner accents to enhance the visual appeal */}
-              <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-[#D946EF] rounded-tl-lg"></div>
-              <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-[#D946EF] rounded-tr-lg"></div>
-              <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-[#D946EF] rounded-bl-lg"></div>
-              <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#D946EF] rounded-br-lg"></div>
               
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold text-white">Yearly Plan</h3>
