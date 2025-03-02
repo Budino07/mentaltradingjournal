@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link } from "react-router-dom";
@@ -38,6 +39,10 @@ const Pricing = () => {
     } catch (error) {
       toast(error instanceof Error ? error.message : "Failed to update username");
     }
+  };
+
+  const handleManageSubscription = () => {
+    window.open("https://billing.stripe.com/p/login/dR617i4AUaWldbibII", "_blank");
   };
 
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || 'User';
@@ -107,6 +112,13 @@ const Pricing = () => {
                         </Button>
                       )}
                     </div>
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleManageSubscription}
+                    >
+                      Manage Subscription
+                    </Button>
                     <Button
                       variant="destructive"
                       className="w-full"

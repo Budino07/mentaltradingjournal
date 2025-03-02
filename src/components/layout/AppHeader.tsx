@@ -44,6 +44,10 @@ export function AppHeader() {
     }
   };
 
+  const handleManageSubscription = () => {
+    window.open("https://billing.stripe.com/p/login/dR617i4AUaWldbibII", "_blank");
+  };
+
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || 'User';
   const userEmail = user?.email;
 
@@ -111,6 +115,13 @@ export function AppHeader() {
                       </Button>
                     )}
                   </div>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleManageSubscription}
+                  >
+                    Manage Subscription
+                  </Button>
                   <Button
                     variant="destructive"
                     className="w-full"
@@ -187,6 +198,13 @@ export function AppHeader() {
                       Edit Username
                     </Button>
                   )}
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleManageSubscription}
+                  >
+                    Manage Subscription
+                  </Button>
                   <Button
                     variant="destructive"
                     className="w-full"
