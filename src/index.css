@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -130,4 +131,27 @@
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-20px); }
+}
+
+/* Footer animations */
+.footer-link-hover {
+  @apply relative overflow-hidden;
+}
+
+.footer-link-hover::after {
+  content: '';
+  @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300;
+}
+
+.footer-link-hover:hover::after {
+  @apply w-full;
+}
+
+/* Social media hover effects */
+.social-icon-hover {
+  @apply transition-transform duration-300;
+}
+
+.social-icon-hover:hover {
+  transform: translateY(-3px);
 }
