@@ -2,7 +2,6 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { AppHeader } from "./AppHeader";
-import { Footer } from "./Footer";
 
 export const AppLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -14,7 +13,6 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
           <main className="flex-1 p-4 md:p-6 overflow-x-hidden animate-fade-in">
             {children}
           </main>
-          <Footer />
         </div>
       </div>
     </SidebarProvider>
