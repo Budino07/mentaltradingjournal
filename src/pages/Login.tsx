@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -167,10 +168,15 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md p-6 space-y-6">
+    <div className="min-h-screen flex items-center justify-center bg-[#0D0A1F] relative p-4 overflow-hidden">
+      {/* Glow Effects */}
+      <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/20 rounded-full blur-[100px] animate-pulse-slow"></div>
+      <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-secondary/20 rounded-full blur-[80px] animate-pulse-slow" style={{ animationDelay: "1s" }}></div>
+      <div className="absolute top-1/3 right-1/3 w-80 h-80 bg-accent/20 rounded-full blur-[90px] animate-pulse-slow" style={{ animationDelay: "2s" }}></div>
+      
+      <Card className="w-full max-w-md p-8 space-y-6 backdrop-blur-xl bg-[#1A1A2E]/80 border border-white/10 shadow-[0_0_25px_rgba(110,89,165,0.3)] z-10 animate-scale-in">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">Welcome to Mental</h1>
+          <h1 className="text-3xl font-bold text-gradient">Welcome to Mental</h1>
           <p className="text-muted-foreground">
             {isResetPassword
               ? "Create a new password"

@@ -30,14 +30,15 @@ export const LoginForm = ({
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <div className="space-y-2">
+    <form onSubmit={onSubmit} className="space-y-5 animate-fade-in">
+      <div className="space-y-3">
         <Input
           type="email"
           placeholder="Email"
           value={email}
           onChange={onEmailChange}
           required
+          className="bg-white/5 backdrop-blur-sm border-white/10 focus:border-primary/50 transition-all duration-300"
         />
       </div>
       <div className="space-y-2">
@@ -49,10 +50,11 @@ export const LoginForm = ({
             onChange={onPasswordChange}
             required
             minLength={6}
+            className="bg-white/5 backdrop-blur-sm border-white/10 focus:border-primary/50 transition-all duration-300"
           />
           <button
             type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors focus:outline-none"
             onClick={togglePasswordVisibility}
             tabIndex={-1}
           >
@@ -64,7 +66,11 @@ export const LoginForm = ({
           </button>
         </div>
       </div>
-      <Button className="w-full" type="submit" disabled={loading}>
+      <Button 
+        className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-all duration-300 shadow-[0_0_15px_rgba(110,89,165,0.5)]" 
+        type="submit" 
+        disabled={loading}
+      >
         {loading ? (
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
         ) : isSignUp ? (
