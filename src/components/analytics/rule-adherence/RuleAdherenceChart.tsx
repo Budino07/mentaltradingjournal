@@ -1,4 +1,3 @@
-
 import {
   BarChart,
   Bar,
@@ -16,8 +15,6 @@ interface RuleAdherenceData {
   wins: number;
   losses: number;
   total: number;
-  actualWins?: number;
-  actualLosses?: number;
 }
 
 interface RuleAdherenceChartProps {

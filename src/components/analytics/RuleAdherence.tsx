@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,10 +10,9 @@ export const RuleAdherence = () => {
     queryFn: async () => {
       console.log("Fetching rule adherence data...");
       
-      // Fetch all post-session entries that have trade outcomes
       const { data: entries, error } = await supabase
         .from('journal_entries')
-        .select('*, trades(*)')
+        .select('*')
         .eq('session_type', 'post')
         .not('outcome', 'eq', 'no_trades');
 
@@ -23,25 +21,7 @@ export const RuleAdherence = () => {
         throw error;
       }
 
-      console.log("Fetched post-session entries:", entries);
-      
-      // If no entries found, return empty array to indicate no data
-      if (!entries || entries.length === 0) {
-        return [];
-      }
-
-      // Only process entries that have proper rule adherence data and valid outcome
-      const validEntries = entries.filter(entry => 
-        entry.outcome && 
-        (entry.outcome === 'win' || entry.outcome === 'loss') && 
-        Array.isArray(entry.followed_rules)
-      );
-      
-      console.log("Valid entries for processing:", validEntries);
-      
-      if (validEntries.length === 0) {
-        return [];
-      }
+      console.log("Fetched entries:", entries);
 
       const rulesFollowedStats = {
         wins: 0,
@@ -55,7 +35,7 @@ export const RuleAdherence = () => {
         total: 0,
       };
 
-      validEntries.forEach(entry => {
+      entries?.forEach(entry => {
         const hasFollowedRules = entry.followed_rules && entry.followed_rules.length > 0;
         
         if (hasFollowedRules) {
@@ -72,41 +52,27 @@ export const RuleAdherence = () => {
       console.log("Rules followed stats:", rulesFollowedStats);
       console.log("Rules not followed stats:", rulesNotFollowedStats);
 
-      // Only return categories that have data
-      const results = [];
-      
-      const calculatePercentage = (value, total) => 
+      const calculatePercentage = (value: number, total: number) => 
         total > 0 ? Math.round((value / total) * 100) : 0;
-      
-      // Only add rules followed data if we have entries in that category
-      if (rulesFollowedStats.total > 0) {
-        results.push({
+
+      return [
+        {
           name: "Rules Followed",
           wins: calculatePercentage(rulesFollowedStats.wins, rulesFollowedStats.total),
           losses: calculatePercentage(rulesFollowedStats.losses, rulesFollowedStats.total),
           total: rulesFollowedStats.total,
-          actualWins: rulesFollowedStats.wins,
-          actualLosses: rulesFollowedStats.losses,
-        });
-      }
-      
-      // Only add rules not followed data if we have entries in that category
-      if (rulesNotFollowedStats.total > 0) {
-        results.push({
+        },
+        {
           name: "Rules Not Followed",
           wins: calculatePercentage(rulesNotFollowedStats.wins, rulesNotFollowedStats.total),
           losses: calculatePercentage(rulesNotFollowedStats.losses, rulesNotFollowedStats.total),
           total: rulesNotFollowedStats.total,
-          actualWins: rulesNotFollowedStats.wins,
-          actualLosses: rulesNotFollowedStats.losses,
-        });
-      }
-      
-      return results;
+        },
+      ];
     },
   });
   
-  if (isLoading) {
+  if (isLoading || !analytics) {
     return (
       <Card className="p-4 md:p-6 space-y-4">
         <div className="animate-pulse space-y-4">
@@ -117,8 +83,18 @@ export const RuleAdherence = () => {
     );
   }
 
-  // Check if we have any valid rule adherence data
-  const hasRuleAdherenceData = analytics && analytics.length > 0;
+  // Default values if analytics data is incomplete
+  const defaultStats = { wins: 0, losses: 0, total: 0 };
+  const rulesFollowed = analytics[0] || { name: "Rules Followed", ...defaultStats };
+  const rulesNotFollowed = analytics[1] || { name: "Rules Not Followed", ...defaultStats };
+  
+  // Require minimum 5 sessions in each category for meaningful insights
+  const MINIMUM_SESSIONS = 5;
+  const hasEnoughData = rulesFollowed.total >= MINIMUM_SESSIONS && 
+                       rulesNotFollowed.total >= MINIMUM_SESSIONS;
+
+  // Calculate insights only if we have valid data
+  const winRateDifference = (rulesFollowed.wins || 0) - (rulesNotFollowed.wins || 0);
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -129,27 +105,13 @@ export const RuleAdherence = () => {
         </p>
       </div>
 
-      {hasRuleAdherenceData ? (
-        <>
-          <RuleAdherenceChart data={analytics} />
-          
-          <RuleAdherenceInsight 
-            hasEnoughData={analytics.some(item => item.total >= 5)}
-            winRateDifference={
-              (analytics[0]?.wins || 0) - (analytics[1]?.wins || 0)
-            }
-            rulesFollowed={analytics.find(item => item.name === "Rules Followed") || { wins: 0, total: 0 }}
-          />
-        </>
-      ) : (
-        <div className="h-[250px] flex flex-col items-center justify-center text-center p-6">
-          <p className="text-muted-foreground mb-2">No rule adherence data available</p>
-          <p className="text-sm text-muted-foreground">
-            Complete post-session journal entries and indicate which trading rules you followed 
-            to see how rule adherence affects your performance.
-          </p>
-        </div>
-      )}
+      <RuleAdherenceChart data={analytics} />
+
+      <RuleAdherenceInsight 
+        hasEnoughData={hasEnoughData}
+        winRateDifference={winRateDifference}
+        rulesFollowed={rulesFollowed}
+      />
     </Card>
   );
 };
