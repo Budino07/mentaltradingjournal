@@ -11,9 +11,10 @@ export const RuleAdherence = () => {
     queryFn: async () => {
       console.log("Fetching rule adherence data...");
       
+      // Fetch all post-session entries that have trade outcomes
       const { data: entries, error } = await supabase
         .from('journal_entries')
-        .select('*')
+        .select('*, trades(*)')
         .eq('session_type', 'post')
         .not('outcome', 'eq', 'no_trades');
 
@@ -22,19 +23,21 @@ export const RuleAdherence = () => {
         throw error;
       }
 
-      console.log("Fetched entries:", entries);
+      console.log("Fetched post-session entries:", entries);
       
       // If no entries found, return empty array to indicate no data
       if (!entries || entries.length === 0) {
         return [];
       }
 
-      // Only process entries that have proper rule adherence data
+      // Only process entries that have proper rule adherence data and valid outcome
       const validEntries = entries.filter(entry => 
         entry.outcome && 
         (entry.outcome === 'win' || entry.outcome === 'loss') && 
         Array.isArray(entry.followed_rules)
       );
+      
+      console.log("Valid entries for processing:", validEntries);
       
       if (validEntries.length === 0) {
         return [];
