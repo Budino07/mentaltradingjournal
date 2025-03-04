@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -83,6 +84,9 @@ export const RuleAdherence = () => {
     );
   }
 
+  // Check if we have any post-session data with rule adherence
+  const hasRuleAdherenceData = analytics.some(item => item.total > 0);
+
   // Default values if analytics data is incomplete
   const defaultStats = { wins: 0, losses: 0, total: 0 };
   const rulesFollowed = analytics[0] || { name: "Rules Followed", ...defaultStats };
@@ -105,13 +109,25 @@ export const RuleAdherence = () => {
         </p>
       </div>
 
-      <RuleAdherenceChart data={analytics} />
-
-      <RuleAdherenceInsight 
-        hasEnoughData={hasEnoughData}
-        winRateDifference={winRateDifference}
-        rulesFollowed={rulesFollowed}
-      />
+      {hasRuleAdherenceData ? (
+        <>
+          <RuleAdherenceChart data={analytics} />
+          
+          <RuleAdherenceInsight 
+            hasEnoughData={hasEnoughData}
+            winRateDifference={winRateDifference}
+            rulesFollowed={rulesFollowed}
+          />
+        </>
+      ) : (
+        <div className="h-[250px] flex flex-col items-center justify-center text-center p-6">
+          <p className="text-muted-foreground mb-2">No rule adherence data available</p>
+          <p className="text-sm text-muted-foreground">
+            Complete post-session journal entries and indicate which trading rules you followed 
+            to see how rule adherence affects your performance.
+          </p>
+        </div>
+      )}
     </Card>
   );
 };
