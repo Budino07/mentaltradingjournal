@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
+import { analyzeTradeDurations } from "@/utils/analytics/tradeDurationAnalysis";
 
 // Custom tooltip component
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -55,13 +56,10 @@ export const TradeDuration = () => {
 
   // Process trades to calculate durations and win rates
   const allTrades = analytics.journalEntries.flatMap(entry => entry.trades || []);
+  console.log("All trades for duration analysis:", allTrades);
   
-  const calculateDuration = (trade: any) => {
-    if (!trade.entryDate || !trade.exitDate) return 0;
-    const entryTime = new Date(trade.entryDate).getTime();
-    const exitTime = new Date(trade.exitDate).getTime();
-    return Math.max(0, (exitTime - entryTime) / (1000 * 60)); // Duration in minutes
-  };
+  const durationData = analyzeTradeDurations(allTrades);
+  console.log("Processed duration data:", durationData);
 
   const durationRanges = [
     { min: 0, max: 30, label: "< 30 min" },
@@ -75,23 +73,25 @@ export const TradeDuration = () => {
   ];
 
   const data = durationRanges.map(range => {
-    const tradesInRange = allTrades.filter(trade => {
-      const duration = calculateDuration(trade);
+    const tradesInRange = durationData.filter(trade => {
+      const duration = trade.duration;
       return duration > range.min && duration <= range.max;
     });
 
+    console.log(`Range ${range.label}: ${tradesInRange.length} trades`);
+    
     const totalTrades = tradesInRange.length;
-    const winningTrades = tradesInRange.filter(trade => {
-      const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : trade.pnl;
-      return pnl > 0;
-    }).length;
+    const winningTrades = tradesInRange.filter(trade => trade.pnl > 0).length;
 
     return {
       duration: range.label,
       winRate: totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0,
       tradeCount: totalTrades,
+      instruments: tradesInRange.map(t => t.instrument).join(', ')
     };
   }).filter(item => item.tradeCount > 0); // Only show ranges with trades
+
+  console.log("Chart data:", data);
 
   const bestDuration = data.length > 0 ? 
     data.reduce((prev, current) => 
