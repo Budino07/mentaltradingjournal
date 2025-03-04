@@ -23,6 +23,22 @@ export const RuleAdherence = () => {
       }
 
       console.log("Fetched entries:", entries);
+      
+      // If no entries found, return empty array to indicate no data
+      if (!entries || entries.length === 0) {
+        return [];
+      }
+
+      // Only process entries that have proper rule adherence data
+      const validEntries = entries.filter(entry => 
+        entry.outcome && 
+        (entry.outcome === 'win' || entry.outcome === 'loss') && 
+        Array.isArray(entry.followed_rules)
+      );
+      
+      if (validEntries.length === 0) {
+        return [];
+      }
 
       const rulesFollowedStats = {
         wins: 0,
@@ -36,7 +52,7 @@ export const RuleAdherence = () => {
         total: 0,
       };
 
-      entries?.forEach(entry => {
+      validEntries.forEach(entry => {
         const hasFollowedRules = entry.followed_rules && entry.followed_rules.length > 0;
         
         if (hasFollowedRules) {
@@ -53,27 +69,41 @@ export const RuleAdherence = () => {
       console.log("Rules followed stats:", rulesFollowedStats);
       console.log("Rules not followed stats:", rulesNotFollowedStats);
 
-      const calculatePercentage = (value: number, total: number) => 
+      // Only return categories that have data
+      const results = [];
+      
+      const calculatePercentage = (value, total) => 
         total > 0 ? Math.round((value / total) * 100) : 0;
-
-      return [
-        {
+      
+      // Only add rules followed data if we have entries in that category
+      if (rulesFollowedStats.total > 0) {
+        results.push({
           name: "Rules Followed",
           wins: calculatePercentage(rulesFollowedStats.wins, rulesFollowedStats.total),
           losses: calculatePercentage(rulesFollowedStats.losses, rulesFollowedStats.total),
           total: rulesFollowedStats.total,
-        },
-        {
+          actualWins: rulesFollowedStats.wins,
+          actualLosses: rulesFollowedStats.losses,
+        });
+      }
+      
+      // Only add rules not followed data if we have entries in that category
+      if (rulesNotFollowedStats.total > 0) {
+        results.push({
           name: "Rules Not Followed",
           wins: calculatePercentage(rulesNotFollowedStats.wins, rulesNotFollowedStats.total),
           losses: calculatePercentage(rulesNotFollowedStats.losses, rulesNotFollowedStats.total),
           total: rulesNotFollowedStats.total,
-        },
-      ];
+          actualWins: rulesNotFollowedStats.wins,
+          actualLosses: rulesNotFollowedStats.losses,
+        });
+      }
+      
+      return results;
     },
   });
   
-  if (isLoading || !analytics) {
+  if (isLoading) {
     return (
       <Card className="p-4 md:p-6 space-y-4">
         <div className="animate-pulse space-y-4">
@@ -84,21 +114,8 @@ export const RuleAdherence = () => {
     );
   }
 
-  // Check if we have any post-session data with rule adherence
-  const hasRuleAdherenceData = analytics.some(item => item.total > 0);
-
-  // Default values if analytics data is incomplete
-  const defaultStats = { wins: 0, losses: 0, total: 0 };
-  const rulesFollowed = analytics[0] || { name: "Rules Followed", ...defaultStats };
-  const rulesNotFollowed = analytics[1] || { name: "Rules Not Followed", ...defaultStats };
-  
-  // Require minimum 5 sessions in each category for meaningful insights
-  const MINIMUM_SESSIONS = 5;
-  const hasEnoughData = rulesFollowed.total >= MINIMUM_SESSIONS && 
-                       rulesNotFollowed.total >= MINIMUM_SESSIONS;
-
-  // Calculate insights only if we have valid data
-  const winRateDifference = (rulesFollowed.wins || 0) - (rulesNotFollowed.wins || 0);
+  // Check if we have any valid rule adherence data
+  const hasRuleAdherenceData = analytics && analytics.length > 0;
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -114,9 +131,11 @@ export const RuleAdherence = () => {
           <RuleAdherenceChart data={analytics} />
           
           <RuleAdherenceInsight 
-            hasEnoughData={hasEnoughData}
-            winRateDifference={winRateDifference}
-            rulesFollowed={rulesFollowed}
+            hasEnoughData={analytics.some(item => item.total >= 5)}
+            winRateDifference={
+              (analytics[0]?.wins || 0) - (analytics[1]?.wins || 0)
+            }
+            rulesFollowed={analytics.find(item => item.name === "Rules Followed") || { wins: 0, total: 0 }}
           />
         </>
       ) : (
