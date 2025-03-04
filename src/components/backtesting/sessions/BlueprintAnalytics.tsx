@@ -107,13 +107,10 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
   const tradeDurationData = sessions.map(session => ({
     entryDate: session.entryDate,
     exitDate: session.exitDate,
-    pnl: session.pnl,
-    instrument: session.instrument
+    pnl: session.pnl
   }));
 
-  console.log("Blueprint trade duration data:", tradeDurationData);
   const durationData = analyzeTradeDurations(tradeDurationData);
-  console.log("Processed blueprint duration data:", durationData);
 
   // Group trades by duration category and calculate stats
   const durationRanges = [
@@ -144,8 +141,6 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
     return acc;
   }, {} as Record<string, { count: number; wins: number; totalPnL: number; }>);
 
-  console.log("Duration stats:", durationStats);
-
   const durationChartData = Object.entries(durationStats)
     .map(([category, stats]) => ({
       category,
@@ -159,8 +154,6 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
       const indexB = durationRanges.findIndex(r => r.label === b.category);
       return indexA - indexB;
     });
-
-  console.log("Duration chart data:", durationChartData);
 
   // Find the best performing duration category
   const bestDuration = durationChartData.reduce((prev, current) => 
