@@ -78,12 +78,15 @@ export const EntryContent = ({
   };
 
   const renderTextWithLinks = (text: string): ReactNode[] => {
+    if (!text) return [];
+    
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     
     const parts = text.split(urlRegex);
     const matches = text.match(urlRegex) || [];
     
     return parts.map((part, i) => {
+      // Check if this part is a URL
       if (matches.includes(part)) {
         return (
           <a 
