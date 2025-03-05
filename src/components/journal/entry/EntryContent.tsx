@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Trade } from "@/types/trade";
@@ -135,7 +134,7 @@ export const EntryContent = ({
             />
           ) : (
             <p className="text-muted-foreground whitespace-pre-wrap">
-              {renderTextWithLinks(editedNotes)}
+              {renderTextWithLinks(notes)}
             </p>
           )}
         </div>

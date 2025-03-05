@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -64,35 +65,62 @@ export const PreTradingEvents = () => {
     );
   }
 
-  // Process journal entries to calculate impact of pre-trading activities
-  const activityImpact = analytics.journalEntries.reduce((acc: { [key: string]: { totalPnL: number; count: number } }, entry) => {
-    if (!entry.pre_trading_activities || !entry.trades?.length) return acc;
+  // First, create a mapping of dates to pre-trading activities
+  const dateToActivities = new Map<string, string[]>();
+  
+  analytics.journalEntries.forEach(entry => {
+    if (entry.pre_trading_activities && entry.pre_trading_activities.length > 0) {
+      const date = new Date(entry.created_at).toISOString().split('T')[0];
+      dateToActivities.set(date, entry.pre_trading_activities);
+    }
+  });
 
+  // Then, associate trades with the pre-trading activities for that day
+  const activityImpact: Record<string, { totalPnL: number; count: number }> = {};
+  
+  // Initialize empty records for all predefined activities
+  PREDEFINED_ACTIVITIES.forEach(activity => {
+    activityImpact[activity] = { totalPnL: 0, count: 0 };
+  });
+  
+  analytics.journalEntries.forEach(entry => {
+    if (!entry.trades || entry.trades.length === 0) return;
+    
+    // Get the date of this entry
+    const entryDate = new Date(entry.created_at).toISOString().split('T')[0];
+    
+    // Get activities from this day's pre-trading session
+    const activitiesForToday = dateToActivities.get(entryDate);
+    if (!activitiesForToday || activitiesForToday.length === 0) return;
+    
+    // Calculate P&L for this entry's trades
     const dailyPnL = entry.trades.reduce((sum, trade) => {
       const pnlValue = trade.pnl || trade.profit_loss || 0;
       const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
       return sum + (isNaN(numericPnL) ? 0 : numericPnL);
     }, 0);
-
-    entry.pre_trading_activities.forEach(activity => {
-      // Replace spaces with newlines for comparison
+    
+    // Associate this P&L with all activities from today
+    activitiesForToday.forEach(activity => {
+      // Replace spaces with newlines for consistent comparison
       const normalizedActivity = activity.replace("Review Daily Goals", "Review\nDaily\nGoals");
+      
       if (PREDEFINED_ACTIVITIES.includes(normalizedActivity)) {
-        if (!acc[normalizedActivity]) {
-          acc[normalizedActivity] = { totalPnL: 0, count: 0 };
-        }
-        acc[normalizedActivity].totalPnL += dailyPnL;
-        acc[normalizedActivity].count += 1;
+        activityImpact[normalizedActivity].totalPnL += dailyPnL;
+        activityImpact[normalizedActivity].count += 1;
+        
+        console.log(`Associating activity '${normalizedActivity}' with P&L: $${dailyPnL} on date ${entryDate}`);
       }
     });
-
-    return acc;
-  }, {});
+  });
 
   // Calculate average impact for each predefined activity
   const data = PREDEFINED_ACTIVITIES.map(activity => {
-    const stats = activityImpact[activity] || { totalPnL: 0, count: 0 };
+    const stats = activityImpact[activity];
     const averageImpact = stats.count > 0 ? (stats.totalPnL / stats.count) : 0;
+    
+    console.log(`${activity}: Total P&L: $${stats.totalPnL}, Count: ${stats.count}, Average: $${averageImpact.toFixed(2)}`);
+    
     return {
       activity,
       impact: parseFloat(averageImpact.toFixed(2)),
