@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Trade } from "@/types/trade";
@@ -41,7 +40,6 @@ export const EntryContent = ({
   const [editedNotes, setEditedNotes] = useState(notes);
   const hasObservationLinks = weeklyUrl || dailyUrl || fourHourUrl || oneHourUrl;
 
-  // Update local state when props change
   useEffect(() => {
     setEditedNotes(notes);
   }, [notes]);
@@ -78,6 +76,31 @@ export const EntryContent = ({
     );
   };
 
+  const renderTextWithLinks = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    
+    const parts = text.split(urlRegex);
+    const matches = text.match(urlRegex) || [];
+    
+    return parts.map((part, i) => {
+      if (matches.includes(part)) {
+        return (
+          <a 
+            key={i} 
+            href={part} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-primary hover:underline inline-flex items-center"
+          >
+            {part}
+            <ExternalLink className="h-3 w-3 ml-1" />
+          </a>
+        );
+      }
+      return part;
+    });
+  };
+
   return (
     <div className="space-y-6">
       {notes && (
@@ -107,7 +130,9 @@ export const EntryContent = ({
               className="min-h-[100px]"
             />
           ) : (
-            <p className="text-muted-foreground whitespace-pre-wrap">{editedNotes}</p>
+            <p className="text-muted-foreground whitespace-pre-wrap">
+              {renderTextWithLinks(editedNotes)}
+            </p>
           )}
         </div>
       )}
@@ -163,7 +188,7 @@ export const EntryContent = ({
           <div className="space-y-2">
             <h3 className="text-lg font-medium">Post Submission Notes</h3>
             <p className="text-muted-foreground whitespace-pre-wrap">
-              {postSubmissionNotes}
+              {renderTextWithLinks(postSubmissionNotes)}
             </p>
           </div>
         </>
