@@ -1,4 +1,3 @@
-
 import { DayProps } from "react-day-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { calculateDayStats, formatCurrency } from "./calendarUtils";
@@ -27,12 +26,12 @@ export const CalendarDay = ({
   const [isWeeklyReviewOpen, setIsWeeklyReviewOpen] = useState(false);
   const stats = calculateDayStats(
     entries.filter(entry => {
-      const hasClosedTradesOnThisDay = entry.trades?.some(trade => {
-        const exitDate = trade.exitDate ? new Date(trade.exitDate) : null;
-        return exitDate?.toDateString() === dayDate.toDateString();
+      const hasTradesOnThisDay = entry.trades?.some(trade => {
+        const entryDate = trade.entryDate ? new Date(trade.entryDate) : null;
+        return entryDate?.toDateString() === dayDate.toDateString();
       });
       
-      return hasClosedTradesOnThisDay || 
+      return hasTradesOnThisDay || 
              new Date(entry.date).toDateString() === dayDate.toDateString();
     })
   );

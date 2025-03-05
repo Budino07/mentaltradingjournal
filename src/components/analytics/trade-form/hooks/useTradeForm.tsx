@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,7 +39,6 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
       };
 
       if (editTrade) {
-        // Get all journal entries for trades
         const { data: entries, error: fetchError } = await supabase
           .from('journal_entries')
           .select('*')
@@ -48,7 +46,6 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
 
         if (fetchError) throw fetchError;
         
-        // Find the entry containing our trade
         const entry = entries?.find(entry => {
           const trades = entry.trades as any[];
           return trades?.some(trade => trade.id === editTrade.id);
@@ -58,18 +55,15 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
 
         const trades = entry.trades as any[];
         
-        // Create a clean trade object for the update
         const updatedTradeObject = {
           id: editTrade.id,
           ...tradeData
         };
 
-        // Update the trades array
         const updatedTrades = trades.map(trade => 
           trade.id === editTrade.id ? updatedTradeObject : trade
         );
 
-        // Update the journal entry with the modified trades array
         const { error: updateError } = await supabase
           .from('journal_entries')
           .update({ trades: updatedTrades })
@@ -77,8 +71,7 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
 
         if (updateError) throw updateError;
       } else {
-        // Create a new trade entry using the exit date as created_at
-        const exitDate = new Date(tradeData.exitDate);
+        const entryDate = new Date(tradeData.entryDate);
         const tradeObject = {
           id: crypto.randomUUID(),
           ...tradeData
@@ -93,7 +86,7 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
             session_type: 'trade',
             emotion: 'neutral',    
             emotion_detail: 'neutral',
-            created_at: exitDate.toISOString() // Set created_at to the trade's exit date
+            created_at: entryDate.toISOString()
           });
 
         if (tradeError) throw tradeError;
@@ -102,7 +95,6 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
       await onSubmit(tradeData as Trade, !!editTrade);
       onOpenChange(false);
 
-      // Create a full-screen loading overlay
       const overlay = document.createElement('div');
       overlay.className = 'fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center';
       overlay.innerHTML = `
@@ -113,13 +105,10 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
       `;
       document.body.appendChild(overlay);
 
-      // Short delay to ensure the overlay is visible
       await new Promise(resolve => setTimeout(resolve, 500));
       
       if (!editTrade) {
-        // Store success message in sessionStorage before refresh
         sessionStorage.setItem('tradeSuccess', 'true');
-        // Refresh the page
         window.location.reload();
       } else {
         toast.success("Trade updated successfully!");
