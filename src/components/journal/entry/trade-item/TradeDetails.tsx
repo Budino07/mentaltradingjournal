@@ -34,7 +34,7 @@ export const TradeDetails = ({ trade, formatDate }: TradeDetailsProps) => {
         </div>
       </div>
 
-      {(trade.forecastScreenshot || trade.resultScreenshot) && (
+      {(trade.forecastScreenshot || trade.resultUrl) && (
         <>
           <Separator />
           <div className="space-y-3">
@@ -50,12 +50,12 @@ export const TradeDetails = ({ trade, formatDate }: TradeDetailsProps) => {
                   View Forecast <ExternalLink className="h-4 w-4" />
                 </Button>
               )}
-              {trade.resultScreenshot && (
+              {trade.resultUrl && (
                 <Button
                   variant="outline"
                   size="sm"
                   className="flex items-center gap-2"
-                  onClick={() => window.open(trade.resultScreenshot, '_blank')}
+                  onClick={() => window.open(trade.resultUrl, '_blank')}
                 >
                   View Result <ExternalLink className="h-4 w-4" />
                 </Button>
