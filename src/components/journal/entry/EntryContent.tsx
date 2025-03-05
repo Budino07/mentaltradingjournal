@@ -1,10 +1,11 @@
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Trade } from "@/types/trade";
 import { TradingRules } from "../entry/TradingRules";
 import { TradesList } from "../entry/TradesList";
 import { ExternalLink, Edit2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,7 +77,7 @@ export const EntryContent = ({
     );
   };
 
-  const renderTextWithLinks = (text: string) => {
+  const renderTextWithLinks = (text: string): ReactNode[] => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     
     const parts = text.split(urlRegex);
@@ -97,7 +98,7 @@ export const EntryContent = ({
           </a>
         );
       }
-      return part;
+      return <span key={i}>{part}</span>;
     });
   };
 
