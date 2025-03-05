@@ -88,7 +88,7 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
           .from('journal_entries')
           .insert({
             user_id: user?.id,
-            notes: `Write anything that stands out for ${tradeData.instrument}`,
+            notes: `Trade entry for ${tradeData.instrument}`,
             trades: [tradeObject],
             session_type: 'trade',
             emotion: 'neutral',    
