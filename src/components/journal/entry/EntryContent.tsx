@@ -19,7 +19,7 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO, getWeek, getMonth, getYear, startOfWeek, endOfWeek } from "date-fns";
-import { CustomTooltip } from "./shared/CustomTooltip";
+import { CustomTooltip } from "@/components/analytics/shared/CustomTooltip";
 
 export const TradeFrequencyByWeek = () => {
   const { data: analytics, isLoading } = useQuery({
@@ -252,5 +252,27 @@ export const TradeFrequencyByWeek = () => {
         </div>
       )}
     </Card>
+  );
+};
+
+// Export the EntryContent component
+export const EntryContent = ({ 
+  id,
+  marketConditions,
+  notes,
+  followedRules,
+  trades,
+  postSubmissionNotes,
+  preTradingActivities,
+  weeklyUrl,
+  dailyUrl,
+  fourHourUrl,
+  oneHourUrl,
+}) => {
+  // Implementation of EntryContent component
+  return (
+    <div>
+      {/* EntryContent implementation */}
+    </div>
   );
 };
