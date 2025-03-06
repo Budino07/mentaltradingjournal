@@ -6,6 +6,7 @@ import { generateAnalytics } from "@/utils/analyticsUtils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { startOfWeek, startOfMonth, startOfQuarter, startOfYear, isAfter } from "date-fns";
+import { formatDate } from "@/utils/dateUtils";
 
 export const EmotionFrequency = () => {
   const [timeFilter, setTimeFilter] = useState<"week" | "month" | "quarter" | "year">("month");
@@ -72,13 +73,13 @@ export const EmotionFrequency = () => {
   const getEmotionColor = (emotion: string) => {
     switch (emotion.toLowerCase()) {
       case "positive":
-        return "hsl(142.1 76.2% 36.3%)";
+        return "hsl(142.1 76.2% 36.3%)"; // Green
       case "neutral":
-        return "hsl(215.4 16.3% 46.9%)";
+        return "hsl(215.4 16.3% 46.9%)"; // Blue-gray
       case "negative":
-        return "hsl(346.8 77.2% 49.8%)";
+        return "hsl(346.8 77.2% 49.8%)"; // Red
       default:
-        return "hsl(215.4 16.3% 46.9%)";
+        return "hsl(215.4 16.3% 46.9%)"; // Default blue-gray
     }
   };
 
@@ -98,6 +99,45 @@ export const EmotionFrequency = () => {
   };
 
   const hasData = emotionData.some(item => item.count > 0);
+  
+  // Generate AI insights based on data
+  const generateInsights = () => {
+    if (!hasData) {
+      return {
+        primary: "No emotional data available for this time period.",
+        secondary: "Record your post-session emotions to gain insights."
+      };
+    }
+    
+    const totalSessions = emotionData.reduce((sum, item) => sum + item.count, 0);
+    const positiveCount = emotionData.find(item => item.emotion === "Positive")?.count || 0;
+    const negativeCount = emotionData.find(item => item.emotion === "Negative")?.count || 0;
+    const neutralCount = emotionData.find(item => item.emotion === "Neutral")?.count || 0;
+    
+    const positivePercentage = totalSessions > 0 ? Math.round((positiveCount / totalSessions) * 100) : 0;
+    const negativePercentage = totalSessions > 0 ? Math.round((negativeCount / totalSessions) * 100) : 0;
+    
+    let primary = "";
+    let secondary = "";
+    
+    if (positiveCount > negativeCount && positiveCount > neutralCount) {
+      primary = `${positivePercentage}% of your sessions resulted in positive emotions.`;
+      secondary = "You're consistently feeling satisfied with your trading sessions.";
+    } else if (negativeCount > positiveCount && negativeCount > neutralCount) {
+      primary = `${negativePercentage}% of your sessions resulted in negative emotions.`;
+      secondary = "Consider reviewing your trading strategy or risk management approach.";
+    } else if (neutralCount > positiveCount && neutralCount > negativeCount) {
+      primary = "Most of your sessions resulted in neutral emotions.";
+      secondary = "Your emotional state remains balanced after trading sessions.";
+    } else {
+      primary = `Your emotional states are evenly distributed.`;
+      secondary = "This indicates balanced emotional responses to your trading sessions.";
+    }
+    
+    return { primary, secondary };
+  };
+  
+  const insights = generateInsights();
 
   return (
     <Card className="h-full">
@@ -105,7 +145,7 @@ export const EmotionFrequency = () => {
         <CardTitle className="text-base md:text-lg">Post-Session Emotional States</CardTitle>
         <CardDescription>Frequency of emotional states after trading sessions {getTimeFilterLabel()}</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-5">
         <Tabs defaultValue="month" className="w-full" onValueChange={(value) => setTimeFilter(value as any)}>
           <TabsList className="mb-4 w-full grid grid-cols-4">
             <TabsTrigger value="week">Week</TabsTrigger>
@@ -132,7 +172,7 @@ export const EmotionFrequency = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={emotionData}
-                margin={{ top: 10, right: 10, left: 10, bottom: 20 }}
+                margin={{ top: 10, right: 10, left: 20, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis 
@@ -145,13 +185,6 @@ export const EmotionFrequency = () => {
                   axisLine={false}
                   tickLine={false}
                   allowDecimals={false}
-                  label={{ 
-                    value: 'Count', 
-                    angle: -90, 
-                    position: 'insideLeft',
-                    style: { fontSize: '12px', textAnchor: 'middle' },
-                    dx: -15
-                  }}
                 />
                 <Tooltip 
                   cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
@@ -159,6 +192,7 @@ export const EmotionFrequency = () => {
                     backgroundColor: 'hsl(var(--background))',
                     border: '1px solid hsl(var(--border))',
                     borderRadius: '6px',
+                    padding: '8px 12px',
                   }}
                   labelStyle={{ 
                     fontWeight: 'bold',
@@ -166,6 +200,15 @@ export const EmotionFrequency = () => {
                   }}
                   formatter={(value) => [`${value} sessions`, 'Count']}
                 />
+                <text
+                  x={0}
+                  y={15}
+                  textAnchor="start"
+                  dominantBaseline="middle"
+                  style={{ fontSize: '12px', fill: 'hsl(var(--muted-foreground))' }}
+                >
+                  Count
+                </text>
                 <Bar 
                   dataKey="count" 
                   radius={[4, 4, 0, 0]}
@@ -181,6 +224,13 @@ export const EmotionFrequency = () => {
             </ResponsiveContainer>
           </div>
         )}
+
+        {/* AI Insights Section */}
+        <div className="bg-accent/10 p-4 rounded-lg space-y-1 mt-4">
+          <h4 className="font-medium text-sm">AI Insight</h4>
+          <p className="text-sm text-muted-foreground">{insights.primary}</p>
+          <p className="text-xs text-muted-foreground">{insights.secondary}</p>
+        </div>
       </CardContent>
     </Card>
   );
