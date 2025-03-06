@@ -1,8 +1,8 @@
+
 import React from 'react';
 import { Trade } from '@/types/analytics'; 
 import { format } from "date-fns";
 
-import { JournalEntry } from "@/types/analytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,11 +13,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
-import { calculateTotalPL } from "@/utils/tradeUtils";
-import { calculateSessionTypeColor } from "@/utils/journalUtils";
-import { calculateRulesFollowedStyle } from "@/utils/ruleUtils";
-import { calculateMistakeStyle } from "@/utils/mistakeUtils";
-import { calculatePreTradingActivityStyle } from "@/utils/preTradingActivityUtils";
 
 interface EntryContentProps {
   id: string;
@@ -31,7 +26,65 @@ interface EntryContentProps {
   dailyUrl?: string;
   fourHourUrl?: string;
   oneHourUrl?: string;
+  // Additional props needed from original entry object
+  created_at?: string;
+  session_type?: string;
+  emotion?: string;
+  emotion_detail?: string;
+  outcome?: string;
+  mistakes?: string[];
 }
+
+// Utility functions that were previously imported
+const calculateTotalPL = (trades: Trade[]): number => {
+  return trades.reduce((total, trade) => {
+    const pnl = typeof trade.pnl === 'number' 
+      ? trade.pnl 
+      : typeof trade.profit_loss === 'number' 
+        ? trade.profit_loss 
+        : 0;
+    return total + pnl;
+  }, 0);
+};
+
+const calculateSessionTypeColor = (sessionType?: string): string => {
+  if (!sessionType) return "bg-gray-500";
+  
+  switch (sessionType) {
+    case "pre":
+      return "bg-blue-500";
+    case "post":
+      return "bg-green-500";
+    case "trade":
+      return "bg-amber-500";
+    default:
+      return "bg-gray-500";
+  }
+};
+
+const calculateRulesFollowedStyle = (rule: string): string => {
+  // Simple logic to assign color based on rule name
+  if (rule.toLowerCase().includes("risk")) return "bg-blue-500 hover:bg-blue-600";
+  if (rule.toLowerCase().includes("entry")) return "bg-green-500 hover:bg-green-600";
+  if (rule.toLowerCase().includes("exit")) return "bg-amber-500 hover:bg-amber-600";
+  return "bg-primary hover:bg-primary/90";
+};
+
+const calculateMistakeStyle = (mistake: string): string => {
+  // Simple logic to assign color based on mistake type
+  if (mistake.toLowerCase().includes("emotion")) return "bg-red-500 hover:bg-red-600";
+  if (mistake.toLowerCase().includes("risk")) return "bg-orange-500 hover:bg-orange-600";
+  if (mistake.toLowerCase().includes("analysis")) return "bg-purple-500 hover:bg-purple-600";
+  return "bg-pink-500 hover:bg-pink-600";
+};
+
+const calculatePreTradingActivityStyle = (activity: string): string => {
+  // Simple logic to assign color based on activity
+  if (activity.toLowerCase().includes("meditation")) return "bg-indigo-500 hover:bg-indigo-600";
+  if (activity.toLowerCase().includes("review")) return "bg-cyan-500 hover:bg-cyan-600";
+  if (activity.toLowerCase().includes("journal")) return "bg-teal-500 hover:bg-teal-600";
+  return "bg-emerald-500 hover:bg-emerald-600";
+};
 
 export const EntryContent: React.FC<EntryContentProps> = ({ 
   id,
@@ -44,19 +97,25 @@ export const EntryContent: React.FC<EntryContentProps> = ({
   weeklyUrl,
   dailyUrl,
   fourHourUrl,
-  oneHourUrl
+  oneHourUrl,
+  created_at,
+  session_type,
+  emotion,
+  emotion_detail,
+  outcome,
+  mistakes
 }) => {
   const totalPL = calculateTotalPL(trades || []);
-  const sessionTypeColor = calculateSessionTypeColor(entry.session_type);
+  const sessionTypeColor = calculateSessionTypeColor(session_type);
 
   return (
     <Card className="w-full">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>
-            {format(new Date(entry.created_at), "PPP")}
+            {created_at && format(new Date(created_at), "PPP")}
           </CardTitle>
-          <Badge className={sessionTypeColor}>{entry.session_type}</Badge>
+          <Badge className={sessionTypeColor}>{session_type}</Badge>
         </div>
       </CardHeader>
       <CardContent className="pl-4">
@@ -65,11 +124,11 @@ export const EntryContent: React.FC<EntryContentProps> = ({
             {/* Emotion and Details */}
             <div>
               <h4 className="text-sm font-semibold">Emotion</h4>
-              <p className="text-muted-foreground">{entry.emotion}</p>
-              {entry.emotion_detail && (
+              <p className="text-muted-foreground">{emotion}</p>
+              {emotion_detail && (
                 <>
                   <h4 className="text-sm font-semibold mt-2">Emotion Detail</h4>
-                  <p className="text-muted-foreground">{entry.emotion_detail}</p>
+                  <p className="text-muted-foreground">{emotion_detail}</p>
                 </>
               )}
             </div>
@@ -77,31 +136,31 @@ export const EntryContent: React.FC<EntryContentProps> = ({
             {/* Notes */}
             <div>
               <h4 className="text-sm font-semibold">Notes</h4>
-              <p className="text-muted-foreground">{entry.notes}</p>
+              <p className="text-muted-foreground">{notes}</p>
             </div>
 
             {/* Outcome */}
-            {entry.outcome && (
+            {outcome && (
               <div>
                 <h4 className="text-sm font-semibold">Outcome</h4>
-                <p className="text-muted-foreground">{entry.outcome}</p>
+                <p className="text-muted-foreground">{outcome}</p>
               </div>
             )}
 
             {/* Market Conditions */}
-            {entry.market_conditions && (
+            {marketConditions && (
               <div>
                 <h4 className="text-sm font-semibold">Market Conditions</h4>
-                <p className="text-muted-foreground">{entry.market_conditions}</p>
+                <p className="text-muted-foreground">{marketConditions}</p>
               </div>
             )}
 
             {/* Trades Accordion */}
-            {entry.trades && entry.trades.length > 0 && (
+            {trades && trades.length > 0 && (
               <div>
                 <h4 className="text-sm font-semibold">Trades</h4>
                 <Accordion type="single" collapsible>
-                  {entry.trades.map((trade, index) => (
+                  {trades.map((trade, index) => (
                     <AccordionItem key={index} value={`trade-${index}`}>
                       <AccordionTrigger>
                         Trade {index + 1}: {trade.instrument || "Unknown"}
@@ -171,11 +230,11 @@ export const EntryContent: React.FC<EntryContentProps> = ({
             <Separator />
 
             {/* Rules Followed */}
-            {entry.followed_rules && entry.followed_rules.length > 0 && (
+            {followedRules && followedRules.length > 0 && (
               <div>
                 <h4 className="text-sm font-semibold">Rules Followed</h4>
                 <div className="flex flex-wrap gap-1">
-                  {entry.followed_rules.map((rule, index) => {
+                  {followedRules.map((rule, index) => {
                     const style = calculateRulesFollowedStyle(rule);
                     return (
                       <Badge key={index} className={style}>
@@ -188,11 +247,11 @@ export const EntryContent: React.FC<EntryContentProps> = ({
             )}
 
             {/* Mistakes */}
-            {entry.mistakes && entry.mistakes.length > 0 && (
+            {mistakes && mistakes.length > 0 && (
               <div>
                 <h4 className="text-sm font-semibold">Mistakes</h4>
                 <div className="flex flex-wrap gap-1">
-                  {entry.mistakes.map((mistake, index) => {
+                  {mistakes.map((mistake, index) => {
                     const style = calculateMistakeStyle(mistake);
                     return (
                       <Badge key={index} className={style}>
@@ -205,11 +264,11 @@ export const EntryContent: React.FC<EntryContentProps> = ({
             )}
 
             {/* Pre-Trading Activities */}
-            {entry.pre_trading_activities && entry.pre_trading_activities.length > 0 && (
+            {preTradingActivities && preTradingActivities.length > 0 && (
               <div>
                 <h4 className="text-sm font-semibold">Pre-Trading Activities</h4>
                 <div className="flex flex-wrap gap-1">
-                  {entry.pre_trading_activities.map((activity, index) => {
+                  {preTradingActivities.map((activity, index) => {
                     const style = calculatePreTradingActivityStyle(activity);
                     return (
                       <Badge key={index} className={style}>
@@ -222,10 +281,10 @@ export const EntryContent: React.FC<EntryContentProps> = ({
             )}
 
             {/* Post Submission Notes */}
-            {entry.post_submission_notes && (
+            {postSubmissionNotes && (
               <div>
                 <h4 className="text-sm font-semibold">Post Submission Notes</h4>
-                <p className="text-muted-foreground">{entry.post_submission_notes}</p>
+                <p className="text-muted-foreground">{postSubmissionNotes}</p>
               </div>
             )}
           </div>
@@ -233,11 +292,4 @@ export const EntryContent: React.FC<EntryContentProps> = ({
       </CardContent>
     </Card>
   );
-};
-
-// Fix for the specific error mentioned
-const handleSomeFunctionWithError = (param: any) => {
-  // Convert string to the correct type or handle it appropriately
-  // This is just a placeholder fix - update according to actual implementation
-  return param;
 };
