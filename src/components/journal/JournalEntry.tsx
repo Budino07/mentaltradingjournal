@@ -24,7 +24,6 @@ interface JournalEntry {
   daily_url?: string;
   four_hour_url?: string;
   one_hour_url?: string;
-  mistakes?: string[];
 }
 
 interface JournalEntryProps {
@@ -92,12 +91,6 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
           dailyUrl={entry.daily_url}
           fourHourUrl={entry.four_hour_url}
           oneHourUrl={entry.one_hour_url}
-          created_at={entry.created_at}
-          session_type={entry.session_type}
-          emotion={entry.emotion}
-          emotion_detail={entry.emotion_detail}
-          outcome={entry.outcome}
-          mistakes={entry.mistakes}
         />
       </div>
     </Card>
