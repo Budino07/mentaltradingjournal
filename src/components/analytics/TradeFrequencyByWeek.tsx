@@ -144,7 +144,7 @@ export const TradeFrequencyByWeek = () => {
           // For the last week, the end is the end of the month
           const nextWeekStart = i < weeksInMonth.length - 1 
             ? weeksInMonth[i + 1] 
-            : new Date(monthEnd(tradeDate).getTime() + 1); // Add 1ms to include the end day
+            : new Date(endOfMonth(tradeDate).getTime() + 1); // Add 1ms to include the end day
           
           if (tradeDate >= weekStart && tradeDate < nextWeekStart) {
             const weekLabel = `Week ${i + 1}`;
