@@ -61,11 +61,10 @@ export const EntryContent = ({
       await new Promise(resolve => setTimeout(resolve, 800));
       
       toast.success("Notes updated successfully");
-      setIsEditing(false);
+      window.location.reload();
     } catch (error) {
       console.error('Error updating notes:', error);
       toast.error("Failed to update notes");
-    } finally {
       setIsSaving(false);
     }
   };
