@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import {
@@ -224,6 +223,7 @@ export const TradeFrequencyByWeek = () => {
             />
             <Tooltip 
               content={<CustomTooltip valueFormatter={valueFormatter} />}
+              cursor={{ fill: 'transparent' }}
             />
             <Bar 
               dataKey="trades" 
