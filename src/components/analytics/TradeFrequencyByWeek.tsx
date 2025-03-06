@@ -108,6 +108,12 @@ export const TradeFrequencyByWeek = () => {
           weekOfMonth = 1;
         }
         
+        // Always set the first week of a month to Week 1, regardless of actual week number
+        // This addresses the issue where it was showing Week 2 instead of Week 1
+        if (weekOfMonth === 1 || (weekNum === firstWeekOfMonth)) {
+          weekOfMonth = 1;
+        }
+        
         const weekLabel = `Week ${weekOfMonth}`;
         const weekKey = `${year}-${weekNum}`;
         
