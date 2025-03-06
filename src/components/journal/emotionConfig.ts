@@ -1,3 +1,4 @@
+
 import { Smile, Meh, Frown, ThumbsUp, Equal, ThumbsDown, MinusCircle, Activity } from "lucide-react";
 import { Emotion, TradingOutcome, MistakeCategory, TradingRule } from "./types";
 
@@ -50,7 +51,7 @@ export const tradingOutcome: TradingOutcome[] = [
   { icon: ThumbsUp, label: "Win", value: "win" },
   { icon: Equal, label: "Breakeven", value: "breakeven" },
   { icon: ThumbsDown, label: "Loss", value: "loss" },
-  { icon: Activity, label: "Open Trade", value: "open_trade" },
+  { icon: Activity, label: "Running Trade", value: "running_trade" },
   { icon: MinusCircle, label: "No Trades", value: "no_trades" },
 ];
 

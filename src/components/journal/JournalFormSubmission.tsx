@@ -1,3 +1,4 @@
+
 import { useJournalToast } from "@/hooks/useJournalToast";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
 import { toast } from "sonner";
@@ -93,7 +94,10 @@ export const useJournalFormSubmission = ({
         one_hour_url: oneHourUrl,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error submitting journal entry:', error);
+        throw error;
+      }
 
       await updateProgress(sessionType);
       console.log(`Progress updated for ${sessionType} session`);

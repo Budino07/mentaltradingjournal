@@ -57,13 +57,13 @@ export const TradingOutcomeSection = ({
         </div>
 
         <div>
-          <RadioGroupItem value="open_trade" id="open_trade" className="peer sr-only" />
+          <RadioGroupItem value="running_trade" id="running_trade" className="peer sr-only" />
           <Label
-            htmlFor="open_trade"
+            htmlFor="running_trade"
             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-primary/5 hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer transition-colors duration-200"
           >
             <Activity className="mb-2 h-5 w-5 text-yellow-500" />
-            <span>Open Trade</span>
+            <span>Running Trade</span>
           </Label>
         </div>
 
