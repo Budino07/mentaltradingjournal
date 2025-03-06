@@ -6,6 +6,10 @@ import { Trade } from "@/types/trade";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { useJournalEntryDelete } from "./entry/hooks/useJournalEntryDelete";
+import { JournalEntryDeleteDialog } from "./entry/JournalEntryDeleteDialog";
 
 interface JournalEntry {
   id: string;
@@ -32,6 +36,13 @@ interface JournalEntryProps {
 
 export const JournalEntry = ({ entry }: JournalEntryProps) => {
   const queryClient = useQueryClient();
+  const { 
+    isDeleteDialogOpen, 
+    setIsDeleteDialogOpen, 
+    isDeleting,
+    handleDeleteClick, 
+    handleDeleteConfirm 
+  } = useJournalEntryDelete();
 
   // Subscribe to real-time updates for trades
   useEffect(() => {
@@ -71,13 +82,24 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
   return (
     <Card className="p-6 rounded-lg bg-background/50 border border-primary/10 transition-all duration-300 hover:shadow-md">
       <div className="flex flex-col gap-6">
-        <SessionHeader
-          date={formattedDate}
-          sessionType={entry.session_type}
-          emotion={entry.emotion}
-          emotionDetail={entry.emotion_detail}
-          outcome={entry.outcome}
-        />
+        <div className="flex justify-between items-start">
+          <SessionHeader
+            date={formattedDate}
+            sessionType={entry.session_type}
+            emotion={entry.emotion}
+            emotionDetail={entry.emotion_detail}
+            outcome={entry.outcome}
+          />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleDeleteClick(entry.id)}
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4" />
+            <span className="sr-only">Delete entry</span>
+          </Button>
+        </div>
 
         <EntryContent
           id={entry.id}
@@ -93,6 +115,13 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
           oneHourUrl={entry.one_hour_url}
         />
       </div>
+
+      <JournalEntryDeleteDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isDeleting}
+      />
     </Card>
   );
 };
