@@ -1,6 +1,7 @@
+
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { ThumbsUp, Equal, ThumbsDown, XCircle } from "lucide-react";
+import { ThumbsUp, Equal, ThumbsDown, XCircle, Activity } from "lucide-react";
 
 interface TradingOutcomeSectionProps {
   selectedOutcome: string;
@@ -20,7 +21,7 @@ export const TradingOutcomeSection = ({
       <RadioGroup
         value={selectedOutcome}
         onValueChange={setSelectedOutcome}
-        className="grid grid-cols-2 md:grid-cols-4 gap-4"
+        className="grid grid-cols-2 md:grid-cols-5 gap-4"
       >
         <div>
           <RadioGroupItem value="win" id="win" className="peer sr-only" />
@@ -52,6 +53,17 @@ export const TradingOutcomeSection = ({
           >
             <ThumbsDown className="mb-2 h-5 w-5 text-red-500" />
             <span>Loss</span>
+          </Label>
+        </div>
+
+        <div>
+          <RadioGroupItem value="open_trade" id="open_trade" className="peer sr-only" />
+          <Label
+            htmlFor="open_trade"
+            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-primary/5 hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer transition-colors duration-200"
+          >
+            <Activity className="mb-2 h-5 w-5 text-yellow-500" />
+            <span>Open Trade</span>
           </Label>
         </div>
 
