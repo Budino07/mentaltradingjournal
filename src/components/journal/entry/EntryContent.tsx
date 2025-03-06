@@ -40,7 +40,18 @@ export const EntryContent = ({
 
   const formatNotes = (text: string) => {
     if (!text) return "";
-    return text.replace(/\n/g, "<br />");
+    
+    // First, convert newlines to <br> tags
+    let formattedText = text.replace(/\n/g, "<br />");
+    
+    // Then, convert URLs to clickable links
+    const urlRegex = /(https?:\/\/[^\s<]+)/g;
+    formattedText = formattedText.replace(
+      urlRegex, 
+      '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">$1</a>'
+    );
+    
+    return formattedText;
   };
 
   return (
