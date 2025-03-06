@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
+import { Trade } from "@/types/analytics";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload || !payload.length) return null;
@@ -39,16 +40,29 @@ const formatToK = (value: number): string => {
   return `${value < 0 ? '-' : ''}$${absValue}`;
 };
 
-const generateDynamicRanges = (trades: any[]) => {
-  const pnlValues = trades.map(trade => Number(trade.pnl));
-  const validPnlValues = pnlValues.filter(pnl => !isNaN(pnl) && isFinite(pnl));
+// Extract all PnL values from trades ensuring they're valid numbers
+const extractValidPnlValues = (trades: Trade[]): number[] => {
+  return trades
+    .map(trade => {
+      const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+                 typeof trade.pnl === 'number' ? trade.pnl :
+                 typeof trade.profit_loss === 'string' ? parseFloat(trade.profit_loss) :
+                 typeof trade.profit_loss === 'number' ? trade.profit_loss : 
+                 null;
+      return pnl !== null && !isNaN(pnl) ? pnl : null;
+    })
+    .filter((pnl): pnl is number => pnl !== null);
+};
+
+const generateDynamicRanges = (trades: Trade[]) => {
+  const pnlValues = extractValidPnlValues(trades);
   
-  if (validPnlValues.length === 0) {
+  if (pnlValues.length === 0) {
     return [];
   }
 
-  const min = Math.min(...validPnlValues);
-  const max = Math.max(...validPnlValues);
+  const min = Math.min(...pnlValues);
+  const max = Math.max(...pnlValues);
 
   // Handle case where all values are the same
   if (min === max) {
@@ -61,23 +75,17 @@ const generateDynamicRanges = (trades: any[]) => {
 
   // Determine the optimal number of bins based on data spread
   const spread = max - min;
-  const targetBinCount = spread > 10000 ? 6 : spread > 5000 ? 5 : 4;
+  const targetBinCount = Math.min(6, Math.max(4, Math.ceil(pnlValues.length / 2)));
 
   const binSize = Math.ceil(spread / targetBinCount);
   const ranges = [];
 
   // Create bins with round numbers
-  const roundToPrettyNumber = (num: number) => {
-    if (num === 0) return 0;
-    const magnitude = Math.pow(10, Math.floor(Math.log10(Math.abs(num))));
-    return Math.round(num / magnitude) * magnitude;
-  };
+  let currentMin = Math.floor(min);
+  const maxWithBuffer = Math.ceil(max + binSize * 0.1);
 
-  let currentMin = roundToPrettyNumber(min);
-  const roundedMax = roundToPrettyNumber(max + binSize);
-
-  while (currentMin < roundedMax) {
-    const currentMax = Math.min(roundToPrettyNumber(currentMin + binSize), roundedMax);
+  while (currentMin < maxWithBuffer) {
+    const currentMax = currentMin + binSize;
     ranges.push({
       min: currentMin,
       max: currentMax,
@@ -114,7 +122,10 @@ export const ProfitLossDistribution = () => {
 
   // Process trades from journal entries
   const allTrades = analytics.journalEntries.flatMap(entry => entry.trades || [])
-    .filter(trade => trade && trade.pnl !== undefined && trade.pnl !== null);
+    .filter(trade => trade && (trade.pnl !== undefined || trade.profit_loss !== undefined));
+
+  console.log("Total trades found:", allTrades.length);
+  console.log("Trades with valid PnL:", extractValidPnlValues(allTrades).length);
 
   if (allTrades.length === 0) {
     return (
@@ -128,6 +139,7 @@ export const ProfitLossDistribution = () => {
   }
 
   const ranges = generateDynamicRanges(allTrades);
+  console.log("Generated ranges:", ranges);
 
   if (ranges.length === 0) {
     return (
@@ -140,20 +152,30 @@ export const ProfitLossDistribution = () => {
     );
   }
 
-  const data = ranges.map(range => ({
-    range: formatRangeLabel(range),
-    count: allTrades.filter(trade => {
-      const pnl = Number(trade.pnl);
-      return pnl >= range.min && pnl < range.max;
-    }).length,
-    min: range.min // Add min value to determine color
-  }));
+  const data = ranges.map(range => {
+    const count = allTrades.filter(trade => {
+      const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+                 typeof trade.pnl === 'number' ? trade.pnl :
+                 typeof trade.profit_loss === 'string' ? parseFloat(trade.profit_loss) :
+                 typeof trade.profit_loss === 'number' ? trade.profit_loss : 
+                 null;
+      return pnl !== null && !isNaN(pnl) && pnl >= range.min && pnl < range.max;
+    }).length;
+    
+    console.log(`Range ${range.label}: ${count} trades`);
+    
+    return {
+      range: formatRangeLabel(range),
+      count: count,
+      min: range.min // Add min value to determine color
+    };
+  });
 
-  // Calculate statistics for AI insight with initial value for reduce
+  // Calculate statistics for AI insight
   const totalTrades = allTrades.length;
   const mostFrequentBin = data.reduce((prev, current) => 
     (current.count > prev.count) ? current : prev, 
-    { range: '', count: 0 }
+    { range: '', count: 0, min: 0 }
   );
   const mostFrequentPercentage = totalTrades > 0 ? (mostFrequentBin.count / totalTrades) * 100 : 0;
 
