@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   ScatterChart,
@@ -12,6 +13,7 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { format, parseISO } from "date-fns";
 
 const formatValue = (value: number): string => {
   if (Math.abs(value) >= 1000) {
@@ -72,10 +74,7 @@ const CustomTooltip = ({ active, payload }: any) => {
     return (
       <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
         <p className="font-medium text-sm text-foreground mb-2">
-          {new Date(data.date).toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric'
-          })}
+          {format(new Date(data.date), 'MMM d, yyyy')}
         </p>
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm">
@@ -122,29 +121,26 @@ export const EmotionTrend = () => {
     );
   }
 
+  // Create a proper map of dates to emotions, ensuring we use consistent date formats
   const preSessionEmotions = analytics.journalEntries
     .filter(entry => entry.session_type === 'pre')
     .reduce((acc, entry) => {
-      const date = new Date(entry.created_at);
-      const localDate = date.toLocaleDateString('en-US', { 
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      });
-      acc[localDate] = entry.emotion;
+      // Ensure all dates are stored in a consistent ISO format
+      const dateObj = new Date(entry.created_at);
+      const dateKey = dateObj.toISOString().split('T')[0]; // YYYY-MM-DD format
+      acc[dateKey] = entry.emotion;
       return acc;
     }, {} as Record<string, string>);
 
+  // Process trades with consistent date handling
   const tradesByDate = analytics.journalEntries
     .flatMap(entry => 
       entry.trades?.map(trade => {
-        const date = new Date(trade.entryDate || entry.created_at);
+        const dateObj = new Date(trade.entryDate || entry.created_at);
+        const dateKey = dateObj.toISOString().split('T')[0]; // YYYY-MM-DD format
+        
         return {
-          date: date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-          }),
+          date: dateKey,
           pnl: Number(trade.pnl) || 0,
         };
       }) || []
@@ -155,15 +151,21 @@ export const EmotionTrend = () => {
       return acc;
     }, {} as Record<string, number[]>);
 
-  const scatterData = Object.entries(tradesByDate).map(([dateStr, pnls]) => {
-    const [month, day, year] = dateStr.split('/');
-    const date = new Date(Number(year), Number(month) - 1, Number(day));
+  // Generate scatter data using the consistent date keys
+  const scatterData = Object.entries(tradesByDate).map(([dateKey, pnls]) => {
+    const dateObj = new Date(dateKey);
     return {
-      date: date.getTime(),
+      date: dateObj.getTime(), // Unix timestamp for sorting
+      dateString: dateKey, // Keep the original string for reference
       pnl: pnls.reduce((sum, pnl) => sum + pnl, 0),
-      emotion: preSessionEmotions[dateStr] || 'neutral'
+      emotion: preSessionEmotions[dateKey] || 'neutral'
     };
-  }).sort((a, b) => a.date - b.date);
+  }).sort((a, b) => a.date - b.date); // Sort by date
+
+  // Create a map of dates for better axis display
+  const uniqueDates = scatterData
+    .map(item => new Date(item.date))
+    .sort((a, b) => a.getTime() - b.getTime());
 
   const positiveData = scatterData.filter(d => d.emotion === 'positive');
   const neutralData = scatterData.filter(d => d.emotion === 'neutral');
@@ -209,13 +211,12 @@ export const EmotionTrend = () => {
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
             <XAxis
               dataKey="date"
-              domain={['auto', 'auto']}
               name="Time"
-              tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric'
-              })}
               type="number"
+              domain={['dataMin', 'dataMax']}
+              scale="time"
+              tickFormatter={(unixTime) => format(new Date(unixTime), 'MMM d')}
+              ticks={uniqueDates.map(date => date.getTime())}
             />
             <YAxis
               dataKey="pnl"

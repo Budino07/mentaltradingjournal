@@ -1,3 +1,4 @@
+
 import { JournalEntry } from "@/types/analytics";
 
 export const calculateEmotionRecovery = (entries: JournalEntry[]) => {
@@ -18,21 +19,21 @@ export const calculateEmotionRecovery = (entries: JournalEntry[]) => {
 };
 
 export const calculateEmotionTrend = (entries: JournalEntry[]) => {
-  // Filter pre-session entries to get emotional states
+  // Filter pre-session entries to get emotional states using ISO date format
   const preSessionEmotions = entries
     .filter(entry => entry.session_type === 'pre')
     .reduce((acc, entry) => {
-      const date = new Date(entry.created_at).toISOString().split('T')[0];
+      const date = new Date(entry.created_at).toISOString().split('T')[0]; // YYYY-MM-DD format
       acc[date] = entry.emotion;
       return acc;
     }, {} as Record<string, string>);
 
-  // Get all trades with their dates and PnL
+  // Get all trades with their dates and PnL using ISO date format
   const tradesByDate = entries.reduce((acc, entry) => {
     if (!entry.trades) return acc;
     
     entry.trades.forEach(trade => {
-      const date = new Date(trade.entryDate || entry.created_at).toISOString().split('T')[0];
+      const date = new Date(trade.entryDate || entry.created_at).toISOString().split('T')[0]; // YYYY-MM-DD format
       if (!acc[date]) acc[date] = [];
       
       const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) :
@@ -51,9 +52,9 @@ export const calculateEmotionTrend = (entries: JournalEntry[]) => {
     const totalPnL = pnls.reduce((sum, pnl) => sum + pnl, 0);
     
     return {
-      date: new Date(date).getTime(),
+      date: new Date(date).getTime(), // Store as timestamp for sorting
       pnl: totalPnL,
       emotion: preSessionEmotions[date] || 'neutral'
     };
-  }).sort((a, b) => a.date - b.date);
+  }).sort((a, b) => a.date - b.date); // Sort by date
 };
