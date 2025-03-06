@@ -12,9 +12,10 @@ import { formatDate } from "./utils/dateUtils";
 
 interface TradesListProps {
   trades: Trade[];
+  journalEntryId?: string; // Make this optional
 }
 
-export const TradesList = ({ trades }: TradesListProps) => {
+export const TradesList = ({ trades, journalEntryId }: TradesListProps) => {
   const { user } = useAuth();
   const {
     isEditDialogOpen,

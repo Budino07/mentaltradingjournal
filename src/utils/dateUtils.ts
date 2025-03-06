@@ -1,4 +1,5 @@
-import { differenceInDays, isWeekend } from 'date-fns';
+
+import { differenceInDays, isWeekend, format } from 'date-fns';
 
 export const shouldResetStreak = (lastActivity: Date): boolean => {
   const today = new Date();
@@ -16,4 +17,17 @@ export const shouldResetStreak = (lastActivity: Date): boolean => {
   }
   
   return false;
+};
+
+// Add format function for date formatting
+export const formatDate = (date: string | Date): string => {
+  if (!date) return '';
+  
+  try {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return format(dateObj, 'MMM dd, yyyy HH:mm');
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return '';
+  }
 };

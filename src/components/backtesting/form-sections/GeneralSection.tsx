@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import { useState } from "react";
 
 interface GeneralSectionProps {
   formData: {
@@ -23,14 +24,26 @@ interface GeneralSectionProps {
 }
 
 export function GeneralSection({ formData, direction, onInputChange, onDirectionSelect }: GeneralSectionProps) {
+  const [date, setDate] = useState<Date | undefined>(
+    formData.entryDate ? new Date(formData.entryDate) : undefined
+  );
+  
   const handleDateSelect = (date: Date | undefined) => {
     if (!date) return;
+    setDate(date);
     
-    // Preserve the local date by using the local timezone
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}T00:00`;
+    // If time exists in the current entryDate, preserve it
+    const existingDate = formData.entryDate ? new Date(formData.entryDate) : new Date();
+    const hours = existingDate.getHours();
+    const minutes = existingDate.getMinutes();
+    
+    // Set the selected date with the existing time
+    const newDate = new Date(date);
+    newDate.setHours(hours);
+    newDate.setMinutes(minutes);
+    
+    // Format as ISO string but cut off at minutes for the datetime-local input
+    const formattedDate = newDate.toISOString().slice(0, 16);
     
     // Create a synthetic event to match the expected type
     const syntheticEvent = {
@@ -43,23 +56,28 @@ export function GeneralSection({ formData, direction, onInputChange, onDirection
     onInputChange(syntheticEvent);
   };
 
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // This will directly pass the event to the parent handler
+    onInputChange(e);
+  };
+  
   return (
     <div className="space-y-4 p-6 bg-background/50 border rounded-lg">
       <h3 className="text-lg font-semibold">General</h3>
       
       <div className="space-y-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between">
           <Label htmlFor="entryDate">Entry Date & Time</Label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-4 w-4 p-0">
+              <Button variant="outline" size="sm" className="h-8 w-8 p-0">
                 <Calendar className="h-4 w-4" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0" align="end">
               <CalendarComponent
                 mode="single"
-                selected={formData.entryDate ? new Date(formData.entryDate) : undefined}
+                selected={date}
                 onSelect={handleDateSelect}
                 initialFocus
               />
@@ -70,7 +88,7 @@ export function GeneralSection({ formData, direction, onInputChange, onDirection
           type="datetime-local"
           id="entryDate"
           value={formData.entryDate}
-          onChange={onInputChange}
+          onChange={handleTimeChange}
           className="w-full"
         />
       </div>
