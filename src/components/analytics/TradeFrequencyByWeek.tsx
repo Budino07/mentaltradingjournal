@@ -12,7 +12,17 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
-import { format, parseISO, getMonth, getYear, getWeek, startOfMonth, endOfMonth, eachWeekOfInterval } from "date-fns";
+import { 
+  format, 
+  parseISO, 
+  getMonth, 
+  getYear, 
+  startOfMonth, 
+  endOfMonth, 
+  eachWeekOfInterval,
+  getDate,
+  isLastDayOfMonth
+} from "date-fns";
 import { CustomTooltip } from "./shared/CustomTooltip";
 import {
   Select,
@@ -52,18 +62,38 @@ export const TradeFrequencyByWeek = () => {
   // Get current year
   const currentYear = getYear(new Date());
 
-  // Function to get all weeks in the selected month
+  // Function to get standard weeks in the selected month (usually 4-5 weeks)
   const getWeeksInMonth = (month: number, year: number) => {
     const monthStart = startOfMonth(new Date(year, month));
     const monthEnd = endOfMonth(new Date(year, month));
     
-    return eachWeekOfInterval(
+    // Get all weeks that touch this month
+    const allWeeks = eachWeekOfInterval(
       { start: monthStart, end: monthEnd },
       { weekStartsOn: 0 } // 0 for Sunday
     );
+    
+    // Limit to 5 weeks maximum for consistency and merging partial weeks
+    const normalizedWeeks: Date[] = [];
+    
+    if (allWeeks.length <= 5) {
+      // If 5 or fewer weeks, use all of them
+      normalizedWeeks.push(...allWeeks);
+    } else {
+      // If more than 5 weeks, merge any partial weeks at start/end
+      // For example, if the month has 6 weeks with small partial weeks
+      
+      // Always include the first 4 weeks
+      normalizedWeeks.push(...allWeeks.slice(0, 4));
+      
+      // Use the last week to represent the rest of the month
+      normalizedWeeks.push(allWeeks[allWeeks.length - 1]);
+    }
+    
+    return normalizedWeeks;
   };
 
-  // Initialize week counts
+  // Initialize week counts with normalized week labels
   const initializeWeekCounts = () => {
     const weeks = getWeeksInMonth(selectedMonth, currentYear);
     const weekCounts: Record<string, number> = {};
@@ -99,10 +129,22 @@ export const TradeFrequencyByWeek = () => {
         const monthStart = startOfMonth(tradeDate);
         const weeksInMonth = getWeeksInMonth(selectedMonth, currentYear);
         
+        // For trades at the end of the month that might fall into a partial week,
+        // assign them to the last full week
+        if (isLastDayOfMonth(tradeDate) && getDate(tradeDate) <= 3) {
+          const weekLabel = `Week ${weeksInMonth.length}`;
+          weekCounts[weekLabel] = (weekCounts[weekLabel] || 0) + 1;
+          processedTradeIds.add(trade.id);
+          return;
+        }
+        
         // Find which week of the month this trade falls into
         for (let i = 0; i < weeksInMonth.length; i++) {
           const weekStart = weeksInMonth[i];
-          const nextWeekStart = i < weeksInMonth.length - 1 ? weeksInMonth[i + 1] : endOfMonth(tradeDate);
+          // For the last week, the end is the end of the month
+          const nextWeekStart = i < weeksInMonth.length - 1 
+            ? weeksInMonth[i + 1] 
+            : new Date(monthEnd(tradeDate).getTime() + 1); // Add 1ms to include the end day
           
           if (tradeDate >= weekStart && tradeDate < nextWeekStart) {
             const weekLabel = `Week ${i + 1}`;
