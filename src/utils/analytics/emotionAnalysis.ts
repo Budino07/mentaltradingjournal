@@ -24,7 +24,7 @@ export const calculateEmotionTrend = (entries: JournalEntry[]) => {
     .filter(entry => entry.session_type === 'pre')
     .reduce((acc, entry) => {
       const date = new Date(entry.created_at).toISOString().split('T')[0]; // YYYY-MM-DD format
-      acc[date] = entry.emotion;
+      acc[date] = entry.emotion || 'neutral';
       return acc;
     }, {} as Record<string, string>);
 

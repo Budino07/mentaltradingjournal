@@ -1,14 +1,16 @@
+
 import { Card } from "@/components/ui/card";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import { BalanceSelector } from "./equity-curve/BalanceSelector";
 import { EquityCurveChart } from "./equity-curve/EquityCurveChart";
 import { EquityMetrics } from "./equity-curve/EquityMetrics";
 import { supabase } from "@/integrations/supabase/client";
+import { getInitialCapital, setInitialCapital } from "@/utils/capitalUtils";
+import { CapitalSettingsDialog } from "./CapitalSettingsDialog";
 
 export const EquityCurve = () => {
-  const [selectedBalance, setSelectedBalance] = useState(10000);
+  const [selectedBalance, setSelectedBalance] = useState(() => getInitialCapital());
   
   const { data: analytics, isLoading, refetch } = useQuery({
     queryKey: ['analytics'],
@@ -36,6 +38,21 @@ export const EquityCurve = () => {
       supabase.removeChannel(channel);
     };
   }, [refetch]);
+
+  // Update initial capital when changed externally
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setSelectedBalance(getInitialCapital());
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  const handleCapitalUpdate = () => {
+    // Refresh initial capital from localStorage
+    setSelectedBalance(getInitialCapital());
+  };
 
   if (isLoading || !analytics) {
     return (
@@ -73,7 +90,7 @@ export const EquityCurve = () => {
     }, []);
 
   // Calculate performance metrics
-  const currentBalance = equityData[equityData.length - 1]?.balance || selectedBalance;
+  const currentBalance = equityData.length > 0 ? equityData[equityData.length - 1]?.balance : selectedBalance;
   const totalReturn = ((currentBalance - selectedBalance) / selectedBalance) * 100;
   
   // Calculate maximum drawdown
@@ -93,10 +110,7 @@ export const EquityCurve = () => {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h3 className="text-xl md:text-2xl font-bold">Equity Curve</h3>
-          <BalanceSelector
-            selectedBalance={selectedBalance}
-            onBalanceChange={setSelectedBalance}
-          />
+          <CapitalSettingsDialog onSave={handleCapitalUpdate} />
         </div>
         <p className="text-sm text-muted-foreground">
           Track your account balance progression over time
