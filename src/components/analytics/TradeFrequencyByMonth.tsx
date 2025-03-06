@@ -47,6 +47,22 @@ export const TradeFrequencyByMonth = () => {
     'December': 0
   };
 
+  // Initialize monthly P&L for all months
+  const monthlyPnL = {
+    'January': 0,
+    'February': 0,
+    'March': 0,
+    'April': 0,
+    'May': 0,
+    'June': 0,
+    'July': 0,
+    'August': 0,
+    'September': 0,
+    'October': 0,
+    'November': 0,
+    'December': 0
+  };
+
   // Process all trades from journal entries
   const processedTradeIds = new Set<string>();
   
@@ -65,6 +81,11 @@ export const TradeFrequencyByMonth = () => {
       const month = format(tradeDate, 'MMMM'); // Get full month name
       monthCounts[month]++;
       
+      // Add the trade's P&L to the monthly total
+      const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+                  typeof trade.pnl === 'number' ? trade.pnl : 0;
+      monthlyPnL[month] += pnl;
+      
       // Mark this trade as processed
       processedTradeIds.add(trade.id);
     });
@@ -79,6 +100,7 @@ export const TradeFrequencyByMonth = () => {
   const data = months.map(month => ({
     month,
     trades: monthCounts[month],
+    pnl: monthlyPnL[month]
   }));
 
   const formatYAxisTick = (value: number): string => {

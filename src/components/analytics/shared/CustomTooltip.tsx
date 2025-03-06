@@ -1,3 +1,4 @@
+
 interface TooltipProps {
   active?: boolean;
   payload?: Array<{
@@ -6,6 +7,7 @@ interface TooltipProps {
     color: string;
     dataKey?: string;
     fill?: string;
+    payload?: any;
   }>;
   label?: string;
   valueFormatter?: (value: number) => string;
@@ -31,6 +33,17 @@ export const CustomTooltip = ({ active, payload, label, valueFormatter }: Toolti
           </span>
         </div>
       ))}
+      
+      {/* Display Net P&L if available in the payload */}
+      {payload[0]?.payload?.pnl !== undefined && (
+        <div className="flex items-center gap-2 text-sm mt-1">
+          <div className="w-2 h-2 rounded-full bg-transparent" />
+          <span className="text-muted-foreground">Net P&L:</span>
+          <span className={`font-medium ${payload[0].payload.pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            ${payload[0].payload.pnl.toFixed(2)}
+          </span>
+        </div>
+      )}
     </div>
   );
 };
