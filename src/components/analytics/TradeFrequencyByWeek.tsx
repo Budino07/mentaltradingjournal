@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import {
@@ -96,17 +95,17 @@ export const TradeFrequencyByWeek = () => {
   // Initialize week counts with normalized week labels
   const initializeWeekCounts = () => {
     const weeks = getWeeksInMonth(selectedMonth, currentYear);
-    const weekData: Record<string, { trades: number, pnl: number }> = {};
+    const weekCounts: Record<string, number> = {};
     
     weeks.forEach((weekStart, index) => {
       // Always label as Week 1, Week 2, etc.
-      weekData[`Week ${index + 1}`] = { trades: 0, pnl: 0 };
+      weekCounts[`Week ${index + 1}`] = 0;
     });
     
-    return weekData;
+    return weekCounts;
   };
 
-  const weekData = initializeWeekCounts();
+  const weekCounts = initializeWeekCounts();
 
   // Process trades for the selected month
   const processedTradeIds = new Set<string>();
@@ -129,16 +128,11 @@ export const TradeFrequencyByWeek = () => {
         const monthStart = startOfMonth(tradeDate);
         const weeksInMonth = getWeeksInMonth(selectedMonth, currentYear);
         
-        // Calculate trade P&L
-        const tradePnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
-                        typeof trade.pnl === 'number' ? trade.pnl : 0;
-        
         // For trades at the end of the month that might fall into a partial week,
         // assign them to the last full week
         if (isLastDayOfMonth(tradeDate) && getDate(tradeDate) <= 3) {
           const weekLabel = `Week ${weeksInMonth.length}`;
-          weekData[weekLabel].trades += 1;
-          weekData[weekLabel].pnl += tradePnl;
+          weekCounts[weekLabel] = (weekCounts[weekLabel] || 0) + 1;
           processedTradeIds.add(trade.id);
           return;
         }
@@ -153,8 +147,7 @@ export const TradeFrequencyByWeek = () => {
           
           if (tradeDate >= weekStart && tradeDate < nextWeekStart) {
             const weekLabel = `Week ${i + 1}`;
-            weekData[weekLabel].trades += 1;
-            weekData[weekLabel].pnl += tradePnl;
+            weekCounts[weekLabel] = (weekCounts[weekLabel] || 0) + 1;
             break;
           }
         }
@@ -165,11 +158,10 @@ export const TradeFrequencyByWeek = () => {
     });
   });
 
-  // Convert week data to chart data format
-  const data = Object.entries(weekData).map(([weekLabel, data]) => ({
+  // Convert week counts to chart data format
+  const data = Object.entries(weekCounts).map(([weekLabel, trades]) => ({
     week: weekLabel,
-    trades: data.trades,
-    pnl: data.pnl
+    trades: trades,
   }));
 
   const formatYAxisTick = (value: number): string => {
