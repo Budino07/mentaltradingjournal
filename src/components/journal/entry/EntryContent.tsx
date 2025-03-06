@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Trade } from "@/types/trade";
@@ -84,7 +85,7 @@ export const EntryContent = ({
     );
   };
 
-  const renderTextWithLinks = (text: string | undefined): ReactNode[] => {
+  const renderTextWithLinks = (text?: string): ReactNode[] => {
     if (!text) return [];
     
     const urlRegex = /(https?:\/\/[^\s]+)/g;

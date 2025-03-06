@@ -11,6 +11,7 @@ import { MistakeAnalysis } from "./MistakeAnalysis";
 import { PersonalityPatterns } from "./PersonalityPatterns";
 import { ProfitLossDistribution } from "./ProfitLossDistribution";
 import { TradeFrequency } from "./TradeFrequency";
+import { TradeFrequencyByMonth } from "./TradeFrequencyByMonth";
 import { RiskRewardAnalysis } from "./RiskRewardAnalysis";
 import { WinLossRatio } from "./WinLossRatio";
 import { AssetPairPerformance } from "./AssetPairPerformance";
@@ -40,6 +41,7 @@ export const AnalyticsDashboard = () => {
     TradeDuration,
     ProfitLossDistribution,
     TradeFrequency,
+    TradeFrequencyByMonth,
     RiskRewardAnalysis,
     WinLossRatio,
   ];
