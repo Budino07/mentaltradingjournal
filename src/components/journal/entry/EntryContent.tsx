@@ -161,10 +161,10 @@ export const EntryContent = ({
           <Separator />
           <div className="space-y-3">
             <h4 className="text-sm font-medium">Trades</h4>
-            <TradesList journalEntryId={id} trades={trades} />
+            <TradesList trades={trades} />
           </div>
         </>
       )}
     </div>
   );
-};
+}
