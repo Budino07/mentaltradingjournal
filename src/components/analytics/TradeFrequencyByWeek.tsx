@@ -93,8 +93,22 @@ export const TradeFrequencyByWeek = () => {
         const month = getMonth(tradeDate);
         const weekNum = getWeek(tradeDate, { weekStartsOn: 1 }); // Week starts on Monday
         
-        // Generate a week label that's "Week X" 
-        const weekLabel = `Week ${weekNum - getWeek(new Date(year, month, 1), { weekStartsOn: 1 }) + 1}`;
+        // Calculate the first day of the month
+        const firstDayOfMonth = new Date(year, month, 1);
+        // Get the week number of the first day of the month
+        const firstWeekOfMonth = getWeek(firstDayOfMonth, { weekStartsOn: 1 });
+        
+        // Generate a week label that's "Week X" where X starts from 1 for the first week of the month
+        // We need to handle the case when the first week of the month is in the previous year
+        let weekOfMonth = weekNum - firstWeekOfMonth + 1;
+        
+        // Handle edge case for end of year/beginning of year
+        if (weekOfMonth < 0) {
+          // This means we're in the first week of January but the week started in December
+          weekOfMonth = 1;
+        }
+        
+        const weekLabel = `Week ${weekOfMonth}`;
         const weekKey = `${year}-${weekNum}`;
         
         // Initialize week if not exists
@@ -158,7 +172,7 @@ export const TradeFrequencyByWeek = () => {
     <Card className="p-4 md:p-6 space-y-4">
       <div className="flex justify-between items-center">
         <div className="space-y-2">
-          <h3 className="text-xl md:text-2xl font-bold">Weekly Trade Frequency</h3>
+          <h3 className="text-xl md:text-2xl font-bold">Trade Frequency By Week</h3>
           <p className="text-sm text-muted-foreground">
             Number of trades by week {selectedMonth !== "all" ? `in ${selectedMonth}` : ''}
           </p>

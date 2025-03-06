@@ -17,7 +17,7 @@ export const CustomTooltip = ({ active, payload, label, valueFormatter }: Toolti
   if (!active || !payload || !payload.length) return null;
 
   return (
-    <div className="rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95 bg-background/80 backdrop-blur-sm border border-border">
+    <div className="rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95 bg-background/70 backdrop-blur-md border border-border">
       <p className="font-medium text-sm text-foreground mb-2">{label}</p>
       {payload.map((entry, index) => (
         <div key={index} className="flex items-center gap-2 text-sm">
