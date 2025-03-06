@@ -44,11 +44,14 @@ const formatToK = (value: number): string => {
 const extractValidPnlValues = (trades: Trade[]): number[] => {
   return trades
     .map(trade => {
+      // Try to extract PnL value from multiple possible fields/formats
       const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
                  typeof trade.pnl === 'number' ? trade.pnl :
                  typeof trade.profit_loss === 'string' ? parseFloat(trade.profit_loss) :
                  typeof trade.profit_loss === 'number' ? trade.profit_loss : 
                  null;
+                 
+      // Only return valid numeric values (not NaN)
       return pnl !== null && !isNaN(pnl) ? pnl : null;
     })
     .filter((pnl): pnl is number => pnl !== null);
@@ -73,17 +76,19 @@ const generateDynamicRanges = (trades: Trade[]) => {
     }];
   }
 
-  // Determine the optimal number of bins based on data spread
+  // Use a smaller number of bins to ensure trades are visible
+  // This ensures each bin is more likely to have trades
+  const targetBinCount = Math.min(4, Math.max(2, Math.ceil(pnlValues.length / 2)));
+  
+  // Calculate bin size based on data range and target bin count
   const spread = max - min;
-  const targetBinCount = Math.min(6, Math.max(4, Math.ceil(pnlValues.length / 2)));
-
   const binSize = Math.ceil(spread / targetBinCount);
+  
   const ranges = [];
-
-  // Create bins with round numbers
   let currentMin = Math.floor(min);
   const maxWithBuffer = Math.ceil(max + binSize * 0.1);
 
+  // Create bins with round numbers
   while (currentMin < maxWithBuffer) {
     const currentMax = currentMin + binSize;
     ranges.push({
@@ -138,6 +143,7 @@ export const ProfitLossDistribution = () => {
     );
   }
 
+  // Create ranges based on trade PnL values
   const ranges = generateDynamicRanges(allTrades);
   console.log("Generated ranges:", ranges);
 
@@ -152,13 +158,17 @@ export const ProfitLossDistribution = () => {
     );
   }
 
+  // Count trades in each range
   const data = ranges.map(range => {
+    // Count trades in this range - important fix: use >= for min and < for max
     const count = allTrades.filter(trade => {
       const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
                  typeof trade.pnl === 'number' ? trade.pnl :
                  typeof trade.profit_loss === 'string' ? parseFloat(trade.profit_loss) :
                  typeof trade.profit_loss === 'number' ? trade.profit_loss : 
                  null;
+      
+      // Fixed range calculation: >= min and < max
       return pnl !== null && !isNaN(pnl) && pnl >= range.min && pnl < range.max;
     }).length;
     
