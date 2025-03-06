@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { TradesList } from "./TradesList";
 import { TradingRules } from "./TradingRules";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp, ListChecks, NotebookPen, LineChart } from "lucide-react";
+import { ChevronDown, ChevronUp, ListChecks, NotebookPen, LineChart, ExternalLink } from "lucide-react";
 import { Trade } from "@/types/trade";
 
 interface EntryContentProps {
@@ -52,6 +52,13 @@ export const EntryContent = ({
     );
     
     return formattedText;
+  };
+
+  // Function to handle opening the image URL in a new tab
+  const openImageInNewTab = (url?: string) => {
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (
@@ -109,26 +116,86 @@ export const EntryContent = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {weeklyUrl && (
               <div className="space-y-1">
-                <p className="text-xs font-medium">Weekly</p>
-                <img src={weeklyUrl} alt="Weekly chart" className="rounded-md border max-h-64 object-contain" />
+                <p className="text-xs font-medium flex items-center gap-1">
+                  Weekly
+                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                </p>
+                <div 
+                  onClick={() => openImageInNewTab(weeklyUrl)} 
+                  className="cursor-pointer hover:opacity-90 transition-opacity relative group"
+                >
+                  <img 
+                    src={weeklyUrl} 
+                    alt="Weekly chart" 
+                    className="rounded-md border max-h-64 object-contain w-full" 
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                    <ExternalLink className="w-6 h-6 text-white" />
+                  </div>
+                </div>
               </div>
             )}
             {dailyUrl && (
               <div className="space-y-1">
-                <p className="text-xs font-medium">Daily</p>
-                <img src={dailyUrl} alt="Daily chart" className="rounded-md border max-h-64 object-contain" />
+                <p className="text-xs font-medium flex items-center gap-1">
+                  Daily
+                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                </p>
+                <div 
+                  onClick={() => openImageInNewTab(dailyUrl)} 
+                  className="cursor-pointer hover:opacity-90 transition-opacity relative group"
+                >
+                  <img 
+                    src={dailyUrl} 
+                    alt="Daily chart" 
+                    className="rounded-md border max-h-64 object-contain w-full" 
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                    <ExternalLink className="w-6 h-6 text-white" />
+                  </div>
+                </div>
               </div>
             )}
             {fourHourUrl && (
               <div className="space-y-1">
-                <p className="text-xs font-medium">4-Hour</p>
-                <img src={fourHourUrl} alt="4-Hour chart" className="rounded-md border max-h-64 object-contain" />
+                <p className="text-xs font-medium flex items-center gap-1">
+                  4-Hour
+                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                </p>
+                <div 
+                  onClick={() => openImageInNewTab(fourHourUrl)} 
+                  className="cursor-pointer hover:opacity-90 transition-opacity relative group"
+                >
+                  <img 
+                    src={fourHourUrl} 
+                    alt="4-Hour chart" 
+                    className="rounded-md border max-h-64 object-contain w-full" 
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                    <ExternalLink className="w-6 h-6 text-white" />
+                  </div>
+                </div>
               </div>
             )}
             {oneHourUrl && (
               <div className="space-y-1">
-                <p className="text-xs font-medium">1-Hour</p>
-                <img src={oneHourUrl} alt="1-Hour chart" className="rounded-md border max-h-64 object-contain" />
+                <p className="text-xs font-medium flex items-center gap-1">
+                  1-Hour
+                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                </p>
+                <div 
+                  onClick={() => openImageInNewTab(oneHourUrl)} 
+                  className="cursor-pointer hover:opacity-90 transition-opacity relative group"
+                >
+                  <img 
+                    src={oneHourUrl} 
+                    alt="1-Hour chart" 
+                    className="rounded-md border max-h-64 object-contain w-full" 
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                    <ExternalLink className="w-6 h-6 text-white" />
+                  </div>
+                </div>
               </div>
             )}
           </div>
