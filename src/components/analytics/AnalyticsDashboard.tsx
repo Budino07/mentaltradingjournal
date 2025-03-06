@@ -53,7 +53,7 @@ export const AnalyticsDashboard = () => {
       case 'trading':
         return tradingComponents;
       default:
-        return [EmotionTrend, ...psychologicalComponents.slice(1), ...tradingComponents];
+        return [...psychologicalComponents, ...tradingComponents];
     }
   };
 

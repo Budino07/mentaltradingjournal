@@ -73,7 +73,9 @@ export const TradeFrequencyByMonth = () => {
       monthData[month].pnl += pnlValue;
       
       // Mark this trade as processed
-      processedTradeIds.add(trade.id);
+      if (trade.id) {
+        processedTradeIds.add(trade.id);
+      }
     });
   });
 
