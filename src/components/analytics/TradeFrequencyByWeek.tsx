@@ -33,19 +33,23 @@ export const TradeFrequencyByWeek = () => {
   const months = useMemo(() => {
     if (!analytics?.journalEntries?.length) return [];
     
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    
     const uniqueMonths = new Set<string>();
     
-    analytics.journalEntries.forEach(entry => {
-      if (!entry.trades?.length) return;
-      
-      const month = format(parseISO(entry.created_at), 'MMMM yyyy');
-      uniqueMonths.add(month);
+    // Add all months with year
+    const currentYear = new Date().getFullYear();
+    monthNames.forEach(month => {
+      uniqueMonths.add(`${month} ${currentYear}`);
     });
     
     return Array.from(uniqueMonths).sort((a, b) => {
-      const dateA = new Date(a);
-      const dateB = new Date(b);
-      return dateB.getTime() - dateA.getTime(); // Sort most recent first
+      const monthA = monthNames.findIndex(m => a.includes(m));
+      const monthB = monthNames.findIndex(m => b.includes(m));
+      return monthA - monthB; // Sort chronologically
     });
   }, [analytics]);
   
@@ -54,7 +58,18 @@ export const TradeFrequencyByWeek = () => {
     
     // Process all trades from journal entries
     const processedTradeIds = new Set<string>();
-    const weekCounts: Record<string, { trades: number, pnl: number }> = {};
+    
+    // Instead of storing weekNum and weekLabel directly in the object,
+    // we'll create an interface
+    interface WeekCount {
+      trades: number;
+      pnl: number;
+      weekNum: number;
+      weekLabel: string;
+      year: number;
+    }
+    
+    const weekCounts: Record<string, WeekCount> = {};
     
     analytics.journalEntries.forEach(entry => {
       if (!entry.trades) return;
@@ -75,10 +90,11 @@ export const TradeFrequencyByWeek = () => {
         }
         
         const year = getYear(tradeDate);
+        const month = getMonth(tradeDate);
         const weekNum = getWeek(tradeDate, { weekStartsOn: 1 }); // Week starts on Monday
-        const weekStart = format(startOfWeek(tradeDate, { weekStartsOn: 1 }), 'MMM d');
-        const weekEnd = format(endOfWeek(tradeDate, { weekStartsOn: 1 }), 'MMM d');
-        const weekLabel = `${weekStart} - ${weekEnd}`;
+        
+        // Generate a week label that's "Week X" 
+        const weekLabel = `Week ${weekNum - getWeek(new Date(year, month, 1), { weekStartsOn: 1 }) + 1}`;
         const weekKey = `${year}-${weekNum}`;
         
         // Initialize week if not exists
