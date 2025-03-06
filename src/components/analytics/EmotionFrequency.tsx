@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
@@ -7,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { startOfWeek, startOfMonth, startOfQuarter, startOfYear, isAfter } from "date-fns";
 import { formatDate } from "@/utils/dateUtils";
+import { cn } from "@/lib/utils";
 
 export const EmotionFrequency = () => {
   const [timeFilter, setTimeFilter] = useState<"week" | "month" | "quarter" | "year">("month");
@@ -21,12 +21,10 @@ export const EmotionFrequency = () => {
       return [];
     }
 
-    // Filter post-session entries only
     const postSessionEntries = analytics.journalEntries.filter(entry => 
       entry.session_type === 'post'
     );
 
-    // Apply time filter
     const now = new Date();
     let startDate;
     
@@ -50,7 +48,6 @@ export const EmotionFrequency = () => {
       return isAfter(entryDate, startDate);
     });
 
-    // Count emotions
     const emotionCounts = {
       "positive": 0,
       "neutral": 0,
@@ -63,9 +60,8 @@ export const EmotionFrequency = () => {
       }
     });
 
-    // Transform to chart data format
     return Object.keys(emotionCounts).map(emotion => ({
-      emotion: emotion.charAt(0).toUpperCase() + emotion.slice(1), // Capitalize
+      emotion: emotion.charAt(0).toUpperCase() + emotion.slice(1),
       count: emotionCounts[emotion as keyof typeof emotionCounts]
     }));
   }, [analytics, timeFilter]);
@@ -73,13 +69,13 @@ export const EmotionFrequency = () => {
   const getEmotionColor = (emotion: string) => {
     switch (emotion.toLowerCase()) {
       case "positive":
-        return "hsl(142.1 76.2% 36.3%)"; // Green
+        return "hsl(142.1 76.2% 36.3%)";
       case "neutral":
-        return "hsl(215.4 16.3% 46.9%)"; // Blue-gray
+        return "hsl(215.4 16.3% 46.9%)";
       case "negative":
-        return "hsl(346.8 77.2% 49.8%)"; // Red
+        return "hsl(346.8 77.2% 49.8%)";
       default:
-        return "hsl(215.4 16.3% 46.9%)"; // Default blue-gray
+        return "hsl(215.4 16.3% 46.9%)";
     }
   };
 
@@ -100,7 +96,6 @@ export const EmotionFrequency = () => {
 
   const hasData = emotionData.some(item => item.count > 0);
   
-  // Generate AI insights based on data
   const generateInsights = () => {
     if (!hasData) {
       return {
@@ -181,7 +176,10 @@ export const EmotionFrequency = () => {
                   axisLine={false}
                 />
                 <YAxis 
-                  tick={{ fontSize: 12 }}
+                  tick={{ 
+                    fontSize: 12,
+                    fill: "hsl(var(--foreground))"
+                  }}
                   axisLine={false}
                   tickLine={false}
                   allowDecimals={false}
@@ -209,8 +207,15 @@ export const EmotionFrequency = () => {
                   labelStyle={{ 
                     fontWeight: 'bold',
                     marginBottom: '4px',
+                    color: 'hsl(var(--foreground))'
                   }}
-                  formatter={(value) => [`${value} sessions`, 'Count']}
+                  formatter={(value) => [
+                    <span className="text-foreground">{value} sessions</span>, 
+                    'Count'
+                  ]}
+                  labelFormatter={(label) => (
+                    <span className="text-foreground">{label}</span>
+                  )}
                 />
                 <Bar 
                   dataKey="count" 
@@ -228,7 +233,6 @@ export const EmotionFrequency = () => {
           </div>
         )}
 
-        {/* AI Insights Section */}
         <div className="bg-accent/10 p-4 rounded-lg space-y-1 mt-4">
           <h4 className="font-medium text-sm">AI Insight</h4>
           <p className="text-sm text-muted-foreground">{insights.primary}</p>
