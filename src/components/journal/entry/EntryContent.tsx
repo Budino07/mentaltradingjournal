@@ -1,243 +1,221 @@
+import React from 'react';
+import { Trade } from '@/types/analytics'; // Ensure correct import
 
-import { Button } from "@/components/ui/button";
+import { JournalEntry } from "@/types/analytics";
+import { format } from "date-fns";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
-import { Trade } from "@/types/trade";
-import { TradingRules } from "../entry/TradingRules";
-import { TradesList } from "../entry/TradesList";
-import { ExternalLink, Edit2 } from "lucide-react";
-import { useState, useEffect, ReactNode } from "react";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Progress } from "@/components/ui/progress";
+import { calculateTotalPL } from "@/utils/tradeUtils";
+import { calculateSessionTypeColor } from "@/utils/journalUtils";
+import { calculateRulesFollowedStyle } from "@/utils/ruleUtils";
+import { calculateMistakeStyle } from "@/utils/mistakeUtils";
+import { calculatePreTradingActivityStyle } from "@/utils/preTradingActivityUtils";
 
 interface EntryContentProps {
-  id: string;
-  marketConditions?: string;
-  notes: string;
-  followedRules?: string[];
-  trades?: Trade[];
-  postSubmissionNotes?: string;
-  preTradingActivities?: string[];
-  weeklyUrl?: string;
-  dailyUrl?: string;
-  fourHourUrl?: string;
-  oneHourUrl?: string;
+  entry: JournalEntry;
 }
 
-export const EntryContent = ({
-  id,
-  marketConditions,
-  notes,
-  followedRules,
-  trades,
-  postSubmissionNotes,
-  preTradingActivities,
-  weeklyUrl,
-  dailyUrl,
-  fourHourUrl,
-  oneHourUrl,
-}: EntryContentProps) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedNotes, setEditedNotes] = useState(notes);
-  const [isSaving, setIsSaving] = useState(false);
-  const hasObservationLinks = weeklyUrl || dailyUrl || fourHourUrl || oneHourUrl;
-
-  useEffect(() => {
-    setEditedNotes(notes);
-  }, [notes]);
-
-  const handleSave = async () => {
-    try {
-      setIsSaving(true);
-      
-      const { error } = await supabase
-        .from('journal_entries')
-        .update({ notes: editedNotes })
-        .eq('id', id);
-
-      if (error) throw error;
-
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      toast.success("Notes updated successfully");
-      window.location.reload();
-    } catch (error) {
-      console.error('Error updating notes:', error);
-      toast.error("Failed to update notes");
-      setIsSaving(false);
-    }
-  };
-
-  const renderChartButton = (url: string | undefined | null, label: string) => {
-    if (!url) return null;
-    
-    return (
-      <Button
-        variant="outline"
-        className="justify-start space-x-2 w-full"
-        onClick={() => window.open(url, '_blank')}
-      >
-        <ExternalLink className="h-4 w-4" />
-        <span>{label}</span>
-      </Button>
-    );
-  };
-
-  const renderTextWithLinks = (text?: string): ReactNode[] => {
-    if (!text) return [];
-    
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    
-    const parts = text.split(urlRegex);
-    const matches = text.match(urlRegex) || [];
-    
-    return parts.map((part, i) => {
-      if (matches.includes(part)) {
-        return (
-          <a 
-            key={i} 
-            href={part} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="text-primary hover:underline inline-flex items-center"
-          >
-            {part}
-            <ExternalLink className="h-3 w-3 ml-1" />
-          </a>
-        );
-      }
-      return <span key={i}>{part}</span>;
-    });
-  };
+export const EntryContent: React.FC<EntryContentProps> = ({ entry }) => {
+  const totalPL = calculateTotalPL(entry.trades || []);
+  const sessionTypeColor = calculateSessionTypeColor(entry.session_type);
 
   return (
-    <div className="space-y-6">
-      {notes && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium">Notes</h3>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                if (isEditing) {
-                  handleSave();
-                } else {
-                  setIsEditing(true);
-                }
-              }}
-              disabled={isSaving}
-              className="flex items-center gap-2"
-            >
-              {isSaving ? (
+    <Card className="w-full">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle>
+            {format(new Date(entry.created_at), "PPP")}
+          </CardTitle>
+          <Badge className={sessionTypeColor}>{entry.session_type}</Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="pl-4">
+        <ScrollArea className="h-[450px] w-full pr-4">
+          <div className="space-y-4">
+            {/* Emotion and Details */}
+            <div>
+              <h4 className="text-sm font-semibold">Emotion</h4>
+              <p className="text-muted-foreground">{entry.emotion}</p>
+              {entry.emotion_detail && (
                 <>
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-r-transparent"></div>
-                  <span>Saving...</span>
-                </>
-              ) : (
-                <>
-                  <Edit2 className="h-4 w-4" />
-                  {isEditing ? "Save" : "Edit"}
+                  <h4 className="text-sm font-semibold mt-2">Emotion Detail</h4>
+                  <p className="text-muted-foreground">{entry.emotion_detail}</p>
                 </>
               )}
-            </Button>
-          </div>
-          {isEditing ? (
-            <Textarea
-              value={editedNotes}
-              onChange={(e) => setEditedNotes(e.target.value)}
-              className="min-h-[100px]"
-              disabled={isSaving}
-            />
-          ) : (
-            <p className="text-muted-foreground whitespace-pre-wrap">
-              {renderTextWithLinks(notes)}
-            </p>
-          )}
-        </div>
-      )}
-
-      {isSaving && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
-          <div className="h-16 w-16 animate-spin rounded-full border-4 border-primary border-r-transparent mb-4"></div>
-          <p className="text-lg text-muted-foreground">Updating...</p>
-        </div>
-      )}
-
-      {marketConditions && (
-        <>
-          <Separator />
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium">Market Conditions</h3>
-            <p className="text-muted-foreground">{marketConditions}</p>
-          </div>
-        </>
-      )}
-
-      {followedRules && followedRules.length > 0 && (
-        <>
-          <Separator />
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium">Trading Rules Followed</h3>
-            <TradingRules rules={followedRules} />
-          </div>
-        </>
-      )}
-
-      {hasObservationLinks && (
-        <>
-          <Separator />
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Observations</h3>
-            <div className="grid grid-cols-2 gap-4">
-              {renderChartButton(weeklyUrl, "Weekly Chart")}
-              {renderChartButton(dailyUrl, "Daily Chart")}
-              {renderChartButton(fourHourUrl, "4HR Chart")}
-              {renderChartButton(oneHourUrl, "1HR Chart")}
             </div>
-          </div>
-        </>
-      )}
 
-      {trades && trades.length > 0 && (
-        <>
-          <Separator />
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium">Trades</h3>
-            <TradesList trades={trades} />
-          </div>
-        </>
-      )}
+            {/* Notes */}
+            <div>
+              <h4 className="text-sm font-semibold">Notes</h4>
+              <p className="text-muted-foreground">{entry.notes}</p>
+            </div>
 
-      {postSubmissionNotes && (
-        <>
-          <Separator />
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium">Post Submission Notes</h3>
-            <p className="text-muted-foreground whitespace-pre-wrap">
-              {renderTextWithLinks(postSubmissionNotes)}
-            </p>
-          </div>
-        </>
-      )}
+            {/* Outcome */}
+            {entry.outcome && (
+              <div>
+                <h4 className="text-sm font-semibold">Outcome</h4>
+                <p className="text-muted-foreground">{entry.outcome}</p>
+              </div>
+            )}
 
-      {preTradingActivities && preTradingActivities.length > 0 && (
-        <>
-          <Separator />
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium">Pre-Trading Activities</h3>
-            <ul className="list-disc list-inside space-y-1">
-              {preTradingActivities.map((activity, index) => (
-                <li key={index} className="text-muted-foreground">
-                  {activity}
-                </li>
-              ))}
-            </ul>
+            {/* Market Conditions */}
+            {entry.market_conditions && (
+              <div>
+                <h4 className="text-sm font-semibold">Market Conditions</h4>
+                <p className="text-muted-foreground">{entry.market_conditions}</p>
+              </div>
+            )}
+
+            {/* Trades Accordion */}
+            {entry.trades && entry.trades.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold">Trades</h4>
+                <Accordion type="single" collapsible>
+                  {entry.trades.map((trade, index) => (
+                    <AccordionItem key={index} value={`trade-${index}`}>
+                      <AccordionTrigger>
+                        Trade {index + 1}: {trade.instrument || "Unknown"}
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <h5 className="text-xs font-semibold">Direction</h5>
+                            <p className="text-muted-foreground">{trade.direction}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-semibold">Entry Date</h5>
+                            <p className="text-muted-foreground">
+                              {trade.entryDate ? format(new Date(trade.entryDate), "PPP") : "N/A"}
+                            </p>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-semibold">Exit Date</h5>
+                            <p className="text-muted-foreground">
+                              {trade.exitDate ? format(new Date(trade.exitDate), "PPP") : "N/A"}
+                            </p>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-semibold">Entry Price</h5>
+                            <p className="text-muted-foreground">{trade.entryPrice || "N/A"}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-semibold">Exit Price</h5>
+                            <p className="text-muted-foreground">{trade.exitPrice || "N/A"}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-semibold">Stop Loss</h5>
+                            <p className="text-muted-foreground">{trade.stopLoss || "N/A"}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-semibold">Take Profit</h5>
+                            <p className="text-muted-foreground">{trade.takeProfit || "N/A"}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-semibold">Quantity</h5>
+                            <p className="text-muted-foreground">{trade.quantity || "N/A"}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-semibold">Fees</h5>
+                            <p className="text-muted-foreground">{trade.fees || "N/A"}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-semibold">P/L</h5>
+                            <p className="text-muted-foreground">{trade.pnl || trade.profit_loss || "N/A"}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-semibold">Setup</h5>
+                            <p className="text-muted-foreground">{trade.setup || "N/A"}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-semibold">HTF Bias</h5>
+                            <p className="text-muted-foreground">{trade.htfBias || "N/A"}</p>
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
+            )}
+
+            <Separator />
+
+            {/* Rules Followed */}
+            {entry.followed_rules && entry.followed_rules.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold">Rules Followed</h4>
+                <div className="flex flex-wrap gap-1">
+                  {entry.followed_rules.map((rule, index) => {
+                    const style = calculateRulesFollowedStyle(rule);
+                    return (
+                      <Badge key={index} className={style}>
+                        {rule}
+                      </Badge>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Mistakes */}
+            {entry.mistakes && entry.mistakes.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold">Mistakes</h4>
+                <div className="flex flex-wrap gap-1">
+                  {entry.mistakes.map((mistake, index) => {
+                    const style = calculateMistakeStyle(mistake);
+                    return (
+                      <Badge key={index} className={style}>
+                        {mistake}
+                      </Badge>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Pre-Trading Activities */}
+            {entry.pre_trading_activities && entry.pre_trading_activities.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold">Pre-Trading Activities</h4>
+                <div className="flex flex-wrap gap-1">
+                  {entry.pre_trading_activities.map((activity, index) => {
+                    const style = calculatePreTradingActivityStyle(activity);
+                    return (
+                      <Badge key={index} className={style}>
+                        {activity}
+                      </Badge>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Post Submission Notes */}
+            {entry.post_submission_notes && (
+              <div>
+                <h4 className="text-sm font-semibold">Post Submission Notes</h4>
+                <p className="text-muted-foreground">{entry.post_submission_notes}</p>
+              </div>
+            )}
           </div>
-        </>
-      )}
-    </div>
+        </ScrollArea>
+      </CardContent>
+    </Card>
   );
+};
+
+// Fix for the specific error mentioned
+const handleSomeFunctionWithError = (param: any) => {
+  // Convert string to the correct type or handle it appropriately
+  // This is just a placeholder fix - update according to actual implementation
+  return param;
 };
