@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { EmotionTrend } from "./EmotionTrend";
@@ -12,6 +11,7 @@ import { PersonalityPatterns } from "./PersonalityPatterns";
 import { ProfitLossDistribution } from "./ProfitLossDistribution";
 import { TradeFrequency } from "./TradeFrequency";
 import { TradeFrequencyByMonth } from "./TradeFrequencyByMonth";
+import { TradeFrequencyByWeek } from "./TradeFrequencyByWeek";
 import { RiskRewardAnalysis } from "./RiskRewardAnalysis";
 import { WinLossRatio } from "./WinLossRatio";
 import { AssetPairPerformance } from "./AssetPairPerformance";
@@ -41,6 +41,7 @@ export const AnalyticsDashboard = () => {
     TradeDuration,
     ProfitLossDistribution,
     TradeFrequency,
+    TradeFrequencyByWeek,
     TradeFrequencyByMonth,
     RiskRewardAnalysis,
     WinLossRatio,
