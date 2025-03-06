@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { EmotionTrend } from "./EmotionTrend";
@@ -17,6 +18,7 @@ import { WinLossRatio } from "./WinLossRatio";
 import { AssetPairPerformance } from "./AssetPairPerformance";
 import { TimeBasedPerformance } from "./TimeBasedPerformance";
 import { EquityCurve } from "./EquityCurve";
+import { EmotionFrequency } from "./EmotionFrequency";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,7 @@ export const AnalyticsDashboard = () => {
 
   const psychologicalComponents = [
     EmotionTrend,
+    EmotionFrequency,
     MistakeAnalysis,
     EmotionRecovery,
     PreTradingEvents,
@@ -54,7 +57,7 @@ export const AnalyticsDashboard = () => {
       case 'trading':
         return tradingComponents;
       default:
-        return [EmotionTrend, ...psychologicalComponents.slice(1), ...tradingComponents];
+        return [EmotionTrend, EmotionFrequency, ...psychologicalComponents.slice(2), ...tradingComponents];
     }
   };
 
