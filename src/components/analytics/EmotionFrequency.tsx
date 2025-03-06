@@ -185,6 +185,17 @@ export const EmotionFrequency = () => {
                   axisLine={false}
                   tickLine={false}
                   allowDecimals={false}
+                  label={{ 
+                    value: 'Count', 
+                    angle: -90, 
+                    position: 'insideLeft', 
+                    offset: -5,
+                    style: { 
+                      textAnchor: 'middle', 
+                      fontSize: '12px', 
+                      fill: 'hsl(var(--muted-foreground))'
+                    }
+                  }}
                 />
                 <Tooltip 
                   cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
@@ -200,15 +211,6 @@ export const EmotionFrequency = () => {
                   }}
                   formatter={(value) => [`${value} sessions`, 'Count']}
                 />
-                <text
-                  x={0}
-                  y={15}
-                  textAnchor="start"
-                  dominantBaseline="middle"
-                  style={{ fontSize: '12px', fill: 'hsl(var(--muted-foreground))' }}
-                >
-                  Count
-                </text>
                 <Bar 
                   dataKey="count" 
                   radius={[4, 4, 0, 0]}
