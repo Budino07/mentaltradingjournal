@@ -172,7 +172,7 @@ export const EmotionFrequency = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={emotionData}
-                margin={{ top: 10, right: 10, left: 20, bottom: 20 }}
+                margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis 
@@ -189,13 +189,14 @@ export const EmotionFrequency = () => {
                     value: 'Count', 
                     angle: -90, 
                     position: 'insideLeft', 
-                    offset: -5,
+                    offset: 0,
                     style: { 
                       textAnchor: 'middle', 
-                      fontSize: '12px', 
+                      fontSize: '10px', 
                       fill: 'hsl(var(--muted-foreground))'
                     }
                   }}
+                  width={20}
                 />
                 <Tooltip 
                   cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
