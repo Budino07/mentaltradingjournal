@@ -1,13 +1,28 @@
+
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { startOfMonth, startOfQuarter, startOfYear, isAfter } from "date-fns";
+import { getInitialCapital } from "@/utils/capitalUtils";
+import { CapitalSettingsDialog } from "./CapitalSettingsDialog";
 
 export const TimeBasedPerformance = () => {
+  const [initialCapital, setInitialCapital] = useState(() => getInitialCapital());
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
   });
+
+  // Update initial capital when changed externally
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setInitialCapital(getInitialCapital());
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   if (isLoading || !analytics) {
     return (
@@ -31,7 +46,6 @@ export const TimeBasedPerformance = () => {
     const strikeRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
 
     const totalPnL = allTrades.reduce((sum, trade) => sum + (Number(trade.pnl) || 0), 0);
-    const initialCapital = 10000; // Assuming initial capital of $10,000
     const percentagePerformance = (totalPnL / initialCapital) * 100;
 
     return {
@@ -52,13 +66,21 @@ export const TimeBasedPerformance = () => {
     { label: "Past Year", ...yearMetrics },
   ];
 
+  const handleCapitalUpdate = () => {
+    // Refresh initial capital from localStorage
+    setInitialCapital(getInitialCapital());
+  };
+
   return (
     <Card className="p-4 md:p-6 space-y-4">
-      <div className="space-y-2">
-        <h3 className="text-xl md:text-2xl font-bold">Time-Based Performance</h3>
-        <p className="text-sm text-muted-foreground">
-          Analysis of trading performance across different time horizons
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="space-y-2">
+          <h3 className="text-xl md:text-2xl font-bold">Time-Based Performance</h3>
+          <p className="text-sm text-muted-foreground">
+            Analysis of trading performance across different time horizons
+          </p>
+        </div>
+        <CapitalSettingsDialog onSave={handleCapitalUpdate} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
