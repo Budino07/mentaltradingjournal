@@ -77,6 +77,8 @@ export const useJournalFormSubmission = ({
     }
 
     try {
+      console.log("Submitting journal entry with outcome:", selectedOutcome);
+      
       const { error } = await supabase.from('journal_entries').insert({
         user_id: user.id,
         session_type: sessionType,
