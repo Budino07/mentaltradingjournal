@@ -1,8 +1,8 @@
 import React from 'react';
-import { Trade } from '@/types/analytics'; // Ensure correct import
+import { Trade } from '@/types/analytics'; 
+import { format } from "date-fns";
 
 import { JournalEntry } from "@/types/analytics";
-import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -20,11 +20,33 @@ import { calculateMistakeStyle } from "@/utils/mistakeUtils";
 import { calculatePreTradingActivityStyle } from "@/utils/preTradingActivityUtils";
 
 interface EntryContentProps {
-  entry: JournalEntry;
+  id: string;
+  marketConditions?: string;
+  notes: string;
+  followedRules?: string[];
+  trades?: Trade[];
+  postSubmissionNotes?: string;
+  preTradingActivities?: string[];
+  weeklyUrl?: string;
+  dailyUrl?: string;
+  fourHourUrl?: string;
+  oneHourUrl?: string;
 }
 
-export const EntryContent: React.FC<EntryContentProps> = ({ entry }) => {
-  const totalPL = calculateTotalPL(entry.trades || []);
+export const EntryContent: React.FC<EntryContentProps> = ({ 
+  id,
+  marketConditions,
+  notes,
+  followedRules,
+  trades,
+  postSubmissionNotes,
+  preTradingActivities,
+  weeklyUrl,
+  dailyUrl,
+  fourHourUrl,
+  oneHourUrl
+}) => {
+  const totalPL = calculateTotalPL(trades || []);
   const sessionTypeColor = calculateSessionTypeColor(entry.session_type);
 
   return (
