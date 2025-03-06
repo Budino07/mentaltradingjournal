@@ -8,6 +8,8 @@ import { useState, useEffect, ReactNode } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
 
 interface EntryContentProps {
   id: string;
@@ -38,6 +40,7 @@ export const EntryContent = ({
 }: EntryContentProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedNotes, setEditedNotes] = useState(notes);
+  const [isSaving, setIsSaving] = useState(false);
   const hasObservationLinks = weeklyUrl || dailyUrl || fourHourUrl || oneHourUrl;
 
   useEffect(() => {
@@ -46,6 +49,8 @@ export const EntryContent = ({
 
   const handleSave = async () => {
     try {
+      setIsSaving(true);
+      
       const { error } = await supabase
         .from('journal_entries')
         .update({ notes: editedNotes })
@@ -53,11 +58,15 @@ export const EntryContent = ({
 
       if (error) throw error;
 
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
       toast.success("Notes updated successfully");
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating notes:', error);
       toast.error("Failed to update notes");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -76,7 +85,7 @@ export const EntryContent = ({
     );
   };
 
-  const renderTextWithLinks = (text: string): ReactNode[] => {
+  const renderTextWithLinks = (text: string | undefined): ReactNode[] => {
     if (!text) return [];
     
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -85,7 +94,6 @@ export const EntryContent = ({
     const matches = text.match(urlRegex) || [];
     
     return parts.map((part, i) => {
-      // Check if this part is a URL
       if (matches.includes(part)) {
         return (
           <a 
@@ -120,10 +128,20 @@ export const EntryContent = ({
                   setIsEditing(true);
                 }
               }}
+              disabled={isSaving}
               className="flex items-center gap-2"
             >
-              <Edit2 className="h-4 w-4" />
-              {isEditing ? "Save" : "Edit"}
+              {isSaving ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-r-transparent"></div>
+                  <span>Saving...</span>
+                </>
+              ) : (
+                <>
+                  <Edit2 className="h-4 w-4" />
+                  {isEditing ? "Save" : "Edit"}
+                </>
+              )}
             </Button>
           </div>
           {isEditing ? (
@@ -131,12 +149,20 @@ export const EntryContent = ({
               value={editedNotes}
               onChange={(e) => setEditedNotes(e.target.value)}
               className="min-h-[100px]"
+              disabled={isSaving}
             />
           ) : (
             <p className="text-muted-foreground whitespace-pre-wrap">
               {renderTextWithLinks(notes)}
             </p>
           )}
+        </div>
+      )}
+
+      {isSaving && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
+          <div className="h-16 w-16 animate-spin rounded-full border-4 border-primary border-r-transparent mb-4"></div>
+          <p className="text-lg text-muted-foreground">Updating...</p>
         </div>
       )}
 
