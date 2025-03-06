@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { TradesList } from "./TradesList";
 import { TradingRules } from "./TradingRules";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp, ListChecks, NotebookPen, LineChart, ExternalLink } from "lucide-react";
+import { ChevronDown, ChevronUp, ListChecks, NotebookPen, LineChart, ExternalLink, Pencil } from "lucide-react";
 import { Trade } from "@/types/trade";
+import { NoteEditDialog } from "./NoteEditDialog";
 
 interface EntryContentProps {
   id: string;
@@ -37,6 +38,12 @@ export const EntryContent = ({
 }: EntryContentProps) => {
   const [showNotes, setShowNotes] = useState(true);
   const [showRules, setShowRules] = useState(true);
+  const [localNotes, setLocalNotes] = useState(notes);
+  const [localPostNotes, setLocalPostNotes] = useState(postSubmissionNotes);
+  
+  // State for edit dialogs
+  const [isEditingNotes, setIsEditingNotes] = useState(false);
+  const [isEditingPostNotes, setIsEditingPostNotes] = useState(false);
 
   const formatNotes = (text: string) => {
     if (!text) return "";
@@ -70,23 +77,34 @@ export const EntryContent = ({
         </div>
       )}
 
-      {notes && (
+      {localNotes && (
         <Collapsible open={showNotes} onOpenChange={setShowNotes} className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <NotebookPen className="w-4 h-4 text-primary" />
               <h4 className="text-sm font-medium">Trading Notes</h4>
             </div>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
-                {showNotes ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-7 px-2"
+                onClick={() => setIsEditingNotes(true)}
+              >
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="sr-only">Edit notes</span>
               </Button>
-            </CollapsibleTrigger>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
+                  {showNotes ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </Button>
+              </CollapsibleTrigger>
+            </div>
           </div>
           <CollapsibleContent className="space-y-2">
             <div
               className="text-sm text-muted-foreground"
-              dangerouslySetInnerHTML={{ __html: formatNotes(notes) }}
+              dangerouslySetInnerHTML={{ __html: formatNotes(localNotes) }}
             />
           </CollapsibleContent>
         </Collapsible>
@@ -221,15 +239,26 @@ export const EntryContent = ({
         </Collapsible>
       )}
 
-      {postSubmissionNotes && (
+      {localPostNotes && (
         <div className="space-y-2">
-          <h4 className="text-sm font-medium flex items-center gap-1">
-            <NotebookPen className="w-4 h-4 text-primary" />
-            Post Session Notes
-          </h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium flex items-center gap-1">
+              <NotebookPen className="w-4 h-4 text-primary" />
+              Post Session Notes
+            </h4>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-7 px-2"
+              onClick={() => setIsEditingPostNotes(true)}
+            >
+              <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="sr-only">Edit post-session notes</span>
+            </Button>
+          </div>
           <div
             className="text-sm text-muted-foreground"
-            dangerouslySetInnerHTML={{ __html: formatNotes(postSubmissionNotes) }}
+            dangerouslySetInnerHTML={{ __html: formatNotes(localPostNotes) }}
           />
         </div>
       )}
@@ -242,6 +271,29 @@ export const EntryContent = ({
             <TradesList journalEntryId={id} trades={trades} />
           </div>
         </>
+      )}
+
+      {/* Edit dialogs */}
+      {isEditingNotes && (
+        <NoteEditDialog 
+          isOpen={isEditingNotes}
+          onClose={() => setIsEditingNotes(false)}
+          entryId={id}
+          initialText={localNotes}
+          noteType="notes"
+          onNoteUpdated={setLocalNotes}
+        />
+      )}
+
+      {isEditingPostNotes && (
+        <NoteEditDialog 
+          isOpen={isEditingPostNotes}
+          onClose={() => setIsEditingPostNotes(false)}
+          entryId={id}
+          initialText={localPostNotes || ""}
+          noteType="post_submission_notes"
+          onNoteUpdated={setLocalPostNotes}
+        />
       )}
     </div>
   );
