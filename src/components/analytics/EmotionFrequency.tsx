@@ -210,8 +210,8 @@ export const EmotionFrequency = () => {
                     color: 'hsl(var(--foreground))'
                   }}
                   formatter={(value) => [
-                    <span className="text-foreground">{value} sessions</span>, 
-                    'Count'
+                    <span className="text-foreground">Count: {value} sessions</span>, 
+                    ''
                   ]}
                   labelFormatter={(label) => (
                     <span className="text-foreground">{label}</span>
