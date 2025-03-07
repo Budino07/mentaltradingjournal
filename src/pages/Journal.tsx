@@ -1,4 +1,3 @@
-
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -29,20 +28,29 @@ const Journal = () => {
     filteredEntries
   } = useJournalFilters(entries);
 
+  const handleDateSelection = (date: Date | undefined) => {
+    setSelectedDate(date);
+    setSearchQuery(""); // Clear search query when date is selected
+    
+    // Dispatch an event to notify other components that search has been cleared
+    const event = new CustomEvent('journal-search-clear');
+    window.dispatchEvent(event);
+    
+    setTimeout(() => {
+      const journalEntriesSection = document.querySelector('#journal-entries');
+      if (journalEntriesSection) {
+        journalEntriesSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  };
+
   useEffect(() => {
     const handleSearch = (event: CustomEvent) => {
       setSearchQuery(event.detail.query);
     };
 
     const handleDateSelect = (event: CustomEvent) => {
-      setSelectedDate(event.detail.date);
-      
-      setTimeout(() => {
-        const journalEntriesSection = document.querySelector('#journal-entries');
-        if (journalEntriesSection) {
-          journalEntriesSection.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
+      handleDateSelection(event.detail.date);
     };
 
     window.addEventListener('journal-search', handleSearch as EventListener);
@@ -52,9 +60,9 @@ const Journal = () => {
       window.removeEventListener('journal-search', handleSearch as EventListener);
       window.removeEventListener('journal-date-select', handleDateSelect as EventListener);
     };
-  }, [setSelectedDate]);
+  }, []);
 
-  const fetchEntries = async () => {
+  useEffect(() => {
     if (!user) return;
     
     console.log('Fetching entries for user:', user.id);
@@ -71,12 +79,10 @@ const Journal = () => {
 
     console.log('Fetched entries:', data);
     setEntries(data || []);
-  };
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
-
-    fetchEntries();
 
     const channel = supabase
       .channel('journal_entries_changes')
@@ -110,16 +116,9 @@ const Journal = () => {
 
   useEffect(() => {
     if (locationState?.selectedDate) {
-      setSelectedDate(new Date(locationState.selectedDate));
-      
-      setTimeout(() => {
-        const journalEntriesSection = document.querySelector('#journal-entries');
-        if (journalEntriesSection) {
-          journalEntriesSection.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
+      handleDateSelection(new Date(locationState.selectedDate));
     }
-  }, [locationState?.selectedDate, setSelectedDate]);
+  }, [locationState?.selectedDate]);
 
   const searchFilteredEntries = (entries: JournalEntryType[]) => {
     if (!searchQuery) return entries;
@@ -194,12 +193,15 @@ const Journal = () => {
       <SubscriptionGuard>
         <TimeFilterProvider>
           <div className="max-w-7xl mx-auto space-y-8 px-4">
-            <StatsHeader />
+            <StatsHeader 
+              searchQuery={searchQuery} 
+              setSearchQuery={setSearchQuery} 
+            />
 
             <div>
               <JournalCalendar 
                 date={selectedDate}
-                onDateSelect={setSelectedDate}
+                onDateSelect={handleDateSelection}
                 entries={calendarEntries}
               />
             </div>

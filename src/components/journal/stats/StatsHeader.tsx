@@ -15,13 +15,26 @@ import { Input } from "@/components/ui/input";
 import { formatDate } from "@/utils/dateUtils";
 import { JournalEntryType } from "@/types/journal";
 
-export const StatsHeader = () => {
+interface StatsHeaderProps {
+  searchQuery?: string;
+  setSearchQuery?: (query: string) => void;
+}
+
+export const StatsHeader = ({ searchQuery: externalSearchQuery, setSearchQuery: setExternalSearchQuery }: StatsHeaderProps = {}) => {
   const queryClient = useQueryClient();
   const { state, toggleSidebar } = useSidebar();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [internalSearchQuery, setInternalSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<JournalEntryType[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  const searchQuery = externalSearchQuery !== undefined ? externalSearchQuery : internalSearchQuery;
+  const setSearchQuery = (query: string) => {
+    if (setExternalSearchQuery) {
+      setExternalSearchQuery(query);
+    }
+    setInternalSearchQuery(query);
+  };
   
   useEffect(() => {
     const channel = supabase
@@ -44,6 +57,20 @@ export const StatsHeader = () => {
       supabase.removeChannel(channel);
     };
   }, [queryClient]);
+
+  useEffect(() => {
+    const handleSearchClear = () => {
+      setInternalSearchQuery("");
+      setIsSearching(false);
+      setSearchResults([]);
+    };
+    
+    window.addEventListener('journal-search-clear', handleSearchClear);
+    
+    return () => {
+      window.removeEventListener('journal-search-clear', handleSearchClear);
+    };
+  }, []);
 
   const { data: analytics, isLoading: isAnalyticsLoading } = useQuery({
     queryKey: ['analytics'],
@@ -95,12 +122,14 @@ export const StatsHeader = () => {
 
     setSearchResults(sortedEntries.slice(0, 5));
     
-    const event = new CustomEvent('journal-search', { 
-      detail: { query: searchQuery } 
-    });
-    window.dispatchEvent(event);
+    if (!setExternalSearchQuery) {
+      const event = new CustomEvent('journal-search', { 
+        detail: { query: searchQuery } 
+      });
+      window.dispatchEvent(event);
+    }
     
-  }, [searchQuery, analytics?.journalEntries]);
+  }, [searchQuery, analytics?.journalEntries, setExternalSearchQuery]);
 
   const handleEntryClick = (entry: JournalEntryType) => {
     const selectedDate = new Date(entry.created_at);
@@ -110,6 +139,7 @@ export const StatsHeader = () => {
     window.dispatchEvent(event);
     
     setSearchResults([]);
+    setIsSearching(false);
   };
 
   const getTimeInterval = () => {
