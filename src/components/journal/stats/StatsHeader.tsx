@@ -45,6 +45,20 @@ export const StatsHeader = () => {
     };
   }, [queryClient]);
 
+  useEffect(() => {
+    const handleSearchClear = () => {
+      setSearchQuery("");
+      setSearchResults([]);
+      setIsSearching(false);
+    };
+
+    window.addEventListener('journal-search-clear', handleSearchClear);
+    
+    return () => {
+      window.removeEventListener('journal-search-clear', handleSearchClear);
+    };
+  }, []);
+
   const { data: analytics, isLoading: isAnalyticsLoading } = useQuery({
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
@@ -110,6 +124,8 @@ export const StatsHeader = () => {
     window.dispatchEvent(event);
     
     setSearchResults([]);
+    setSearchQuery("");
+    setIsSearching(false);
   };
 
   const getTimeInterval = () => {
@@ -285,6 +301,11 @@ export const StatsHeader = () => {
                   setSearchQuery("");
                   setIsSearching(false);
                   setSearchResults([]);
+                  
+                  const clearSearchEvent = new CustomEvent('journal-search', { 
+                    detail: { query: "" } 
+                  });
+                  window.dispatchEvent(clearSearchEvent);
                 }}
               >
                 <X className="h-4 w-4" />

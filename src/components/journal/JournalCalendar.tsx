@@ -76,6 +76,10 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
     });
     onDateSelect(newDate);
     
+    // Dispatch an event to clear search when a date is selected from the calendar
+    const clearSearchEvent = new CustomEvent('journal-search-clear');
+    window.dispatchEvent(clearSearchEvent);
+    
     const journalEntriesSection = document.querySelector('#journal-entries');
     if (journalEntriesSection) {
       journalEntriesSection.scrollIntoView({ behavior: 'smooth' });

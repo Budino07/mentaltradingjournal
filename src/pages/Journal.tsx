@@ -35,7 +35,13 @@ const Journal = () => {
     };
 
     const handleDateSelect = (event: CustomEvent) => {
+      // Clear the search query when a date is selected
+      setSearchQuery("");
       setSelectedDate(event.detail.date);
+      
+      // Dispatch an event to notify other components that search should be cleared
+      const clearSearchEvent = new CustomEvent('journal-search-clear');
+      window.dispatchEvent(clearSearchEvent);
       
       setTimeout(() => {
         const journalEntriesSection = document.querySelector('#journal-entries');
@@ -111,6 +117,7 @@ const Journal = () => {
   useEffect(() => {
     if (locationState?.selectedDate) {
       setSelectedDate(new Date(locationState.selectedDate));
+      setSearchQuery(""); // Clear search query when date is selected from location state
       
       setTimeout(() => {
         const journalEntriesSection = document.querySelector('#journal-entries');
@@ -199,7 +206,14 @@ const Journal = () => {
             <div>
               <JournalCalendar 
                 date={selectedDate}
-                onDateSelect={setSelectedDate}
+                onDateSelect={(date) => {
+                  setSelectedDate(date);
+                  setSearchQuery(""); // Clear search query when a date is directly selected
+                  
+                  // Dispatch an event to notify other components that search should be cleared
+                  const clearSearchEvent = new CustomEvent('journal-search-clear');
+                  window.dispatchEvent(clearSearchEvent);
+                }}
                 entries={calendarEntries}
               />
             </div>
