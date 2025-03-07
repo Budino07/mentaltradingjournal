@@ -67,47 +67,88 @@ export function AiRecommendations({ stats }: AiRecommendationsProps) {
   const favorableRec = getFavorableExcursionRecommendation();
 
   return (
-    <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-800">
-      <div className="flex items-start gap-4">
-        <div className="bg-blue-500/10 p-2 rounded-full">
-          <LightbulbIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+    <Card className="p-6 bg-gradient-to-br from-indigo-50/90 to-purple-50/90 dark:from-indigo-950/30 dark:to-purple-950/30 border border-indigo-200 dark:border-indigo-800 shadow-sm">
+      <div className="flex flex-col items-center space-y-4">
+        <div className="bg-gradient-to-br from-primary-light to-primary p-3 rounded-full shadow-md">
+          <LightbulbIcon className="h-7 w-7 text-white" />
         </div>
-        <div>
-          <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-300 mb-3">AI Trading Insights</h3>
+        
+        <h3 className="text-xl font-semibold text-gradient mb-2">AI Trading Insights</h3>
+        
+        <div className="w-full">
+          <div className="flex flex-wrap gap-2 mb-4 justify-center">
+            <div className="bg-white/60 dark:bg-indigo-900/40 text-primary-dark dark:text-indigo-300 text-xs px-2.5 py-1.5 rounded-md shadow-sm border border-indigo-100 dark:border-indigo-800/50">
+              <span className="font-medium">MFE Winner:</span> {stats.avgUpdrawWinner.toFixed(2)}%
+            </div>
+            <div className="bg-white/60 dark:bg-indigo-900/40 text-primary-dark dark:text-indigo-300 text-xs px-2.5 py-1.5 rounded-md shadow-sm border border-indigo-100 dark:border-indigo-800/50">
+              <span className="font-medium">MFE Loser:</span> {stats.avgUpdrawLoser.toFixed(2)}%
+            </div>
+            <div className="bg-white/60 dark:bg-indigo-900/40 text-primary-dark dark:text-indigo-300 text-xs px-2.5 py-1.5 rounded-md shadow-sm border border-indigo-100 dark:border-indigo-800/50">
+              <span className="font-medium">MAE Winner:</span> {stats.avgDrawdownWinner.toFixed(2)}%
+            </div>
+            <div className="bg-white/60 dark:bg-indigo-900/40 text-primary-dark dark:text-indigo-300 text-xs px-2.5 py-1.5 rounded-md shadow-sm border border-indigo-100 dark:border-indigo-800/50">
+              <span className="font-medium">MAE Loser:</span> {stats.avgDrawdownLoser.toFixed(2)}%
+            </div>
+          </div>
           
-          <div className="mb-4">
-            <div className="flex flex-wrap gap-2 mb-3">
-              <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs px-2 py-1 rounded-md">
-                Your Avg. MAE Winner: {stats.avgDrawdownWinner.toFixed(2)}%
-              </div>
-              <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs px-2 py-1 rounded-md">
-                Your Avg. MAE Loser: {stats.avgDrawdownLoser.toFixed(2)}%
-              </div>
-              <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs px-2 py-1 rounded-md">
-                Your Avg. MFE Winner: {stats.avgUpdrawWinner.toFixed(2)}%
-              </div>
-              <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs px-2 py-1 rounded-md">
-                Your Avg. MFE Loser: {stats.avgUpdrawLoser.toFixed(2)}%
+          <div className="space-y-4">
+            <div className="bg-white/70 dark:bg-indigo-900/20 p-4 rounded-lg shadow-sm border border-indigo-100 dark:border-indigo-800/40">
+              <h4 className="font-semibold text-primary-dark dark:text-indigo-300 mb-2">Drawdown Analysis</h4>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{drawdownRec.insight}</p>
+              <div className="mb-3 flex items-start gap-2">
+                <div className="mt-0.5 flex-shrink-0">
+                  <div className="bg-primary/10 p-1 rounded-full">
+                    <LightbulbIcon className="h-4 w-4 text-primary" />
+                  </div>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium text-primary-dark dark:text-primary-light">Recommendation:</span> {drawdownRec.recommendation}
+                </p>
               </div>
             </div>
             
-            <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1">Drawdown Analysis</h4>
-            <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{drawdownRec.insight}</p>
-            <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
-              <span className="font-medium">💡 Recommendation:</span> {drawdownRec.recommendation}
-            </p>
+            <div className="bg-white/70 dark:bg-indigo-900/20 p-4 rounded-lg shadow-sm border border-indigo-100 dark:border-indigo-800/40">
+              <h4 className="font-semibold text-primary-dark dark:text-indigo-300 mb-2">Favorable Movement Analysis</h4>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{favorableRec.insight}</p>
+              <div className="mb-3 flex items-start gap-2">
+                <div className="mt-0.5 flex-shrink-0">
+                  <div className="bg-primary/10 p-1 rounded-full">
+                    <LightbulbIcon className="h-4 w-4 text-primary" />
+                  </div>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium text-primary-dark dark:text-primary-light">Recommendation:</span> {favorableRec.recommendation}
+                </p>
+              </div>
+            </div>
             
-            <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1">Favorable Movement Analysis</h4>
-            <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{favorableRec.insight}</p>
-            <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
-              <span className="font-medium">💡 Recommendation:</span> {favorableRec.recommendation}
-            </p>
-            
-            <div className="bg-blue-100 dark:bg-blue-900/40 p-3 rounded-md mt-3">
-              <p className="text-sm font-medium text-blue-800 dark:text-blue-300">📌 Example:</p>
-              <p className="text-sm text-gray-700 dark:text-gray-300">{drawdownRec.example}</p>
-              <p className="text-sm font-medium text-blue-800 dark:text-blue-300 mt-2">🔍 Next Step:</p>
-              <p className="text-sm text-gray-700 dark:text-gray-300">{drawdownRec.nextStep}</p>
+            <div className="bg-gradient-to-r from-indigo-100/70 to-purple-100/70 dark:from-indigo-900/30 dark:to-purple-900/30 p-4 rounded-lg shadow-sm border border-indigo-200 dark:border-indigo-800/50">
+              <div className="flex items-start gap-3 mb-3">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="bg-accent/20 p-1 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent-dark">
+                      <path d="M12 9v4"></path><path d="M12 17h.01"></path><circle cx="12" cy="12" r="10"></circle>
+                    </svg>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-primary-dark dark:text-accent">Example:</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">{drawdownRec.example}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="bg-primary/10 p-1 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                      <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-primary-dark dark:text-primary-light">Next Step:</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">{drawdownRec.nextStep}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
