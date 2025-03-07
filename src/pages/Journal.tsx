@@ -21,12 +21,26 @@ const Journal = () => {
   const { user } = useAuth();
   const location = useLocation();
   const locationState = location.state as { selectedDate?: Date } | undefined;
+  const [searchQuery, setSearchQuery] = useState("");
   
   const {
     selectedDate,
     setSelectedDate,
     filteredEntries
   } = useJournalFilters(entries);
+
+  // Listen for search events from StatsHeader
+  useEffect(() => {
+    const handleSearch = (event: CustomEvent) => {
+      setSearchQuery(event.detail.query);
+    };
+
+    window.addEventListener('journal-search', handleSearch as EventListener);
+    
+    return () => {
+      window.removeEventListener('journal-search', handleSearch as EventListener);
+    };
+  }, []);
 
   const fetchEntries = async () => {
     if (!user) return;
@@ -99,14 +113,80 @@ const Journal = () => {
     }
   }, [locationState?.selectedDate, setSelectedDate]);
 
+  // Filter entries based on the search query
+  const searchFilteredEntries = (entries: JournalEntryType[]) => {
+    if (!searchQuery) return entries;
+    
+    return entries.filter(entry => {
+      // Search in emotion field
+      if (entry.emotion.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return true;
+      }
+      
+      // Search in emotion_detail field
+      if (entry.emotion_detail.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return true;
+      }
+      
+      // Search in notes field
+      if (entry.notes.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return true;
+      }
+      
+      // Search in outcome field
+      if (entry.outcome && entry.outcome.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return true;
+      }
+      
+      // Search in market_conditions field
+      if (entry.market_conditions && entry.market_conditions.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return true;
+      }
+      
+      // Search in followed_rules array
+      if (entry.followed_rules && entry.followed_rules.some(rule => 
+        rule.toLowerCase().includes(searchQuery.toLowerCase()))) {
+        return true;
+      }
+      
+      // Search in mistakes array
+      if (entry.mistakes && entry.mistakes.some(mistake => 
+        mistake.toLowerCase().includes(searchQuery.toLowerCase()))) {
+        return true;
+      }
+      
+      // Search in post_submission_notes
+      if (entry.post_submission_notes && 
+        entry.post_submission_notes.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return true;
+      }
+      
+      // Search in trades - if they exist
+      if (entry.trades && entry.trades.length > 0) {
+        return entry.trades.some(trade => {
+          // Convert trade fields to string to make searching easier
+          const tradeString = JSON.stringify(trade).toLowerCase();
+          return tradeString.includes(searchQuery.toLowerCase());
+        });
+      }
+      
+      return false;
+    });
+  };
+
   // Display all entries if no date is selected, otherwise filter by date
-  const displayedEntries = selectedDate
+  let displayedEntries = selectedDate
     ? entries.filter(entry => {
         const entryDate = new Date(entry.created_at);
         return entryDate >= startOfDay(selectedDate) && 
                entryDate <= endOfDay(selectedDate);
       })
     : filteredEntries;
+  
+  // Apply search filtering after date filtering
+  if (searchQuery) {
+    displayedEntries = searchFilteredEntries(displayedEntries);
+  }
 
   // Map entries for calendar display
   const calendarEntries = entries.map(entry => ({
@@ -133,14 +213,16 @@ const Journal = () => {
             <Card id="journal-entries" className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-                  {selectedDate 
-                    ? `Journal Entries for ${selectedDate.toLocaleDateString('en-US', { 
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}`
-                    : 'Journal Entries'
+                  {searchQuery 
+                    ? `Search Results for "${searchQuery}"`
+                    : selectedDate 
+                      ? `Journal Entries for ${selectedDate.toLocaleDateString('en-US', { 
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}`
+                      : 'Journal Entries'
                   }
                 </h2>
                 <JournalFilters />
@@ -155,9 +237,11 @@ const Journal = () => {
                   </div>
                 ) : (
                   <p className="text-muted-foreground text-center py-8">
-                    {selectedDate 
-                      ? `No entries found for ${selectedDate.toLocaleDateString()}`
-                      : 'No entries found for the selected filters'
+                    {searchQuery
+                      ? `No entries found for "${searchQuery}"`
+                      : selectedDate 
+                        ? `No entries found for ${selectedDate.toLocaleDateString()}`
+                        : 'No entries found for the selected filters'
                     }
                   </p>
                 )}

@@ -1,10 +1,14 @@
+
 import { DayProps } from "react-day-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { calculateDayStats, formatCurrency } from "./calendarUtils";
 import { Trade } from "@/types/trade";
 import { Circle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { WeeklyReviewDialog } from "../weekly/WeeklyReviewDialog";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 
 interface CalendarDayProps extends Omit<DayProps, 'displayMonth'> {
   entries: Array<{
@@ -24,6 +28,9 @@ export const CalendarDay = ({
   ...props 
 }: CalendarDayProps) => {
   const [isWeeklyReviewOpen, setIsWeeklyReviewOpen] = useState(false);
+  const [hasWeeklyReview, setHasWeeklyReview] = useState(false);
+  const { user } = useAuth();
+  
   const stats = calculateDayStats(
     entries.filter(entry => {
       const hasTradesOnThisDay = entry.trades?.some(trade => {
@@ -39,6 +46,44 @@ export const CalendarDay = ({
   const isToday = dayDate.toDateString() === new Date().toDateString();
   const hasEntries = stats !== null;
   const isSaturday = dayDate.getDay() === 6;
+
+  // Check if weekly review exists for this date
+  useEffect(() => {
+    const checkWeeklyReview = async () => {
+      if (!user || !isSaturday) return;
+      
+      try {
+        const weekDate = format(dayDate, 'yyyy-MM-dd');
+        
+        const { data, error } = await supabase
+          .from('weekly_reviews')
+          .select('strength, weakness, improvement')
+          .eq('week_start_date', weekDate)
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error checking weekly review:', error);
+          return;
+        }
+
+        // Check if any content exists
+        const hasContent = data && (
+          (data.strength && data.strength.trim() !== '') || 
+          (data.weakness && data.weakness.trim() !== '') || 
+          (data.improvement && data.improvement.trim() !== '')
+        );
+        
+        console.log('Weekly review check for', weekDate, ':', data, 'Has content:', hasContent);
+        
+        setHasWeeklyReview(!!hasContent);
+      } catch (error) {
+        console.error('Error in checkWeeklyReview:', error);
+      }
+    };
+
+    checkWeeklyReview();
+  }, [user, dayDate, isSaturday]);
 
   const getPnLColor = (amount: number) => {
     if (amount === 0) return 'text-gray-500 dark:text-gray-400';
@@ -110,14 +155,18 @@ export const CalendarDay = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Circle 
-                className="h-4 w-4 text-primary cursor-pointer hover:text-primary-dark transition-colors"
+                className={`h-4 w-4 cursor-pointer transition-colors
+                  ${hasWeeklyReview 
+                    ? "fill-primary text-primary hover:text-primary-dark" 
+                    : "text-primary hover:text-primary-dark"
+                  }`}
                 onClick={() => {
                   setIsWeeklyReviewOpen(true);
                 }}
               />
             </TooltipTrigger>
             <TooltipContent>
-              <p>Weekly Review</p>
+              <p>{hasWeeklyReview ? "View Weekly Review" : "Weekly Review"}</p>
             </TooltipContent>
           </Tooltip>
         </div>
@@ -127,6 +176,7 @@ export const CalendarDay = ({
         onOpenChange={setIsWeeklyReviewOpen}
         weekNumber={Math.ceil(dayDate.getDate() / 7)}
         selectedDate={dayDate}
+        onReviewSaved={() => setHasWeeklyReview(true)}
       />
     </div>
   );

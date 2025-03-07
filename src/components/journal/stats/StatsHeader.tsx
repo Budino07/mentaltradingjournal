@@ -5,17 +5,20 @@ import { generateAnalytics } from "@/utils/analyticsUtils";
 import { TradeWinPercentage } from "./TradeWinPercentage";
 import { useTimeFilter } from "@/contexts/TimeFilterContext";
 import { startOfMonth, subMonths, isWithinInterval, endOfMonth, startOfYear, endOfYear, subYears } from "date-fns";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Card } from "@/components/ui/card";
-import { DollarSign, Smile, Flame, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { DollarSign, Smile, Flame, PanelLeftClose, PanelLeftOpen, Search, X } from "lucide-react";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
+import { Input } from "@/components/ui/input";
 
 export const StatsHeader = () => {
   const queryClient = useQueryClient();
   const { state, toggleSidebar } = useSidebar();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
   
   useEffect(() => {
     const channel = supabase
@@ -46,6 +49,17 @@ export const StatsHeader = () => {
 
   const { stats } = useProgressTracking();
   const { timeFilter, setTimeFilter } = useTimeFilter();
+
+  // Pass search query to parent component through context
+  useEffect(() => {
+    // This event will be listened to by the Journal component
+    if (searchQuery) {
+      const event = new CustomEvent('journal-search', { 
+        detail: { query: searchQuery } 
+      });
+      window.dispatchEvent(event);
+    }
+  }, [searchQuery]);
 
   const getTimeInterval = () => {
     const now = new Date();
@@ -154,7 +168,7 @@ export const StatsHeader = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-start gap-2 items-center">
+      <div className="flex justify-start gap-2 items-center flex-wrap">
         <Button
           variant="ghost"
           size="icon"
@@ -203,6 +217,42 @@ export const StatsHeader = () => {
         >
           Eternal
         </Button>
+        
+        {/* Search functionality */}
+        <div className="relative ml-2">
+          {isSearching ? (
+            <div className="flex items-center border rounded-md bg-background">
+              <Input
+                type="text"
+                placeholder="Search entries..."
+                className="h-9 border-none focus-visible:ring-0"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9"
+                onClick={() => {
+                  setSearchQuery("");
+                  setIsSearching(false);
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={() => setIsSearching(true)}
+            >
+              <Search className="h-4 w-4" />
+              <span>Search</span>
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

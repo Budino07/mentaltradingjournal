@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +14,7 @@ interface WeeklyReviewDialogProps {
   onOpenChange: (open: boolean) => void;
   weekNumber: number;
   selectedDate?: Date;
+  onReviewSaved?: () => void;
 }
 
 export const WeeklyReviewDialog = ({
@@ -20,6 +22,7 @@ export const WeeklyReviewDialog = ({
   onOpenChange,
   weekNumber,
   selectedDate,
+  onReviewSaved,
 }: WeeklyReviewDialogProps) => {
   const [strength, setStrength] = useState("");
   const [weakness, setWeakness] = useState("");
@@ -144,6 +147,11 @@ export const WeeklyReviewDialog = ({
       }
 
       if (error) throw error;
+
+      // Call the onReviewSaved callback if provided
+      if (onReviewSaved) {
+        onReviewSaved();
+      }
 
       toast({
         title: "Weekly Review Saved",
