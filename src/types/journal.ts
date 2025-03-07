@@ -1,3 +1,4 @@
+
 export interface JournalEntryType {
   id: string;
   created_at: string;
@@ -10,5 +11,6 @@ export interface JournalEntryType {
   followed_rules?: string[];
   mistakes?: string[];
   pre_trading_activities?: string[];
+  post_submission_notes?: string;
   trades?: any[];
 }

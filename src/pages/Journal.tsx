@@ -1,4 +1,3 @@
-
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -29,7 +28,6 @@ const Journal = () => {
     filteredEntries
   } = useJournalFilters(entries);
 
-  // Listen for search events from StatsHeader
   useEffect(() => {
     const handleSearch = (event: CustomEvent) => {
       setSearchQuery(event.detail.query);
@@ -49,7 +47,7 @@ const Journal = () => {
     const { data, error } = await supabase
       .from('journal_entries')
       .select('*')
-      .eq('user_id', user.id) // Only fetch current user's entries
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -66,7 +64,6 @@ const Journal = () => {
 
     fetchEntries();
 
-    // Subscribe to real-time updates for current user's entries only
     const channel = supabase
       .channel('journal_entries_changes')
       .on(
@@ -75,11 +72,10 @@ const Journal = () => {
           event: '*',
           schema: 'public',
           table: 'journal_entries',
-          filter: `user_id=eq.${user.id}` // Only listen to changes for current user's entries
+          filter: `user_id=eq.${user.id}`
         },
         (payload) => {
           console.log('Realtime update received:', payload);
-          // Immediately update the local state based on the change type
           if (payload.eventType === 'UPDATE') {
             setEntries(currentEntries => 
               currentEntries.map(entry => 
@@ -87,7 +83,6 @@ const Journal = () => {
               )
             );
           } else {
-            // For other changes (INSERT, DELETE), fetch all entries again
             fetchEntries();
           }
         }
@@ -103,7 +98,6 @@ const Journal = () => {
     if (locationState?.selectedDate) {
       setSelectedDate(new Date(locationState.selectedDate));
       
-      // Scroll to journal entries section after a short delay to ensure the DOM is ready
       setTimeout(() => {
         const journalEntriesSection = document.querySelector('#journal-entries');
         if (journalEntriesSection) {
@@ -113,58 +107,47 @@ const Journal = () => {
     }
   }, [locationState?.selectedDate, setSelectedDate]);
 
-  // Filter entries based on the search query
   const searchFilteredEntries = (entries: JournalEntryType[]) => {
     if (!searchQuery) return entries;
     
     return entries.filter(entry => {
-      // Search in emotion field
       if (entry.emotion.toLowerCase().includes(searchQuery.toLowerCase())) {
         return true;
       }
       
-      // Search in emotion_detail field
       if (entry.emotion_detail.toLowerCase().includes(searchQuery.toLowerCase())) {
         return true;
       }
       
-      // Search in notes field
       if (entry.notes.toLowerCase().includes(searchQuery.toLowerCase())) {
         return true;
       }
       
-      // Search in outcome field
       if (entry.outcome && entry.outcome.toLowerCase().includes(searchQuery.toLowerCase())) {
         return true;
       }
       
-      // Search in market_conditions field
       if (entry.market_conditions && entry.market_conditions.toLowerCase().includes(searchQuery.toLowerCase())) {
         return true;
       }
       
-      // Search in followed_rules array
       if (entry.followed_rules && entry.followed_rules.some(rule => 
         rule.toLowerCase().includes(searchQuery.toLowerCase()))) {
         return true;
       }
       
-      // Search in mistakes array
       if (entry.mistakes && entry.mistakes.some(mistake => 
         mistake.toLowerCase().includes(searchQuery.toLowerCase()))) {
         return true;
       }
       
-      // Search in post_submission_notes
       if (entry.post_submission_notes && 
         entry.post_submission_notes.toLowerCase().includes(searchQuery.toLowerCase())) {
         return true;
       }
       
-      // Search in trades - if they exist
       if (entry.trades && entry.trades.length > 0) {
         return entry.trades.some(trade => {
-          // Convert trade fields to string to make searching easier
           const tradeString = JSON.stringify(trade).toLowerCase();
           return tradeString.includes(searchQuery.toLowerCase());
         });
@@ -174,7 +157,6 @@ const Journal = () => {
     });
   };
 
-  // Display all entries if no date is selected, otherwise filter by date
   let displayedEntries = selectedDate
     ? entries.filter(entry => {
         const entryDate = new Date(entry.created_at);
@@ -183,12 +165,10 @@ const Journal = () => {
       })
     : filteredEntries;
   
-  // Apply search filtering after date filtering
   if (searchQuery) {
     displayedEntries = searchFilteredEntries(displayedEntries);
   }
 
-  // Map entries for calendar display
   const calendarEntries = entries.map(entry => ({
     date: new Date(entry.created_at),
     emotion: entry.emotion,
