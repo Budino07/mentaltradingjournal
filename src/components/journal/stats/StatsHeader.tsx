@@ -268,11 +268,11 @@ export const StatsHeader = () => {
         
         <div className="relative ml-2">
           {isSearching ? (
-            <div className="flex items-center border rounded-md bg-background">
+            <div className="flex items-center rounded-md bg-background/95 backdrop-blur-sm border border-primary/20 overflow-hidden">
               <Input
                 type="text"
                 placeholder="Search entries..."
-                className="h-9 border-none focus-visible:ring-0"
+                className="h-9 border-none focus-visible:ring-0 bg-transparent"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
@@ -344,7 +344,7 @@ export const StatsHeader = () => {
                               key={idx} 
                               className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-accent/20 text-foreground"
                             >
-                              {trade.symbol || "Unknown"} 
+                              {trade.symbol || trade.instrument || "Unknown"} 
                               {trade.pnl && 
                                 <span className={`ml-1 ${parseFloat(String(trade.pnl)) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                   {parseFloat(String(trade.pnl)) >= 0 ? '+' : ''}{trade.pnl}
