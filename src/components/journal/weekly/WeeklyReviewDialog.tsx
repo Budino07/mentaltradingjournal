@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -148,13 +147,19 @@ export const WeeklyReviewDialog = ({
 
       if (error) throw error;
 
+      const hasContent = (
+        (strength && strength.trim() !== '') || 
+        (weakness && weakness.trim() !== '') || 
+        (improvement && improvement.trim() !== '')
+      );
+
       toast({
         title: "Weekly Review Saved",
         description: "Your weekly review has been saved successfully.",
       });
       
-      // Notify parent component that review has been saved
-      if (onReviewSaved) {
+      if (onReviewSaved && hasContent) {
+        console.log('Calling onReviewSaved callback');
         onReviewSaved();
       }
       

@@ -1,4 +1,3 @@
-
 import { DayProps } from "react-day-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { calculateDayStats, formatCurrency } from "./calendarUtils";
@@ -47,7 +46,6 @@ export const CalendarDay = ({
   const isSaturday = dayDate.getDay() === 6;
 
   useEffect(() => {
-    // Check if weekly review exists for this day
     const checkWeeklyReview = async () => {
       if (!user || !isSaturday) return;
       
@@ -63,7 +61,6 @@ export const CalendarDay = ({
           
         if (error) throw error;
         
-        // Check if review exists and has at least one field filled
         const hasContent = data && (
           (data.strength && data.strength.trim() !== '') || 
           (data.weakness && data.weakness.trim() !== '') || 
@@ -71,6 +68,7 @@ export const CalendarDay = ({
         );
         
         setHasWeeklyReview(!!hasContent);
+        console.log('Weekly review check for', weekDate, 'hasContent:', hasContent);
       } catch (error) {
         console.error('Error checking weekly review:', error);
       }
@@ -152,7 +150,7 @@ export const CalendarDay = ({
             <TooltipTrigger asChild>
               {hasWeeklyReview ? (
                 <Circle 
-                  className="h-4 w-4 text-primary cursor-pointer hover:text-primary-dark transition-colors fill-primary"
+                  className="h-4 w-4 text-primary fill-primary cursor-pointer hover:text-primary-dark transition-colors"
                   onClick={() => {
                     setIsWeeklyReviewOpen(true);
                   }}
@@ -176,11 +174,8 @@ export const CalendarDay = ({
         open={isWeeklyReviewOpen}
         onOpenChange={(open) => {
           setIsWeeklyReviewOpen(open);
-          // Refresh the weekly review status when dialog is closed
-          if (!open) {
+          if (!open && user && isSaturday) {
             const checkWeeklyReview = async () => {
-              if (!user || !isSaturday) return;
-              
               try {
                 const weekDate = dayDate.toISOString().split('T')[0];
                 
@@ -200,6 +195,7 @@ export const CalendarDay = ({
                 );
                 
                 setHasWeeklyReview(!!hasContent);
+                console.log('Weekly review status updated:', hasContent);
               } catch (error) {
                 console.error('Error checking weekly review:', error);
               }
@@ -210,7 +206,10 @@ export const CalendarDay = ({
         }}
         weekNumber={Math.ceil(dayDate.getDate() / 7)}
         selectedDate={dayDate}
-        onReviewSaved={() => setHasWeeklyReview(true)}
+        onReviewSaved={() => {
+          setHasWeeklyReview(true);
+          console.log('Weekly review saved, setting hasWeeklyReview to true');
+        }}
       />
     </div>
   );
