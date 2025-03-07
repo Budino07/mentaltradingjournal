@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { LightbulbIcon } from "lucide-react";
 import { Stats } from "../types";
@@ -138,7 +137,7 @@ export function AiRecommendations({ stats }: AiRecommendationsProps) {
           <LightbulbIcon className="h-7 w-7 text-white" />
         </div>
         
-        <h3 className="text-xl font-semibold text-gradient mb-2">AI Trading Insights</h3>
+        <h3 className="text-xl font-semibold mb-2">Trading Insights</h3>
         
         <div className="w-full">
           <div className="flex flex-wrap gap-2 mb-4 justify-center">

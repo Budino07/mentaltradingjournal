@@ -133,7 +133,7 @@ export const BlueprintMfeMaeInsights = ({ sessions }: BlueprintMfeMaeInsightsPro
           <LightbulbIcon className="h-7 w-7 text-white" />
         </div>
         
-        <h3 className="text-xl font-semibold mb-2">AI Trading Insights</h3>
+        <h3 className="text-xl font-semibold mb-2">Trading Insights</h3>
         
         <div className="w-full">
           <div className="flex flex-wrap gap-2 mb-4 justify-center">
@@ -156,32 +156,132 @@ export const BlueprintMfeMaeInsights = ({ sessions }: BlueprintMfeMaeInsightsPro
             <div className="bg-white/70 dark:bg-indigo-900/20 p-4 rounded-lg shadow-sm border border-indigo-100 dark:border-indigo-800/40">
               <h4 className="font-semibold text-primary-dark dark:text-indigo-300 mb-2">Maximum Favorable Excursion (Winners)</h4>
               <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{mfeWinnerAnalysis.insight}</p>
-              <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{mfeWinnerAnalysis.recommendation}</p>
-              <p className="text-sm text-gray-700 dark:text-gray-300">{mfeWinnerAnalysis.nextStep}</p>
+              <div className="mb-3 flex items-start gap-2">
+                <div className="mt-0.5 flex-shrink-0">
+                  <div className="bg-primary/10 p-1 rounded-full">
+                    <LightbulbIcon className="h-4 w-4 text-primary" />
+                  </div>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium text-primary-dark dark:text-primary-light">Insight:</span> {mfeWinnerAnalysis.recommendation}
+                </p>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="mt-0.5 flex-shrink-0">
+                  <div className="bg-accent/10 p-1 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                      <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                      <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                      <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                      <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                      <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium text-accent-dark dark:text-accent">Action:</span> {mfeWinnerAnalysis.nextStep}
+                </p>
+              </div>
             </div>
             
             {/* MFE Loser Analysis */}
             <div className="bg-white/70 dark:bg-indigo-900/20 p-4 rounded-lg shadow-sm border border-indigo-100 dark:border-indigo-800/40">
               <h4 className="font-semibold text-primary-dark dark:text-indigo-300 mb-2">Maximum Favorable Excursion (Losers)</h4>
               <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{mfeLoserAnalysis.insight}</p>
-              <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{mfeLoserAnalysis.recommendation}</p>
-              <p className="text-sm text-gray-700 dark:text-gray-300">{mfeLoserAnalysis.nextStep}</p>
+              <div className="mb-3 flex items-start gap-2">
+                <div className="mt-0.5 flex-shrink-0">
+                  <div className="bg-primary/10 p-1 rounded-full">
+                    <LightbulbIcon className="h-4 w-4 text-primary" />
+                  </div>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium text-primary-dark dark:text-primary-light">Insight:</span> {mfeLoserAnalysis.recommendation}
+                </p>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="mt-0.5 flex-shrink-0">
+                  <div className="bg-accent/10 p-1 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                      <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                      <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                      <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                      <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                      <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium text-accent-dark dark:text-accent">Action:</span> {mfeLoserAnalysis.nextStep}
+                </p>
+              </div>
             </div>
             
             {/* MAE Winner Analysis */}
             <div className="bg-white/70 dark:bg-indigo-900/20 p-4 rounded-lg shadow-sm border border-indigo-100 dark:border-indigo-800/40">
               <h4 className="font-semibold text-primary-dark dark:text-indigo-300 mb-2">Maximum Adverse Excursion (Winners)</h4>
               <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{maeWinnerAnalysis.insight}</p>
-              <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{maeWinnerAnalysis.recommendation}</p>
-              <p className="text-sm text-gray-700 dark:text-gray-300">{maeWinnerAnalysis.nextStep}</p>
+              <div className="mb-3 flex items-start gap-2">
+                <div className="mt-0.5 flex-shrink-0">
+                  <div className="bg-primary/10 p-1 rounded-full">
+                    <LightbulbIcon className="h-4 w-4 text-primary" />
+                  </div>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium text-primary-dark dark:text-primary-light">Insight:</span> {maeWinnerAnalysis.recommendation}
+                </p>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="mt-0.5 flex-shrink-0">
+                  <div className="bg-accent/10 p-1 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                      <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                      <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                      <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                      <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                      <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium text-accent-dark dark:text-accent">Action:</span> {maeWinnerAnalysis.nextStep}
+                </p>
+              </div>
             </div>
             
             {/* MAE Loser Analysis */}
             <div className="bg-white/70 dark:bg-indigo-900/20 p-4 rounded-lg shadow-sm border border-indigo-100 dark:border-indigo-800/40">
               <h4 className="font-semibold text-primary-dark dark:text-indigo-300 mb-2">Maximum Adverse Excursion (Losers)</h4>
               <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{maeLoserAnalysis.insight}</p>
-              <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{maeLoserAnalysis.recommendation}</p>
-              <p className="text-sm text-gray-700 dark:text-gray-300">{maeLoserAnalysis.nextStep}</p>
+              <div className="mb-3 flex items-start gap-2">
+                <div className="mt-0.5 flex-shrink-0">
+                  <div className="bg-primary/10 p-1 rounded-full">
+                    <LightbulbIcon className="h-4 w-4 text-primary" />
+                  </div>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium text-primary-dark dark:text-primary-light">Insight:</span> {maeLoserAnalysis.recommendation}
+                </p>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="mt-0.5 flex-shrink-0">
+                  <div className="bg-accent/10 p-1 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                      <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                      <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                      <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                      <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                      <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium text-accent-dark dark:text-accent">Action:</span> {maeLoserAnalysis.nextStep}
+                </p>
+              </div>
             </div>
           </div>
         </div>
