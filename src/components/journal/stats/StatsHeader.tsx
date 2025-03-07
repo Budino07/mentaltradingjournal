@@ -53,7 +53,6 @@ export const StatsHeader = () => {
   const { stats } = useProgressTracking();
   const { timeFilter, setTimeFilter } = useTimeFilter();
 
-  // Handle clicks outside the dropdown to close it
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -67,7 +66,6 @@ export const StatsHeader = () => {
     };
   }, [dropdownRef]);
 
-  // Search for entries when search query changes
   useEffect(() => {
     if (!searchQuery || !analytics?.journalEntries) {
       setSearchResults([]);
@@ -91,15 +89,12 @@ export const StatsHeader = () => {
       );
     });
 
-    // Sort entries by date (most recent first)
     const sortedEntries = [...foundEntries].sort((a, b) => 
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
 
-    // Limit to 5 results for the dropdown
     setSearchResults(sortedEntries.slice(0, 5));
     
-    // Still dispatch the search event for broader search
     const event = new CustomEvent('journal-search', { 
       detail: { query: searchQuery } 
     });
@@ -108,14 +103,12 @@ export const StatsHeader = () => {
   }, [searchQuery, analytics?.journalEntries]);
 
   const handleEntryClick = (entry: JournalEntryType) => {
-    // Create a new event to navigate to the selected date
     const selectedDate = new Date(entry.created_at);
     const event = new CustomEvent('journal-date-select', { 
       detail: { date: selectedDate } 
     });
     window.dispatchEvent(event);
     
-    // Clear search
     setSearchResults([]);
   };
 
@@ -151,7 +144,6 @@ export const StatsHeader = () => {
     }
   };
 
-  // Calculate Net P&L for the selected time period
   const calculateNetPnL = () => {
     if (!analytics?.journalEntries || analytics.journalEntries.length === 0) return 0;
 
@@ -178,7 +170,6 @@ export const StatsHeader = () => {
 
   const netPnL = calculateNetPnL();
 
-  // Filter entries by time (for other components that need filtered data)
   const filteredEntries = analytics?.journalEntries ? 
     (getTimeInterval() ? 
       analytics.journalEntries.filter(entry => {
@@ -189,7 +180,6 @@ export const StatsHeader = () => {
     [];
 
   const emotionStats = filteredEntries.reduce((acc, entry) => {
-    // Only count pre and post session entries for emotion stats
     if (entry.session_type === 'pre' || entry.session_type === 'post') {
       if (entry.emotion?.toLowerCase().includes('positive')) acc.positive++;
       acc.total++;
@@ -276,7 +266,6 @@ export const StatsHeader = () => {
           Eternal
         </Button>
         
-        {/* Search functionality with dropdown */}
         <div className="relative ml-2">
           {isSearching ? (
             <div className="flex items-center border rounded-md bg-background">
@@ -312,32 +301,64 @@ export const StatsHeader = () => {
             </Button>
           )}
           
-          {/* Search Results Dropdown */}
           {searchResults.length > 0 && isSearching && (
             <div 
               ref={dropdownRef}
-              className="absolute z-50 mt-1 w-64 md:w-80 bg-popover rounded-md border shadow-md max-h-[300px] overflow-auto"
+              className="absolute z-50 mt-1 w-64 md:w-96 bg-background/95 backdrop-blur-sm rounded-md border border-primary/20 shadow-lg overflow-hidden"
             >
-              <div className="p-2 text-sm font-medium text-muted-foreground border-b">
-                Search Results
+              <div className="p-3 text-sm font-medium bg-gradient-to-r from-primary-light/10 to-accent/10 border-b">
+                <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">Search Results</span>
               </div>
               <ul className="py-1">
                 {searchResults.map((entry) => (
                   <li 
                     key={entry.id}
-                    className="px-3 py-2 hover:bg-accent hover:text-accent-foreground cursor-pointer text-sm"
+                    className="hover:bg-primary/5 cursor-pointer transition-colors duration-200"
                     onClick={() => handleEntryClick(entry)}
                   >
-                    <div className="flex flex-col">
-                      <div className="font-medium">
-                        {entry.emotion} - {entry.emotion_detail}
+                    <div className="px-4 py-3 border-b border-primary/5 last:border-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="font-medium text-sm">
+                          <span className={`inline-block px-2 py-0.5 rounded-full text-xs ${
+                            entry.emotion?.toLowerCase().includes('positive') 
+                              ? 'bg-green-100 text-green-800' 
+                              : entry.emotion?.toLowerCase().includes('negative')
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-blue-100 text-blue-800'
+                          }`}>
+                            {entry.emotion}
+                          </span>
+                          <span className="ml-2 text-muted-foreground">{entry.emotion_detail}</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {formatDate(entry.created_at)}
+                        </div>
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        {formatDate(entry.created_at)}
+                      <div className="text-xs text-muted-foreground line-clamp-2">
+                        {entry.notes || "No notes available"}
                       </div>
-                      <div className="text-xs truncate max-w-full">
-                        {entry.notes?.substring(0, 50)}{entry.notes?.length > 50 ? '...' : ''}
-                      </div>
+                      {entry.trades && entry.trades.length > 0 && (
+                        <div className="mt-1.5 flex flex-wrap gap-1">
+                          {entry.trades.slice(0, 2).map((trade, idx) => (
+                            <span 
+                              key={idx} 
+                              className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-accent/20 text-foreground"
+                            >
+                              {trade.symbol || "Unknown"} 
+                              {trade.pnl && 
+                                <span className={`ml-1 ${parseFloat(String(trade.pnl)) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                  {parseFloat(String(trade.pnl)) >= 0 ? '+' : ''}{trade.pnl}
+                                </span>
+                              }
+                            </span>
+                          ))}
+                          {entry.trades.length > 2 && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-muted text-muted-foreground">
+                              +{entry.trades.length - 2} more
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </li>
                 ))}
