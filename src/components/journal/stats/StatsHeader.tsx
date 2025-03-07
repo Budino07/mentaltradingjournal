@@ -1,11 +1,10 @@
-
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { TradeWinPercentage } from "./TradeWinPercentage";
 import { useTimeFilter } from "@/contexts/TimeFilterContext";
 import { startOfMonth, subMonths, isWithinInterval, endOfMonth, startOfYear, endOfYear, subYears } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -13,12 +12,16 @@ import { Card } from "@/components/ui/card";
 import { DollarSign, Smile, Flame, PanelLeftClose, PanelLeftOpen, Search, X } from "lucide-react";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
 import { Input } from "@/components/ui/input";
+import { formatDate } from "@/utils/dateUtils";
+import { JournalEntryType } from "@/types/journal";
 
 export const StatsHeader = () => {
   const queryClient = useQueryClient();
   const { state, toggleSidebar } = useSidebar();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<JournalEntryType[]>([]);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     const channel = supabase
@@ -50,16 +53,71 @@ export const StatsHeader = () => {
   const { stats } = useProgressTracking();
   const { timeFilter, setTimeFilter } = useTimeFilter();
 
-  // Pass search query to parent component through context
+  // Handle clicks outside the dropdown to close it
   useEffect(() => {
-    // This event will be listened to by the Journal component
-    if (searchQuery) {
-      const event = new CustomEvent('journal-search', { 
-        detail: { query: searchQuery } 
-      });
-      window.dispatchEvent(event);
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setSearchResults([]);
+      }
     }
-  }, [searchQuery]);
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
+
+  // Search for entries when search query changes
+  useEffect(() => {
+    if (!searchQuery || !analytics?.journalEntries) {
+      setSearchResults([]);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase();
+    const foundEntries = analytics.journalEntries.filter(entry => {
+      return (
+        entry.emotion?.toLowerCase().includes(query) ||
+        entry.emotion_detail?.toLowerCase().includes(query) ||
+        entry.notes?.toLowerCase().includes(query) ||
+        entry.outcome?.toLowerCase().includes(query) ||
+        entry.market_conditions?.toLowerCase().includes(query) ||
+        entry.followed_rules?.some(rule => rule.toLowerCase().includes(query)) ||
+        entry.mistakes?.some(mistake => mistake.toLowerCase().includes(query)) ||
+        entry.post_submission_notes?.toLowerCase().includes(query) ||
+        (entry.trades && entry.trades.some(trade => 
+          JSON.stringify(trade).toLowerCase().includes(query)
+        ))
+      );
+    });
+
+    // Sort entries by date (most recent first)
+    const sortedEntries = [...foundEntries].sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    // Limit to 5 results for the dropdown
+    setSearchResults(sortedEntries.slice(0, 5));
+    
+    // Still dispatch the search event for broader search
+    const event = new CustomEvent('journal-search', { 
+      detail: { query: searchQuery } 
+    });
+    window.dispatchEvent(event);
+    
+  }, [searchQuery, analytics?.journalEntries]);
+
+  const handleEntryClick = (entry: JournalEntryType) => {
+    // Create a new event to navigate to the selected date
+    const selectedDate = new Date(entry.created_at);
+    const event = new CustomEvent('journal-date-select', { 
+      detail: { date: selectedDate } 
+    });
+    window.dispatchEvent(event);
+    
+    // Clear search
+    setSearchResults([]);
+  };
 
   const getTimeInterval = () => {
     const now = new Date();
@@ -218,7 +276,7 @@ export const StatsHeader = () => {
           Eternal
         </Button>
         
-        {/* Search functionality */}
+        {/* Search functionality with dropdown */}
         <div className="relative ml-2">
           {isSearching ? (
             <div className="flex items-center border rounded-md bg-background">
@@ -237,6 +295,7 @@ export const StatsHeader = () => {
                 onClick={() => {
                   setSearchQuery("");
                   setIsSearching(false);
+                  setSearchResults([]);
                 }}
               >
                 <X className="h-4 w-4" />
@@ -251,6 +310,39 @@ export const StatsHeader = () => {
               <Search className="h-4 w-4" />
               <span>Search</span>
             </Button>
+          )}
+          
+          {/* Search Results Dropdown */}
+          {searchResults.length > 0 && isSearching && (
+            <div 
+              ref={dropdownRef}
+              className="absolute z-50 mt-1 w-64 md:w-80 bg-popover rounded-md border shadow-md max-h-[300px] overflow-auto"
+            >
+              <div className="p-2 text-sm font-medium text-muted-foreground border-b">
+                Search Results
+              </div>
+              <ul className="py-1">
+                {searchResults.map((entry) => (
+                  <li 
+                    key={entry.id}
+                    className="px-3 py-2 hover:bg-accent hover:text-accent-foreground cursor-pointer text-sm"
+                    onClick={() => handleEntryClick(entry)}
+                  >
+                    <div className="flex flex-col">
+                      <div className="font-medium">
+                        {entry.emotion} - {entry.emotion_detail}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {formatDate(entry.created_at)}
+                      </div>
+                      <div className="text-xs truncate max-w-full">
+                        {entry.notes?.substring(0, 50)}{entry.notes?.length > 50 ? '...' : ''}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
       </div>

@@ -1,3 +1,4 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -33,12 +34,25 @@ const Journal = () => {
       setSearchQuery(event.detail.query);
     };
 
+    const handleDateSelect = (event: CustomEvent) => {
+      setSelectedDate(event.detail.date);
+      
+      setTimeout(() => {
+        const journalEntriesSection = document.querySelector('#journal-entries');
+        if (journalEntriesSection) {
+          journalEntriesSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    };
+
     window.addEventListener('journal-search', handleSearch as EventListener);
+    window.addEventListener('journal-date-select', handleDateSelect as EventListener);
     
     return () => {
       window.removeEventListener('journal-search', handleSearch as EventListener);
+      window.removeEventListener('journal-date-select', handleDateSelect as EventListener);
     };
-  }, []);
+  }, [setSelectedDate]);
 
   const fetchEntries = async () => {
     if (!user) return;
