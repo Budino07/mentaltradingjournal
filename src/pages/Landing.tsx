@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -96,7 +97,7 @@ const Landing = () => {
                   className="text-lg px-8 py-6 bg-primary hover:bg-primary/90 backdrop-blur-lg shadow-lg shadow-primary/20"
                   onClick={() => navigate("/login")}
                 >
-                  Sign up with email
+                  Get Started
                 </Button>
                 <Button
                   variant="outline"
@@ -175,7 +176,7 @@ const Landing = () => {
                 <Button
                   size="lg"
                   className="text-lg px-8 py-6 bg-white/10 hover:bg-white/20 backdrop-blur-lg border border-white/10 transition-all duration-300"
-                  onClick={() => navigate("/login")}
+                  onClick={() => navigate("/features")}
                 >
                   Focus on what matters →
                 </Button>
