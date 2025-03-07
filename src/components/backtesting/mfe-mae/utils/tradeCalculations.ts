@@ -1,3 +1,4 @@
+
 import { Trade } from "@/types/trade";
 
 export const calculateMaeRelativeToSl = (
@@ -32,6 +33,16 @@ export const calculateMfeRelativeToTp = (
   lowestPrice: number,
   isLongForTp: boolean
 ): number => {
+  // Check if the trade hit take profit
+  const hitTakeProfit = isLongForTp 
+    ? highestPrice >= takeProfit
+    : lowestPrice <= takeProfit;
+  
+  // If take profit was hit, return exactly 100%
+  if (hitTakeProfit) {
+    return 100;
+  }
+
   const mfeValue = isLongForTp 
     ? ((highestPrice - entryPrice) / (takeProfit - entryPrice)) * 100
     : ((entryPrice - lowestPrice) / (entryPrice - takeProfit)) * 100;

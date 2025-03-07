@@ -61,8 +61,9 @@ export function MfeMaeChart() {
       const tradesHitSl = processedData.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100).length;
       const tradesHitSlPercentage = (tradesHitSl / totalTrades) * 100;
 
-      // Calculate average MFE for all trades
-      const avgMfeAll = processedData.reduce((sum, trade) => sum + trade.mfeRelativeToTp, 0) / totalTrades;
+      // MFE for winner trades (those that hit take profit)
+      const winningTradesTp = processedData.filter(trade => trade.mfeRelativeToTp >= 100);
+      const avgMfeWinner = winningTradesTp.length > 0 ? 100 : 0;
 
       // Calculate MFE for losing trades (trades that hit stop loss)
       const losingTrades = processedData.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100);
@@ -70,14 +71,14 @@ export function MfeMaeChart() {
         ? losingTrades.reduce((sum, trade) => sum + trade.mfeRelativeToTp, 0) / losingTrades.length
         : 0;
 
-      // Step 1 & 2: Identify winning trades based on profitability
+      // Identify winning trades based on profitability
       const winningTrades = processedData.filter(trade => {
         const hasNotHitStopLoss = Math.abs(trade.maeRelativeToSl) < 100;
         const isProfitable = trade.rMultiple && trade.rMultiple > 0;
         return hasNotHitStopLoss && isProfitable;
       });
       
-      // Step 3 & 4: Calculate average MAE for winning trades
+      // Calculate average MAE for winning trades
       const avgMaeWinner = winningTrades.length > 0
         ? winningTrades.reduce((sum, trade) => sum + Math.abs(trade.maeRelativeToSl), 0) / winningTrades.length
         : 0;
@@ -88,7 +89,7 @@ export function MfeMaeChart() {
       setStats({
         tradesHitTp: tradesHitTpPercentage,
         tradesHitSl: tradesHitSlPercentage,
-        avgUpdrawWinner: avgMfeAll,
+        avgUpdrawWinner: avgMfeWinner,
         avgUpdrawLoser: avgMfeLoser,
         avgDrawdownWinner: avgMaeWinner,
         avgDrawdownLoser: avgMaeLoser,
