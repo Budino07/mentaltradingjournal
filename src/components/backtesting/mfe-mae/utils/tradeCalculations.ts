@@ -48,11 +48,23 @@ export const calculateCapturedMove = (
   if (isLong) {
     const totalMove = highestPrice - entryPrice;
     const capturedMove = exitPrice - entryPrice;
-    return totalMove !== 0 ? (capturedMove / totalMove) * 100 : 0;
+    
+    // If no favorable move occurred or the move was against the position
+    if (totalMove <= 0) {
+      return Math.max(-100, (capturedMove / Math.abs(entryPrice - lowestPrice)) * 100);
+    }
+    
+    return Math.min(100, Math.max(-100, (capturedMove / totalMove) * 100));
   } else {
     const totalMove = entryPrice - lowestPrice;
     const capturedMove = entryPrice - exitPrice;
-    return totalMove !== 0 ? (capturedMove / totalMove) * 100 : 0;
+    
+    // If no favorable move occurred or the move was against the position
+    if (totalMove <= 0) {
+      return Math.max(-100, (capturedMove / Math.abs(entryPrice - highestPrice)) * 100);
+    }
+    
+    return Math.min(100, Math.max(-100, (capturedMove / totalMove) * 100));
   }
 };
 
