@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Trade } from "@/types/trade";
 import { StatsCards } from "./components/StatsCards";
 import { MfeMaeBarChart } from "./components/MfeMaeBarChart";
+import { AiRecommendations } from "./components/AiRecommendations";
 import { processTrade } from "./utils/tradeCalculations";
 import { ChartData, Stats } from "./types";
 
@@ -109,6 +110,7 @@ export function MfeMaeChart() {
         </div>
       </Card>
       <StatsCards stats={stats} />
+      <AiRecommendations stats={stats} />
     </div>
   );
 }
