@@ -61,10 +61,8 @@ export function MfeMaeChart() {
       const tradesHitSl = processedData.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100).length;
       const tradesHitSlPercentage = (tradesHitSl / totalTrades) * 100;
 
-      // Calculate sum of updraw values
-      const sumUpdraw = processedData.reduce((sum, trade) => {
-        return sum + trade.mfeRelativeToTp;
-      }, 0);
+      // Calculate average MFE for all trades
+      const avgMfeAll = processedData.reduce((sum, trade) => sum + trade.mfeRelativeToTp, 0) / totalTrades;
 
       // Calculate MFE for losing trades (trades that hit stop loss)
       const losingTrades = processedData.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100);
@@ -72,12 +70,7 @@ export function MfeMaeChart() {
         ? losingTrades.reduce((sum, trade) => sum + trade.mfeRelativeToTp, 0) / losingTrades.length
         : 0;
 
-      // Calculate sum of drawdown values for losing trades
-      const sumDrawdown = processedData.reduce((sum, trade) => {
-        return sum + Math.abs(trade.maeRelativeToSl);
-      }, 0);
-
-      // Step 1 & 2: Identify winning trades based on drawdown and profitability
+      // Step 1 & 2: Identify winning trades based on profitability
       const winningTrades = processedData.filter(trade => {
         const hasNotHitStopLoss = Math.abs(trade.maeRelativeToSl) < 100;
         const isProfitable = trade.rMultiple && trade.rMultiple > 0;
@@ -89,13 +82,16 @@ export function MfeMaeChart() {
         ? winningTrades.reduce((sum, trade) => sum + Math.abs(trade.maeRelativeToSl), 0) / winningTrades.length
         : 0;
 
+      // For losing trades, MAE should be exactly 100% since they hit stop loss
+      const avgMaeLoser = tradesHitSl > 0 ? 100 : 0;
+
       setStats({
         tradesHitTp: tradesHitTpPercentage,
         tradesHitSl: tradesHitSlPercentage,
-        avgUpdrawWinner: sumUpdraw / totalTrades,
+        avgUpdrawWinner: avgMfeAll,
         avgUpdrawLoser: avgMfeLoser,
         avgDrawdownWinner: avgMaeWinner,
-        avgDrawdownLoser: sumDrawdown / totalTrades,
+        avgDrawdownLoser: avgMaeLoser,
       });
     };
 

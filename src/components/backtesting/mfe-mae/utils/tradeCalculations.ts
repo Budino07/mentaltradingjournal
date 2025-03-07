@@ -1,4 +1,3 @@
-
 import { Trade } from "@/types/trade";
 
 export const calculateMaeRelativeToSl = (
@@ -8,6 +7,17 @@ export const calculateMaeRelativeToSl = (
   lowestPrice: number,
   isLong: boolean
 ): number => {
+  // Check if the trade hit stop loss
+  const hitStopLoss = isLong 
+    ? lowestPrice <= stopLoss
+    : highestPrice >= stopLoss;
+  
+  // If stop loss was hit, return exactly -100%
+  if (hitStopLoss) {
+    return -100;
+  }
+  
+  // Otherwise calculate the actual percentage
   const maeRelativeToSl = isLong 
     ? ((lowestPrice - entryPrice) / (stopLoss - entryPrice)) * 100
     : ((highestPrice - entryPrice) / (stopLoss - entryPrice)) * 100;
