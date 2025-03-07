@@ -137,7 +137,7 @@ export function AiRecommendations({ stats }: AiRecommendationsProps) {
           <LightbulbIcon className="h-7 w-7 text-white" />
         </div>
         
-        <h3 className="text-xl font-semibold mb-2">Trading Insights</h3>
+        <h3 className="text-xl font-semibold mb-2 bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">Trading Insights</h3>
         
         <div className="w-full">
           <div className="flex flex-wrap gap-2 mb-4 justify-center">
