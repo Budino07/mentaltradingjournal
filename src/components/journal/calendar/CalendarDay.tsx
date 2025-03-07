@@ -3,10 +3,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { calculateDayStats, formatCurrency } from "./calendarUtils";
 import { Trade } from "@/types/trade";
 import { Circle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { WeeklyReviewDialog } from "../weekly/WeeklyReviewDialog";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface CalendarDayProps extends Omit<DayProps, 'displayMonth'> {
   entries: Array<{
@@ -26,9 +24,6 @@ export const CalendarDay = ({
   ...props 
 }: CalendarDayProps) => {
   const [isWeeklyReviewOpen, setIsWeeklyReviewOpen] = useState(false);
-  const [hasWeeklyReview, setHasWeeklyReview] = useState(false);
-  const { user } = useAuth();
-  
   const stats = calculateDayStats(
     entries.filter(entry => {
       const hasTradesOnThisDay = entry.trades?.some(trade => {
@@ -44,40 +39,6 @@ export const CalendarDay = ({
   const isToday = dayDate.toDateString() === new Date().toDateString();
   const hasEntries = stats !== null;
   const isSaturday = dayDate.getDay() === 6;
-
-  useEffect(() => {
-    const checkWeeklyReview = async () => {
-      if (!user || !isSaturday) return;
-      
-      try {
-        const weekDate = dayDate.toISOString().split('T')[0];
-        
-        const { data, error } = await supabase
-          .from('weekly_reviews')
-          .select('id, strength, weakness, improvement')
-          .eq('week_start_date', weekDate)
-          .eq('user_id', user.id)
-          .maybeSingle();
-          
-        if (error) throw error;
-        
-        const hasContent = data && (
-          (data.strength && data.strength.trim() !== '') || 
-          (data.weakness && data.weakness.trim() !== '') || 
-          (data.improvement && data.improvement.trim() !== '')
-        );
-        
-        setHasWeeklyReview(!!hasContent);
-        console.log('Weekly review check for', weekDate, 'hasContent:', hasContent);
-      } catch (error) {
-        console.error('Error checking weekly review:', error);
-      }
-    };
-    
-    if (user && isSaturday) {
-      checkWeeklyReview();
-    }
-  }, [user, dayDate, isSaturday]);
 
   const getPnLColor = (amount: number) => {
     if (amount === 0) return 'text-gray-500 dark:text-gray-400';
@@ -148,68 +109,24 @@ export const CalendarDay = ({
         <div className="absolute -right-8 top-1/2 -translate-y-1/2">
           <Tooltip>
             <TooltipTrigger asChild>
-              {hasWeeklyReview ? (
-                <Circle 
-                  className="h-4 w-4 text-primary fill-primary cursor-pointer hover:text-primary-dark transition-colors"
-                  onClick={() => {
-                    setIsWeeklyReviewOpen(true);
-                  }}
-                />
-              ) : (
-                <Circle 
-                  className="h-4 w-4 text-primary cursor-pointer hover:text-primary-dark transition-colors"
-                  onClick={() => {
-                    setIsWeeklyReviewOpen(true);
-                  }}
-                />
-              )}
+              <Circle 
+                className="h-4 w-4 text-primary cursor-pointer hover:text-primary-dark transition-colors"
+                onClick={() => {
+                  setIsWeeklyReviewOpen(true);
+                }}
+              />
             </TooltipTrigger>
             <TooltipContent>
-              <p>{hasWeeklyReview ? "View Weekly Review" : "Weekly Review"}</p>
+              <p>Weekly Review</p>
             </TooltipContent>
           </Tooltip>
         </div>
       )}
       <WeeklyReviewDialog 
         open={isWeeklyReviewOpen}
-        onOpenChange={(open) => {
-          setIsWeeklyReviewOpen(open);
-          if (!open && user && isSaturday) {
-            const checkWeeklyReview = async () => {
-              try {
-                const weekDate = dayDate.toISOString().split('T')[0];
-                
-                const { data, error } = await supabase
-                  .from('weekly_reviews')
-                  .select('id, strength, weakness, improvement')
-                  .eq('week_start_date', weekDate)
-                  .eq('user_id', user.id)
-                  .maybeSingle();
-                  
-                if (error) throw error;
-                
-                const hasContent = data && (
-                  (data.strength && data.strength.trim() !== '') || 
-                  (data.weakness && data.weakness.trim() !== '') || 
-                  (data.improvement && data.improvement.trim() !== '')
-                );
-                
-                setHasWeeklyReview(!!hasContent);
-                console.log('Weekly review status updated:', hasContent);
-              } catch (error) {
-                console.error('Error checking weekly review:', error);
-              }
-            };
-            
-            checkWeeklyReview();
-          }
-        }}
+        onOpenChange={setIsWeeklyReviewOpen}
         weekNumber={Math.ceil(dayDate.getDate() / 7)}
         selectedDate={dayDate}
-        onReviewSaved={() => {
-          setHasWeeklyReview(true);
-          console.log('Weekly review saved, setting hasWeeklyReview to true');
-        }}
       />
     </div>
   );

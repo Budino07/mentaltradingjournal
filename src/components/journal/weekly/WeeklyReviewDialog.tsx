@@ -13,7 +13,6 @@ interface WeeklyReviewDialogProps {
   onOpenChange: (open: boolean) => void;
   weekNumber: number;
   selectedDate?: Date;
-  onReviewSaved?: () => void;
 }
 
 export const WeeklyReviewDialog = ({
@@ -21,7 +20,6 @@ export const WeeklyReviewDialog = ({
   onOpenChange,
   weekNumber,
   selectedDate,
-  onReviewSaved,
 }: WeeklyReviewDialogProps) => {
   const [strength, setStrength] = useState("");
   const [weakness, setWeakness] = useState("");
@@ -147,22 +145,10 @@ export const WeeklyReviewDialog = ({
 
       if (error) throw error;
 
-      const hasContent = (
-        (strength && strength.trim() !== '') || 
-        (weakness && weakness.trim() !== '') || 
-        (improvement && improvement.trim() !== '')
-      );
-
       toast({
         title: "Weekly Review Saved",
         description: "Your weekly review has been saved successfully.",
       });
-      
-      if (onReviewSaved && hasContent) {
-        console.log('Calling onReviewSaved callback');
-        onReviewSaved();
-      }
-      
       onOpenChange(false);
     } catch (error) {
       console.error('Error saving review:', error);
