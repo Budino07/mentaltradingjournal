@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Session } from "./types";
 import { AssetPairChart } from "@/components/analytics/asset-pair/AssetPairChart";
@@ -14,6 +15,7 @@ import { MfeMaeBarChart } from "@/components/backtesting/mfe-mae/components/MfeM
 import { StatsCards } from "@/components/backtesting/mfe-mae/components/StatsCards";
 import { processTrade } from "@/components/backtesting/mfe-mae/utils/tradeCalculations";
 import { ChartData } from "@/components/backtesting/mfe-mae/types";
+import { BlueprintMfeMaeInsights } from "./BlueprintMfeMaeInsights";
 
 interface BlueprintAnalyticsProps {
   sessions: Session[];
@@ -355,6 +357,9 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
           <StatsCards stats={mfeMaeStats} />
         )}
       </div>
+      
+      {/* Add the new AI insights component */}
+      <BlueprintMfeMaeInsights sessions={sessions} />
     </div>
   );
 };

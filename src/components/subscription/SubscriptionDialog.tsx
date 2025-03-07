@@ -25,6 +25,7 @@ interface SubscriptionDialogProps {
   open: boolean;
   onClose: () => void;
   showPricingPlans?: boolean;
+  featureName?: string;
 }
 
 const pricingPlans: PricingPlan[] = [
@@ -56,7 +57,7 @@ const pricingPlans: PricingPlan[] = [
   }
 ];
 
-export const SubscriptionDialog = ({ open, onClose, showPricingPlans = false }: SubscriptionDialogProps) => {
+export const SubscriptionDialog = ({ open, onClose, showPricingPlans = false, featureName = "Premium Feature" }: SubscriptionDialogProps) => {
   const navigate = useNavigate();
 
   const handleUpgrade = () => {
@@ -116,7 +117,7 @@ export const SubscriptionDialog = ({ open, onClose, showPricingPlans = false }: 
     <AlertDialog open={open} onOpenChange={onClose}>
       <AlertDialogContent className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <AlertDialogHeader>
-          <AlertDialogTitle>Premium Feature</AlertDialogTitle>
+          <AlertDialogTitle>{featureName}</AlertDialogTitle>
           <AlertDialogDescription>
             This feature requires a subscription. Upgrade to our premium plan to access all features including analytics, backtesting, and advanced journaling tools.
           </AlertDialogDescription>
