@@ -288,7 +288,7 @@ export const StatsHeader = () => {
               <Input
                 type="text"
                 placeholder="Search entries..."
-                className="h-9 border-none focus-visible:ring-0 bg-transparent"
+                className="h-9 border-none focus-visible:ring-0 bg-transparent rounded-none"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
@@ -296,7 +296,7 @@ export const StatsHeader = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9"
+                className="h-9 w-9 rounded-none"
                 onClick={() => {
                   setSearchQuery("");
                   setIsSearching(false);
