@@ -21,10 +21,6 @@ interface EntryContentProps {
   dailyUrl?: string;
   fourHourUrl?: string;
   oneHourUrl?: string;
-  weeklyLabel?: string;
-  dailyLabel?: string;
-  fourHourLabel?: string;
-  oneHourLabel?: string;
 }
 
 export const EntryContent = ({
@@ -39,10 +35,6 @@ export const EntryContent = ({
   dailyUrl,
   fourHourUrl,
   oneHourUrl,
-  weeklyLabel = 'Weekly',
-  dailyLabel = 'Daily',
-  fourHourLabel = '4HR',
-  oneHourLabel = '1HR/15m',
 }: EntryContentProps) => {
   const [showNotes, setShowNotes] = useState(true);
   const [showRules, setShowRules] = useState(true);
@@ -143,7 +135,7 @@ export const EntryContent = ({
             {weeklyUrl && (
               <div className="space-y-1">
                 <p className="text-xs font-medium flex items-center gap-1">
-                  {weeklyLabel}
+                  Weekly
                   <ExternalLink className="w-3 h-3 text-muted-foreground" />
                 </p>
                 <div 
@@ -152,7 +144,7 @@ export const EntryContent = ({
                 >
                   <img 
                     src={weeklyUrl} 
-                    alt={`${weeklyLabel} chart`} 
+                    alt="Weekly chart" 
                     className="rounded-md border max-h-64 object-contain w-full" 
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
@@ -164,7 +156,7 @@ export const EntryContent = ({
             {dailyUrl && (
               <div className="space-y-1">
                 <p className="text-xs font-medium flex items-center gap-1">
-                  {dailyLabel}
+                  Daily
                   <ExternalLink className="w-3 h-3 text-muted-foreground" />
                 </p>
                 <div 
@@ -173,7 +165,7 @@ export const EntryContent = ({
                 >
                   <img 
                     src={dailyUrl} 
-                    alt={`${dailyLabel} chart`} 
+                    alt="Daily chart" 
                     className="rounded-md border max-h-64 object-contain w-full" 
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
@@ -185,7 +177,7 @@ export const EntryContent = ({
             {fourHourUrl && (
               <div className="space-y-1">
                 <p className="text-xs font-medium flex items-center gap-1">
-                  {fourHourLabel}
+                  4-Hour
                   <ExternalLink className="w-3 h-3 text-muted-foreground" />
                 </p>
                 <div 
@@ -194,7 +186,7 @@ export const EntryContent = ({
                 >
                   <img 
                     src={fourHourUrl} 
-                    alt={`${fourHourLabel} chart`} 
+                    alt="4-Hour chart" 
                     className="rounded-md border max-h-64 object-contain w-full" 
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
@@ -206,7 +198,7 @@ export const EntryContent = ({
             {oneHourUrl && (
               <div className="space-y-1">
                 <p className="text-xs font-medium flex items-center gap-1">
-                  {oneHourLabel}
+                  1-Hour
                   <ExternalLink className="w-3 h-3 text-muted-foreground" />
                 </p>
                 <div 
@@ -215,7 +207,7 @@ export const EntryContent = ({
                 >
                   <img 
                     src={oneHourUrl} 
-                    alt={`${oneHourLabel} chart`} 
+                    alt="1-Hour chart" 
                     className="rounded-md border max-h-64 object-contain w-full" 
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">

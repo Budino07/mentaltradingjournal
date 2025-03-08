@@ -1,3 +1,4 @@
+
 import { useJournalToast } from "@/hooks/useJournalToast";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
 import { toast } from "sonner";
@@ -13,16 +14,12 @@ interface JournalFormSubmissionProps {
   selectedOutcome?: string;
   followedRules?: string[];
   selectedMistakes?: string[];
-  preTradingActivities?: string[];
-  trades?: Trade[];
+  preTradingActivities: string[];
+  trades: Trade[];
   weeklyUrl?: string;
   dailyUrl?: string;
   fourHourUrl?: string;
   oneHourUrl?: string;
-  weeklyLabel?: string;
-  dailyLabel?: string;
-  fourHourLabel?: string;
-  oneHourLabel?: string;
   resetForm: () => void;
   onSubmitSuccess?: () => void;
 }
@@ -41,22 +38,14 @@ export const useJournalFormSubmission = ({
   dailyUrl,
   fourHourUrl,
   oneHourUrl,
-  weeklyLabel,
-  dailyLabel,
-  fourHourLabel,
-  oneHourLabel,
   resetForm,
   onSubmitSuccess,
 }: JournalFormSubmissionProps) => {
   const { showSuccessToast } = useJournalToast();
   const { updateProgress } = useProgressTracking();
   const { user } = useAuth();
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
+  const handleSubmit = async () => {
     if (!user) {
       toast.error("Authentication Error", {
         description: "You must be logged in to submit journal entries.",
@@ -90,30 +79,22 @@ export const useJournalFormSubmission = ({
     try {
       console.log("Submitting journal entry with outcome:", selectedOutcome);
       
-      const { data, error } = await supabase
-        .from("journal_entries")
-        .insert([
-          {
-            user_id: user.id,
-            session_type: sessionType,
-            emotion: selectedEmotion,
-            emotion_detail: selectedEmotionDetail,
-            notes: notes,
-            outcome: sessionType === "post" ? selectedOutcome : null,
-            followed_rules: sessionType === "post" ? followedRules : null,
-            mistakes: sessionType === "post" && selectedOutcome === "loss" ? selectedMistakes : null,
-            pre_trading_activities: sessionType === "pre" ? preTradingActivities : null,
-            weekly_url: weeklyUrl,
-            daily_url: dailyUrl,
-            four_hour_url: fourHourUrl,
-            one_hour_url: oneHourUrl,
-            weekly_label: weeklyLabel,
-            daily_label: dailyLabel,
-            four_hour_label: fourHourLabel,
-            one_hour_label: oneHourLabel,
-          },
-        ])
-        .select();
+      const { error } = await supabase.from('journal_entries').insert({
+        user_id: user.id,
+        session_type: sessionType,
+        emotion: selectedEmotion,
+        emotion_detail: selectedEmotionDetail,
+        notes,
+        outcome: sessionType === "pre" ? null : selectedOutcome,
+        followed_rules: followedRules,
+        mistakes: selectedMistakes,
+        pre_trading_activities: preTradingActivities,
+        trades,
+        weekly_url: weeklyUrl,
+        daily_url: dailyUrl,
+        four_hour_url: fourHourUrl,
+        one_hour_url: oneHourUrl,
+      });
 
       if (error) {
         console.error('Error submitting journal entry:', error);
@@ -131,10 +112,8 @@ export const useJournalFormSubmission = ({
         description: error instanceof Error ? error.message : "Failed to submit journal entry. Please try again.",
         duration: 5000,
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
-  return { handleSubmit, isSubmitting };
+  return { handleSubmit };
 };

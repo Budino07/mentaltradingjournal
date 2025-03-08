@@ -20,14 +20,6 @@ interface PostSessionFormSectionProps {
   setFourHourUrl: (url: string) => void;
   oneHourUrl: string;
   setOneHourUrl: (url: string) => void;
-  weeklyLabel?: string;
-  setWeeklyLabel?: (label: string) => void;
-  dailyLabel?: string;
-  setDailyLabel?: (label: string) => void;
-  fourHourLabel?: string;
-  setFourHourLabel?: (label: string) => void;
-  oneHourLabel?: string;
-  setOneHourLabel?: (label: string) => void;
 }
 
 export const PostSessionFormSection = ({
@@ -47,14 +39,6 @@ export const PostSessionFormSection = ({
   setFourHourUrl,
   oneHourUrl,
   setOneHourUrl,
-  weeklyLabel,
-  setWeeklyLabel,
-  dailyLabel,
-  setDailyLabel,
-  fourHourLabel,
-  setFourHourLabel,
-  oneHourLabel,
-  setOneHourLabel,
 }: PostSessionFormSectionProps) => {
   return (
     <PostSessionSection
@@ -76,14 +60,6 @@ export const PostSessionFormSection = ({
       setFourHourUrl={setFourHourUrl}
       oneHourUrl={oneHourUrl}
       setOneHourUrl={setOneHourUrl}
-      weeklyLabel={weeklyLabel}
-      setWeeklyLabel={setWeeklyLabel}
-      dailyLabel={dailyLabel}
-      setDailyLabel={setDailyLabel}
-      fourHourLabel={fourHourLabel}
-      setFourHourLabel={setFourHourLabel}
-      oneHourLabel={oneHourLabel}
-      setOneHourLabel={setOneHourLabel}
     />
   );
 };
