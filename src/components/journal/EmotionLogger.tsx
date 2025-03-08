@@ -10,9 +10,6 @@ import { FormHeader } from "./form/FormHeader";
 import { EmotionSection } from "./form/EmotionSection";
 import { PostSessionFormSection } from "./form/PostSessionFormSection";
 import { ProgressStats } from "./ProgressStats";
-import { TradingOutcomeSection } from "./post-session/TradingOutcomeSection";
-import { TradingRulesSection } from "./post-session/TradingRulesSection";
-import { ObservationsSection } from "./post-session/ObservationsSection";
 
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",
@@ -48,6 +45,10 @@ export const EmotionLogger = ({
   const [dailyUrl, setDailyUrl] = useState('');
   const [fourHourUrl, setFourHourUrl] = useState('');
   const [oneHourUrl, setOneHourUrl] = useState('');
+  const [weeklyLabel, setWeeklyLabel] = useState('Weekly');
+  const [dailyLabel, setDailyLabel] = useState('Daily');
+  const [fourHourLabel, setFourHourLabel] = useState('4HR');
+  const [oneHourLabel, setOneHourLabel] = useState('1HR/15m');
 
   const { stats } = useProgressTracking();
 
@@ -87,6 +88,10 @@ export const EmotionLogger = ({
     dailyUrl,
     fourHourUrl,
     oneHourUrl,
+    weeklyLabel,
+    dailyLabel,
+    fourHourLabel,
+    oneHourLabel,
     resetForm,
     onSubmitSuccess: () => {
       setShowCelebration(true);
@@ -182,6 +187,14 @@ export const EmotionLogger = ({
               setFourHourUrl={setFourHourUrl}
               oneHourUrl={oneHourUrl}
               setOneHourUrl={setOneHourUrl}
+              weeklyLabel={weeklyLabel}
+              setWeeklyLabel={setWeeklyLabel}
+              dailyLabel={dailyLabel}
+              setDailyLabel={setDailyLabel}
+              fourHourLabel={fourHourLabel}
+              setFourHourLabel={setFourHourLabel}
+              oneHourLabel={oneHourLabel}
+              setOneHourLabel={setOneHourLabel}
             />
           )}
 
