@@ -27,6 +27,14 @@ interface PostSessionSectionProps {
   setFourHourUrl: (url: string) => void;
   oneHourUrl: string;
   setOneHourUrl: (url: string) => void;
+  weeklyLabel?: string;
+  setWeeklyLabel?: (label: string) => void;
+  dailyLabel?: string;
+  setDailyLabel?: (label: string) => void;
+  fourHourLabel?: string;
+  setFourHourLabel?: (label: string) => void;
+  oneHourLabel?: string;
+  setOneHourLabel?: (label: string) => void;
 }
 
 export const PostSessionSection = ({
@@ -48,6 +56,14 @@ export const PostSessionSection = ({
   setFourHourUrl,
   oneHourUrl,
   setOneHourUrl,
+  weeklyLabel = 'Weekly',
+  setWeeklyLabel,
+  dailyLabel = 'Daily',
+  setDailyLabel,
+  fourHourLabel = '4HR',
+  setFourHourLabel,
+  oneHourLabel = '1HR/15m',
+  setOneHourLabel,
 }: PostSessionSectionProps) => {
   return (
     <div className="space-y-6">
@@ -87,6 +103,14 @@ export const PostSessionSection = ({
             onDailyUrlChange={setDailyUrl}
             onFourHourUrlChange={setFourHourUrl}
             onOneHourUrlChange={setOneHourUrl}
+            weeklyLabel={weeklyLabel}
+            dailyLabel={dailyLabel}
+            fourHourLabel={fourHourLabel}
+            oneHourLabel={oneHourLabel}
+            onWeeklyLabelChange={setWeeklyLabel}
+            onDailyLabelChange={setDailyLabel}
+            onFourHourLabelChange={setFourHourLabel}
+            onOneHourLabelChange={setOneHourLabel}
           />
         </div>
       </Card>

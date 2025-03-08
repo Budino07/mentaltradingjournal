@@ -28,6 +28,10 @@ interface JournalEntry {
   daily_url?: string;
   four_hour_url?: string;
   one_hour_url?: string;
+  weekly_label?: string;
+  daily_label?: string;
+  four_hour_label?: string;
+  one_hour_label?: string;
 }
 
 interface JournalEntryProps {
@@ -113,6 +117,10 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
           dailyUrl={entry.daily_url}
           fourHourUrl={entry.four_hour_url}
           oneHourUrl={entry.one_hour_url}
+          weeklyLabel={entry.weekly_label}
+          dailyLabel={entry.daily_label}
+          fourHourLabel={entry.four_hour_label}
+          oneHourLabel={entry.one_hour_label}
         />
       </div>
 

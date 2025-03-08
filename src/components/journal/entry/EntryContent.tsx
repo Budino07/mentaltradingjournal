@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -21,6 +20,10 @@ interface EntryContentProps {
   dailyUrl?: string;
   fourHourUrl?: string;
   oneHourUrl?: string;
+  weeklyLabel?: string;
+  dailyLabel?: string;
+  fourHourLabel?: string;
+  oneHourLabel?: string;
 }
 
 export const EntryContent = ({
@@ -35,23 +38,24 @@ export const EntryContent = ({
   dailyUrl,
   fourHourUrl,
   oneHourUrl,
+  weeklyLabel = 'Weekly',
+  dailyLabel = 'Daily',
+  fourHourLabel = '4HR',
+  oneHourLabel = '1HR/15m',
 }: EntryContentProps) => {
   const [showNotes, setShowNotes] = useState(true);
   const [showRules, setShowRules] = useState(true);
   const [localNotes, setLocalNotes] = useState(notes);
   const [localPostNotes, setLocalPostNotes] = useState(postSubmissionNotes);
   
-  // State for edit dialogs
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [isEditingPostNotes, setIsEditingPostNotes] = useState(false);
 
   const formatNotes = (text: string) => {
     if (!text) return "";
     
-    // First, convert newlines to <br> tags
     let formattedText = text.replace(/\n/g, "<br />");
     
-    // Then, convert URLs to clickable links
     const urlRegex = /(https?:\/\/[^\s<]+)/g;
     formattedText = formattedText.replace(
       urlRegex, 
@@ -61,7 +65,6 @@ export const EntryContent = ({
     return formattedText;
   };
 
-  // Function to handle opening the image URL in a new tab
   const openImageInNewTab = (url?: string) => {
     if (url) {
       window.open(url, '_blank', 'noopener,noreferrer');
@@ -124,7 +127,6 @@ export const EntryContent = ({
         </div>
       )}
 
-      {/* Screenshots section */}
       {(weeklyUrl || dailyUrl || fourHourUrl || oneHourUrl) && (
         <div className="space-y-3">
           <h4 className="text-sm font-medium flex items-center gap-1">
@@ -135,7 +137,7 @@ export const EntryContent = ({
             {weeklyUrl && (
               <div className="space-y-1">
                 <p className="text-xs font-medium flex items-center gap-1">
-                  Weekly
+                  {weeklyLabel}
                   <ExternalLink className="w-3 h-3 text-muted-foreground" />
                 </p>
                 <div 
@@ -144,7 +146,7 @@ export const EntryContent = ({
                 >
                   <img 
                     src={weeklyUrl} 
-                    alt="Weekly chart" 
+                    alt={`${weeklyLabel} chart`} 
                     className="rounded-md border max-h-64 object-contain w-full" 
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
@@ -156,7 +158,7 @@ export const EntryContent = ({
             {dailyUrl && (
               <div className="space-y-1">
                 <p className="text-xs font-medium flex items-center gap-1">
-                  Daily
+                  {dailyLabel}
                   <ExternalLink className="w-3 h-3 text-muted-foreground" />
                 </p>
                 <div 
@@ -165,7 +167,7 @@ export const EntryContent = ({
                 >
                   <img 
                     src={dailyUrl} 
-                    alt="Daily chart" 
+                    alt={`${dailyLabel} chart`} 
                     className="rounded-md border max-h-64 object-contain w-full" 
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
@@ -177,7 +179,7 @@ export const EntryContent = ({
             {fourHourUrl && (
               <div className="space-y-1">
                 <p className="text-xs font-medium flex items-center gap-1">
-                  4-Hour
+                  {fourHourLabel}
                   <ExternalLink className="w-3 h-3 text-muted-foreground" />
                 </p>
                 <div 
@@ -186,7 +188,7 @@ export const EntryContent = ({
                 >
                   <img 
                     src={fourHourUrl} 
-                    alt="4-Hour chart" 
+                    alt={`${fourHourLabel} chart`} 
                     className="rounded-md border max-h-64 object-contain w-full" 
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
@@ -198,7 +200,7 @@ export const EntryContent = ({
             {oneHourUrl && (
               <div className="space-y-1">
                 <p className="text-xs font-medium flex items-center gap-1">
-                  1-Hour
+                  {oneHourLabel}
                   <ExternalLink className="w-3 h-3 text-muted-foreground" />
                 </p>
                 <div 
@@ -207,7 +209,7 @@ export const EntryContent = ({
                 >
                   <img 
                     src={oneHourUrl} 
-                    alt="1-Hour chart" 
+                    alt={`${oneHourLabel} chart`} 
                     className="rounded-md border max-h-64 object-contain w-full" 
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
@@ -273,7 +275,6 @@ export const EntryContent = ({
         </>
       )}
 
-      {/* Edit dialogs */}
       {isEditingNotes && (
         <NoteEditDialog 
           isOpen={isEditingNotes}

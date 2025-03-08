@@ -1,5 +1,7 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useState, useEffect } from "react";
 
 interface ObservationsSectionProps {
   weeklyUrl?: string;
@@ -10,6 +12,14 @@ interface ObservationsSectionProps {
   onDailyUrlChange: (url: string) => void;
   onFourHourUrlChange: (url: string) => void;
   onOneHourUrlChange: (url: string) => void;
+  weeklyLabel?: string;
+  dailyLabel?: string;
+  fourHourLabel?: string;
+  oneHourLabel?: string;
+  onWeeklyLabelChange?: (label: string) => void;
+  onDailyLabelChange?: (label: string) => void;
+  onFourHourLabelChange?: (label: string) => void;
+  onOneHourLabelChange?: (label: string) => void;
 }
 
 export const ObservationsSection = ({
@@ -21,55 +31,193 @@ export const ObservationsSection = ({
   onDailyUrlChange,
   onFourHourUrlChange,
   onOneHourUrlChange,
+  weeklyLabel = 'Weekly',
+  dailyLabel = 'Daily',
+  fourHourLabel = '4HR',
+  oneHourLabel = '1HR/15m',
+  onWeeklyLabelChange,
+  onDailyLabelChange,
+  onFourHourLabelChange,
+  onOneHourLabelChange,
 }: ObservationsSectionProps) => {
+  const [editingWeeklyLabel, setEditingWeeklyLabel] = useState(false);
+  const [editingDailyLabel, setEditingDailyLabel] = useState(false);
+  const [editingFourHourLabel, setEditingFourHourLabel] = useState(false);
+  const [editingOneHourLabel, setEditingOneHourLabel] = useState(false);
+
+  const [localWeeklyLabel, setLocalWeeklyLabel] = useState(weeklyLabel);
+  const [localDailyLabel, setLocalDailyLabel] = useState(dailyLabel);
+  const [localFourHourLabel, setLocalFourHourLabel] = useState(fourHourLabel);
+  const [localOneHourLabel, setLocalOneHourLabel] = useState(oneHourLabel);
+
+  useEffect(() => {
+    setLocalWeeklyLabel(weeklyLabel);
+    setLocalDailyLabel(dailyLabel);
+    setLocalFourHourLabel(fourHourLabel);
+    setLocalOneHourLabel(oneHourLabel);
+  }, [weeklyLabel, dailyLabel, fourHourLabel, oneHourLabel]);
+
+  const handleLabelClick = (labelType: 'weekly' | 'daily' | 'fourHour' | 'oneHour') => {
+    if (labelType === 'weekly') setEditingWeeklyLabel(true);
+    if (labelType === 'daily') setEditingDailyLabel(true);
+    if (labelType === 'fourHour') setEditingFourHourLabel(true);
+    if (labelType === 'oneHour') setEditingOneHourLabel(true);
+  };
+
+  const handleLabelBlur = (labelType: 'weekly' | 'daily' | 'fourHour' | 'oneHour') => {
+    if (labelType === 'weekly') {
+      setEditingWeeklyLabel(false);
+      if (onWeeklyLabelChange) onWeeklyLabelChange(localWeeklyLabel);
+    }
+    if (labelType === 'daily') {
+      setEditingDailyLabel(false);
+      if (onDailyLabelChange) onDailyLabelChange(localDailyLabel);
+    }
+    if (labelType === 'fourHour') {
+      setEditingFourHourLabel(false);
+      if (onFourHourLabelChange) onFourHourLabelChange(localFourHourLabel);
+    }
+    if (labelType === 'oneHour') {
+      setEditingOneHourLabel(false);
+      if (onOneHourLabelChange) onOneHourLabelChange(localOneHourLabel);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, labelType: 'weekly' | 'daily' | 'fourHour' | 'oneHour') => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleLabelBlur(labelType);
+    }
+  };
+
   return (
     <div>
       <h3 className="text-lg font-medium mb-4">Observations</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div>
-            <Label htmlFor="weekly_url">Weekly</Label>
+            {editingWeeklyLabel ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={localWeeklyLabel}
+                  onChange={(e) => setLocalWeeklyLabel(e.target.value)}
+                  onBlur={() => handleLabelBlur('weekly')}
+                  onKeyDown={(e) => handleKeyDown(e, 'weekly')}
+                  autoFocus
+                  className="py-0 h-7 text-sm font-medium"
+                  maxLength={15}
+                />
+              </div>
+            ) : (
+              <Label 
+                htmlFor="weekly_url" 
+                className="cursor-pointer hover:text-primary transition-colors"
+                onClick={() => handleLabelClick('weekly')}
+              >
+                {localWeeklyLabel}
+              </Label>
+            )}
             <Input
               id="weekly_url"
               type="url"
               value={weeklyUrl}
               onChange={(e) => onWeeklyUrlChange(e.target.value)}
-              placeholder="Enter weekly chart URL"
+              placeholder={`Enter ${localWeeklyLabel.toLowerCase()} chart URL`}
               className="mt-1"
             />
           </div>
           <div>
-            <Label htmlFor="daily_url">Daily</Label>
+            {editingDailyLabel ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={localDailyLabel}
+                  onChange={(e) => setLocalDailyLabel(e.target.value)}
+                  onBlur={() => handleLabelBlur('daily')}
+                  onKeyDown={(e) => handleKeyDown(e, 'daily')}
+                  autoFocus
+                  className="py-0 h-7 text-sm font-medium"
+                  maxLength={15}
+                />
+              </div>
+            ) : (
+              <Label 
+                htmlFor="daily_url" 
+                className="cursor-pointer hover:text-primary transition-colors"
+                onClick={() => handleLabelClick('daily')}
+              >
+                {localDailyLabel}
+              </Label>
+            )}
             <Input
               id="daily_url"
               type="url"
               value={dailyUrl}
               onChange={(e) => onDailyUrlChange(e.target.value)}
-              placeholder="Enter daily chart URL"
+              placeholder={`Enter ${localDailyLabel.toLowerCase()} chart URL`}
               className="mt-1"
             />
           </div>
         </div>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="four_hour_url">4HR</Label>
+            {editingFourHourLabel ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={localFourHourLabel}
+                  onChange={(e) => setLocalFourHourLabel(e.target.value)}
+                  onBlur={() => handleLabelBlur('fourHour')}
+                  onKeyDown={(e) => handleKeyDown(e, 'fourHour')}
+                  autoFocus
+                  className="py-0 h-7 text-sm font-medium"
+                  maxLength={15}
+                />
+              </div>
+            ) : (
+              <Label 
+                htmlFor="four_hour_url" 
+                className="cursor-pointer hover:text-primary transition-colors"
+                onClick={() => handleLabelClick('fourHour')}
+              >
+                {localFourHourLabel}
+              </Label>
+            )}
             <Input
               id="four_hour_url"
               type="url"
               value={fourHourUrl}
               onChange={(e) => onFourHourUrlChange(e.target.value)}
-              placeholder="Enter 4-hour chart URL"
+              placeholder={`Enter ${localFourHourLabel.toLowerCase()} chart URL`}
               className="mt-1"
             />
           </div>
           <div>
-            <Label htmlFor="one_hour_url">1HR/15m</Label>
+            {editingOneHourLabel ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={localOneHourLabel}
+                  onChange={(e) => setLocalOneHourLabel(e.target.value)}
+                  onBlur={() => handleLabelBlur('oneHour')}
+                  onKeyDown={(e) => handleKeyDown(e, 'oneHour')}
+                  autoFocus
+                  className="py-0 h-7 text-sm font-medium"
+                  maxLength={15}
+                />
+              </div>
+            ) : (
+              <Label 
+                htmlFor="one_hour_url" 
+                className="cursor-pointer hover:text-primary transition-colors"
+                onClick={() => handleLabelClick('oneHour')}
+              >
+                {localOneHourLabel}
+              </Label>
+            )}
             <Input
               id="one_hour_url"
               type="url"
               value={oneHourUrl}
               onChange={(e) => onOneHourUrlChange(e.target.value)}
-              placeholder="Enter 1-hour/15min chart URL"
+              placeholder={`Enter ${localOneHourLabel.toLowerCase()} chart URL`}
               className="mt-1"
             />
           </div>
