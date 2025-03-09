@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { startOfWeek, endOfWeek, format, isWithinInterval, startOfMonth, getWeek, getWeeksInMonth, addWeeks } from "date-fns";
+import { startOfMonth, endOfMonth, format, isWithinInterval, getWeeksInMonth, addWeeks, isSameMonth } from "date-fns";
 import { calculateDayStats } from "./calendar/calendarUtils";
 import { Trade } from "@/types/trade";
 import { ArrowUpRight, ArrowDownRight, DollarSign, LineChart, TrendingUp, BarChart } from "lucide-react";
@@ -32,20 +32,29 @@ export const WeeklyPerformance = ({ entries, currentMonth }: WeeklyPerformancePr
   
   const calculateWeeklySummaries = () => {
     const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(currentMonth);
     const numberOfWeeks = getWeeksInMonth(currentMonth);
     
     const summaries: WeekSummary[] = [];
     
     for (let i = 0; i < numberOfWeeks; i++) {
       const weekStart = i === 0 ? monthStart : addWeeks(monthStart, i);
-      const weekStartDate = startOfWeek(weekStart, { weekStartsOn: 0 });
-      const weekEndDate = endOfWeek(weekStart, { weekStartsOn: 0 });
+      const weekStartDate = weekStart;
+      const weekEndDate = i === numberOfWeeks - 1 
+        ? monthEnd 
+        : new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6);
+      
+      // Skip weeks that don't belong to this month
+      if (!isSameMonth(weekStartDate, currentMonth)) {
+        continue;
+      }
       
       const weekEntries = entries.filter(entry => {
-        return isWithinInterval(entry.date, {
+        const entryDate = new Date(entry.date);
+        return isWithinInterval(entryDate, {
           start: weekStartDate,
           end: weekEndDate
-        });
+        }) && isSameMonth(entryDate, currentMonth);
       });
       
       let totalPL = 0;
