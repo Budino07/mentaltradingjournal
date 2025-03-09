@@ -80,17 +80,17 @@ export const BlueprintMfeMaeInsights = ({ sessions }: BlueprintMfeMaeInsightsPro
 
   // Generate analysis for MFE Loser
   const getMfeLoserAnalysis = () => {
-    if (stats.avgUpdrawLoser < 100) {
+    if (stats.avgUpdrawLoser < 25) {
       return {
-        insight: `On average, your losing trades reach ${stats.avgUpdrawLoser.toFixed(1)}% of your Take Profit target before reversing and stopping you out for a loss.`,
-        recommendation: `This suggests there may be opportunities to adjust your stop-loss strategy—such as moving stops to breakeven—to reduce unnecessary losses and improve risk management.`,
-        nextStep: `Consider implementing a rule to move your stop to breakeven when the trade reaches ${(stats.avgUpdrawLoser * 0.8).toFixed(0)}% of your take profit target.`
+        insight: `This suggests that your losing trades almost instantly go wrong, without making any significant move in your direction first.`,
+        recommendation: `Your losing trades show minimal favorable movement (${stats.avgUpdrawLoser.toFixed(1)}%) before stopping you out.`,
+        nextStep: `Nothing to do regarding trade management because your losing trades don't move much in your favor before stopping you out. Moving stops to breakeven will choke all your trades, even the winners, which we do not want.`
       };
     } else {
       return {
-        insight: `Your losing trades achieve an average of ${stats.avgUpdrawLoser.toFixed(1)}% movement toward take profit.`,
-        recommendation: `This unusually high percentage suggests some trades may be hitting take profit but still ending as losses, possibly due to re-entry or position management issues.`,
-        nextStep: `Review your trade management practices to ensure you're not turning winners into losers through unnecessary adjustments after hitting take profit.`
+        insight: `This suggests that your losing trades, on average, move in your desired direction sufficiently before reversing to take you out for a loss.`,
+        recommendation: `Your losing trades reach ${stats.avgUpdrawLoser.toFixed(1)}% of your take profit target before turning against you.`,
+        nextStep: `Try moving your stops to breakeven sooner, like when it reaches 25% of your TP.`
       };
     }
   };
