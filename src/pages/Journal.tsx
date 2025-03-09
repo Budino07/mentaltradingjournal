@@ -1,4 +1,3 @@
-
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -203,20 +202,18 @@ const Journal = () => {
           <div className="max-w-7xl mx-auto space-y-8 px-4">
             <StatsHeader />
 
-            <div>
-              <JournalCalendar 
-                date={selectedDate}
-                onDateSelect={(date) => {
-                  setSelectedDate(date);
-                  setSearchQuery(""); // Clear search query when a date is directly selected
-                  
-                  // Dispatch an event to notify other components that search should be cleared
-                  const clearSearchEvent = new CustomEvent('journal-search-clear');
-                  window.dispatchEvent(clearSearchEvent);
-                }}
-                entries={calendarEntries}
-              />
-            </div>
+            <JournalCalendar 
+              date={selectedDate}
+              onDateSelect={(date) => {
+                setSelectedDate(date);
+                setSearchQuery(""); // Clear search query when a date is directly selected
+                
+                // Dispatch an event to notify other components that search should be cleared
+                const clearSearchEvent = new CustomEvent('journal-search-clear');
+                window.dispatchEvent(clearSearchEvent);
+              }}
+              entries={calendarEntries}
+            />
 
             <Card id="journal-entries" className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
               <div className="flex items-center justify-between mb-6">
