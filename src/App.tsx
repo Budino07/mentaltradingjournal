@@ -76,6 +76,22 @@ const App = () => {
                     path="/dashboard"
                     element={
                       <ProtectedRoute>
+                        <Index />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/journal"
+                    element={
+                      <ProtectedRoute>
+                        <Journal />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/journal/:entryId"
+                    element={
+                      <ProtectedRoute>
                         <Journal />
                       </ProtectedRoute>
                     }
