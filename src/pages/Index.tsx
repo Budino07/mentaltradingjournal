@@ -5,6 +5,7 @@ import { WeeklyPerformance } from "@/components/journal/WeeklyPerformance";
 import { TradesOverviewTable } from "@/components/journal/stats/TradesOverviewTable";
 import { useTradesOverview } from "@/hooks/useTradesOverview";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
+import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { JournalEntryType } from "@/types/journal";
@@ -37,7 +38,7 @@ const Index = () => {
     fetchEntries();
   }, []);
 
-  const currentMonth = new Date();
+  const currentMonth = new Date().getMonth();
 
   return (
     <TimeFilterProvider>

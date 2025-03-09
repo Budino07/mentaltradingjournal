@@ -39,8 +39,6 @@ export const useTradesOverview = () => {
           return;
         }
 
-        console.log("Fetched entries:", entries);
-
         // Process trades from all entries
         const allTrades: TradeWithEntry[] = [];
         entries?.forEach((entry: JournalEntryType) => {
@@ -54,8 +52,6 @@ export const useTradesOverview = () => {
             });
           }
         });
-
-        console.log("Processed trades:", allTrades);
 
         // Sort trades by date (newest first)
         const sortedTrades = allTrades.sort((a, b) => {
