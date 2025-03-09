@@ -1,13 +1,17 @@
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { startOfMonth, endOfMonth, format, isWithinInterval, getWeeksInMonth, addWeeks, isSameMonth } from "date-fns";
 import { calculateDayStats } from "./calendar/calendarUtils";
 import { Trade } from "@/types/trade";
 import { ArrowUpRight, ArrowDownRight, DollarSign, LineChart, TrendingUp, BarChart } from "lucide-react";
-import { JournalEntryType } from "@/types/journal";
 
 interface WeeklyPerformanceProps {
-  entries: JournalEntryType[];
+  entries: Array<{
+    date: Date;
+    emotion: string;
+    trades?: Trade[];
+  }>;
   currentMonth: Date;
 }
 
@@ -46,7 +50,7 @@ export const WeeklyPerformance = ({ entries, currentMonth }: WeeklyPerformancePr
       }
       
       const weekEntries = entries.filter(entry => {
-        const entryDate = new Date(entry.created_at);
+        const entryDate = new Date(entry.date);
         return isWithinInterval(entryDate, {
           start: weekStartDate,
           end: weekEndDate

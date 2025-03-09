@@ -1,4 +1,3 @@
-
 export interface Trade {
   [key: string]: any;
   id?: string;
@@ -18,6 +17,4 @@ export interface Trade {
   forecastScreenshot?: string;
   resultScreenshot?: string;
   htfBias?: string;
-  highestPrice?: number;
-  lowestPrice?: number;
 }
