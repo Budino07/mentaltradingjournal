@@ -1,3 +1,4 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -14,6 +15,9 @@ import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
 import { startOfDay, endOfDay } from "date-fns";
 import { useLocation } from "react-router-dom";
 import { SubscriptionGuard } from "@/components/subscription/SubscriptionGuard";
+import { WeeklyPerformance } from "@/components/journal/WeeklyPerformance";
+import { TradesOverviewTable } from "@/components/journal/stats/TradesOverviewTable";
+import { useTradesOverview } from "@/hooks/useTradesOverview";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
@@ -21,6 +25,7 @@ const Journal = () => {
   const location = useLocation();
   const locationState = location.state as { selectedDate?: Date } | undefined;
   const [searchQuery, setSearchQuery] = useState("");
+  const { trades } = useTradesOverview();
   
   const {
     selectedDate,
@@ -190,10 +195,17 @@ const Journal = () => {
   }
 
   const calendarEntries = entries.map(entry => ({
-    date: new Date(entry.created_at),
+    id: entry.id,
+    created_at: entry.created_at,
+    session_type: entry.session_type,
     emotion: entry.emotion,
-    trades: entry.trades || []
+    emotion_detail: entry.emotion_detail,
+    trades: entry.trades || [],
+    notes: entry.notes
   }));
+
+  // Get current month for weekly performance component
+  const currentMonth = new Date();
 
   return (
     <AppLayout>
@@ -201,6 +213,15 @@ const Journal = () => {
         <TimeFilterProvider>
           <div className="max-w-7xl mx-auto space-y-8 px-4">
             <StatsHeader />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <WeeklyPerformance entries={calendarEntries} currentMonth={currentMonth} />
+              </div>
+              <div>
+                <TradesOverviewTable trades={trades} />
+              </div>
+            </div>
 
             <JournalCalendar 
               date={selectedDate}

@@ -1,9 +1,6 @@
 
 import { AppLayout } from "@/components/layout/AppLayout";
 import { EmotionLogger } from "@/components/journal/EmotionLogger";
-import { WeeklyPerformance } from "@/components/journal/WeeklyPerformance";
-import { TradesOverviewTable } from "@/components/journal/stats/TradesOverviewTable";
-import { useTradesOverview } from "@/hooks/useTradesOverview";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
 import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +10,6 @@ import { JournalEntryType } from "@/types/journal";
 const Index = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { trades } = useTradesOverview();
   
   useEffect(() => {
     const fetchEntries = async () => {
@@ -38,22 +34,11 @@ const Index = () => {
     fetchEntries();
   }, []);
 
-  const currentMonth = new Date().getMonth();
-
   return (
     <TimeFilterProvider>
       <AppLayout>
         <div className="container mx-auto py-6 space-y-8">
           <EmotionLogger />
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <WeeklyPerformance entries={entries} currentMonth={currentMonth} />
-            </div>
-            <div>
-              <TradesOverviewTable trades={trades} />
-            </div>
-          </div>
         </div>
       </AppLayout>
     </TimeFilterProvider>
