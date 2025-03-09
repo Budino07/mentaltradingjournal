@@ -1,208 +1,255 @@
+
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { EmotionSelector } from "./EmotionSelector";
+import { EmotionDetailDialog } from "./EmotionDetailDialog";
 import { Card } from "@/components/ui/card";
-import { SessionProgress } from "./SessionProgress";
-import { PreTradingActivities } from "./PreTradingActivities";
-import { useJournalFormSubmission } from "./JournalFormSubmission";
-import { useProgressTracking } from "@/hooks/useProgressTracking";
-import { Trade } from "@/types/trade";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { SessionTypeSelector } from "./SessionTypeSelector";
+import { JournalFormSubmission } from "./JournalFormSubmission";
 import { FormSubmissionSection } from "./FormSubmissionSection";
-import { FormHeader } from "./form/FormHeader";
-import { EmotionSection } from "./form/EmotionSection";
+import { useProgressTracking } from "@/hooks/useProgressTracking";
+import { useJournalToast } from "@/hooks/useJournalToast";
+import { SessionProgress } from "./SessionProgress";
 import { PostSessionFormSection } from "./form/PostSessionFormSection";
-import { ProgressStats } from "./ProgressStats";
-import { TradingOutcomeSection } from "./post-session/TradingOutcomeSection";
-import { TradingRulesSection } from "./post-session/TradingRulesSection";
-import { ObservationsSection } from "./post-session/ObservationsSection";
+import { Trade } from "@/types/trade";
+import { v4 as uuidv4 } from 'uuid';
+import { PreTradingActivities } from "./PreTradingActivities";
+import { PreSessionProgress } from "./PreSessionProgress";
+import { PreSessionSection } from "./PreSessionSection";
 
-const PRE_TRADING_ACTIVITIES = [
-  "Meditation",
-  "Exercise",
-  "Review Daily Goals",
-  "Cold Shower",
-  "Good Sleep",
-  "Affirmations"
-];
-
-interface EmotionLoggerProps {
-  initialSessionType?: "pre" | "post";
-  onSubmitSuccess?: () => void;
-}
-
-export const EmotionLogger = ({ 
-  initialSessionType,
-  onSubmitSuccess 
-}: EmotionLoggerProps) => {
-  const [selectedEmotion, setSelectedEmotion] = useState("");
-  const [selectedEmotionDetail, setSelectedEmotionDetail] = useState("");
-  const [selectedOutcome, setSelectedOutcome] = useState("");
-  const [notes, setNotes] = useState("");
-  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
-  const [customDetails, setCustomDetails] = useState<string[]>([]);
-  const [sessionType, setSessionType] = useState<"pre" | "post">(initialSessionType || "pre");
-  const [selectedMistakes, setSelectedMistakes] = useState<string[]>([]);
-  const [followedRules, setFollowedRules] = useState<string[]>([]);
-  const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
-  const [showCelebration, setShowCelebration] = useState(false);
+export const EmotionLogger = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [selectedEmotion, setSelectedEmotion] = useState<string>("");
+  const [emotionDialogOpen, setEmotionDialogOpen] = useState(false);
+  const [emotionDetail, setEmotionDetail] = useState<string>("");
+  const [sessionType, setSessionType] = useState<string>("pre");
+  const [notes, setNotes] = useState<string>("");
+  const [marketConditions, setMarketConditions] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [trades, setTrades] = useState<Trade[]>([]);
-  const [weeklyUrl, setWeeklyUrl] = useState('');
-  const [dailyUrl, setDailyUrl] = useState('');
-  const [fourHourUrl, setFourHourUrl] = useState('');
-  const [oneHourUrl, setOneHourUrl] = useState('');
+  const [selectedOutcome, setSelectedOutcome] = useState<string>("");
+  const [followedRules, setFollowedRules] = useState<string[]>([]);
+  const [selectedMistakes, setSelectedMistakes] = useState<string[]>([]);
+  const [postSubmissionNotes, setPostSubmissionNotes] = useState<string>("");
+  const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
+  const [weeklyUrl, setWeeklyUrl] = useState<string>("");
+  const [dailyUrl, setDailyUrl] = useState<string>("");
+  const [fourHourUrl, setFourHourUrl] = useState<string>("");
+  const [oneHourUrl, setOneHourUrl] = useState<string>("");
+  const [weeklyLabel, setWeeklyLabel] = useState<string>("Weekly");
+  const [dailyLabel, setDailyLabel] = useState<string>("Daily");
+  const [fourHourLabel, setFourHourLabel] = useState<string>("4HR");
+  const [oneHourLabel, setOneHourLabel] = useState<string>("1HR/15m");
 
-  const { stats } = useProgressTracking();
+  const { trackPreSession, trackPostSession } = useProgressTracking();
+  const { showJournalToast } = useJournalToast();
 
-  // Set initial session type when provided
   useEffect(() => {
-    if (initialSessionType) {
-      setSessionType(initialSessionType);
+    window.scrollTo(0, 0);
+  }, []);
+
+  const handleEmotionClick = (emotion: string) => {
+    setSelectedEmotion(emotion);
+    setEmotionDialogOpen(true);
+  };
+
+  const handleEmotionDetailSubmit = (detail: string) => {
+    setEmotionDetail(detail);
+    setEmotionDialogOpen(false);
+  };
+
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error("You must be logged in to submit a journal entry");
+      return;
     }
-  }, [initialSessionType]);
 
-  const resetForm = () => {
-    setSelectedEmotion("");
-    setSelectedEmotionDetail("");
-    setSelectedOutcome("");
-    setNotes("");
-    setSelectedMistakes([]);
-    setFollowedRules([]);
-    setPreTradingActivities([]);
-    setTrades([]);
-    setWeeklyUrl('');
-    setDailyUrl('');
-    setFourHourUrl('');
-    setOneHourUrl('');
-  };
+    if (!selectedEmotion) {
+      toast.error("Please select an emotion before submitting");
+      return;
+    }
 
-  const { handleSubmit } = useJournalFormSubmission({
-    sessionType,
-    selectedEmotion,
-    selectedEmotionDetail,
-    notes,
-    selectedOutcome,
-    followedRules,
-    selectedMistakes,
-    preTradingActivities,
-    trades,
-    weeklyUrl,
-    dailyUrl,
-    fourHourUrl,
-    oneHourUrl,
-    resetForm,
-    onSubmitSuccess: () => {
-      setShowCelebration(true);
-      setTimeout(() => {
-        setShowCelebration(false);
-        onSubmitSuccess?.();
-      }, 5000);
-    },
-  });
+    setIsSubmitting(true);
 
-  const handleEmotionSelect = (value: string) => {
-    setSelectedEmotion(value);
-    if (sessionType === "post") {
-      setIsDetailDialogOpen(true);
-    } else {
-      setSelectedEmotionDetail(value);
+    try {
+      const entryId = uuidv4();
+
+      let entry = {
+        id: entryId,
+        user_id: user.id,
+        emotion: selectedEmotion,
+        emotion_detail: emotionDetail,
+        notes: notes,
+        session_type: sessionType,
+      };
+
+      // Add fields based on session type
+      if (sessionType === "pre") {
+        entry = {
+          ...entry,
+          pre_trading_activities: preTradingActivities,
+          market_conditions: marketConditions,
+        };
+      } else if (sessionType === "post") {
+        entry = {
+          ...entry,
+          outcome: selectedOutcome,
+          followed_rules: followedRules,
+          mistakes: selectedMistakes,
+          post_submission_notes: postSubmissionNotes,
+          weekly_url: weeklyUrl,
+          daily_url: dailyUrl,
+          four_hour_url: fourHourUrl,
+          one_hour_url: oneHourUrl,
+          weekly_label: weeklyLabel,
+          daily_label: dailyLabel,
+          four_hour_label: fourHourLabel,
+          one_hour_label: oneHourLabel,
+        };
+      }
+
+      // Insert the entry into the database
+      const { error } = await supabase
+        .from("journal_entries")
+        .insert([entry]);
+
+      if (error) throw error;
+
+      // Track progress based on session type
+      if (sessionType === "pre") {
+        trackPreSession();
+      } else if (sessionType === "post") {
+        trackPostSession();
+      }
+
+      showJournalToast();
+      navigate("/journal");
+    } catch (error) {
+      console.error("Error submitting journal entry:", error);
+      toast.error("Failed to submit journal entry");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleDetailSelect = (detail: string) => {
-    setSelectedEmotionDetail(detail);
-    setIsDetailDialogOpen(false);
-  };
-
-  const handleCustomDetailAdd = (detail: string) => {
-    if (!customDetails.includes(detail)) {
-      setCustomDetails([...customDetails, detail]);
-    }
-  };
-
-  const handleTradeSubmit = (tradeData: Trade) => {
-    setTrades([...trades, tradeData]);
+  const onTradeSubmit = (tradeData: Trade) => {
+    setTrades((prev) => [...prev, tradeData]);
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr,300px]">
-      <Card className="p-8 space-y-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
-        <FormHeader 
-          sessionType={sessionType}
-          onSessionTypeChange={setSessionType}
-          disableTypeChange={!!initialSessionType}
-        />
+    <div className="space-y-8">
+      <div className="space-y-4">
+        {sessionType === "pre" ? (
+          <SessionProgress />
+        ) : sessionType === "post" ? (
+          <PreSessionProgress />
+        ) : null}
 
-        <SessionProgress 
-          emotionSelected={!!selectedEmotion}
-          emotionDetailSelected={!!selectedEmotionDetail}
-          activitiesSelected={preTradingActivities.length > 0}
-          notesEntered={notes.length > 0}
-          outcomeSelected={!!selectedOutcome}
-          rulesSelected={followedRules.length > 0}
-          mistakesReviewed={selectedMistakes.length > 0}
-          tradesAdded={trades.length > 0}
-          isPostSession={sessionType === "post"}
-          showCelebration={showCelebration}
-        />
-
-        {sessionType === "pre" && (
-          <PreTradingActivities
-            activities={PRE_TRADING_ACTIVITIES}
-            selectedActivities={preTradingActivities}
-            onActivityChange={setPreTradingActivities}
-          />
-        )}
-        
-        <div className="space-y-6">
-          <EmotionSection
-            sessionType={sessionType}
-            selectedEmotion={selectedEmotion}
-            selectedEmotionDetail={selectedEmotionDetail}
-            isDetailDialogOpen={isDetailDialogOpen}
-            customDetails={customDetails}
-            onEmotionSelect={handleEmotionSelect}
-            onDetailSelect={handleDetailSelect}
-            onDetailDialogOpenChange={setIsDetailDialogOpen}
-            onCustomDetailAdd={handleCustomDetailAdd}
-          />
-
-          {sessionType === "post" && (
-            <PostSessionFormSection
-              selectedOutcome={selectedOutcome}
-              setSelectedOutcome={setSelectedOutcome}
-              followedRules={followedRules}
-              setFollowedRules={setFollowedRules}
-              selectedMistakes={selectedMistakes}
-              setSelectedMistakes={setSelectedMistakes}
-              trades={trades}
-              onTradeSubmit={handleTradeSubmit}
-              weeklyUrl={weeklyUrl}
-              setWeeklyUrl={setWeeklyUrl}
-              dailyUrl={dailyUrl}
-              setDailyUrl={setDailyUrl}
-              fourHourUrl={fourHourUrl}
-              setFourHourUrl={setFourHourUrl}
-              oneHourUrl={oneHourUrl}
-              setOneHourUrl={setOneHourUrl}
+        <Card className="p-6 bg-card/30 backdrop-blur-xl border-primary/10">
+          <div className="space-y-6">
+            <SessionTypeSelector
+              sessionType={sessionType}
+              setSessionType={setSessionType}
             />
-          )}
 
-          <FormSubmissionSection
-            sessionType={sessionType}
-            notes={notes}
-            setNotes={setNotes}
-            trades={trades}
-            handleSubmit={handleSubmit}
-            selectedOutcome={selectedOutcome}
-          />
-        </div>
-      </Card>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="emotion">How are you feeling?</Label>
+                <EmotionSelector
+                  selectedEmotion={selectedEmotion}
+                  onEmotionClick={handleEmotionClick}
+                />
+              </div>
 
-      <ProgressStats 
-        preSessionStreak={stats.preSessionStreak}
-        postSessionStreak={stats.postSessionStreak}
-        dailyStreak={stats.dailyStreak}
-        level={stats.level}
-        levelProgress={stats.levelProgress}
-      />
+              <div className="space-y-2">
+                <Label htmlFor="notes">Notes</Label>
+                <Textarea
+                  id="notes"
+                  placeholder="Add your notes here..."
+                  className="h-32"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+              </div>
+
+              {sessionType === "pre" && (
+                <PreSessionSection
+                  marketConditions={marketConditions}
+                  setMarketConditions={setMarketConditions}
+                  preTradingActivities={preTradingActivities}
+                  setPreTradingActivities={setPreTradingActivities}
+                />
+              )}
+
+              {sessionType === "post" && (
+                <PostSessionFormSection
+                  selectedOutcome={selectedOutcome}
+                  setSelectedOutcome={setSelectedOutcome}
+                  followedRules={followedRules}
+                  setFollowedRules={setFollowedRules}
+                  selectedMistakes={selectedMistakes}
+                  setSelectedMistakes={setSelectedMistakes}
+                  trades={trades}
+                  onTradeSubmit={onTradeSubmit}
+                  weeklyUrl={weeklyUrl}
+                  setWeeklyUrl={setWeeklyUrl}
+                  dailyUrl={dailyUrl}
+                  setDailyUrl={setDailyUrl}
+                  fourHourUrl={fourHourUrl}
+                  setFourHourUrl={setFourHourUrl}
+                  oneHourUrl={oneHourUrl}
+                  setOneHourUrl={setOneHourUrl}
+                  weeklyLabel={weeklyLabel}
+                  setWeeklyLabel={setWeeklyLabel}
+                  dailyLabel={dailyLabel}
+                  setDailyLabel={setDailyLabel}
+                  fourHourLabel={fourHourLabel}
+                  setFourHourLabel={setFourHourLabel}
+                  oneHourLabel={oneHourLabel}
+                  setOneHourLabel={setOneHourLabel}
+                />
+              )}
+            </div>
+
+            <div className="flex justify-end">
+              <Button
+                onClick={handleSubmit}
+                disabled={!selectedEmotion || isSubmitting}
+                className="gradient-button bg-gradient-to-r from-primary-light to-accent hover:from-primary-light/90 hover:to-accent/90"
+              >
+                {isSubmitting ? "Submitting..." : "Submit Entry"}
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        <EmotionDetailDialog
+          open={emotionDialogOpen}
+          onOpenChange={setEmotionDialogOpen}
+          emotion={selectedEmotion}
+          onSubmit={handleEmotionDetailSubmit}
+        />
+      </div>
+
+      {sessionType === "trade" && (
+        <JournalFormSubmission onTradeSubmit={onTradeSubmit} />
+      )}
+
+      {trades.length > 0 && (
+        <FormSubmissionSection
+          trades={trades}
+          onTradeDelete={(id) =>
+            setTrades((prev) => prev.filter((t) => t.id !== id))
+          }
+        />
+      )}
     </div>
   );
 };
