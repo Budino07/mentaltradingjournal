@@ -1,3 +1,4 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -34,9 +35,11 @@ const Journal = () => {
     };
 
     const handleDateSelect = (event: CustomEvent) => {
+      // Clear the search query when a date is selected
       setSearchQuery("");
       setSelectedDate(event.detail.date);
       
+      // Dispatch an event to notify other components that search should be cleared
       const clearSearchEvent = new CustomEvent('journal-search-clear');
       window.dispatchEvent(clearSearchEvent);
       
@@ -207,6 +210,7 @@ const Journal = () => {
                   setSelectedDate(date);
                   setSearchQuery(""); // Clear search query when a date is directly selected
                   
+                  // Dispatch an event to notify other components that search should be cleared
                   const clearSearchEvent = new CustomEvent('journal-search-clear');
                   window.dispatchEvent(clearSearchEvent);
                 }}
