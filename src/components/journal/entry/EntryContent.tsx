@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown, ChevronUp, ListChecks, NotebookPen, LineChart, ExternalLink, Pencil } from "lucide-react";
 import { Trade } from "@/types/trade";
 import { NoteEditDialog } from "./NoteEditDialog";
-import { LinkPreview } from "@/components/common/LinkPreview";
 
 interface EntryContentProps {
   id: string;
@@ -67,13 +65,9 @@ export const EntryContent = ({
     return formattedText;
   };
 
-  // Function to check if a URL is valid
-  const isValidUrl = (string: string) => {
-    try {
-      new URL(string);
-      return true;
-    } catch (_) {
-      return false;
+  const openImageInNewTab = (url?: string) => {
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -115,15 +109,6 @@ export const EntryContent = ({
               className="text-sm text-muted-foreground"
               dangerouslySetInnerHTML={{ __html: formatNotes(localNotes) }}
             />
-            
-            {/* Extract URLs and display previews */}
-            {localNotes && (
-              <div className="mt-4 space-y-2">
-                {localNotes.split(/\s+/).filter(word => isValidUrl(word)).map((url, index) => (
-                  <LinkPreview key={`${url}-${index}`} url={url} />
-                ))}
-              </div>
-            )}
           </CollapsibleContent>
         </Collapsible>
       )}
@@ -151,26 +136,86 @@ export const EntryContent = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {weeklyUrl && (
               <div className="space-y-1">
-                <p className="text-xs font-medium mb-1">{weeklyLabel}</p>
-                <LinkPreview url={weeklyUrl} />
+                <p className="text-xs font-medium flex items-center gap-1">
+                  {weeklyLabel}
+                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                </p>
+                <div 
+                  onClick={() => openImageInNewTab(weeklyUrl)} 
+                  className="cursor-pointer hover:opacity-90 transition-opacity relative group"
+                >
+                  <img 
+                    src={weeklyUrl} 
+                    alt={`${weeklyLabel} chart`} 
+                    className="rounded-md border max-h-64 object-contain w-full" 
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                    <ExternalLink className="w-6 h-6 text-white" />
+                  </div>
+                </div>
               </div>
             )}
             {dailyUrl && (
               <div className="space-y-1">
-                <p className="text-xs font-medium mb-1">{dailyLabel}</p>
-                <LinkPreview url={dailyUrl} />
+                <p className="text-xs font-medium flex items-center gap-1">
+                  {dailyLabel}
+                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                </p>
+                <div 
+                  onClick={() => openImageInNewTab(dailyUrl)} 
+                  className="cursor-pointer hover:opacity-90 transition-opacity relative group"
+                >
+                  <img 
+                    src={dailyUrl} 
+                    alt={`${dailyLabel} chart`} 
+                    className="rounded-md border max-h-64 object-contain w-full" 
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                    <ExternalLink className="w-6 h-6 text-white" />
+                  </div>
+                </div>
               </div>
             )}
             {fourHourUrl && (
               <div className="space-y-1">
-                <p className="text-xs font-medium mb-1">{fourHourLabel}</p>
-                <LinkPreview url={fourHourUrl} />
+                <p className="text-xs font-medium flex items-center gap-1">
+                  {fourHourLabel}
+                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                </p>
+                <div 
+                  onClick={() => openImageInNewTab(fourHourUrl)} 
+                  className="cursor-pointer hover:opacity-90 transition-opacity relative group"
+                >
+                  <img 
+                    src={fourHourUrl} 
+                    alt={`${fourHourLabel} chart`} 
+                    className="rounded-md border max-h-64 object-contain w-full" 
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                    <ExternalLink className="w-6 h-6 text-white" />
+                  </div>
+                </div>
               </div>
             )}
             {oneHourUrl && (
               <div className="space-y-1">
-                <p className="text-xs font-medium mb-1">{oneHourLabel}</p>
-                <LinkPreview url={oneHourUrl} />
+                <p className="text-xs font-medium flex items-center gap-1">
+                  {oneHourLabel}
+                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                </p>
+                <div 
+                  onClick={() => openImageInNewTab(oneHourUrl)} 
+                  className="cursor-pointer hover:opacity-90 transition-opacity relative group"
+                >
+                  <img 
+                    src={oneHourUrl} 
+                    alt={`${oneHourLabel} chart`} 
+                    className="rounded-md border max-h-64 object-contain w-full" 
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                    <ExternalLink className="w-6 h-6 text-white" />
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -217,15 +262,6 @@ export const EntryContent = ({
             className="text-sm text-muted-foreground"
             dangerouslySetInnerHTML={{ __html: formatNotes(localPostNotes) }}
           />
-          
-          {/* Extract URLs and display previews */}
-          {localPostNotes && (
-            <div className="mt-4 space-y-2">
-              {localPostNotes.split(/\s+/).filter(word => isValidUrl(word)).map((url, index) => (
-                <LinkPreview key={`${url}-${index}`} url={url} />
-              ))}
-            </div>
-          )}
         </div>
       )}
 
