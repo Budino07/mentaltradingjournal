@@ -10,6 +10,12 @@ interface TradeDetailsProps {
 }
 
 export const TradeDetails = ({ trade, formatDate }: TradeDetailsProps) => {
+  const openImageInNewTab = (url?: string) => {
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <div className="space-y-6 pt-2">
       <div className="grid grid-cols-2 gap-6">
@@ -39,26 +45,42 @@ export const TradeDetails = ({ trade, formatDate }: TradeDetailsProps) => {
           <Separator />
           <div className="space-y-3">
             <h4 className="text-sm font-medium text-muted-foreground">Trade Screenshots</h4>
-            <div className="flex gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {trade.forecastScreenshot && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2"
-                  onClick={() => window.open(trade.forecastScreenshot, '_blank')}
-                >
-                  View Forecast <ExternalLink className="h-4 w-4" />
-                </Button>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium">Forecast</p>
+                  <div 
+                    onClick={() => openImageInNewTab(trade.forecastScreenshot)} 
+                    className="cursor-pointer hover:opacity-90 transition-opacity relative group"
+                  >
+                    <img 
+                      src={trade.forecastScreenshot} 
+                      alt="Trade forecast" 
+                      className="rounded-md border max-h-64 object-contain w-full" 
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                      <ExternalLink className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                </div>
               )}
               {trade.resultUrl && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2"
-                  onClick={() => window.open(trade.resultUrl, '_blank')}
-                >
-                  View Result <ExternalLink className="h-4 w-4" />
-                </Button>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium">Result</p>
+                  <div 
+                    onClick={() => openImageInNewTab(trade.resultUrl)} 
+                    className="cursor-pointer hover:opacity-90 transition-opacity relative group"
+                  >
+                    <img 
+                      src={trade.resultUrl} 
+                      alt="Trade result" 
+                      className="rounded-md border max-h-64 object-contain w-full" 
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                      <ExternalLink className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           </div>

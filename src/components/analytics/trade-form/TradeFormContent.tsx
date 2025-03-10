@@ -1,3 +1,4 @@
+
 import { Trade } from "@/types/trade";
 import { FormSections } from "./form-sections/FormSections";
 import { FormActions } from "./form-sections/FormActions";
@@ -35,6 +36,12 @@ export const TradeFormContent = ({
           const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
           if (input && value !== undefined && value !== null) {
             input.value = value.toString();
+            
+            // Trigger change event for URL fields to show previews
+            if (key === 'forecastScreenshot' || key === 'resultUrl') {
+              const event = new Event('change', { bubbles: true });
+              input.dispatchEvent(event);
+            }
           }
         });
       }

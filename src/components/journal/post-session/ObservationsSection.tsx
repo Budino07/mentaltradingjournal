@@ -2,6 +2,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
+import { ExternalLink } from "lucide-react";
 
 interface ObservationsSectionProps {
   weeklyUrl?: string;
@@ -49,6 +50,12 @@ export const ObservationsSection = ({
   const [localDailyLabel, setLocalDailyLabel] = useState(dailyLabel);
   const [localFourHourLabel, setLocalFourHourLabel] = useState(fourHourLabel);
   const [localOneHourLabel, setLocalOneHourLabel] = useState(oneHourLabel);
+
+  const openImageInNewTab = (url: string) => {
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   useEffect(() => {
     setLocalWeeklyLabel(weeklyLabel);
@@ -125,6 +132,21 @@ export const ObservationsSection = ({
               placeholder={`Enter ${localWeeklyLabel.toLowerCase()} chart URL`}
               className="mt-1"
             />
+            {weeklyUrl && (
+              <div 
+                onClick={() => openImageInNewTab(weeklyUrl)} 
+                className="cursor-pointer hover:opacity-90 transition-opacity relative group mt-2"
+              >
+                <img 
+                  src={weeklyUrl} 
+                  alt={`${localWeeklyLabel} chart`} 
+                  className="rounded-md border max-h-32 object-contain w-full" 
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                  <ExternalLink className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            )}
           </div>
           <div>
             {editingDailyLabel ? (
@@ -156,6 +178,21 @@ export const ObservationsSection = ({
               placeholder={`Enter ${localDailyLabel.toLowerCase()} chart URL`}
               className="mt-1"
             />
+            {dailyUrl && (
+              <div 
+                onClick={() => openImageInNewTab(dailyUrl)} 
+                className="cursor-pointer hover:opacity-90 transition-opacity relative group mt-2"
+              >
+                <img 
+                  src={dailyUrl} 
+                  alt={`${localDailyLabel} chart`} 
+                  className="rounded-md border max-h-32 object-contain w-full" 
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                  <ExternalLink className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            )}
           </div>
         </div>
         <div className="space-y-4">
@@ -189,6 +226,21 @@ export const ObservationsSection = ({
               placeholder={`Enter ${localFourHourLabel.toLowerCase()} chart URL`}
               className="mt-1"
             />
+            {fourHourUrl && (
+              <div 
+                onClick={() => openImageInNewTab(fourHourUrl)} 
+                className="cursor-pointer hover:opacity-90 transition-opacity relative group mt-2"
+              >
+                <img 
+                  src={fourHourUrl} 
+                  alt={`${localFourHourLabel} chart`} 
+                  className="rounded-md border max-h-32 object-contain w-full" 
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                  <ExternalLink className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            )}
           </div>
           <div>
             {editingOneHourLabel ? (
@@ -220,6 +272,21 @@ export const ObservationsSection = ({
               placeholder={`Enter ${localOneHourLabel.toLowerCase()} chart URL`}
               className="mt-1"
             />
+            {oneHourUrl && (
+              <div 
+                onClick={() => openImageInNewTab(oneHourUrl)} 
+                className="cursor-pointer hover:opacity-90 transition-opacity relative group mt-2"
+              >
+                <img 
+                  src={oneHourUrl} 
+                  alt={`${localOneHourLabel} chart`} 
+                  className="rounded-md border max-h-32 object-contain w-full" 
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                  <ExternalLink className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
