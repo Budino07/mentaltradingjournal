@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -138,7 +137,7 @@ export const EntryContent = ({
             {weeklyUrl && (
               <div className="space-y-1">
                 <p className="text-xs font-medium flex items-center gap-1">
-                  {weeklyLabel || 'Weekly'}
+                  {weeklyLabel}
                   <ExternalLink className="w-3 h-3 text-muted-foreground" />
                 </p>
                 <div 
@@ -147,7 +146,7 @@ export const EntryContent = ({
                 >
                   <img 
                     src={weeklyUrl} 
-                    alt={`${weeklyLabel || 'Weekly'} chart`} 
+                    alt={`${weeklyLabel} chart`} 
                     className="rounded-md border max-h-64 object-contain w-full" 
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
@@ -159,7 +158,7 @@ export const EntryContent = ({
             {dailyUrl && (
               <div className="space-y-1">
                 <p className="text-xs font-medium flex items-center gap-1">
-                  {dailyLabel || 'Daily'}
+                  {dailyLabel}
                   <ExternalLink className="w-3 h-3 text-muted-foreground" />
                 </p>
                 <div 
@@ -168,7 +167,7 @@ export const EntryContent = ({
                 >
                   <img 
                     src={dailyUrl} 
-                    alt={`${dailyLabel || 'Daily'} chart`} 
+                    alt={`${dailyLabel} chart`} 
                     className="rounded-md border max-h-64 object-contain w-full" 
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
@@ -180,7 +179,7 @@ export const EntryContent = ({
             {fourHourUrl && (
               <div className="space-y-1">
                 <p className="text-xs font-medium flex items-center gap-1">
-                  {fourHourLabel || '4HR'}
+                  {fourHourLabel}
                   <ExternalLink className="w-3 h-3 text-muted-foreground" />
                 </p>
                 <div 
@@ -189,7 +188,7 @@ export const EntryContent = ({
                 >
                   <img 
                     src={fourHourUrl} 
-                    alt={`${fourHourLabel || '4HR'} chart`} 
+                    alt={`${fourHourLabel} chart`} 
                     className="rounded-md border max-h-64 object-contain w-full" 
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
@@ -201,7 +200,7 @@ export const EntryContent = ({
             {oneHourUrl && (
               <div className="space-y-1">
                 <p className="text-xs font-medium flex items-center gap-1">
-                  {oneHourLabel || '1HR/15m'}
+                  {oneHourLabel}
                   <ExternalLink className="w-3 h-3 text-muted-foreground" />
                 </p>
                 <div 
@@ -210,7 +209,7 @@ export const EntryContent = ({
                 >
                   <img 
                     src={oneHourUrl} 
-                    alt={`${oneHourLabel || '1HR/15m'} chart`} 
+                    alt={`${oneHourLabel} chart`} 
                     className="rounded-md border max-h-64 object-contain w-full" 
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
