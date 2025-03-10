@@ -12,7 +12,6 @@ import {
 } from "recharts";
 import { ChartData } from "../types";
 import { useNavigate } from "react-router-dom";
-import { CustomTooltip } from "@/components/analytics/shared/CustomTooltip";
 import { format } from "date-fns";
 
 interface MfeMaeBarChartProps {
@@ -22,7 +21,8 @@ interface MfeMaeBarChartProps {
 export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
   const navigate = useNavigate();
   
-  const dataWithNumbers = [...data].reverse().map((item, index) => ({
+  // Sort data chronologically by entry date
+  const dataWithNumbers = data.map((item, index) => ({
     ...item,
     tradeNum: (index + 1).toString(),
   }));
