@@ -11,9 +11,17 @@ export const RuleAdherence = () => {
     queryFn: async () => {
       console.log("Fetching rule adherence data...");
       
+      // Get the current user's ID
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.log("No authenticated user found");
+        return [];
+      }
+      
       const { data: entries, error } = await supabase
         .from('journal_entries')
         .select('*')
+        .eq('user_id', user.id) // Filter entries by current user's ID
         .eq('session_type', 'post')
         .not('outcome', 'eq', 'no_trades');
 
