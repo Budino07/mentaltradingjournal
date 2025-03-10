@@ -1,3 +1,4 @@
+
 import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, BrainCircuit, Notebook, LineChart } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -18,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { useState } from "react";
 
 const menuItems = [
@@ -36,7 +38,7 @@ export function AppSidebar() {
 
   return (
     <>
-      <Sidebar>
+      <Sidebar collapsible="icon">
         <SidebarContent>
           <div className="p-3">
             <Link to="/" className="flex items-center gap-1.5 group">
@@ -50,22 +52,38 @@ export function AppSidebar() {
             <SidebarGroupLabel>Menu</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {menuItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <Link to={item.url} className="flex items-center gap-1.5">
-                        <item.icon className="w-4 h-4" />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
+                <TooltipProvider>
+                  {menuItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <SidebarMenuButton asChild tooltip={item.title}>
+                            <Link to={item.url} className="flex items-center gap-1.5">
+                              <item.icon className="w-4 h-4" />
+                              <span>{item.title}</span>
+                            </Link>
+                          </SidebarMenuButton>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="bg-popover text-popover-foreground">
+                          {item.title}
+                        </TooltipContent>
+                      </Tooltip>
+                    </SidebarMenuItem>
+                  ))}
+                  <SidebarMenuItem>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <SidebarMenuButton onClick={() => setShowMentorDialog(true)} tooltip="Mentor Mode">
+                          <UserCog className="w-4 h-4" />
+                          <span>Mentor Mode</span>
+                        </SidebarMenuButton>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="bg-popover text-popover-foreground">
+                        Mentor Mode
+                      </TooltipContent>
+                    </Tooltip>
                   </SidebarMenuItem>
-                ))}
-                <SidebarMenuItem>
-                  <SidebarMenuButton onClick={() => setShowMentorDialog(true)}>
-                    <UserCog className="w-4 h-4" />
-                    <span>Mentor Mode</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                </TooltipProvider>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

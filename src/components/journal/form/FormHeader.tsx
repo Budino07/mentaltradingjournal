@@ -1,3 +1,4 @@
+
 import { HelpCircle, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { SessionTypeSelector } from "../SessionTypeSelector";
