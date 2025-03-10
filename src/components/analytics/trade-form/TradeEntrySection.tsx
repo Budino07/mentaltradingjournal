@@ -2,8 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { LinkPreview } from "@/components/common/LinkPreview";
 
 export const TradeEntrySection = () => {
+  const [forecastUrl, setForecastUrl] = useState("");
+  
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold mb-3">Trade Entry</h3>
@@ -55,10 +59,15 @@ export const TradeEntrySection = () => {
             id="forecastScreenshot"
             name="forecastScreenshot"
             placeholder="Enter screenshot URL"
+            onChange={(e) => setForecastUrl(e.target.value)}
           />
+          {forecastUrl && forecastUrl.startsWith('http') && (
+            <div className="mt-2">
+              <LinkPreview url={forecastUrl} />
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
-

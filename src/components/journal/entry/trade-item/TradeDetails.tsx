@@ -3,6 +3,7 @@ import { Trade } from "@/types/trade";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { LinkPreview } from "@/components/common/LinkPreview";
 
 interface TradeDetailsProps {
   trade: Trade;
@@ -39,26 +40,18 @@ export const TradeDetails = ({ trade, formatDate }: TradeDetailsProps) => {
           <Separator />
           <div className="space-y-3">
             <h4 className="text-sm font-medium text-muted-foreground">Trade Screenshots</h4>
-            <div className="flex gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {trade.forecastScreenshot && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2"
-                  onClick={() => window.open(trade.forecastScreenshot, '_blank')}
-                >
-                  View Forecast <ExternalLink className="h-4 w-4" />
-                </Button>
+                <div>
+                  <p className="text-xs font-medium mb-1">Forecast</p>
+                  <LinkPreview url={trade.forecastScreenshot} />
+                </div>
               )}
               {trade.resultUrl && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2"
-                  onClick={() => window.open(trade.resultUrl, '_blank')}
-                >
-                  View Result <ExternalLink className="h-4 w-4" />
-                </Button>
+                <div>
+                  <p className="text-xs font-medium mb-1">Result</p>
+                  <LinkPreview url={trade.resultUrl} />
+                </div>
               )}
             </div>
           </div>
