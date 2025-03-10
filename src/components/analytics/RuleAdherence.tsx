@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +23,11 @@ export const RuleAdherence = () => {
       }
 
       console.log("Fetched entries:", entries);
+
+      // If no entries, return empty data
+      if (!entries || entries.length === 0) {
+        return [];
+      }
 
       const rulesFollowedStats = {
         wins: 0,
@@ -78,6 +84,27 @@ export const RuleAdherence = () => {
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-accent/10 rounded w-3/4"></div>
           <div className="h-[250px] md:h-[300px] bg-accent/10 rounded"></div>
+        </div>
+      </Card>
+    );
+  }
+
+  // If there's no data or empty array, show empty state
+  if (!analytics || analytics.length === 0 || (analytics[0].total === 0 && analytics[1].total === 0)) {
+    return (
+      <Card className="p-4 md:p-6 space-y-4">
+        <div className="space-y-2">
+          <h3 className="text-xl md:text-2xl font-bold">Rule Adherence vs. Performance</h3>
+          <p className="text-sm text-muted-foreground">
+            Compare outcomes when trading rules are followed vs. not followed
+          </p>
+        </div>
+
+        <div className="h-[250px] md:h-[300px] w-full flex items-center justify-center">
+          <div className="text-center text-muted-foreground">
+            <p>No rule adherence data available</p>
+            <p className="text-sm">Add journal entries with rule adherence information to see analysis</p>
+          </div>
         </div>
       </Card>
     );

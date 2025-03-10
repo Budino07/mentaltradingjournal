@@ -1,3 +1,4 @@
+
 import {
   BarChart,
   Bar,
@@ -22,6 +23,19 @@ interface RuleAdherenceChartProps {
 }
 
 export const RuleAdherenceChart = ({ data }: RuleAdherenceChartProps) => {
+  // Ensure we have valid data before rendering
+  const hasValidData = data && data.length > 0 && data.some(item => item.total > 0);
+
+  if (!hasValidData) {
+    return (
+      <div className="h-[250px] md:h-[300px] w-full flex items-center justify-center">
+        <div className="text-center text-muted-foreground">
+          <p>No data available to display</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-[250px] md:h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
