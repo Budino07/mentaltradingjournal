@@ -22,7 +22,13 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
   const navigate = useNavigate();
   
   // Sort data chronologically by entry date
-  const dataWithNumbers = data.map((item, index) => ({
+  const sortedData = [...data].sort((a, b) => {
+    const dateA = a.entryDate ? new Date(a.entryDate).getTime() : 0;
+    const dateB = b.entryDate ? new Date(b.entryDate).getTime() : 0;
+    return dateA - dateB;
+  });
+
+  const dataWithNumbers = sortedData.map((item, index) => ({
     ...item,
     tradeNum: (index + 1).toString(),
   }));
@@ -85,7 +91,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           tick={{ fill: 'hsl(var(--card-foreground))' }}
         />
         <Tooltip 
-          cursor={{ cursor: 'pointer' }}
+          cursor={{ fill: 'transparent', cursor: 'pointer' }}
           content={({ active, payload }) => {
             if (!active || !payload || !payload.length) return null;
 
