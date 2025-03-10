@@ -11,33 +11,16 @@ import {
   ReferenceLine,
 } from "recharts";
 import { ChartData } from "../types";
-import { useNavigate } from "react-router-dom";
-import { format } from "date-fns";
 
 interface MfeMaeBarChartProps {
   data: ChartData[];
 }
 
 export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
-  const navigate = useNavigate();
-  
   const dataWithNumbers = [...data].reverse().map((item, index) => ({
     ...item,
     tradeNum: (index + 1).toString(),
   }));
-
-  const handleBarClick = (data: any) => {
-    if (data && data.journalEntryId) {
-      // Navigate to the journal entry and pass the date
-      if (data.entryDate) {
-        navigate('/journal', { 
-          state: { 
-            selectedDate: new Date(data.entryDate) 
-          } 
-        });
-      }
-    }
-  };
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -90,7 +73,6 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
             const updrawValue = data.mfeRelativeToTp;
             const drawdownValue = data.maeRelativeToSl;
             const capturedMove = data.capturedMove;
-            const hasLink = data.journalEntryId && data.entryDate;
 
             return (
               <div className="bg-card border border-border rounded-lg shadow-lg p-3">
@@ -110,11 +92,6 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                     <span className="text-card-foreground">Captured Move: {capturedMove?.toFixed(2)}%</span>
                   </div>
                   <p className="text-card-foreground">R-Multiple: {data.rMultiple?.toFixed(2) || '0'}</p>
-                  {hasLink && (
-                    <p className="text-accent text-sm mt-2 cursor-pointer">
-                      Click on the bar to view in journal
-                    </p>
-                  )}
                 </div>
               </div>
             );
@@ -133,8 +110,6 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           fill="#FEC6A1" 
           name="Updraw" 
           stackId="stack"
-          onClick={handleBarClick}
-          cursor="pointer"
         >
           {dataWithNumbers.map((entry, index) => (
             <circle
@@ -151,8 +126,6 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           fill="#9b87f5" 
           name="Drawdown" 
           stackId="stack"
-          onClick={handleBarClick}
-          cursor="pointer"
         />
       </BarChart>
     </ResponsiveContainer>

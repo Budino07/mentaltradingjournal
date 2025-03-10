@@ -16,9 +16,6 @@ interface TooltipProps {
 export const CustomTooltip = ({ active, payload, label, valueFormatter }: TooltipProps) => {
   if (!active || !payload || !payload.length) return null;
 
-  // Check if this data has a journalEntryId (for clickable tooltips)
-  const hasLink = payload[0]?.payload?.journalEntryId && payload[0]?.payload?.entryDate;
-
   return (
     <div className="bg-black/90 dark:bg-background/90 border border-border/50 rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
       <p className="font-medium text-sm text-white dark:text-foreground mb-2">{label}</p>
@@ -45,13 +42,6 @@ export const CustomTooltip = ({ active, payload, label, valueFormatter }: Toolti
           <span className={`font-medium ${payload[0].payload.pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
             ${payload[0].payload.pnl.toFixed(2)}
           </span>
-        </div>
-      )}
-      
-      {/* Add a hint for clickable bars */}
-      {hasLink && (
-        <div className="mt-2 text-xs text-accent">
-          Click on the bar to view in journal
         </div>
       )}
     </div>
