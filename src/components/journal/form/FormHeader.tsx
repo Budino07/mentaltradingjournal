@@ -36,7 +36,7 @@ export const FormHeader = ({
         </Button>
 
         <div className="flex items-center gap-2">
-          <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
             {sessionType === "pre" ? "Pre-Session Check-in" : "Post-Session Review"}
           </h2>
           {sessionType === "pre" && (

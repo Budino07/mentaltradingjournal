@@ -38,19 +38,18 @@ export function AppSidebar() {
 
   return (
     <>
-      {/* Set collapsible to "icon" to show icons only by default */}
-      <Sidebar collapsible="icon" className="bg-sidebar z-50">
+      <Sidebar collapsible="icon">
         <SidebarContent>
-          <div className="p-2">
-            <Link to="/" className="flex items-center justify-center">
-              <BrainCircuit className="w-5 h-5 text-primary transition-all duration-300 hover:text-accent" />
+          <div className="p-3">
+            <Link to="/" className="flex items-center gap-1.5 group">
+              <BrainCircuit className="w-5 h-5 text-primary transition-all duration-300 group-hover:text-accent" />
+              <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent transition-all duration-300">
+                Mental
+              </h1>
             </Link>
           </div>
           <SidebarGroup>
-            {/* We hide this label when collapsed */}
-            <SidebarGroupLabel className="invisible md:group-data-[state=expanded]:visible">
-              Menu
-            </SidebarGroupLabel>
+            <SidebarGroupLabel>Menu</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <TooltipProvider>
@@ -58,8 +57,8 @@ export function AppSidebar() {
                     <SidebarMenuItem key={item.title}>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <SidebarMenuButton asChild>
-                            <Link to={item.url} className="flex items-center justify-center md:justify-start gap-1.5">
+                          <SidebarMenuButton asChild tooltip={item.title}>
+                            <Link to={item.url} className="flex items-center gap-1.5">
                               <item.icon className="w-4 h-4" />
                               <span>{item.title}</span>
                             </Link>
@@ -74,7 +73,7 @@ export function AppSidebar() {
                   <SidebarMenuItem>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <SidebarMenuButton onClick={() => setShowMentorDialog(true)}>
+                        <SidebarMenuButton onClick={() => setShowMentorDialog(true)} tooltip="Mentor Mode">
                           <UserCog className="w-4 h-4" />
                           <span>Mentor Mode</span>
                         </SidebarMenuButton>
