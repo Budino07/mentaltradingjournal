@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   PieChart,
@@ -63,8 +64,30 @@ export const WinLossRatio = () => {
 
   // Process trades to calculate win/loss ratio
   const allTrades = analytics.journalEntries.flatMap(entry => entry.trades || []);
-  const winningTrades = allTrades.filter(trade => Number(trade.pnl) > 0).length;
   const totalTrades = allTrades.length;
+  
+  // If there are no trades, show empty state
+  if (totalTrades === 0) {
+    return (
+      <Card className="p-4 md:p-6 space-y-4">
+        <div className="space-y-2">
+          <h3 className="text-xl md:text-2xl font-bold">Win/Loss Ratio</h3>
+          <p className="text-sm text-muted-foreground">
+            Distribution of winning vs losing trades
+          </p>
+        </div>
+        
+        <div className="h-[250px] md:h-[300px] w-full flex items-center justify-center">
+          <div className="text-center text-muted-foreground">
+            <p>No trades recorded yet</p>
+            <p className="text-sm">Add trades to see your win/loss ratio</p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  const winningTrades = allTrades.filter(trade => Number(trade.pnl) > 0).length;
   
   const winRate = totalTrades ? (winningTrades / totalTrades) * 100 : 0;
   const lossRate = totalTrades ? ((totalTrades - winningTrades) / totalTrades) * 100 : 0;
