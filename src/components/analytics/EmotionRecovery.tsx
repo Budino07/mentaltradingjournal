@@ -50,9 +50,13 @@ export const EmotionRecovery = () => {
 
   // Transform emotionRecovery data into the format needed for the chart
   const totalRecoveries = Object.values(analytics.emotionRecovery).reduce((a, b) => a + b, 0);
+  
+  // Check if we have any recovery data
+  const hasRecoveryData = totalRecoveries > 0;
+
   const data = Object.entries(analytics.emotionRecovery).map(([days, frequency]) => ({
     days,
-    frequency: Math.round((frequency / totalRecoveries) * 100) // Round to whole number
+    frequency: hasRecoveryData ? Math.round((frequency / totalRecoveries) * 100) : 0 // Round to whole number
   })).sort((a, b) => {
     // Custom sort to maintain the correct order
     const order = {
@@ -73,39 +77,50 @@ export const EmotionRecovery = () => {
         </p>
       </div>
 
-      <div className="h-[250px] md:h-[300px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-            <XAxis 
-              dataKey="days" 
-              tick={{ fontSize: 12 }}
-              stroke="currentColor"
-              tickLine={{ stroke: 'currentColor' }}
-            />
-            <YAxis 
-              tick={{ fontSize: 12 }}
-              stroke="currentColor"
-              tickLine={{ stroke: 'currentColor' }}
-            />
-            <Tooltip 
-              content={<CustomTooltip />}
-              cursor={{ fill: 'currentColor', opacity: 0.1 }}
-            />
-            <Bar 
-              dataKey="frequency" 
-              fill="#6E59A5" 
-              name="Frequency"
-              radius={[4, 4, 0, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      {hasRecoveryData ? (
+        <div className="h-[250px] md:h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+              <XAxis 
+                dataKey="days" 
+                tick={{ fontSize: 12 }}
+                stroke="currentColor"
+                tickLine={{ stroke: 'currentColor' }}
+              />
+              <YAxis 
+                tick={{ fontSize: 12 }}
+                stroke="currentColor"
+                tickLine={{ stroke: 'currentColor' }}
+              />
+              <Tooltip 
+                content={<CustomTooltip />}
+                cursor={{ fill: 'currentColor', opacity: 0.1 }}
+              />
+              <Bar 
+                dataKey="frequency" 
+                fill="#6E59A5" 
+                name="Frequency"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-[250px] md:h-[300px] bg-accent/5 rounded-lg">
+          <p className="text-muted-foreground text-center">
+            Not enough data to display recovery patterns.
+          </p>
+          <p className="text-sm text-muted-foreground text-center mt-2">
+            Log both losses and subsequent recoveries to see this chart.
+          </p>
+        </div>
+      )}
 
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
-          {data.length > 0 ? (
+          {hasRecoveryData ? (
             <>
               <p>
                 {data[0].frequency > 40 
@@ -119,7 +134,7 @@ export const EmotionRecovery = () => {
               </p>
             </>
           ) : (
-            <p>Start logging more trades to see insights about your emotional recovery patterns.</p>
+            <p>To see insights about your emotional recovery patterns, log trades with losses and then track your emotions afterward until you record a positive emotion or winning trade.</p>
           )}
         </div>
       </div>
