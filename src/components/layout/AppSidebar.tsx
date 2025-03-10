@@ -34,22 +34,17 @@ const menuItems = [
 
 export function AppSidebar() {
   const [showMentorDialog, setShowMentorDialog] = useState(false);
-  const { state } = useSidebar();
 
   return (
     <>
-      <Sidebar collapsible="icon">
+      <Sidebar className="w-14 flex-shrink-0" collapsible="none">
         <SidebarContent>
-          <div className="p-3">
-            <Link to="/" className="flex items-center gap-1.5 group">
-              <BrainCircuit className="w-5 h-5 text-primary transition-all duration-300 group-hover:text-accent" />
-              <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent transition-all duration-300">
-                Mental
-              </h1>
+          <div className="p-3 flex justify-center">
+            <Link to="/" className="flex items-center justify-center">
+              <BrainCircuit className="w-5 h-5 text-primary transition-all duration-300 hover:text-accent" />
             </Link>
           </div>
           <SidebarGroup>
-            <SidebarGroupLabel>Menu</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <TooltipProvider>
@@ -57,10 +52,9 @@ export function AppSidebar() {
                     <SidebarMenuItem key={item.title}>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <SidebarMenuButton asChild tooltip={item.title}>
-                            <Link to={item.url} className="flex items-center gap-1.5">
+                          <SidebarMenuButton asChild>
+                            <Link to={item.url} className="flex items-center justify-center">
                               <item.icon className="w-4 h-4" />
-                              <span>{item.title}</span>
                             </Link>
                           </SidebarMenuButton>
                         </TooltipTrigger>
@@ -73,9 +67,8 @@ export function AppSidebar() {
                   <SidebarMenuItem>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <SidebarMenuButton onClick={() => setShowMentorDialog(true)} tooltip="Mentor Mode">
+                        <SidebarMenuButton onClick={() => setShowMentorDialog(true)}>
                           <UserCog className="w-4 h-4" />
-                          <span>Mentor Mode</span>
                         </SidebarMenuButton>
                       </TooltipTrigger>
                       <TooltipContent side="right" className="bg-popover text-popover-foreground">
