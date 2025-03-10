@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { SessionProgress } from "./SessionProgress";
@@ -44,10 +45,18 @@ export const EmotionLogger = ({
   const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
   const [trades, setTrades] = useState<Trade[]>([]);
+  
+  // Chart URLs
   const [weeklyUrl, setWeeklyUrl] = useState('');
   const [dailyUrl, setDailyUrl] = useState('');
   const [fourHourUrl, setFourHourUrl] = useState('');
   const [oneHourUrl, setOneHourUrl] = useState('');
+  
+  // Chart Labels
+  const [weeklyLabel, setWeeklyLabel] = useState('Weekly');
+  const [dailyLabel, setDailyLabel] = useState('Daily');
+  const [fourHourLabel, setFourHourLabel] = useState('4HR');
+  const [oneHourLabel, setOneHourLabel] = useState('1HR/15m');
 
   const { stats } = useProgressTracking();
 
@@ -71,6 +80,10 @@ export const EmotionLogger = ({
     setDailyUrl('');
     setFourHourUrl('');
     setOneHourUrl('');
+    setWeeklyLabel('Weekly');
+    setDailyLabel('Daily');
+    setFourHourLabel('4HR');
+    setOneHourLabel('1HR/15m');
   };
 
   const { handleSubmit } = useJournalFormSubmission({
@@ -87,6 +100,10 @@ export const EmotionLogger = ({
     dailyUrl,
     fourHourUrl,
     oneHourUrl,
+    weeklyLabel,
+    dailyLabel,
+    fourHourLabel,
+    oneHourLabel,
     resetForm,
     onSubmitSuccess: () => {
       setShowCelebration(true);
@@ -182,6 +199,14 @@ export const EmotionLogger = ({
               setFourHourUrl={setFourHourUrl}
               oneHourUrl={oneHourUrl}
               setOneHourUrl={setOneHourUrl}
+              weeklyLabel={weeklyLabel}
+              setWeeklyLabel={setWeeklyLabel}
+              dailyLabel={dailyLabel}
+              setDailyLabel={setDailyLabel}
+              fourHourLabel={fourHourLabel}
+              setFourHourLabel={setFourHourLabel}
+              oneHourLabel={oneHourLabel}
+              setOneHourLabel={setOneHourLabel}
             />
           )}
 
