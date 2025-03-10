@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { SessionProgress } from "./SessionProgress";
@@ -14,7 +13,6 @@ import { ProgressStats } from "./ProgressStats";
 import { TradingOutcomeSection } from "./post-session/TradingOutcomeSection";
 import { TradingRulesSection } from "./post-session/TradingRulesSection";
 import { ObservationsSection } from "./post-session/ObservationsSection";
-import { useNavigate } from "react-router-dom";
 
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",
@@ -34,7 +32,6 @@ export const EmotionLogger = ({
   initialSessionType,
   onSubmitSuccess 
 }: EmotionLoggerProps) => {
-  const navigate = useNavigate();
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [selectedEmotionDetail, setSelectedEmotionDetail] = useState("");
   const [selectedOutcome, setSelectedOutcome] = useState("");
@@ -45,15 +42,12 @@ export const EmotionLogger = ({
   const [selectedMistakes, setSelectedMistakes] = useState<string[]>([]);
   const [followedRules, setFollowedRules] = useState<string[]>([]);
   const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
+  const [showCelebration, setShowCelebration] = useState(false);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [weeklyUrl, setWeeklyUrl] = useState('');
   const [dailyUrl, setDailyUrl] = useState('');
   const [fourHourUrl, setFourHourUrl] = useState('');
   const [oneHourUrl, setOneHourUrl] = useState('');
-  const [weeklyLabel, setWeeklyLabel] = useState('');
-  const [dailyLabel, setDailyLabel] = useState('');
-  const [fourHourLabel, setFourHourLabel] = useState('');
-  const [oneHourLabel, setOneHourLabel] = useState('');
 
   const { stats } = useProgressTracking();
 
@@ -77,10 +71,6 @@ export const EmotionLogger = ({
     setDailyUrl('');
     setFourHourUrl('');
     setOneHourUrl('');
-    setWeeklyLabel('');
-    setDailyLabel('');
-    setFourHourLabel('');
-    setOneHourLabel('');
   };
 
   const { handleSubmit } = useJournalFormSubmission({
@@ -99,12 +89,11 @@ export const EmotionLogger = ({
     oneHourUrl,
     resetForm,
     onSubmitSuccess: () => {
-      // Redirect to dashboard after successful submission
-      if (onSubmitSuccess) {
-        onSubmitSuccess();
-      } else {
-        navigate('/dashboard', { state: { showCelebration: true, sessionType } });
-      }
+      setShowCelebration(true);
+      setTimeout(() => {
+        setShowCelebration(false);
+        onSubmitSuccess?.();
+      }, 5000);
     },
   });
 
@@ -151,7 +140,7 @@ export const EmotionLogger = ({
           mistakesReviewed={selectedMistakes.length > 0}
           tradesAdded={trades.length > 0}
           isPostSession={sessionType === "post"}
-          showCelebration={false} // No longer showing celebration here
+          showCelebration={showCelebration}
         />
 
         {sessionType === "pre" && (
@@ -193,14 +182,6 @@ export const EmotionLogger = ({
               setFourHourUrl={setFourHourUrl}
               oneHourUrl={oneHourUrl}
               setOneHourUrl={setOneHourUrl}
-              weeklyLabel={weeklyLabel}
-              setWeeklyLabel={setWeeklyLabel}
-              dailyLabel={dailyLabel}
-              setDailyLabel={setDailyLabel}
-              fourHourLabel={fourHourLabel}
-              setFourHourLabel={setFourHourLabel}
-              oneHourLabel={oneHourLabel}
-              setOneHourLabel={setOneHourLabel}
             />
           )}
 
