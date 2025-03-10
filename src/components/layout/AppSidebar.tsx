@@ -5,7 +5,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
@@ -37,7 +36,7 @@ export function AppSidebar() {
 
   return (
     <>
-      <Sidebar className="w-14 flex-shrink-0" collapsible="none">
+      <Sidebar className="w-14 flex-shrink-0 border-r border-primary/20" collapsible="none">
         <SidebarContent>
           <div className="p-3 flex justify-center">
             <Link to="/" className="flex items-center justify-center">
