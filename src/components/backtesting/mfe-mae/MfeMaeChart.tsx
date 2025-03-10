@@ -42,7 +42,12 @@ export function MfeMaeChart() {
         trades.forEach(trade => {
           const processedTrade = processTrade(trade);
           if (processedTrade) {
-            processedData.push(processedTrade);
+            // Add journal entry ID and entry date for navigation
+            processedData.push({
+              ...processedTrade,
+              journalEntryId: entry.id,
+              entryDate: entry.created_at
+            });
           }
         });
       });

@@ -190,6 +190,9 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
       takeProfit: session.takeProfit,
       stopLoss: session.stopLoss,
       instrument: session.instrument,
+      // Add journal entry ID and date for navigation (using session data)
+      journalEntryId: session.id,
+      entryDate: session.entryDate
     }))
     .map(processTrade)
     .filter((trade): trade is ChartData => trade !== null);
