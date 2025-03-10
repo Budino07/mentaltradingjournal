@@ -20,10 +20,6 @@ interface JournalFormSubmissionProps {
   dailyUrl?: string;
   fourHourUrl?: string;
   oneHourUrl?: string;
-  weeklyLabel?: string;
-  dailyLabel?: string;
-  fourHourLabel?: string;
-  oneHourLabel?: string;
   resetForm: () => void;
   onSubmitSuccess?: () => void;
 }
@@ -42,10 +38,6 @@ export const useJournalFormSubmission = ({
   dailyUrl,
   fourHourUrl,
   oneHourUrl,
-  weeklyLabel,
-  dailyLabel,
-  fourHourLabel,
-  oneHourLabel,
   resetForm,
   onSubmitSuccess,
 }: JournalFormSubmissionProps) => {
@@ -102,10 +94,6 @@ export const useJournalFormSubmission = ({
         daily_url: dailyUrl,
         four_hour_url: fourHourUrl,
         one_hour_url: oneHourUrl,
-        weekly_label: weeklyLabel,
-        daily_label: dailyLabel,
-        four_hour_label: fourHourLabel,
-        one_hour_label: oneHourLabel,
       });
 
       if (error) {

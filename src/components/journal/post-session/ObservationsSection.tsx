@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
@@ -31,10 +32,10 @@ export const ObservationsSection = ({
   onDailyUrlChange,
   onFourHourUrlChange,
   onOneHourUrlChange,
-  weeklyLabel = 'Observation 1',
-  dailyLabel = 'Observation 3',
-  fourHourLabel = 'Observation 2',
-  oneHourLabel = 'Observation 4',
+  weeklyLabel = 'Weekly',
+  dailyLabel = 'Daily',
+  fourHourLabel = '4HR',
+  oneHourLabel = '1HR/15m',
   onWeeklyLabelChange,
   onDailyLabelChange,
   onFourHourLabelChange,

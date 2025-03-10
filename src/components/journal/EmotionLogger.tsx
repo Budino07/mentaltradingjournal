@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { SessionProgress } from "./SessionProgress";
@@ -49,10 +48,6 @@ export const EmotionLogger = ({
   const [dailyUrl, setDailyUrl] = useState('');
   const [fourHourUrl, setFourHourUrl] = useState('');
   const [oneHourUrl, setOneHourUrl] = useState('');
-  const [weeklyLabel, setWeeklyLabel] = useState('Observation 1');
-  const [dailyLabel, setDailyLabel] = useState('Observation 3');
-  const [fourHourLabel, setFourHourLabel] = useState('Observation 2');
-  const [oneHourLabel, setOneHourLabel] = useState('Observation 4');
 
   const { stats } = useProgressTracking();
 
@@ -76,10 +71,6 @@ export const EmotionLogger = ({
     setDailyUrl('');
     setFourHourUrl('');
     setOneHourUrl('');
-    setWeeklyLabel('Observation 1');
-    setDailyLabel('Observation 3');
-    setFourHourLabel('Observation 2');
-    setOneHourLabel('Observation 4');
   };
 
   const { handleSubmit } = useJournalFormSubmission({
@@ -96,10 +87,6 @@ export const EmotionLogger = ({
     dailyUrl,
     fourHourUrl,
     oneHourUrl,
-    weeklyLabel,
-    dailyLabel,
-    fourHourLabel,
-    oneHourLabel,
     resetForm,
     onSubmitSuccess: () => {
       setShowCelebration(true);
@@ -195,14 +182,6 @@ export const EmotionLogger = ({
               setFourHourUrl={setFourHourUrl}
               oneHourUrl={oneHourUrl}
               setOneHourUrl={setOneHourUrl}
-              weeklyLabel={weeklyLabel}
-              setWeeklyLabel={setWeeklyLabel}
-              dailyLabel={dailyLabel}
-              setDailyLabel={setDailyLabel}
-              fourHourLabel={fourHourLabel}
-              setFourHourLabel={setFourHourLabel}
-              oneHourLabel={oneHourLabel}
-              setOneHourLabel={setOneHourLabel}
             />
           )}
 
