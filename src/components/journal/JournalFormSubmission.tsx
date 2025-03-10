@@ -1,8 +1,9 @@
 
-import { useJournalToast } from "@/hooks/useJournalToast";
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { useToast } from "@/hooks/use-toast";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { createClient } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Trade } from "@/types/trade";
 
@@ -11,15 +12,19 @@ interface JournalFormSubmissionProps {
   selectedEmotion: string;
   selectedEmotionDetail: string;
   notes: string;
-  selectedOutcome?: string;
-  followedRules?: string[];
-  selectedMistakes?: string[];
+  selectedOutcome: string;
+  followedRules: string[];
+  selectedMistakes: string[];
   preTradingActivities: string[];
   trades: Trade[];
   weeklyUrl?: string;
   dailyUrl?: string;
   fourHourUrl?: string;
   oneHourUrl?: string;
+  weeklyLabel?: string;
+  dailyLabel?: string;
+  fourHourLabel?: string;
+  oneHourLabel?: string;
   resetForm: () => void;
   onSubmitSuccess?: () => void;
 }
@@ -38,82 +43,89 @@ export const useJournalFormSubmission = ({
   dailyUrl,
   fourHourUrl,
   oneHourUrl,
+  weeklyLabel,
+  dailyLabel,
+  fourHourLabel,
+  oneHourLabel,
   resetForm,
   onSubmitSuccess,
 }: JournalFormSubmissionProps) => {
-  const { showSuccessToast } = useJournalToast();
-  const { updateProgress } = useProgressTracking();
+  const { toast } = useToast();
+  const [submitting, setSubmitting] = useState(false);
+  const { incrementStreak } = useProgressTracking();
   const { user } = useAuth();
+  const supabase = createClient();
 
-  const handleSubmit = async () => {
-    if (!user) {
-      toast.error("Authentication Error", {
-        description: "You must be logged in to submit journal entries.",
-        duration: 5000,
+  const handleSubmit = async (e?: React.SyntheticEvent) => {
+    if (e) e.preventDefault();
+    
+    if (
+      !selectedEmotion || 
+      (sessionType === "post" && !selectedOutcome)
+    ) {
+      toast({
+        title: sessionType === "pre" ? "Please select an emotion" : "Please select an emotion and outcome",
+        variant: "destructive",
       });
       return;
     }
 
-    // Validate pre-session requirements
-    if (sessionType === "pre") {
-      if (!selectedEmotion || !selectedEmotionDetail || !notes || preTradingActivities.length === 0) {
-        toast.error("Missing Information", {
-          description: "Please fill in all required fields: emotion, details, activities, and notes.",
-          duration: 5000,
-        });
-        return;
-      }
-    }
-
-    // Validate post-session requirements
-    if (sessionType === "post") {
-      if (!selectedEmotion || !selectedEmotionDetail || !notes || !selectedOutcome || followedRules?.length === 0) {
-        toast.error("Missing Information", {
-          description: "Please fill in all required fields for post-session.",
-          duration: 5000,
-        });
-        return;
-      }
-    }
-
     try {
-      console.log("Submitting journal entry with outcome:", selectedOutcome);
-      
-      const { error } = await supabase.from('journal_entries').insert({
-        user_id: user.id,
+      setSubmitting(true);
+
+      const entryData = {
+        id: uuidv4(),
+        created_at: new Date().toISOString(),
+        user_id: user?.id,
         session_type: sessionType,
         emotion: selectedEmotion,
         emotion_detail: selectedEmotionDetail,
         notes,
-        outcome: sessionType === "pre" ? null : selectedOutcome,
-        followed_rules: followedRules,
-        mistakes: selectedMistakes,
-        pre_trading_activities: preTradingActivities,
-        trades,
-        weekly_url: weeklyUrl,
-        daily_url: dailyUrl,
-        four_hour_url: fourHourUrl,
-        one_hour_url: oneHourUrl,
-      });
+        outcome: sessionType === "post" ? selectedOutcome : null,
+        followed_rules: sessionType === "post" ? followedRules : null,
+        mistakes: sessionType === "post" ? selectedMistakes : null,
+        pre_trading_activities: sessionType === "pre" ? preTradingActivities : null,
+        trades: sessionType === "post" ? trades : null,
+        weekly_url: weeklyUrl || null,
+        daily_url: dailyUrl || null,
+        four_hour_url: fourHourUrl || null,
+        one_hour_url: oneHourUrl || null,
+        weekly_label: weeklyLabel || null,
+        daily_label: dailyLabel || null,
+        four_hour_label: fourHourLabel || null,
+        one_hour_label: oneHourLabel || null,
+      };
+
+      const { error } = await supabase
+        .from("journal_entries")
+        .insert(entryData);
 
       if (error) {
-        console.error('Error submitting journal entry:', error);
+        console.error("Error submitting journal entry:", error);
         throw error;
       }
 
-      await updateProgress(sessionType);
-      console.log(`Progress updated for ${sessionType} session`);
-      showSuccessToast(sessionType);
+      incrementStreak(sessionType);
       resetForm();
-      onSubmitSuccess?.();
-    } catch (error) {
-      console.error('Error submitting journal entry:', error);
-      toast.error("Error", {
-        description: error instanceof Error ? error.message : "Failed to submit journal entry. Please try again.",
-        duration: 5000,
+      
+      toast({
+        title: `${sessionType === "pre" ? "Pre" : "Post"}-trading session logged!`,
+        description: "Your journal entry has been saved.",
       });
+
+      onSubmitSuccess?.();
+      
+    } catch (error) {
+      console.error("Error in form submission:", error);
+      toast({
+        title: "Error saving journal entry",
+        description: "Please try again later",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  return { handleSubmit };
+  return { handleSubmit, submitting };
 };
