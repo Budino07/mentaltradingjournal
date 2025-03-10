@@ -1,12 +1,14 @@
+
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { TradesList } from "./TradesList";
-import { TradingRules } from "./TradingRules";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp, ListChecks, NotebookPen, LineChart, ExternalLink, Pencil } from "lucide-react";
+import { ChevronDown, ChevronUp, NotebookPen, ListChecks, LineChart, ExternalLink, Pencil } from "lucide-react";
 import { Trade } from "@/types/trade";
 import { NoteEditDialog } from "./NoteEditDialog";
+import { formatNotesWithLinkPreviews } from "./utils/formatNotes";
+import { TradesList } from "./TradesList";
+import { TradingRules } from "./TradingRules";
 
 interface EntryContentProps {
   id: string;
@@ -51,20 +53,6 @@ export const EntryContent = ({
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [isEditingPostNotes, setIsEditingPostNotes] = useState(false);
 
-  const formatNotes = (text: string) => {
-    if (!text) return "";
-    
-    let formattedText = text.replace(/\n/g, "<br />");
-    
-    const urlRegex = /(https?:\/\/[^\s<]+)/g;
-    formattedText = formattedText.replace(
-      urlRegex, 
-      '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">$1</a>'
-    );
-    
-    return formattedText;
-  };
-
   const openImageInNewTab = (url?: string) => {
     if (url) {
       window.open(url, '_blank', 'noopener,noreferrer');
@@ -105,10 +93,9 @@ export const EntryContent = ({
             </div>
           </div>
           <CollapsibleContent className="space-y-2">
-            <div
-              className="text-sm text-muted-foreground"
-              dangerouslySetInnerHTML={{ __html: formatNotes(localNotes) }}
-            />
+            <div className="text-sm text-muted-foreground">
+              {formatNotesWithLinkPreviews(localNotes)}
+            </div>
           </CollapsibleContent>
         </Collapsible>
       )}
@@ -258,10 +245,9 @@ export const EntryContent = ({
               <span className="sr-only">Edit post-session notes</span>
             </Button>
           </div>
-          <div
-            className="text-sm text-muted-foreground"
-            dangerouslySetInnerHTML={{ __html: formatNotes(localPostNotes) }}
-          />
+          <div className="text-sm text-muted-foreground">
+            {formatNotesWithLinkPreviews(localPostNotes)}
+          </div>
         </div>
       )}
 
