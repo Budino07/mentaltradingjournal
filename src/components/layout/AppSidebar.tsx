@@ -45,13 +45,13 @@ export function AppSidebar() {
           </div>
           <SidebarGroup>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="gap-1 py-1">
                 <TooltipProvider>
                   {menuItems.map((item) => (
-                    <SidebarMenuItem key={item.title}>
+                    <SidebarMenuItem key={item.title} className="flex justify-center">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <SidebarMenuButton asChild>
+                          <SidebarMenuButton asChild className="w-10 h-10 flex items-center justify-center">
                             <Link to={item.url} className="flex items-center justify-center">
                               <item.icon className="w-4 h-4" />
                             </Link>
@@ -63,10 +63,10 @@ export function AppSidebar() {
                       </Tooltip>
                     </SidebarMenuItem>
                   ))}
-                  <SidebarMenuItem>
+                  <SidebarMenuItem className="flex justify-center">
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <SidebarMenuButton onClick={() => setShowMentorDialog(true)}>
+                        <SidebarMenuButton className="w-10 h-10 flex items-center justify-center" onClick={() => setShowMentorDialog(true)}>
                           <UserCog className="w-4 h-4" />
                         </SidebarMenuButton>
                       </TooltipTrigger>
