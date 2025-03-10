@@ -6,6 +6,8 @@ export interface ChartData {
   instrument: string;
   rMultiple: number;
   capturedMove: number;
+  journalEntryId?: string; // Add journal entry ID for navigation
+  entryDate?: string; // Add entry date for display
 }
 
 export interface Stats {

@@ -11,16 +11,31 @@ import {
   ReferenceLine,
 } from "recharts";
 import { ChartData } from "../types";
+import { useNavigate } from "react-router-dom";
+import { CustomTooltip } from "@/components/analytics/shared/CustomTooltip";
+import { format } from "date-fns";
 
 interface MfeMaeBarChartProps {
   data: ChartData[];
 }
 
 export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
+  const navigate = useNavigate();
+  
   const dataWithNumbers = [...data].reverse().map((item, index) => ({
     ...item,
     tradeNum: (index + 1).toString(),
   }));
+
+  const handleDataPointClick = (data: any) => {
+    if (data.journalEntryId) {
+      navigate('/dashboard', { 
+        state: { 
+          selectedDate: data.entryDate ? new Date(data.entryDate) : new Date()
+        }
+      });
+    }
+  };
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -33,6 +48,11 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           bottom: 5,
         }}
         stackOffset="sign"
+        onClick={(data) => {
+          if (data && data.activePayload && data.activePayload.length > 0) {
+            handleDataPointClick(data.activePayload[0].payload);
+          }
+        }}
       >
         <CartesianGrid 
           horizontal={true} 
@@ -65,33 +85,33 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           tick={{ fill: 'hsl(var(--card-foreground))' }}
         />
         <Tooltip 
-          cursor={false}
+          cursor={{ cursor: 'pointer' }}
           content={({ active, payload }) => {
             if (!active || !payload || !payload.length) return null;
 
             const data = payload[0].payload;
-            const updrawValue = data.mfeRelativeToTp;
-            const drawdownValue = data.maeRelativeToSl;
-            const capturedMove = data.capturedMove;
+            const formattedDate = data.entryDate ? format(new Date(data.entryDate), 'MMM d, yyyy') : '';
 
             return (
               <div className="bg-card border border-border rounded-lg shadow-lg p-3">
                 <div className="space-y-2">
                   <p className="text-lg font-bold text-card-foreground">Trade #{data.tradeNum}</p>
+                  {formattedDate && <p className="text-sm text-card-foreground">{formattedDate}</p>}
                   <p className="text-lg text-card-foreground">{data.instrument || 'Unknown'}</p>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#FEC6A1]" />
-                    <span className="text-card-foreground">Updraw: {updrawValue?.toFixed(2)}%</span>
+                    <span className="text-card-foreground">Updraw: {data.mfeRelativeToTp?.toFixed(2)}%</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#9b87f5]" />
-                    <span className="text-card-foreground">Drawdown: {Math.abs(drawdownValue)?.toFixed(2)}%</span>
+                    <span className="text-card-foreground">Drawdown: {Math.abs(data.maeRelativeToSl)?.toFixed(2)}%</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#0EA5E9]" />
-                    <span className="text-card-foreground">Captured Move: {capturedMove?.toFixed(2)}%</span>
+                    <span className="text-card-foreground">Captured Move: {data.capturedMove?.toFixed(2)}%</span>
                   </div>
                   <p className="text-card-foreground">R-Multiple: {data.rMultiple?.toFixed(2) || '0'}</p>
+                  <p className="text-xs text-muted-foreground italic mt-2">Click to view journal entry</p>
                 </div>
               </div>
             );
@@ -110,6 +130,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           fill="#FEC6A1" 
           name="Updraw" 
           stackId="stack"
+          cursor="pointer"
         >
           {dataWithNumbers.map((entry, index) => (
             <circle
@@ -126,6 +147,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           fill="#9b87f5" 
           name="Drawdown" 
           stackId="stack"
+          cursor="pointer"
         />
       </BarChart>
     </ResponsiveContainer>
