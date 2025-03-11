@@ -7,7 +7,7 @@ interface FormActionsProps {
 
 export const FormActions = ({ isEdit }: FormActionsProps) => {
   return (
-    <div className="p-6 pt-4 border-t sticky bottom-0 bg-background z-10">
+    <div className="p-6 border-t bg-background">
       <Button type="submit" className="w-full">
         {isEdit ? 'Update' : 'Submit'}
       </Button>

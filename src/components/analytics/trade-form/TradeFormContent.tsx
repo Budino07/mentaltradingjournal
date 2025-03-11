@@ -1,4 +1,3 @@
-
 import { Trade } from "@/types/trade";
 import { FormSections } from "./form-sections/FormSections";
 import { FormActions } from "./form-sections/FormActions";
@@ -43,8 +42,10 @@ export const TradeFormContent = ({
   }, [editTrade]);
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col h-full max-h-[calc(90vh-60px)]">
-      <FormSections direction={direction} setDirection={setDirection} />
+    <form onSubmit={handleSubmit} className="flex flex-col h-[calc(90vh-60px)]">
+      <div className="flex-1 overflow-y-auto">
+        <FormSections direction={direction} setDirection={setDirection} />
+      </div>
       <FormActions isEdit={!!editTrade} />
     </form>
   );
