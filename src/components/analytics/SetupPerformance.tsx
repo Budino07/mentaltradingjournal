@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -23,7 +22,6 @@ interface SetupStats {
   winRate: number;
   averagePnl: number;
   tradeCount: number;
-  averageRiskReward: number;
 }
 
 const formatCurrency = (value: number): string => {
@@ -63,8 +61,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             <span className="font-medium">{data.tradeCount}</span>
           </div>
           <div className="flex justify-between gap-4">
-            <span className="text-muted-foreground">Average R:R:</span>
-            <span className="font-medium">{data.averageRiskReward.toFixed(2)}</span>
+            <span className="text-muted-foreground">Wins / Losses:</span>
+            <span className="font-medium">{data.winCount} / {data.lossCount}</span>
           </div>
         </div>
       </div>
@@ -95,9 +93,7 @@ export const SetupPerformance = () => {
     (entry.trades || []).map(trade => ({
       ...trade,
       pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
-           typeof trade.pnl === 'number' ? trade.pnl : 0,
-      riskRewardRatio: typeof trade.riskRewardRatio === 'string' ? parseFloat(trade.riskRewardRatio) : 
-                       typeof trade.riskRewardRatio === 'number' ? trade.riskRewardRatio : 1
+           typeof trade.pnl === 'number' ? trade.pnl : 0
     }))
   );
 
@@ -134,13 +130,6 @@ export const SetupPerformance = () => {
       return tradePnl < 0;
     }).length;
     
-    // Calculate average risk to reward
-    const averageRiskReward = trades.reduce((sum, trade) => {
-      const rr = typeof trade.riskRewardRatio === 'string' ? parseFloat(trade.riskRewardRatio) : 
-                typeof trade.riskRewardRatio === 'number' ? trade.riskRewardRatio : 1;
-      return sum + rr;
-    }, 0) / (trades.length || 1);
-    
     const winRate = trades.length > 0 ? (winCount / trades.length) * 100 : 0;
     const averagePnl = trades.length > 0 ? totalPnl / trades.length : 0;
 
@@ -151,8 +140,7 @@ export const SetupPerformance = () => {
       lossCount,
       winRate,
       averagePnl,
-      tradeCount: trades.length,
-      averageRiskReward
+      tradeCount: trades.length
     };
   });
 
@@ -197,7 +185,7 @@ export const SetupPerformance = () => {
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis 
                 dataKey="name"
-                angle={0}
+                angle={0} // Make labels horizontal
                 textAnchor="middle"
                 height={60}
                 interval={0}
@@ -207,7 +195,7 @@ export const SetupPerformance = () => {
                 tickFormatter={(value) => `$${formatCurrency(value)}`}
                 domain={pnlDomain}
               />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
+              <Tooltip content={<CustomTooltip />} />
               <Legend />
               <Bar 
                 name="P&L" 
