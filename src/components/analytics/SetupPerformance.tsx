@@ -9,6 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  Cell,
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -161,6 +162,14 @@ export const SetupPerformance = () => {
   const mostProfitableSetup = sortedSetupStats.length > 0 ? sortedSetupStats[0] : null;
   const leastProfitableSetup = sortedSetupStats.length > 0 ? sortedSetupStats[sortedSetupStats.length - 1] : null;
 
+  // Define color based on profitability
+  const getBarColor = (value: number) => {
+    if (value > 1000) return '#22c55e'; // Strong green for very profitable
+    if (value > 0) return '#4ade80';    // Light green for profitable
+    if (value > -500) return '#ef4444';  // Light red for small losses
+    return '#dc2626';                    // Strong red for big losses
+  };
+
   return (
     <Card className="p-4 md:p-6 space-y-4 col-span-2">
       <div className="space-y-2">
@@ -202,10 +211,13 @@ export const SetupPerformance = () => {
               <Bar 
                 name="P&L" 
                 dataKey="totalPnl" 
-                fill="var(--primary)" 
                 radius={[4, 4, 0, 0]}
-                fillOpacity={0.8}
-              />
+                fillOpacity={0.9}
+              >
+                {sortedSetupStats.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={getBarColor(entry.totalPnl)} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
