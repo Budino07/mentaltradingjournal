@@ -7,7 +7,7 @@ const Notebook = () => {
   return (
     <AppLayout>
       <SubscriptionGuard>
-        <div className="h-[calc(100vh-4rem)]">
+        <div className="h-[calc(100vh-4rem)] overflow-hidden">
           <NotebookContent />
         </div>
       </SubscriptionGuard>

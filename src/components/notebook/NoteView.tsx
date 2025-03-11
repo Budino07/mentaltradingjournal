@@ -100,7 +100,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
   }
 
   return (
-    <div className="h-full bg-background">
+    <div className="h-full bg-background overflow-hidden flex flex-col">
       {onBack && (
         <Button
           variant="ghost"
@@ -112,8 +112,8 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
           Back to Notes
         </Button>
       )}
-      <div className="p-8">
-        <div className="max-w-3xl mx-auto space-y-4">
+      <div className="p-8 flex-1 overflow-hidden">
+        <div className="max-w-3xl mx-auto space-y-4 h-full flex flex-col">
           <NoteTitle title={title} onTitleChange={handleTitleChange} />
           <NoteTags 
             tags={tags} 
@@ -131,10 +131,12 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
             onLink={handleLink}
           />
           <Separator className="my-4" />
-          <NoteContent 
-            content={content} 
-            onContentChange={handleContentChange} 
-          />
+          <div className="flex-1 overflow-hidden">
+            <NoteContent 
+              content={content} 
+              onContentChange={handleContentChange} 
+            />
+          </div>
           <ColorPickerDialog
             isOpen={isColorPickerOpen}
             onClose={() => setIsColorPickerOpen(false)}

@@ -109,7 +109,7 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
     <div
       ref={editorRef}
       contentEditable
-      className="min-h-[calc(100vh-300px)] focus:outline-none focus-visible:outline-none text-lg leading-relaxed transition-colors duration-200 prose prose-sm max-w-none dark:prose-invert"
+      className="min-h-[calc(100vh-300px)] max-h-[calc(100vh-300px)] overflow-y-auto focus:outline-none focus-visible:outline-none text-lg leading-relaxed transition-colors duration-200 prose prose-sm max-w-none dark:prose-invert"
       role="textbox"
       aria-multiline="true"
       onPaste={handlePaste}
