@@ -13,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatCurrency } from "@/utils/analyticsUtils";
 import { Trade } from "@/types/analytics";
 
 interface TradesDialogProps {
@@ -22,6 +21,11 @@ interface TradesDialogProps {
   trades: Trade[];
   setup: string;
 }
+
+// Helper function to format currency values
+const formatCurrency = (value: number): string => {
+  return Math.abs(value).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
 
 export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialogProps) => {
   return (
@@ -34,7 +38,6 @@ export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialog
           <TableHeader>
             <TableRow>
               <TableHead>Entry Date</TableHead>
-              <TableHead>Duration</TableHead>
               <TableHead>Direction</TableHead>
               <TableHead>Entry Price</TableHead>
               <TableHead>Exit Price</TableHead>
@@ -47,16 +50,15 @@ export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialog
             {trades.map((trade, index) => (
               <TableRow key={index}>
                 <TableCell>
-                  {new Date(trade.entryDate).toLocaleDateString()}
+                  {trade.entryDate ? new Date(trade.entryDate).toLocaleDateString() : 'N/A'}
                 </TableCell>
-                <TableCell>{trade.duration || '-'}</TableCell>
                 <TableCell className={trade.direction === 'buy' ? 'text-green-500' : 'text-red-500'}>
-                  {trade.direction?.toUpperCase()}
+                  {trade.direction?.toUpperCase() || 'N/A'}
                 </TableCell>
-                <TableCell>{trade.entryPrice}</TableCell>
-                <TableCell>{trade.exitPrice}</TableCell>
-                <TableCell>{trade.stopLoss}</TableCell>
-                <TableCell>{trade.takeProfit}</TableCell>
+                <TableCell>{trade.entryPrice || 'N/A'}</TableCell>
+                <TableCell>{trade.exitPrice || 'N/A'}</TableCell>
+                <TableCell>{trade.stopLoss || 'N/A'}</TableCell>
+                <TableCell>{trade.takeProfit || 'N/A'}</TableCell>
                 <TableCell className={`text-right ${Number(trade.pnl) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                   ${formatCurrency(Number(trade.pnl))}
                 </TableCell>
