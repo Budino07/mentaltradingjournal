@@ -19,6 +19,7 @@ import { AssetPairPerformance } from "./AssetPairPerformance";
 import { TimeBasedPerformance } from "./TimeBasedPerformance";
 import { EquityCurve } from "./EquityCurve";
 import { EmotionFrequency } from "./EmotionFrequency";
+import { SetupPerformance } from "./SetupPerformance";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ export const AnalyticsDashboard = () => {
   const tradingComponents = [
     EquityCurve,
     TimeBasedPerformance,
+    SetupPerformance, // Added new component
     AssetPairPerformance,
     PerformanceBreakdown,
     RuleAdherence,
