@@ -19,6 +19,16 @@ export const GeneralSection = ({ direction, setDirection }: GeneralSectionProps)
     }
   };
 
+  // Hidden input to store direction value
+  const updateDirection = (newDirection: 'buy' | 'sell') => {
+    setDirection(newDirection);
+    // Update hidden input value
+    const input = document.querySelector('input[name="direction"]') as HTMLInputElement;
+    if (input) {
+      input.value = newDirection;
+    }
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold mb-3">General</h3>
@@ -62,13 +72,14 @@ export const GeneralSection = ({ direction, setDirection }: GeneralSectionProps)
         </div>
         <div className="grid w-full gap-1.5">
           <Label>Direction *</Label>
+          <input type="hidden" name="direction" value={direction || ''} />
           <div className="flex gap-2">
             <Button
               type="button"
               size="sm"
               variant={direction === 'buy' ? 'default' : 'outline'}
               className={direction === 'buy' ? 'bg-green-600 hover:bg-green-700' : ''}
-              onClick={() => setDirection('buy')}
+              onClick={() => updateDirection('buy')}
             >
               Buy
             </Button>
@@ -77,7 +88,7 @@ export const GeneralSection = ({ direction, setDirection }: GeneralSectionProps)
               size="sm"
               variant={direction === 'sell' ? 'default' : 'outline'}
               className={direction === 'sell' ? 'bg-red-600 hover:bg-red-700' : ''}
-              onClick={() => setDirection('sell')}
+              onClick={() => updateDirection('sell')}
             >
               Sell
             </Button>
