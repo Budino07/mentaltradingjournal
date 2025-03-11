@@ -74,7 +74,7 @@ const CustomTooltip = ({ active, payload }: any) => {
     return (
       <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
         <p className="font-medium text-sm text-foreground mb-2">
-          {format(new Date(data.date), 'MMM d, yyyy')}
+          {format(new Date(data.originalDate), 'MMM d, yyyy')}
         </p>
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm">
@@ -155,21 +155,23 @@ export const EmotionTrend = () => {
   const scatterData = Object.entries(tradesByDate).map(([dateKey, pnls]) => {
     const dateObj = new Date(dateKey);
     return {
-      date: dateObj.getTime(), // Unix timestamp for sorting
-      dateString: dateKey, // Keep the original string for reference
+      originalDate: dateObj.getTime(), // Store the original timestamp for sorting and display
+      dateString: format(dateObj, 'MMM d'), // Formatted date for display
       pnl: pnls.reduce((sum, pnl) => sum + pnl, 0),
       emotion: preSessionEmotions[dateKey] || 'neutral'
     };
-  }).sort((a, b) => a.date - b.date); // Sort by date
+  }).sort((a, b) => a.originalDate - b.originalDate); // Sort by date
 
-  // Create a map of dates for better axis display
-  const uniqueDates = scatterData
-    .map(item => new Date(item.date))
-    .sort((a, b) => a.getTime() - b.getTime());
+  // Transform data to use index-based positioning for even spacing
+  const transformedData = scatterData.map((item, index) => ({
+    ...item,
+    index, // Use index for positioning on x-axis
+    date: index, // Replace date with index for even spacing
+  }));
 
-  const positiveData = scatterData.filter(d => d.emotion === 'positive');
-  const neutralData = scatterData.filter(d => d.emotion === 'neutral');
-  const negativeData = scatterData.filter(d => d.emotion === 'negative');
+  const positiveData = transformedData.filter(d => d.emotion === 'positive');
+  const neutralData = transformedData.filter(d => d.emotion === 'neutral');
+  const negativeData = transformedData.filter(d => d.emotion === 'negative');
 
   const allPnls = scatterData.map(d => d.pnl);
   const bestPerformance = Math.max(...allPnls);
@@ -182,13 +184,18 @@ export const EmotionTrend = () => {
     correlationStrength >= 0.3 ? 'weak' : 'very weak';
 
   const handleDataPointClick = (data: any) => {
-    const date = new Date(data.date);
+    // Use originalDate for navigation, which contains the actual timestamp
+    const date = new Date(data.originalDate);
     navigate('/dashboard', { 
       state: { 
         selectedDate: date
       }
     });
   };
+
+  // Create custom tick values and labels for the x-axis
+  const xAxisTicks = transformedData.map((item, index) => index);
+  const xAxisLabels = transformedData.map(item => item.dateString);
 
   return (
     <Card className="p-4 md:p-6 space-y-4 col-span-2">
@@ -209,14 +216,21 @@ export const EmotionTrend = () => {
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart margin={{ top: 40, right: 40, bottom: 40, left: 40 }}>
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-            <XAxis
-              dataKey="date"
-              name="Time"
-              type="number"
-              domain={['dataMin', 'dataMax']}
-              scale="time"
-              tickFormatter={(unixTime) => format(new Date(unixTime), 'MMM d')}
-              ticks={uniqueDates.map(date => date.getTime())}
+            <XAxis 
+              dataKey="index"
+              type="number" 
+              domain={[0, transformedData.length - 1]}
+              ticks={xAxisTicks}
+              tickFormatter={(index) => xAxisLabels[index] || ''}
+              label={{ 
+                value: 'Date',
+                position: 'insideBottomRight',
+                offset: -10,
+                style: { 
+                  fontSize: '12px',
+                  fill: 'currentColor'
+                }
+              }}
             />
             <YAxis
               dataKey="pnl"
