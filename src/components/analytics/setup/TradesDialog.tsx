@@ -32,9 +32,15 @@ export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialog
   const navigate = useNavigate();
 
   const handleTradeClick = (trade: Trade) => {
-    // If the trade has a journalEntryId, navigate to the dashboard
-    if (trade.id) {
-      navigate(`/dashboard?entry=${trade.id}`);
+    // If the trade has a date, navigate to the dashboard with the date
+    if (trade.entryDate) {
+      // Parse the date and navigate to the dashboard with the entry date
+      const entryDate = new Date(trade.entryDate);
+      navigate('/dashboard', { 
+        state: { 
+          selectedDate: entryDate
+        }
+      });
     }
   };
 
@@ -64,8 +70,8 @@ export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialog
             {trades.map((trade, index) => (
               <TableRow 
                 key={index} 
-                className={trade.id ? "cursor-pointer hover:bg-accent/50" : ""}
-                onClick={() => trade.id && handleTradeClick(trade)}
+                className={trade.entryDate ? "cursor-pointer hover:bg-accent/50" : ""}
+                onClick={() => trade.entryDate && handleTradeClick(trade)}
               >
                 <TableCell>
                   {trade.entryDate ? new Date(trade.entryDate).toLocaleDateString() : 'N/A'}
