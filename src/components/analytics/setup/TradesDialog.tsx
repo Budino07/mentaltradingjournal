@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -82,7 +83,7 @@ export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialog
                   trade.direction?.toLowerCase() === 'buy' ? 'text-green-500' : 
                   trade.direction?.toLowerCase() === 'sell' ? 'text-red-500' : ''
                 }>
-                  {trade.direction ? trade.direction.toUpperCase() : 'N/A'}
+                  {trade.direction?.toUpperCase() || 'N/A'}
                 </TableCell>
                 <TableCell>{trade.entryPrice || 'N/A'}</TableCell>
                 <TableCell>{trade.exitPrice || 'N/A'}</TableCell>

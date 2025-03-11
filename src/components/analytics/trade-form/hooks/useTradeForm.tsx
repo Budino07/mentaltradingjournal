@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,13 +20,11 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
 
     try {
       const formData = new FormData(event.currentTarget);
-      const direction = formData.get("direction") as string;
-      
       const tradeData = {
         entryDate: formData.get("entryDate") as string,
         instrument: formData.get("instrument") as string,
         setup: formData.get("setup") as string,
-        direction: direction?.toLowerCase() as 'buy' | 'sell', // Ensure direction is lowercase
+        direction: formData.get("direction") as string,
         entryPrice: parseFloat(formData.get("entryPrice") as string),
         exitPrice: parseFloat(formData.get("exitPrice") as string),
         quantity: parseFloat(formData.get("quantity") as string),
@@ -129,4 +126,3 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
     isSubmitting,
   };
 };
-
