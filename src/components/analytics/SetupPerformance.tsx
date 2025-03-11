@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -182,29 +181,19 @@ export const SetupPerformance = () => {
       {sortedSetupStats.length > 0 ? (
         <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={sortedSetupStats} margin={{ top: 20, right: 30, left: 20, bottom: 70 }}>
+            <BarChart data={sortedSetupStats} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis 
                 dataKey="name"
-                angle={-45}
-                textAnchor="end"
-                height={70}
+                angle={0} // Make labels horizontal
+                textAnchor="middle"
+                height={60}
                 interval={0}
                 tick={{ fontSize: 12 }}
               />
               <YAxis 
                 tickFormatter={(value) => `$${formatCurrency(value)}`}
                 domain={pnlDomain}
-                label={{ 
-                  value: 'Total P&L',
-                  angle: -90,
-                  position: 'insideLeft',
-                  style: { 
-                    textAnchor: 'middle',
-                    fontSize: '12px',
-                    fill: 'currentColor'
-                  }
-                }}
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
@@ -230,7 +219,7 @@ export const SetupPerformance = () => {
       )}
 
       {sortedSetupStats.length > 0 && (
-        <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
+        <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg mt-6">
           <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
           <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
             <p>
