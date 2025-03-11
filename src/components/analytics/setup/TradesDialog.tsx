@@ -30,10 +30,13 @@ const formatCurrency = (value: number): string => {
 export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto cursor-pointer">
         <DialogHeader>
           <DialogTitle className="text-xl">{setup} Trades</DialogTitle>
         </DialogHeader>
+        <div className="text-xs text-muted-foreground mb-2">
+          Click to view entries
+        </div>
         <Table>
           <TableHeader>
             <TableRow>
@@ -70,3 +73,4 @@ export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialog
     </Dialog>
   );
 };
+
