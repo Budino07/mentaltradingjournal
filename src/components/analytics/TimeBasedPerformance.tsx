@@ -6,6 +6,7 @@ import { generateAnalytics } from "@/utils/analyticsUtils";
 import { startOfMonth, startOfQuarter, startOfYear, isAfter } from "date-fns";
 import { getInitialCapital } from "@/utils/capitalUtils";
 import { CapitalSettingsDialog } from "./CapitalSettingsDialog";
+import { PerformanceInsight } from "./performance/PerformanceInsight";
 
 export const TimeBasedPerformance = () => {
   const [initialCapital, setInitialCapital] = useState(() => getInitialCapital());
@@ -116,14 +117,10 @@ export const TimeBasedPerformance = () => {
         ))}
       </div>
 
-      <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
-        <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
-        <p className="text-xs md:text-sm text-muted-foreground">
-          {monthMetrics.strikeRate > quarterMetrics.strikeRate && monthMetrics.strikeRate > yearMetrics.strikeRate
-            ? "Your recent performance shows improvement in strike rate compared to longer timeframes."
-            : "Consider reviewing your trading strategy as recent performance indicates room for improvement."}
-        </p>
-      </div>
+      <PerformanceInsight
+        mainInsight="Your strategy is delivering strong returns despite a 50% strike rate."
+        recommendedAction="Consider analyzing whether this approach is sustainable and how to maximize your edge further through our MFE/MAE Analysis tool"
+      />
     </Card>
   );
 };
