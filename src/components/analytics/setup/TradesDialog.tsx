@@ -1,4 +1,5 @@
 
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -28,9 +29,18 @@ const formatCurrency = (value: number): string => {
 };
 
 export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialogProps) => {
+  const navigate = useNavigate();
+
+  const handleTradeClick = (trade: Trade) => {
+    // If the trade has a journalEntryId, navigate to the dashboard
+    if (trade.id) {
+      navigate(`/dashboard?entry=${trade.id}`);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto cursor-pointer">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl">{setup} Trades</DialogTitle>
         </DialogHeader>
@@ -41,6 +51,7 @@ export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialog
           <TableHeader>
             <TableRow>
               <TableHead>Entry Date</TableHead>
+              <TableHead>Instrument</TableHead>
               <TableHead>Direction</TableHead>
               <TableHead>Entry Price</TableHead>
               <TableHead>Exit Price</TableHead>
@@ -51,11 +62,21 @@ export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialog
           </TableHeader>
           <TableBody>
             {trades.map((trade, index) => (
-              <TableRow key={index}>
+              <TableRow 
+                key={index} 
+                className={trade.id ? "cursor-pointer hover:bg-accent/50" : ""}
+                onClick={() => trade.id && handleTradeClick(trade)}
+              >
                 <TableCell>
                   {trade.entryDate ? new Date(trade.entryDate).toLocaleDateString() : 'N/A'}
                 </TableCell>
-                <TableCell className={trade.direction === 'buy' ? 'text-green-500' : 'text-red-500'}>
+                <TableCell>
+                  {trade.instrument || 'N/A'}
+                </TableCell>
+                <TableCell className={
+                  trade.direction?.toLowerCase() === 'buy' ? 'text-green-500' : 
+                  trade.direction?.toLowerCase() === 'sell' ? 'text-red-500' : ''
+                }>
                   {trade.direction?.toUpperCase() || 'N/A'}
                 </TableCell>
                 <TableCell>{trade.entryPrice || 'N/A'}</TableCell>
@@ -73,4 +94,3 @@ export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialog
     </Dialog>
   );
 };
-
