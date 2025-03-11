@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -22,6 +23,7 @@ interface SetupStats {
   winRate: number;
   averagePnl: number;
   tradeCount: number;
+  averageRiskReward: number;
 }
 
 const formatCurrency = (value: number): string => {
@@ -61,8 +63,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             <span className="font-medium">{data.tradeCount}</span>
           </div>
           <div className="flex justify-between gap-4">
-            <span className="text-muted-foreground">Wins / Losses:</span>
-            <span className="font-medium">{data.winCount} / {data.lossCount}</span>
+            <span className="text-muted-foreground">Average R:R:</span>
+            <span className="font-medium">{data.averageRiskReward.toFixed(2)}</span>
           </div>
         </div>
       </div>
@@ -93,12 +95,37 @@ export const SetupPerformance = () => {
     (entry.trades || []).map(trade => ({
       ...trade,
       pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
-           typeof trade.pnl === 'number' ? trade.pnl : 0
+           typeof trade.pnl === 'number' ? trade.pnl : 0,
+      // Calculate risk-reward ratio for each trade
+      riskReward: calculateRiskReward(trade)
     }))
   );
 
+  // Calculate risk-reward ratio for a trade
+  function calculateRiskReward(trade: Trade): number {
+    const entryPrice = Number(trade.entryPrice) || 0;
+    const stopLoss = Number(trade.stopLoss) || 0;
+    const takeProfit = Number(trade.takeProfit) || 0;
+    
+    if (!entryPrice || !stopLoss || !takeProfit) {
+      return 0;
+    }
+    
+    let risk, reward;
+    
+    if (trade.direction === 'buy') {
+      risk = Math.abs(entryPrice - stopLoss);
+      reward = Math.abs(takeProfit - entryPrice);
+    } else {
+      risk = Math.abs(stopLoss - entryPrice);
+      reward = Math.abs(entryPrice - takeProfit);
+    }
+    
+    return risk > 0 ? reward / risk : 0;
+  }
+
   // Group trades by setup
-  const setupMap = new Map<string, Trade[]>();
+  const setupMap = new Map<string, any[]>();
   
   allTrades.forEach(trade => {
     const setup = trade.setup || 'Undefined';
@@ -132,6 +159,12 @@ export const SetupPerformance = () => {
     
     const winRate = trades.length > 0 ? (winCount / trades.length) * 100 : 0;
     const averagePnl = trades.length > 0 ? totalPnl / trades.length : 0;
+    
+    // Calculate average risk-reward ratio
+    const validRrTrades = trades.filter(t => t.riskReward > 0);
+    const averageRiskReward = validRrTrades.length > 0
+      ? validRrTrades.reduce((sum, t) => sum + t.riskReward, 0) / validRrTrades.length
+      : 0;
 
     return {
       name: setup,
@@ -140,7 +173,8 @@ export const SetupPerformance = () => {
       lossCount,
       winRate,
       averagePnl,
-      tradeCount: trades.length
+      tradeCount: trades.length,
+      averageRiskReward
     };
   });
 
@@ -185,7 +219,7 @@ export const SetupPerformance = () => {
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis 
                 dataKey="name"
-                angle={0} // Make labels horizontal
+                angle={0}
                 textAnchor="middle"
                 height={60}
                 interval={0}
@@ -195,10 +229,11 @@ export const SetupPerformance = () => {
                 tickFormatter={(value) => `$${formatCurrency(value)}`}
                 domain={pnlDomain}
               />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend />
+              <Tooltip 
+                content={<CustomTooltip />} 
+                cursor={{ fill: 'transparent' }}
+              />
               <Bar 
-                name="P&L" 
                 dataKey="totalPnl" 
                 radius={[4, 4, 0, 0]}
                 fillOpacity={0.9}
@@ -219,7 +254,7 @@ export const SetupPerformance = () => {
       )}
 
       {sortedSetupStats.length > 0 && (
-        <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg mt-6">
+        <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg mt-8">
           <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
           <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
             <p>
