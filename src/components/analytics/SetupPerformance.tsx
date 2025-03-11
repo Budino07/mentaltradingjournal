@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -123,7 +124,8 @@ export const SetupPerformance = () => {
       ...trade,
       pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
            typeof trade.pnl === 'number' ? trade.pnl : 0,
-      riskReward: calculateRiskReward(trade)
+      riskReward: calculateRiskReward(trade),
+      journalEntryId: entry.id // Add journal entry ID to each trade
     }))
   );
 

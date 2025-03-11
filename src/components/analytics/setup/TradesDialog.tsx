@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Trade } from "@/types/analytics";
+import { useNavigate } from "react-router-dom";
 
 interface TradesDialogProps {
   open: boolean;
@@ -28,9 +29,24 @@ const formatCurrency = (value: number): string => {
 };
 
 export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialogProps) => {
+  const navigate = useNavigate();
+
+  const navigateToJournalEntry = (trade: Trade) => {
+    // Check if we have a journal entry ID to navigate to
+    if (trade.journalEntryId) {
+      // Navigate to the journal page with the date of the trade
+      if (trade.entryDate) {
+        const entryDate = new Date(trade.entryDate);
+        navigate('/journal', { state: { selectedDate: entryDate } });
+      } else {
+        navigate('/journal');
+      }
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto cursor-pointer">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl">{setup} Trades</DialogTitle>
         </DialogHeader>
@@ -41,6 +57,7 @@ export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialog
           <TableHeader>
             <TableRow>
               <TableHead>Entry Date</TableHead>
+              <TableHead>Instrument</TableHead>
               <TableHead>Direction</TableHead>
               <TableHead>Entry Price</TableHead>
               <TableHead>Exit Price</TableHead>
@@ -51,12 +68,23 @@ export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialog
           </TableHeader>
           <TableBody>
             {trades.map((trade, index) => (
-              <TableRow key={index}>
+              <TableRow 
+                key={index}
+                className={trade.journalEntryId ? "cursor-pointer hover:bg-muted/60" : ""}
+                onClick={() => trade.journalEntryId && navigateToJournalEntry(trade)}
+              >
                 <TableCell>
                   {trade.entryDate ? new Date(trade.entryDate).toLocaleDateString() : 'N/A'}
                 </TableCell>
-                <TableCell className={trade.direction === 'buy' ? 'text-green-500' : 'text-red-500'}>
-                  {trade.direction?.toUpperCase() || 'N/A'}
+                <TableCell>
+                  {trade.instrument || 'N/A'}
+                </TableCell>
+                <TableCell className={
+                  trade.direction === 'buy' || trade.direction === 'BUY' ? 'text-green-500' : 
+                  trade.direction === 'sell' || trade.direction === 'SELL' ? 'text-red-500' : 
+                  ''
+                }>
+                  {trade.direction ? String(trade.direction).toUpperCase() : 'N/A'}
                 </TableCell>
                 <TableCell>{trade.entryPrice || 'N/A'}</TableCell>
                 <TableCell>{trade.exitPrice || 'N/A'}</TableCell>
@@ -73,4 +101,3 @@ export const TradesDialog = ({ open, onOpenChange, trades, setup }: TradesDialog
     </Dialog>
   );
 };
-
