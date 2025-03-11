@@ -49,13 +49,9 @@ export const TradeFormContent = ({
   }, [editTrade]);
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto">
-        <FormSections direction={direction} setDirection={setDirection} />
-      </div>
-      <div className="sticky bottom-0 bg-background border-t p-6 mt-auto">
-        <FormActions isEdit={!!editTrade} />
-      </div>
+    <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+      <FormSections direction={direction} setDirection={setDirection} />
+      <FormActions isEdit={!!editTrade} />
     </form>
   );
 };

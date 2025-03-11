@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 
 interface FormActionsProps {
@@ -7,8 +6,10 @@ interface FormActionsProps {
 
 export const FormActions = ({ isEdit }: FormActionsProps) => {
   return (
-    <Button type="submit" className="w-full">
-      {isEdit ? 'Update' : 'Submit'}
-    </Button>
+    <div className="p-6 pt-0 border-t">
+      <Button type="submit" className="w-full">
+        {isEdit ? 'Update' : 'Submit'}
+      </Button>
+    </div>
   );
 };

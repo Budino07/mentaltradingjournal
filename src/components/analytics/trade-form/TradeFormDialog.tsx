@@ -26,8 +26,8 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade, child
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         {children}
-        <DialogContent className="flex flex-col p-0 sm:max-w-[1000px] max-h-[90vh]">
-          <div className="p-6 pb-4 border-b">
+        <DialogContent className="max-h-[90vh] flex flex-col p-0 sm:max-w-[1000px]">
+          <div className="p-6 pb-0">
             <DialogTitle>{editTrade ? 'Edit Trade' : 'Add Trade'}</DialogTitle>
           </div>
           <TradeFormContent
