@@ -77,7 +77,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               variant="outline" 
               size="sm" 
               className="w-full mt-2"
-              onClick={() => setIsDialogOpen(true)}
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent event from bubbling up
+                setIsDialogOpen(true);
+              }}
             >
               <ExternalLink className="w-4 h-4 mr-2" />
               See Trades
@@ -97,6 +100,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export const SetupPerformance = () => {
+  const [selectedSetup, setSelectedSetup] = useState<{ trades: Trade[]; name: string } | null>(null);
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
@@ -235,45 +239,58 @@ export const SetupPerformance = () => {
         </p>
       </div>
 
-      {sortedSetupStats.length > 0 ? (
-        <div className="h-[400px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={sortedSetupStats} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
-              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-              <XAxis 
-                dataKey="name"
-                angle={0}
-                textAnchor="middle"
-                height={60}
-                interval={0}
-                tick={{ fontSize: 12 }}
-              />
-              <YAxis 
-                tickFormatter={(value) => `$${formatCurrency(value)}`}
-                domain={pnlDomain}
-              />
-              <Tooltip 
-                content={<CustomTooltip />} 
-                cursor={{ fill: 'transparent' }}
-              />
-              <Bar 
-                dataKey="totalPnl" 
-                radius={[4, 4, 0, 0]}
-                fillOpacity={0.9}
-              >
-                {sortedSetupStats.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={getBarColor(entry.totalPnl)} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      ) : (
-        <div className="flex items-center justify-center h-[300px]">
-          <p className="text-muted-foreground text-center">
-            No trade setup data available. Add trades with setup information to see performance analysis.
-          </p>
-        </div>
+      <div className="h-[400px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart 
+            data={sortedSetupStats} 
+            margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+            onClick={(data) => {
+              if (data && data.activePayload && data.activePayload[0]) {
+                const setupData = data.activePayload[0].payload;
+                setSelectedSetup({
+                  trades: setupData.trades || [],
+                  name: setupData.name
+                });
+              }
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+            <XAxis 
+              dataKey="name"
+              angle={0}
+              textAnchor="middle"
+              height={60}
+              interval={0}
+              tick={{ fontSize: 12 }}
+            />
+            <YAxis 
+              tickFormatter={(value) => `$${formatCurrency(value)}`}
+              domain={pnlDomain}
+            />
+            <Tooltip 
+              content={<CustomTooltip />} 
+              cursor={{ fill: 'transparent' }}
+            />
+            <Bar 
+              dataKey="totalPnl" 
+              radius={[4, 4, 0, 0]}
+              fillOpacity={0.9}
+            >
+              {sortedSetupStats.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={getBarColor(entry.totalPnl)} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {selectedSetup && (
+        <TradesDialog
+          open={!!selectedSetup}
+          onOpenChange={(open) => !open && setSelectedSetup(null)}
+          trades={selectedSetup.trades}
+          setup={selectedSetup.name}
+        />
       )}
 
       {sortedSetupStats.length > 0 && (
