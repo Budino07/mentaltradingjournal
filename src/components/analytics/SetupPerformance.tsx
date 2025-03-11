@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -8,12 +7,15 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
   Cell,
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { Trade } from "@/types/analytics";
+import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
+import { TradesDialog } from "./setup/TradesDialog";
+import { useState } from "react";
 
 interface SetupStats {
   name: string;
@@ -34,40 +36,61 @@ const formatCurrency = (value: number): string => {
 };
 
 const CustomTooltip = ({ active, payload, label }: any) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   if (active && payload && payload.length) {
     const data = payload[0].payload;
+    const trades = data.trades || [];
+
     return (
-      <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
-        <p className="font-medium text-sm text-foreground mb-2">
-          {data.name}
-        </p>
-        <div className="space-y-1 text-sm">
-          <div className="flex justify-between gap-4">
-            <span className="text-muted-foreground">Total P&L:</span>
-            <span className={`font-medium ${data.totalPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              ${formatCurrency(data.totalPnl)}
-            </span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span className="text-muted-foreground">Win Rate:</span>
-            <span className="font-medium">{data.winRate.toFixed(1)}%</span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span className="text-muted-foreground">Average P&L:</span>
-            <span className={`font-medium ${data.averagePnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              ${formatCurrency(data.averagePnl)}
-            </span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span className="text-muted-foreground">Trades:</span>
-            <span className="font-medium">{data.tradeCount}</span>
-          </div>
-          <div className="flex justify-between gap-4">
-            <span className="text-muted-foreground">Average R:R:</span>
-            <span className="font-medium">{data.averageRiskReward.toFixed(2)}</span>
+      <>
+        <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+          <p className="font-medium text-sm text-foreground mb-2">
+            {data.name}
+          </p>
+          <div className="space-y-1 text-sm">
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">Total P&L:</span>
+              <span className={`font-medium ${data.totalPnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                ${formatCurrency(data.totalPnl)}
+              </span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">Win Rate:</span>
+              <span className="font-medium">{data.winRate.toFixed(1)}%</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">Average P&L:</span>
+              <span className={`font-medium ${data.averagePnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                ${formatCurrency(data.averagePnl)}
+              </span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">Trades:</span>
+              <span className="font-medium">{data.tradeCount}</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">Average R:R:</span>
+              <span className="font-medium">{data.averageRiskReward.toFixed(2)}</span>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full mt-2"
+              onClick={() => setIsDialogOpen(true)}
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              See Trades
+            </Button>
           </div>
         </div>
-      </div>
+        <TradesDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          trades={trades}
+          setup={data.name}
+        />
+      </>
     );
   }
   return null;
@@ -90,13 +113,12 @@ export const SetupPerformance = () => {
     );
   }
 
-  // Process trades to extract setup performance
+  // Update the trades mapping to keep the full trade object
   const allTrades = analytics.journalEntries.flatMap(entry => 
     (entry.trades || []).map(trade => ({
       ...trade,
       pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
            typeof trade.pnl === 'number' ? trade.pnl : 0,
-      // Calculate risk-reward ratio for each trade
       riskReward: calculateRiskReward(trade)
     }))
   );
@@ -124,7 +146,7 @@ export const SetupPerformance = () => {
     return risk > 0 ? reward / risk : 0;
   }
 
-  // Group trades by setup
+  // Group trades by setup and keep the trades array
   const setupMap = new Map<string, any[]>();
   
   allTrades.forEach(trade => {
@@ -136,7 +158,7 @@ export const SetupPerformance = () => {
   });
 
   // Calculate statistics for each setup
-  const setupStats: SetupStats[] = Array.from(setupMap.entries()).map(([setup, trades]) => {
+  const setupStats: (SetupStats & { trades: Trade[] })[] = Array.from(setupMap.entries()).map(([setup, trades]) => {
     // Ensure all pnl values are numbers
     const totalPnl = trades.reduce((sum, trade) => {
       const tradePnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
@@ -174,7 +196,8 @@ export const SetupPerformance = () => {
       winRate,
       averagePnl,
       tradeCount: trades.length,
-      averageRiskReward
+      averageRiskReward,
+      trades // Add the trades array to the stats
     };
   });
 
