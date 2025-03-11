@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Trade } from "@/types/trade";
 import { supabase } from "@/integrations/supabase/client";
@@ -87,24 +86,16 @@ export const useTradeActions = (user: User | null) => {
         entry.trades?.some((trade: Trade) => trade.id === updatedTrade.id)
       );
 
+      // Find the original trade to preserve any fields not included in the update
+      const originalTrade = entryWithTrade?.trades?.find(
+        (trade: Trade) => trade.id === updatedTrade.id
+      );
+
       const updatedTradeObject = {
+        ...originalTrade, // Preserve all original fields
+        ...updatedTrade,  // Override with any updated fields
         id: updatedTrade.id,
-        instrument: updatedTrade.instrument,
-        direction: updatedTrade.direction,
-        entryDate: updatedTrade.entryDate,
-        exitDate: updatedTrade.exitDate,
-        entryPrice: updatedTrade.entryPrice,
-        exitPrice: updatedTrade.exitPrice,
-        stopLoss: updatedTrade.stopLoss,
-        takeProfit: updatedTrade.takeProfit,
-        quantity: updatedTrade.quantity,
-        setup: updatedTrade.setup,
-        pnl: updatedTrade.pnl,
-        forecastScreenshot: updatedTrade.forecastScreenshot,
-        resultScreenshot: updatedTrade.resultScreenshot,
-        htfBias: updatedTrade.htfBias,
-        highestPrice: updatedTrade.highestPrice,
-        lowestPrice: updatedTrade.lowestPrice
+        direction: updatedTrade.direction?.toLowerCase() as 'buy' | 'sell'
       };
 
       const updatedTrades = entryWithTrade?.trades.map((trade: Trade) => 
@@ -115,7 +106,7 @@ export const useTradeActions = (user: User | null) => {
         .from('journal_entries')
         .update({ trades: updatedTrades })
         .eq('id', entryWithTrade?.id)
-        .eq('user_id', user.id); // Add user_id check for extra security
+        .eq('user_id', user.id);
 
       toast.success('Trade updated successfully!');
       setIsEditDialogOpen(false);
