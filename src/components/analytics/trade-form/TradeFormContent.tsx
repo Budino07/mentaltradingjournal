@@ -36,12 +36,6 @@ export const TradeFormContent = ({
           const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
           if (input && value !== undefined && value !== null) {
             input.value = value.toString();
-            
-            // Trigger change event for URL fields to show previews
-            if (key === 'forecastScreenshot' || key === 'resultUrl') {
-              const event = new Event('change', { bubbles: true });
-              input.dispatchEvent(event);
-            }
           }
         });
       }
@@ -49,7 +43,7 @@ export const TradeFormContent = ({
   }, [editTrade]);
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+    <form onSubmit={handleSubmit} className="flex flex-col h-full max-h-[calc(90vh-60px)]">
       <FormSections direction={direction} setDirection={setDirection} />
       <FormActions isEdit={!!editTrade} />
     </form>

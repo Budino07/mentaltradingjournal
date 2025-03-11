@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { ExternalLink } from "lucide-react";
 
 export const TradeExitSection = () => {
   const [resultUrl, setResultUrl] = useState("");
@@ -16,12 +15,6 @@ export const TradeExitSection = () => {
     const input = document.getElementById(inputId) as HTMLInputElement;
     if (input) {
       input.value = localDateTime;
-    }
-  };
-
-  const openImageInNewTab = (url: string) => {
-    if (url) {
-      window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -98,24 +91,6 @@ export const TradeExitSection = () => {
             value={resultUrl}
             onChange={(e) => setResultUrl(e.target.value)}
           />
-          
-          {resultUrl && (
-            <div className="mt-2">
-              <div 
-                onClick={() => openImageInNewTab(resultUrl)} 
-                className="cursor-pointer hover:opacity-90 transition-opacity relative group"
-              >
-                <img 
-                  src={resultUrl} 
-                  alt="Trade result" 
-                  className="rounded-md border max-h-64 object-contain w-full" 
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
-                  <ExternalLink className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
