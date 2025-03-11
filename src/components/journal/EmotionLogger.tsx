@@ -49,6 +49,11 @@ export const EmotionLogger = ({
   const [fourHourUrl, setFourHourUrl] = useState('');
   const [oneHourUrl, setOneHourUrl] = useState('');
 
+  const [weeklyLabel, setWeeklyLabel] = useState('Weekly');
+  const [dailyLabel, setDailyLabel] = useState('Daily');
+  const [fourHourLabel, setFourHourLabel] = useState('4HR');
+  const [oneHourLabel, setOneHourLabel] = useState('1HR/15m');
+  
   const { stats } = useProgressTracking();
 
   // Set initial session type when provided
@@ -182,6 +187,14 @@ export const EmotionLogger = ({
               setFourHourUrl={setFourHourUrl}
               oneHourUrl={oneHourUrl}
               setOneHourUrl={setOneHourUrl}
+              weeklyLabel={weeklyLabel}
+              setWeeklyLabel={setWeeklyLabel}
+              dailyLabel={dailyLabel}
+              setDailyLabel={setDailyLabel}
+              fourHourLabel={fourHourLabel}
+              setFourHourLabel={setFourHourLabel}
+              oneHourLabel={oneHourLabel}
+              setOneHourLabel={setOneHourLabel}
             />
           )}
 
