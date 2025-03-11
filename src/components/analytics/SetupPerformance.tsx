@@ -110,9 +110,26 @@ export const SetupPerformance = () => {
 
   // Calculate statistics for each setup
   const setupStats: SetupStats[] = Array.from(setupMap.entries()).map(([setup, trades]) => {
-    const totalPnl = trades.reduce((sum, trade) => sum + (trade.pnl || 0), 0);
-    const winCount = trades.filter(trade => (trade.pnl || 0) > 0).length;
-    const lossCount = trades.filter(trade => (trade.pnl || 0) < 0).length;
+    // Ensure all pnl values are numbers
+    const totalPnl = trades.reduce((sum, trade) => {
+      const tradePnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+                      typeof trade.pnl === 'number' ? trade.pnl : 0;
+      return sum + tradePnl;
+    }, 0);
+    
+    // Count wins and losses based on numeric pnl values
+    const winCount = trades.filter(trade => {
+      const tradePnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+                      typeof trade.pnl === 'number' ? trade.pnl : 0;
+      return tradePnl > 0;
+    }).length;
+    
+    const lossCount = trades.filter(trade => {
+      const tradePnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+                      typeof trade.pnl === 'number' ? trade.pnl : 0;
+      return tradePnl < 0;
+    }).length;
+    
     const winRate = trades.length > 0 ? (winCount / trades.length) * 100 : 0;
     const averagePnl = trades.length > 0 ? totalPnl / trades.length : 0;
 
