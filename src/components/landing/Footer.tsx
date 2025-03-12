@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Twitter, Instagram, Discord } from "lucide-react";
+import { Twitter, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
@@ -52,6 +52,16 @@ export const Footer = () => {
                   Terms & Conditions
                 </Link>
               </li>
+              <li>
+                <a 
+                  href="https://discord.gg/pBXQnErHYg" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  Discord
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -71,13 +81,6 @@ export const Footer = () => {
                 aria-label="Instagram"
               >
                 <Instagram className="h-5 w-5" />
-              </Link>
-              <Link 
-                to="#" 
-                className="w-10 h-10 rounded-md bg-[#12151E] flex items-center justify-center text-gray-300 hover:text-primary-light transition-colors"
-                aria-label="Discord"
-              >
-                <Discord className="h-5 w-5" />
               </Link>
             </div>
           </div>
