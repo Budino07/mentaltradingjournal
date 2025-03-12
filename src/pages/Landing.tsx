@@ -1,8 +1,8 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { AnalyticsSection } from "@/components/landing/AnalyticsSection";
+import { Footer } from "@/components/landing/Footer";
 import { User, ArrowRightCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -127,6 +127,7 @@ const Landing = () => {
           </div>
         </section>
 
+        {/* Second section */}
         <section className="relative min-h-screen flex items-center py-24">
           <div className="container mx-auto px-4 md:px-6">
             <div className="flex flex-col-reverse md:flex-row items-center gap-12">
@@ -185,7 +186,11 @@ const Landing = () => {
           </div>
         </section>
 
+        {/* Analytics Section */}
         <AnalyticsSection />
+
+        {/* Footer */}
+        <Footer />
       </div>
     </div>
   );
