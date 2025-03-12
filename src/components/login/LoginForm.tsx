@@ -30,7 +30,7 @@ export const LoginForm = ({
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5 animate-fade-in">
+    <form onSubmit={onSubmit} className="space-y-4 sm:space-y-5 animate-fade-in">
       <div className="space-y-3">
         <Input
           type="email"
@@ -38,7 +38,7 @@ export const LoginForm = ({
           value={email}
           onChange={onEmailChange}
           required
-          className="bg-white/5 backdrop-blur-sm border-white/10 focus:border-primary/50 transition-all duration-300"
+          className="bg-white/5 backdrop-blur-sm border-white/10 focus:border-primary/50 transition-all duration-300 h-11"
         />
       </div>
       <div className="space-y-2">
@@ -50,7 +50,7 @@ export const LoginForm = ({
             onChange={onPasswordChange}
             required
             minLength={6}
-            className="bg-white/5 backdrop-blur-sm border-white/10 focus:border-primary/50 transition-all duration-300"
+            className="bg-white/5 backdrop-blur-sm border-white/10 focus:border-primary/50 transition-all duration-300 h-11 pr-10"
           />
           <button
             type="button"
@@ -67,7 +67,7 @@ export const LoginForm = ({
         </div>
       </div>
       <Button 
-        className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-all duration-300 shadow-[0_0_15px_rgba(110,89,165,0.5)]" 
+        className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-all duration-300 shadow-[0_0_15px_rgba(110,89,165,0.5)] h-11" 
         type="submit" 
         disabled={loading}
       >
