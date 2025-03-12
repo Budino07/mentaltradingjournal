@@ -19,7 +19,7 @@ export const Footer = () => {
           </div>
 
           {/* All Links in a Single Column */}
-          <div className="space-y-6">
+          <div className="space-y-6 flex justify-center">
             <ul className="space-y-4">
               <li>
                 <Link to="/login" className="text-gray-300 hover:text-white transition-colors">
@@ -37,16 +37,6 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="#" className="text-gray-300 hover:text-white transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link to="#" className="text-gray-300 hover:text-white transition-colors">
-                  Terms & Conditions
-                </Link>
-              </li>
-              <li>
                 <a 
                   href="https://discord.gg/pBXQnErHYg" 
                   target="_blank" 
@@ -60,7 +50,7 @@ export const Footer = () => {
           </div>
 
           {/* Social Media */}
-          <div className="space-y-6 flex flex-col justify-start">
+          <div className="space-y-6 flex flex-col items-end justify-start">
             <div className="flex space-x-3">
               <Link 
                 to="#" 
