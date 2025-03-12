@@ -7,9 +7,9 @@ export const Footer = () => {
   return (
     <footer className="bg-[#1A1F2C] py-16 border-t border-white/5">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* Logo and Disclaimer */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="text-xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
               Mental
             </div>
@@ -18,9 +18,9 @@ export const Footer = () => {
             </p>
           </div>
 
-          {/* Links Column 1 */}
-          <div className="space-y-4">
-            <ul className="space-y-2">
+          {/* All Links in a Single Column */}
+          <div className="space-y-6">
+            <ul className="space-y-4">
               <li>
                 <Link to="/login" className="text-gray-300 hover:text-white transition-colors">
                   Log In
@@ -36,12 +36,6 @@ export const Footer = () => {
                   Pricing
                 </Link>
               </li>
-            </ul>
-          </div>
-
-          {/* Links Column 2 */}
-          <div className="space-y-4">
-            <ul className="space-y-2">
               <li>
                 <Link to="#" className="text-gray-300 hover:text-white transition-colors">
                   Privacy Policy
@@ -66,8 +60,8 @@ export const Footer = () => {
           </div>
 
           {/* Social Media */}
-          <div className="space-y-4">
-            <div className="flex space-x-2">
+          <div className="space-y-6 flex flex-col justify-start">
+            <div className="flex space-x-3">
               <Link 
                 to="#" 
                 className="w-10 h-10 rounded-md bg-[#12151E] flex items-center justify-center text-gray-300 hover:text-primary-light transition-colors"
@@ -86,7 +80,7 @@ export const Footer = () => {
           </div>
         </div>
         
-        <div className="mt-10 pt-6 border-t border-white/5 text-center text-sm text-gray-500">
+        <div className="mt-12 pt-6 border-t border-white/5 text-center text-sm text-gray-500">
           <p>© {new Date().getFullYear()} Mental. All rights reserved.</p>
         </div>
       </div>
