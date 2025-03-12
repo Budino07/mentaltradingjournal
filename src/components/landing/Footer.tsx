@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { Twitter, Instagram, Discord } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
@@ -14,7 +14,7 @@ export const Footer = () => {
               Mental
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
-              Tools for trading psychology involves substantial risk & is not appropriate for everyone. Only risk capital should be used for trading. Testimonials appearing on this website may not be representative of other users and is not a guarantee of future performance or success.
+              Trading futures, currencies, and options involves significant risk and may not be suitable for all investors. Only risk capital—money you can afford to lose—should be used for trading. Testimonials featured on this website reflect individual experiences and may not represent typical results. Past performance is not indicative of future success.
             </p>
           </div>
 
@@ -32,23 +32,8 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="#" className="text-gray-300 hover:text-white transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
                 <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors">
                   Pricing
-                </Link>
-              </li>
-              <li>
-                <Link to="#" className="text-gray-300 hover:text-white transition-colors">
-                  Supported Brokers
-                </Link>
-              </li>
-              <li>
-                <Link to="#" className="text-gray-300 hover:text-white transition-colors">
-                  Become A Partner
                 </Link>
               </li>
             </ul>
@@ -57,11 +42,6 @@ export const Footer = () => {
           {/* Links Column 2 */}
           <div className="space-y-4">
             <ul className="space-y-2">
-              <li>
-                <Link to="#" className="text-gray-300 hover:text-white transition-colors">
-                  Contact Us
-                </Link>
-              </li>
               <li>
                 <Link to="#" className="text-gray-300 hover:text-white transition-colors">
                   Privacy Policy
@@ -95,16 +75,9 @@ export const Footer = () => {
               <Link 
                 to="#" 
                 className="w-10 h-10 rounded-md bg-[#12151E] flex items-center justify-center text-gray-300 hover:text-primary-light transition-colors"
-                aria-label="LinkedIn"
+                aria-label="Discord"
               >
-                <Linkedin className="h-5 w-5" />
-              </Link>
-              <Link 
-                to="#" 
-                className="w-10 h-10 rounded-md bg-[#12151E] flex items-center justify-center text-gray-300 hover:text-primary-light transition-colors"
-                aria-label="Facebook"
-              >
-                <Facebook className="h-5 w-5" />
+                <Discord className="h-5 w-5" />
               </Link>
             </div>
           </div>
