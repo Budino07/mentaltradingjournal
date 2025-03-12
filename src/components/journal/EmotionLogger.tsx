@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { SessionProgress } from "./SessionProgress";
@@ -127,8 +128,8 @@ export const EmotionLogger = ({
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr,300px]">
-      <Card className="p-8 space-y-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
+    <div className="grid gap-4 md:gap-6 lg:grid-cols-[1fr,300px] mt-0 md:mt-0">
+      <Card className="p-4 md:p-8 space-y-6 md:space-y-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
         <FormHeader 
           sessionType={sessionType}
           onSessionTypeChange={setSessionType}
@@ -156,7 +157,7 @@ export const EmotionLogger = ({
           />
         )}
         
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           <EmotionSection
             sessionType={sessionType}
             selectedEmotion={selectedEmotion}

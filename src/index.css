@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -86,6 +87,16 @@
   .hover-text-visible:hover {
     @apply text-foreground/90;
   }
+  
+  /* Fix mobile layout issues */
+  body {
+    @apply overflow-x-hidden min-h-screen;
+  }
+  
+  /* Ensure content is visible without scrolling on mobile */
+  main {
+    @apply mt-0 pt-0;
+  }
 }
 
 /* Enhanced gradient backgrounds */
@@ -130,4 +141,21 @@
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-20px); }
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 640px) {
+  .container {
+    @apply px-3;
+  }
+  
+  /* Reduce padding on mobile */
+  .p-4 {
+    @apply p-3;
+  }
+  
+  /* Adjust font sizes for better mobile viewing */
+  h1, h2, h3 {
+    @apply tracking-tight;
+  }
 }

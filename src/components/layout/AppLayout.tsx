@@ -10,7 +10,7 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
         <AppSidebar />
         <div className="flex-1 flex flex-col w-full">
           <AppHeader />
-          <main className="flex-1 p-4 md:p-6 overflow-x-hidden animate-fade-in">
+          <main className="flex-1 p-4 md:p-6 overflow-x-hidden animate-fade-in pt-2 mt-0">
             {children}
           </main>
         </div>

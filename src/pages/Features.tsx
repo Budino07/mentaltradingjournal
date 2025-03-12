@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
@@ -51,23 +52,23 @@ const Features = () => {
           <Link to="/" className="text-xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
             Mental
           </Link>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
+          <div className="flex items-center gap-2 md:gap-4">
+            <Button variant="ghost" size="sm" className="h-8 px-2 md:h-10 md:px-4" asChild>
               <Link to="/features">Features</Link>
             </Button>
-            <Button variant="ghost" asChild>
+            <Button variant="ghost" size="sm" className="h-8 px-2 md:h-10 md:px-4" asChild>
               <Link to="/pricing">Pricing</Link>
             </Button>
             {user ? (
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" className="gap-2">
-                    <User className="h-4 w-4" />
-                    <span className="hidden sm:inline-block">{userEmail}</span>
-                    <span className="inline-block sm:hidden">{displayName}</span>
+                  <Button variant="ghost" size="sm" className="h-8 px-2 md:h-10 md:px-4 gap-1 md:gap-2">
+                    <User className="h-3 w-3 md:h-4 md:w-4" />
+                    <span className="hidden sm:inline-block text-xs md:text-sm">{userEmail}</span>
+                    <span className="inline-block sm:hidden text-xs md:text-sm">{displayName}</span>
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-80">
+                <PopoverContent className="w-60 md:w-80">
                   <div className="space-y-4">
                     <div className="space-y-2">
                       {isEditing ? (
@@ -104,10 +105,10 @@ const Features = () => {
               </Popover>
             ) : (
               <>
-                <Button variant="ghost" asChild>
+                <Button variant="ghost" size="sm" className="h-8 px-2 md:h-10 md:px-4" asChild>
                   <Link to="/login">Sign In</Link>
                 </Button>
-                <Button asChild>
+                <Button size="sm" className="h-8 px-2 md:h-10 md:px-4" asChild>
                   <Link to="/pricing">Get Started</Link>
                 </Button>
               </>
@@ -117,20 +118,20 @@ const Features = () => {
       </header>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-16">
-          <div className="space-y-8">
-            <h2 className="text-3xl md:text-4xl font-semibold">
+      <div className="container mx-auto px-4 pt-20 pb-12 md:py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center mt-4 md:mt-16">
+          <div className="space-y-4 md:space-y-8">
+            <h2 className="text-2xl md:text-4xl font-semibold">
               Pre-Session Check In
             </h2>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base md:text-lg text-muted-foreground">
               Start your trading day on the right foot by checking off pre-trading activities that promote focus
             </p>
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-3 md:gap-4">
               <FeatureItem icon={BarChart2} text="Write down how you feel at this moment, what's going on in your life, and what you want to achieve today." />
               <FeatureItem icon={NotebookPen} text="Detailed notes & comments for trade analysis" />
             </div>
-            <Button size="lg" className="mt-6" asChild>
+            <Button size="sm" className="mt-4 md:mt-6 md:size-lg w-full md:w-auto" asChild>
               <Link to="/login">Learn More</Link>
             </Button>
           </div>
@@ -258,9 +259,9 @@ const Features = () => {
 };
 
 const FeatureItem = ({ icon: Icon, text }: { icon: any; text: string }) => (
-  <div className="flex items-center gap-3 bg-accent/10 rounded-lg p-4 hover:bg-accent/20 transition-colors">
-    <Icon className="h-6 w-6 text-primary flex-shrink-0" />
-    <span className="text-base font-medium">{text}</span>
+  <div className="flex items-center gap-2 md:gap-3 bg-accent/10 rounded-lg p-3 md:p-4 hover:bg-accent/20 transition-colors">
+    <Icon className="h-5 w-5 md:h-6 md:w-6 text-primary flex-shrink-0" />
+    <span className="text-sm md:text-base font-medium">{text}</span>
   </div>
 );
 
