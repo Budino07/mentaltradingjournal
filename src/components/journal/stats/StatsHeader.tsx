@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -279,7 +280,7 @@ export const StatsHeader = () => {
           onClick={() => setTimeFilter("this-month")}
           disabled={!hasEntries}
         >
-          Last 30 Days
+          This Month
         </Button>
         <Button 
           variant={timeFilter === "last-month" ? "default" : "outline"}
@@ -462,3 +463,4 @@ export const StatsHeader = () => {
     </div>
   );
 };
+
