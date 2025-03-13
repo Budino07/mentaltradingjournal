@@ -1,10 +1,22 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { Trade } from "@/types/trade";
+import { useEffect, useState } from "react";
 
-export const TradeEntrySection = () => {
-  const [forecastUrl, setForecastUrl] = useState("");
+interface TradeEntrySectionProps {
+  formValues?: Partial<Trade>;
+}
+
+export const TradeEntrySection = ({ formValues }: TradeEntrySectionProps) => {
+  const [forecastUrl, setForecastUrl] = useState(formValues?.forecastScreenshot || "");
+  
+  // Update state when formValues changes
+  useEffect(() => {
+    if (formValues?.forecastScreenshot) {
+      setForecastUrl(formValues.forecastScreenshot);
+    }
+  }, [formValues]);
   
   return (
     <div className="space-y-4">
@@ -18,6 +30,7 @@ export const TradeEntrySection = () => {
             name="entryPrice"
             placeholder="0.000000"
             step="0.000001"
+            defaultValue={formValues?.entryPrice || ""}
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -28,6 +41,7 @@ export const TradeEntrySection = () => {
             name="quantity"
             placeholder="Enter lot size or contracts"
             step="0.000001"
+            defaultValue={formValues?.quantity || ""}
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -38,6 +52,7 @@ export const TradeEntrySection = () => {
             name="stopLoss"
             placeholder="0.000000"
             step="0.000001"
+            defaultValue={formValues?.stopLoss || ""}
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -48,6 +63,7 @@ export const TradeEntrySection = () => {
             name="takeProfit"
             placeholder="0.000000"
             step="0.000001"
+            defaultValue={formValues?.takeProfit || ""}
           />
         </div>
         <div className="grid w-full items-center gap-1.5">

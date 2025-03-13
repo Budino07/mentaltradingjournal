@@ -1,4 +1,5 @@
 
+import { Trade } from "@/types/trade";
 import { GeneralSection } from "../GeneralSection";
 import { TradeEntrySection } from "../TradeEntrySection";
 import { TradeExitSection } from "../TradeExitSection";
@@ -6,22 +7,19 @@ import { TradeExitSection } from "../TradeExitSection";
 interface FormSectionsProps {
   direction: 'buy' | 'sell' | null;
   setDirection: (direction: 'buy' | 'sell') => void;
+  formValues?: Partial<Trade>;
 }
 
-export const FormSections = ({ direction, setDirection }: FormSectionsProps) => {
+export const FormSections = ({ direction, setDirection, formValues }: FormSectionsProps) => {
   return (
-    <div className="p-6">
-      <div className="space-y-4 md:space-y-0 md:space-x-4 md:flex">
-        <div className="flex-1 p-4 border rounded-lg bg-background/50">
-          <GeneralSection direction={direction} setDirection={setDirection} />
-        </div>
-        <div className="flex-1 p-4 border rounded-lg bg-background/50">
-          <TradeEntrySection />
-        </div>
-        <div className="flex-1 p-4 border rounded-lg bg-background/50">
-          <TradeExitSection />
-        </div>
-      </div>
+    <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <GeneralSection 
+        direction={direction} 
+        setDirection={setDirection}
+        formValues={formValues}
+      />
+      <TradeEntrySection formValues={formValues} />
+      <TradeExitSection formValues={formValues} />
     </div>
   );
 };

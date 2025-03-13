@@ -2,10 +2,22 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { Trade } from "@/types/trade";
+import { useEffect, useState } from "react";
 
-export const TradeExitSection = () => {
-  const [resultUrl, setResultUrl] = useState("");
+interface TradeExitSectionProps {
+  formValues?: Partial<Trade>;
+}
+
+export const TradeExitSection = ({ formValues }: TradeExitSectionProps) => {
+  const [resultUrl, setResultUrl] = useState(formValues?.resultUrl || "");
+  
+  // Update state when formValues changes
+  useEffect(() => {
+    if (formValues?.resultUrl) {
+      setResultUrl(formValues.resultUrl);
+    }
+  }, [formValues]);
   
   const setTodayDate = (inputId: string) => {
     const now = new Date();
@@ -30,6 +42,7 @@ export const TradeExitSection = () => {
               id="exitDate"
               name="exitDate"
               className="w-full"
+              defaultValue={formValues?.exitDate || ""}
             />
             <Button 
               type="button" 
@@ -49,6 +62,7 @@ export const TradeExitSection = () => {
             name="exitPrice"
             placeholder="0.000000"
             step="0.000001"
+            defaultValue={formValues?.exitPrice || ""}
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -59,6 +73,7 @@ export const TradeExitSection = () => {
             name="pnl"
             placeholder="0.000000"
             step="0.000001"
+            defaultValue={formValues?.pnl || ""}
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -69,6 +84,7 @@ export const TradeExitSection = () => {
             name="highestPrice"
             placeholder="0.000000"
             step="0.000001"
+            defaultValue={formValues?.highestPrice || ""}
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -79,6 +95,7 @@ export const TradeExitSection = () => {
             name="lowestPrice"
             placeholder="0.000000"
             step="0.000001"
+            defaultValue={formValues?.lowestPrice || ""}
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
