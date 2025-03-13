@@ -1,3 +1,4 @@
+
 import { Trade } from "@/types/trade";
 import { FormSections } from "./form-sections/FormSections";
 import { FormActions } from "./form-sections/FormActions";
@@ -28,6 +29,8 @@ export const TradeFormContent = ({
   // Pre-populate form fields when editing
   useEffect(() => {
     if (editTrade) {
+      setDirection(editTrade.direction as 'buy' | 'sell');
+      
       const form = document.querySelector('form');
       if (form) {
         // Set all the form field values based on editTrade data
@@ -39,7 +42,7 @@ export const TradeFormContent = ({
         });
       }
     }
-  }, [editTrade]);
+  }, [editTrade, setDirection]);
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col h-[calc(90vh-60px)]">

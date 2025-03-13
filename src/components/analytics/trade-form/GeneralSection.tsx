@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,6 +83,12 @@ export const GeneralSection = ({ direction, setDirection }: GeneralSectionProps)
               Sell
             </Button>
           </div>
+          {/* Hidden input to store the direction value for form submission */}
+          <input 
+            type="hidden" 
+            name="direction" 
+            value={direction || ''} 
+          />
         </div>
       </div>
     </div>

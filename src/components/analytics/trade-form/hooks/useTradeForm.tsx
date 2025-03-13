@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,7 +25,7 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         entryDate: formData.get("entryDate") as string,
         instrument: formData.get("instrument") as string,
         setup: formData.get("setup") as string,
-        direction: formData.get("direction") as string,
+        direction: formData.get("direction") as 'buy' | 'sell',
         entryPrice: parseFloat(formData.get("entryPrice") as string),
         exitPrice: parseFloat(formData.get("exitPrice") as string),
         quantity: parseFloat(formData.get("quantity") as string),
@@ -37,6 +38,8 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         highestPrice: parseFloat(formData.get("highestPrice") as string),
         lowestPrice: parseFloat(formData.get("lowestPrice") as string)
       };
+
+      console.log("Trade data to submit:", tradeData);
 
       if (editTrade) {
         const { data: entries, error: fetchError } = await supabase

@@ -23,6 +23,11 @@ export const TradeDetails = ({ trade, formatDate }: TradeDetailsProps) => {
           <h4 className="text-sm font-medium text-muted-foreground">Entry Details</h4>
           <div className="space-y-2">
             <p className="text-sm">Date: {formatDate(trade.entryDate || '')}</p>
+            <p className="text-sm">
+              Direction: <span className={`font-medium ${trade.direction === 'buy' ? 'text-green-600' : 'text-red-600'}`}>
+                {trade.direction === 'buy' ? 'Buy' : trade.direction === 'sell' ? 'Sell' : 'N/A'}
+              </span>
+            </p>
             <p className="text-sm">Price: {trade.entryPrice}</p>
             <p className="text-sm">Stop Loss: {trade.stopLoss}</p>
             <p className="text-sm">Take Profit: {trade.takeProfit}</p>
