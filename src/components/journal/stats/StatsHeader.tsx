@@ -3,7 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { TradeWinPercentage } from "./TradeWinPercentage";
 import { useTimeFilter } from "@/contexts/TimeFilterContext";
-import { startOfMonth, subMonths, isWithinInterval, endOfMonth, startOfYear, endOfYear, subYears } from "date-fns";
+import { 
+  startOfMonth, 
+  endOfMonth, 
+  isWithinInterval, 
+  startOfYear, 
+  endOfYear, 
+  subYears, 
+  subMonths,
+  isAfter,
+  isBefore
+} from "date-fns";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -80,54 +90,6 @@ export const StatsHeader = () => {
     };
   }, [dropdownRef]);
 
-  useEffect(() => {
-    if (!searchQuery || !analytics?.journalEntries) {
-      setSearchResults([]);
-      return;
-    }
-
-    const query = searchQuery.toLowerCase();
-    const foundEntries = analytics.journalEntries.filter(entry => {
-      return (
-        entry.emotion?.toLowerCase().includes(query) ||
-        entry.emotion_detail?.toLowerCase().includes(query) ||
-        entry.notes?.toLowerCase().includes(query) ||
-        entry.outcome?.toLowerCase().includes(query) ||
-        entry.market_conditions?.toLowerCase().includes(query) ||
-        entry.followed_rules?.some(rule => rule.toLowerCase().includes(query)) ||
-        entry.mistakes?.some(mistake => mistake.toLowerCase().includes(query)) ||
-        entry.post_submission_notes?.toLowerCase().includes(query) ||
-        (entry.trades && entry.trades.some(trade => 
-          JSON.stringify(trade).toLowerCase().includes(query)
-        ))
-      );
-    });
-
-    const sortedEntries = [...foundEntries].sort((a, b) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
-
-    setSearchResults(sortedEntries.slice(0, 5));
-    
-    const event = new CustomEvent('journal-search', { 
-      detail: { query: searchQuery } 
-    });
-    window.dispatchEvent(event);
-    
-  }, [searchQuery, analytics?.journalEntries]);
-
-  const handleEntryClick = (entry: JournalEntryType) => {
-    const selectedDate = new Date(entry.created_at);
-    const event = new CustomEvent('journal-date-select', { 
-      detail: { date: selectedDate } 
-    });
-    window.dispatchEvent(event);
-    
-    setSearchResults([]);
-    setSearchQuery("");
-    setIsSearching(false);
-  };
-
   const getTimeInterval = () => {
     const now = new Date();
     if (!timeFilter) {
@@ -140,21 +102,29 @@ export const StatsHeader = () => {
           start: startOfMonth(now),
           end: now
         };
-      case "last-month":
+      case "last-month": {
+        const lastMonthStart = startOfMonth(subMonths(now, 1));
+        const lastMonthEnd = endOfMonth(subMonths(now, 1));
         return {
-          start: startOfMonth(subMonths(now, 1)),
-          end: endOfMonth(subMonths(now, 1))
+          start: lastMonthStart,
+          end: lastMonthEnd
         };
+      }
       case "last-three-months":
         return {
           start: startOfMonth(subMonths(now, 3)),
           end: now
         };
-      case "last-year":
+      case "last-year": {
+        const lastYearStart = startOfYear(subYears(now, 1));
+        const lastYearEnd = endOfYear(subYears(now, 1));
         return {
-          start: startOfYear(subYears(now, 1)),
-          end: endOfYear(subYears(now, 1))
+          start: lastYearStart,
+          end: lastYearEnd
         };
+      }
+      case "eternal":
+        return null;
       default:
         return null;
     }
@@ -190,7 +160,8 @@ export const StatsHeader = () => {
     (getTimeInterval() ? 
       analytics.journalEntries.filter(entry => {
         const entryDate = new Date(entry.created_at);
-        return isWithinInterval(entryDate, getTimeInterval()!);
+        const interval = getTimeInterval();
+        return interval ? isWithinInterval(entryDate, interval) : true;
       }) : 
       analytics.journalEntries) : 
     [];
@@ -246,6 +217,7 @@ export const StatsHeader = () => {
             <PanelLeftOpen className="h-4 w-4" />
           )}
         </Button>
+        
         <Button 
           variant={timeFilter === "this-month" ? "default" : "outline"}
           onClick={() => setTimeFilter("this-month")}
