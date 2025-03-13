@@ -90,10 +90,62 @@ export const StatsHeader = () => {
     };
   }, [dropdownRef]);
 
+  useEffect(() => {
+    if (!searchQuery || !analytics?.journalEntries) {
+      setSearchResults([]);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase();
+    const foundEntries = analytics.journalEntries.filter(entry => {
+      return (
+        entry.emotion?.toLowerCase().includes(query) ||
+        entry.emotion_detail?.toLowerCase().includes(query) ||
+        entry.notes?.toLowerCase().includes(query) ||
+        entry.outcome?.toLowerCase().includes(query) ||
+        entry.market_conditions?.toLowerCase().includes(query) ||
+        entry.followed_rules?.some(rule => rule.toLowerCase().includes(query)) ||
+        entry.mistakes?.some(mistake => mistake.toLowerCase().includes(query)) ||
+        entry.post_submission_notes?.toLowerCase().includes(query) ||
+        (entry.trades && entry.trades.some(trade => 
+          JSON.stringify(trade).toLowerCase().includes(query)
+        ))
+      );
+    });
+
+    const sortedEntries = [...foundEntries].sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    setSearchResults(sortedEntries.slice(0, 5));
+    
+    const event = new CustomEvent('journal-search', { 
+      detail: { query: searchQuery } 
+    });
+    window.dispatchEvent(event);
+    
+  }, [searchQuery, analytics?.journalEntries]);
+
+  const handleEntryClick = (entry: JournalEntryType) => {
+    const selectedDate = new Date(entry.created_at);
+    const event = new CustomEvent('journal-date-select', { 
+      detail: { date: selectedDate } 
+    });
+    window.dispatchEvent(event);
+    
+    setSearchResults([]);
+    setSearchQuery("");
+    setIsSearching(false);
+  };
+
   const getTimeInterval = () => {
     const now = new Date();
     if (!timeFilter) {
-      return null;
+      // If no filter is selected, default to current month
+      return {
+        start: startOfMonth(now),
+        end: now
+      };
     }
     
     switch (timeFilter) {
@@ -126,7 +178,11 @@ export const StatsHeader = () => {
       case "eternal":
         return null;
       default:
-        return null;
+        // Default to current month for any other value
+        return {
+          start: startOfMonth(now),
+          end: now
+        };
     }
   };
 

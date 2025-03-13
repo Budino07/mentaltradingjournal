@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, ReactNode } from "react";
 import { TimeFilter } from "@/hooks/useJournalFilters";
 
@@ -9,7 +10,8 @@ interface TimeFilterContextType {
 const TimeFilterContext = createContext<TimeFilterContextType | undefined>(undefined);
 
 export function TimeFilterProvider({ children }: { children: ReactNode }) {
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>(null);
+  // Changed the default value from null to "this-month"
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("this-month");
 
   return (
     <TimeFilterContext.Provider value={{ timeFilter, setTimeFilter }}>
