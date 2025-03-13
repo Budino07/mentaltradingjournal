@@ -1,6 +1,6 @@
 
 import { Trade } from "@/types/trade";
-import { ArrowTrendingDown, ArrowTrendingUp } from "lucide-react";
+import { TrendingDown, TrendingUp } from "lucide-react";
 
 interface TradeHeaderProps {
   trade: Trade;
@@ -21,8 +21,8 @@ export const TradeHeader = ({ trade }: TradeHeaderProps) => {
               : 'bg-gray-100 text-gray-600'
         }`}>
           {trade.direction === 'buy' 
-            ? <ArrowTrendingUp className="w-4 h-4" /> 
-            : <ArrowTrendingDown className="w-4 h-4" />
+            ? <TrendingUp className="w-4 h-4" /> 
+            : <TrendingDown className="w-4 h-4" />
           }
         </div>
         <div className="truncate">
