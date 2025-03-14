@@ -1,4 +1,5 @@
-import { Home, BookOpen, BarChart2, Menu, User } from "lucide-react";
+
+import { Home, BookOpen, BarChart2, Menu, User, BrainCircuit, FlaskConical, Notebook, LineChart, Settings, UserCog } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export function AppHeader() {
   const location = useLocation();
@@ -25,12 +28,24 @@ export function AppHeader() {
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState("");
   const { user, signOut, updateUsername } = useAuth();
+  const [showMentorDialog, setShowMentorDialog] = useState(false);
+  const isMobile = useIsMobile();
   
   const navigationItems = [
     { icon: Home, label: "Home", path: "/" },
     { label: "Features", path: "/features" },
     { icon: BookOpen, label: "Dashboard", path: "/dashboard" },
     { icon: BarChart2, label: "Analytics", path: "/analytics" },
+  ];
+
+  const sidebarItems = [
+    { title: "Journal Entry", icon: Home, url: "/journal-entry" },
+    { title: "Dashboard", icon: BookOpen, url: "/dashboard" },
+    { title: "Analytics", icon: BarChart2, url: "/analytics" },
+    { title: "Backtesting", icon: FlaskConical, url: "/backtesting" },
+    { title: "MFE & MAE Analysis", icon: LineChart, url: "/mfe-mae" },
+    { title: "Notebook", icon: Notebook, url: "/notebook" },
+    { title: "Settings", icon: Settings, url: "/settings" },
   ];
 
   const handleUpdateUsername = async () => {
@@ -49,6 +64,11 @@ export function AppHeader() {
 
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || 'User';
   const userEmail = user?.email;
+
+  // Close mobile sidebar when navigating to a new page
+  const handleNavigation = () => {
+    setIsOpen(false);
+  };
 
   return (
     <header className="border-b border-border/40 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -150,82 +170,112 @@ export function AppHeader() {
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[240px] sm:w-[280px]">
+          <SheetContent side="right" className="w-[280px] sm:w-[320px]">
             <nav className="flex flex-col gap-4 mt-6">
-              {navigationItems.map((item) => (
-                <Button
-                  key={item.path}
-                  variant="ghost"
-                  asChild
-                  className={cn(
-                    "justify-start",
-                    location.pathname === item.path
-                      ? "text-foreground"
-                      : "text-foreground/60"
-                  )}
-                  onClick={() => setIsOpen(false)}
-                >
-                  <Link to={item.path} className="flex items-center gap-2">
-                    {item.icon && <item.icon className="h-4 w-4" />}
-                    <span>{item.label}</span>
-                  </Link>
-                </Button>
-              ))}
-              <ThemeToggle />
-              {user ? (
-                <div className="space-y-2">
-                  {isEditing ? (
-                    <div className="space-y-2">
-                      <Input
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        placeholder="Enter new username"
-                      />
-                      <Button onClick={handleUpdateUsername} className="w-full">
-                        Save
+              {/* App Navigation Items */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium text-muted-foreground px-2">Navigation</h4>
+                <div className="space-y-1">
+                  {sidebarItems.map((item) => (
+                    <Button
+                      key={item.url}
+                      variant="ghost"
+                      asChild
+                      className={cn(
+                        "justify-start w-full",
+                        location.pathname === item.url
+                          ? "bg-accent text-accent-foreground"
+                          : "text-muted-foreground"
+                      )}
+                      onClick={handleNavigation}
+                    >
+                      <Link to={item.url} className="flex items-center gap-2 px-2">
+                        {item.icon && <item.icon className="h-4 w-4" />}
+                        <span>{item.title}</span>
+                      </Link>
+                    </Button>
+                  ))}
+                  
+                  <Button
+                    variant="ghost"
+                    className="justify-start w-full text-muted-foreground"
+                    onClick={() => setShowMentorDialog(true)}
+                  >
+                    <UserCog className="h-4 w-4 mr-2" />
+                    <span>Mentor Mode</span>
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="border-t border-border/40 pt-4 mt-2">
+                <h4 className="text-sm font-medium text-muted-foreground mb-2 px-2">Account</h4>
+                <ThemeToggle />
+                {user ? (
+                  <div className="space-y-2 mt-4">
+                    {isEditing ? (
+                      <div className="space-y-2">
+                        <Input
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                          placeholder="Enter new username"
+                        />
+                        <Button onClick={handleUpdateUsername} className="w-full">
+                          Save
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => {
+                          setUsername(displayName);
+                          setIsEditing(true);
+                        }}
+                      >
+                        Edit Username
                       </Button>
-                    </div>
-                  ) : (
+                    )}
                     <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => {
-                        setUsername(displayName);
-                        setIsEditing(true);
-                      }}
+                      onClick={handleManageSubscription}
                     >
-                      Edit Username
+                      Manage Subscription
                     </Button>
-                  )}
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={handleManageSubscription}
-                  >
-                    Manage Subscription
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="w-full"
-                    onClick={() => signOut()}
-                  >
-                    Sign Out
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link to="/login">Sign In</Link>
-                  </Button>
-                  <Button className="w-full" asChild>
-                    <Link to="/pricing">Get Started</Link>
-                  </Button>
-                </div>
-              )}
+                    <Button
+                      variant="destructive"
+                      className="w-full"
+                      onClick={() => signOut()}
+                    >
+                      Sign Out
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-2 mt-4">
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link to="/login">Sign In</Link>
+                    </Button>
+                    <Button className="w-full" asChild>
+                      <Link to="/pricing">Get Started</Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
             </nav>
           </SheetContent>
         </Sheet>
       </div>
+      
+      <Dialog open={showMentorDialog} onOpenChange={setShowMentorDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Restricted Access</DialogTitle>
+            <DialogDescription>
+              Access to this feature is restricted. Only members of Tenacity Group are authorized to use it.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }
