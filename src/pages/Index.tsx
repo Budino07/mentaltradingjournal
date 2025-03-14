@@ -7,7 +7,7 @@ const Index = () => {
   return (
     <TimeFilterProvider>
       <AppLayout>
-        <div className="container mx-auto py-0 space-y-4 max-w-full px-2 md:px-4">
+        <div className="container mx-auto py-0 max-w-full px-0 sm:px-2">
           <EmotionLogger />
         </div>
       </AppLayout>

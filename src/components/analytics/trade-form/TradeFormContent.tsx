@@ -4,6 +4,7 @@ import { FormSections } from "./form-sections/FormSections";
 import { FormActions } from "./form-sections/FormActions";
 import { useTradeForm } from "./hooks/useTradeForm";
 import { useEffect, useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TradeFormContentProps {
   direction: 'buy' | 'sell' | null;
@@ -26,6 +27,7 @@ export const TradeFormContent = ({
     onSubmit,
     onOpenChange
   });
+  const isMobile = useIsMobile();
 
   // Pre-populate form fields when editing
   useEffect(() => {
@@ -88,7 +90,7 @@ export const TradeFormContent = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col h-[calc(90vh-60px)]">
+    <form onSubmit={handleSubmit} className={`flex flex-col ${isMobile ? 'h-[calc(100vh-120px)]' : 'h-[calc(90vh-60px)]'}`}>
       <div className="flex-1 overflow-y-auto">
         <FormSections 
           direction={direction} 

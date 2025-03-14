@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { TradeFormContent } from "./TradeFormContent";
 import { Trade } from "@/types/trade";
 import { SuccessDialog } from "../SuccessDialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TradeFormDialogProps {
   open: boolean;
@@ -15,6 +16,7 @@ interface TradeFormDialogProps {
 
 export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade, children }: TradeFormDialogProps) => {
   const [direction, setDirection] = useState<'buy' | 'sell' | null>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (editTrade) {
@@ -26,8 +28,8 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade, child
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         {children}
-        <DialogContent className="max-h-[90vh] flex flex-col p-0 sm:max-w-[1000px]">
-          <div className="p-6 pb-0">
+        <DialogContent className={`max-h-${isMobile ? '100vh' : '[90vh]'} w-full flex flex-col p-0 ${isMobile ? '' : 'sm:max-w-[1000px]'}`}>
+          <div className="p-3 sm:p-6 pb-0">
             <DialogTitle>{editTrade ? 'Edit Trade' : 'Add Trade'}</DialogTitle>
           </div>
           <TradeFormContent
