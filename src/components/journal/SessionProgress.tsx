@@ -1,8 +1,10 @@
+
 import { Progress } from "@/components/ui/progress";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Trophy } from "lucide-react";
 import ReactConfetti from "react-confetti";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export interface SessionProgressProps {
   emotionSelected: boolean;
@@ -34,6 +36,8 @@ export const SessionProgress = ({
     width: window.innerWidth,
     height: window.innerHeight
   });
+  
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const handleResize = () => {
@@ -98,7 +102,7 @@ export const SessionProgress = ({
           }}
         />
       )}
-      <div className="flex justify-between items-center">
+      <div className={`flex justify-between items-center ${isMobile ? 'px-1' : ''}`}>
         <span className="text-sm font-medium text-muted-foreground">
           {isPostSession ? "Post-Session Progress" : "Pre-Session Progress"}
         </span>

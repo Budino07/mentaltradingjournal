@@ -28,8 +28,8 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade, child
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         {children}
-        <DialogContent className={`${isMobile ? 'max-h-[95vh] w-full p-0' : 'max-h-[90vh] p-4 sm:max-w-[1000px]'} flex flex-col`}>
-          <div className={`${isMobile ? 'p-2' : 'p-3 sm:p-6'} pb-0`}>
+        <DialogContent className={`${isMobile ? 'max-h-[95vh] w-full px-1 py-3' : 'max-h-[90vh] p-4 sm:max-w-[1000px]'} flex flex-col`}>
+          <div className={`${isMobile ? 'px-2' : 'p-3 sm:p-6'} pb-0`}>
             <DialogTitle>{editTrade ? 'Edit Trade' : 'Add Trade'}</DialogTitle>
           </div>
           <TradeFormContent

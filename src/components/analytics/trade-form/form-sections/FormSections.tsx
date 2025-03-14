@@ -15,7 +15,7 @@ export const FormSections = ({ direction, setDirection, formValues }: FormSectio
   const isMobile = useIsMobile();
   
   return (
-    <div className={`${isMobile ? 'p-1 pt-0' : 'p-2 md:p-6 pt-2'} grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-6`}>
+    <div className={`${isMobile ? 'p-3 pt-0' : 'p-2 md:p-6 pt-2'} grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-6`}>
       <GeneralSection 
         direction={direction} 
         setDirection={setDirection}

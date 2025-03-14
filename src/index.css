@@ -156,22 +156,31 @@
 
 /* Mobile-specific adjustments */
 @media (max-width: 640px) {
+  /* Ensure proper container padding */
   .container {
-    @apply px-1;
+    @apply px-3;
   }
   
   /* Reduce padding on mobile */
   .p-4 {
-    @apply p-1;
+    @apply p-2;
   }
   
   .p-6 {
-    @apply p-2;
+    @apply p-3;
   }
   
   /* Adjust font sizes for better mobile viewing */
   h1, h2, h3 {
     @apply tracking-tight;
+  }
+
+  h1 {
+    @apply text-2xl;
+  }
+
+  h2 {
+    @apply text-xl;
   }
 
   /* Ensure proper scrolling on mobile */
@@ -182,11 +191,6 @@
     width: 100%;
   }
 
-  /* Fix position of fixed elements */
-  .fixed {
-    position: fixed !important;
-  }
-
   /* Reset problematic max-width constraints */
   #root {
     max-width: 100%;
@@ -195,16 +199,31 @@
     margin: 0;
   }
   
-  /* Fix potential overflow issues */
-  .overflow-hidden {
-    overflow: visible !important;
+  /* Form inputs and buttons */
+  .form-control {
+    @apply p-2 text-sm;
   }
   
-  /* Ensure main content is visible */
-  main {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-    height: calc(100vh - 56px) !important;
-    overflow: auto !important;
+  button {
+    @apply text-sm;
+  }
+  
+  /* Fix spacing in grids */
+  .grid-cols-2 {
+    @apply gap-2;
+  }
+  
+  .grid-cols-3 {
+    @apply gap-2;
+  }
+  
+  /* Add better touch targets */
+  .checkbox, .radio, button, a {
+    min-height: 44px;
+  }
+  
+  /* Improve label readability */
+  label {
+    @apply text-sm font-medium;
   }
 }

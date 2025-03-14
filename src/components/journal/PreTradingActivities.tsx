@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { 
@@ -13,6 +14,7 @@ import {
   Sun,
   Award
 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PreTradingActivitiesProps {
   activities: string[];
@@ -52,10 +54,12 @@ export const PreTradingActivities = ({
   selectedActivities,
   onActivityChange,
 }: PreTradingActivitiesProps) => {
+  const isMobile = useIsMobile();
+  
   return (
     <div className="space-y-4">
       <Label className="text-lg font-medium">Pre-Trading Activities</Label>
-      <div className="grid grid-cols-2 gap-4">
+      <div className={`grid ${isMobile ? 'grid-cols-1 gap-3' : 'grid-cols-2 gap-4'}`}>
         <TooltipProvider>
           {activities.map((activity) => (
             <div key={activity} className="flex items-center space-x-2">
@@ -81,8 +85,8 @@ export const PreTradingActivities = ({
                   </Label>
                 </TooltipTrigger>
                 <TooltipContent 
-                  side="right"
-                  sideOffset={15}
+                  side={isMobile ? "bottom" : "right"}
+                  sideOffset={isMobile ? 5 : 15}
                   className="p-2"
                 >
                   <p>{ACTIVITY_TOOLTIPS[activity]?.text}</p>

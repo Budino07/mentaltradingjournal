@@ -13,7 +13,7 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
         {!isMobile && <AppSidebar />}
         <div className="flex-1 flex flex-col w-full">
           <AppHeader />
-          <main className={`flex-1 p-2 md:p-6 overflow-auto ${isMobile ? 'h-[calc(100vh-56px)]' : ''} animate-fade-in`}>
+          <main className={`flex-1 ${isMobile ? 'p-0 h-[calc(100vh-56px)]' : 'p-6'} overflow-auto animate-fade-in`}>
             {children}
           </main>
         </div>

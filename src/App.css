@@ -59,4 +59,17 @@
     max-height: 100vh;
     overflow-y: auto;
   }
+  
+  /* Add consistent mobile padding */
+  .mobile-container {
+    padding: 0 16px;
+    width: 100%;
+  }
+  
+  /* Center elements properly */
+  .center-mobile {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
 }

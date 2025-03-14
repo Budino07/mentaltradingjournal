@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { SessionProgress } from "./SessionProgress";
@@ -14,6 +13,7 @@ import { ProgressStats } from "./ProgressStats";
 import { TradingOutcomeSection } from "./post-session/TradingOutcomeSection";
 import { TradingRulesSection } from "./post-session/TradingRulesSection";
 import { ObservationsSection } from "./post-session/ObservationsSection";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",
@@ -56,8 +56,8 @@ export const EmotionLogger = ({
   const [oneHourLabel, setOneHourLabel] = useState('1HR/15m');
   
   const { stats } = useProgressTracking();
+  const isMobile = useIsMobile();
 
-  // Set initial session type when provided
   useEffect(() => {
     if (initialSessionType) {
       setSessionType(initialSessionType);
@@ -128,8 +128,8 @@ export const EmotionLogger = ({
   };
 
   return (
-    <div className="grid gap-4 md:gap-6 lg:grid-cols-[1fr,300px] mt-0 md:mt-0">
-      <Card className="p-4 md:p-8 space-y-6 md:space-y-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
+    <div className={`grid gap-4 md:gap-6 lg:grid-cols-[1fr,300px] mt-0 md:mt-0 ${isMobile ? 'mx-0' : ''}`}>
+      <Card className={`${isMobile ? 'p-3' : 'p-4 md:p-8'} space-y-6 md:space-y-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl`}>
         <FormHeader 
           sessionType={sessionType}
           onSessionTypeChange={setSessionType}
@@ -210,13 +210,27 @@ export const EmotionLogger = ({
         </div>
       </Card>
 
-      <ProgressStats 
-        preSessionStreak={stats.preSessionStreak}
-        postSessionStreak={stats.postSessionStreak}
-        dailyStreak={stats.dailyStreak}
-        level={stats.level}
-        levelProgress={stats.levelProgress}
-      />
+      {!isMobile && (
+        <ProgressStats 
+          preSessionStreak={stats.preSessionStreak}
+          postSessionStreak={stats.postSessionStreak}
+          dailyStreak={stats.dailyStreak}
+          level={stats.level}
+          levelProgress={stats.levelProgress}
+        />
+      )}
+      
+      {isMobile && (
+        <div className="mb-4">
+          <ProgressStats 
+            preSessionStreak={stats.preSessionStreak}
+            postSessionStreak={stats.postSessionStreak}
+            dailyStreak={stats.dailyStreak}
+            level={stats.level}
+            levelProgress={stats.levelProgress}
+          />
+        </div>
+      )}
     </div>
   );
 };
