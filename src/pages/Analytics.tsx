@@ -4,9 +4,11 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { SubscriptionGuard } from "@/components/subscription/SubscriptionGuard";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Analytics() {
   const { user, loading } = useAuth();
+  const isMobile = useIsMobile();
 
   if (loading) {
     return (
@@ -25,7 +27,7 @@ export default function Analytics() {
   return (
     <AppLayout>
       <SubscriptionGuard>
-        <div className="container mx-auto px-4 sm:px-6">
+        <div className={`mx-auto ${isMobile ? 'p-1' : 'px-4 sm:px-6'}`}>
           <AnalyticsDashboard />
         </div>
       </SubscriptionGuard>

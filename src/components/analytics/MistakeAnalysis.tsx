@@ -11,6 +11,7 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 import { mistakeCategories } from "@/components/journal/emotionConfig";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TooltipData {
   name: string;
@@ -58,6 +59,8 @@ export const MistakeAnalysis = () => {
     queryFn: generateAnalytics,
   });
   
+  const isMobile = useIsMobile();
+  
   if (isLoading || !analytics) {
     return (
       <Card className="p-4 md:p-6 space-y-4">
@@ -93,15 +96,15 @@ export const MistakeAnalysis = () => {
           </p>
         </div>
 
-        <div className="h-[250px] md:h-[300px] w-full">
+        <div className="h-[200px] md:h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={emptyData}
                 cx="50%"
                 cy="50%"
-                innerRadius={60}
-                outerRadius={80}
+                innerRadius={50}
+                outerRadius={70}
                 fill="#6E59A5"
                 dataKey="value"
               />
@@ -129,29 +132,29 @@ export const MistakeAnalysis = () => {
     };
   }).filter(item => item.value > 0)
     .sort((a, b) => b.loss - a.loss)
-    .slice(0, 6);  // Show top 6 mistakes by loss impact
+    .slice(0, isMobile ? 4 : 6);  // Show fewer items on mobile
 
   const COLORS = ['#6E59A5', '#0EA5E9', '#FEC6A1', '#F87171', '#A78BFA', '#34D399'];
 
   return (
-    <Card className="p-4 md:p-6 space-y-4">
-      <div className="space-y-2">
-        <h3 className="text-xl md:text-2xl font-bold">Behavioral Slippage</h3>
-        <p className="text-sm text-muted-foreground">
+    <Card className="p-3 md:p-6 space-y-4">
+      <div className="space-y-1 md:space-y-2">
+        <h3 className="text-lg md:text-2xl font-bold">Behavioral Slippage</h3>
+        <p className="text-xs md:text-sm text-muted-foreground">
           Analysis of trading mistakes and their impact
         </p>
       </div>
 
-      <div className="h-[250px] md:h-[300px] w-full">
+      <div className={`h-[${isMobile ? '180px' : '250px'}] md:h-[300px] w-full`}>
         <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
+          <PieChart margin={isMobile ? { top: 0, right: 0, bottom: 0, left: 0 } : undefined}>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
-              innerRadius={60}
-              outerRadius={80}
-              paddingAngle={5}
+              innerRadius={isMobile ? 40 : 60}
+              outerRadius={isMobile ? 60 : 80}
+              paddingAngle={4}
               dataKey="value"
               stroke="transparent"
             >
@@ -160,14 +163,14 @@ export const MistakeAnalysis = () => {
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
-            <Legend />
+            <Legend verticalAlign={isMobile ? "bottom" : undefined} layout={isMobile ? "horizontal" : undefined} />
           </PieChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
-        <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
-        <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
+      <div className="space-y-1 md:space-y-2 bg-accent/10 p-2 md:p-4 rounded-lg">
+        <h4 className="font-semibold text-xs md:text-base">AI Insight</h4>
+        <div className="space-y-1 md:space-y-2 text-xs text-muted-foreground">
           {data.length > 0 ? (
             <>
               <p>
@@ -185,4 +188,3 @@ export const MistakeAnalysis = () => {
     </Card>
   );
 };
-

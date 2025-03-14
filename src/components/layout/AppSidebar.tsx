@@ -1,115 +1,189 @@
 
-import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, BrainCircuit, Notebook, LineChart } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSidebar } from "@/components/ui/sidebar";
 import { useState } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  BarChart2,
+  BookOpen,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
+  RefreshCcw,
+  X,
+} from "lucide-react";
 
-const menuItems = [
-  { title: "Journal Entry", icon: Home, url: "/journal-entry" },
-  { title: "Dashboard", icon: BookOpen, url: "/dashboard" },
-  { title: "Analytics", icon: BarChart2, url: "/analytics" },
-  { title: "Backtesting", icon: FlaskConical, url: "/backtesting" },
-  { title: "MFE & MAE Analysis", icon: LineChart, url: "/mfe-mae" },
-  { title: "Notebook", icon: Notebook, url: "/notebook" },
-  { title: "Settings", icon: Settings, url: "/settings" },
-];
+interface AppSidebarProps {
+  mobile?: boolean;
+  onClose?: () => void;
+}
 
-export function AppSidebar() {
-  const [showMentorDialog, setShowMentorDialog] = useState(false);
-  const { setOpenMobile } = useSidebar();
+export const AppSidebar = ({ mobile, onClose }: AppSidebarProps) => {
+  const { open, setOpen } = useSidebar();
+  const navigate = useNavigate();
   const location = useLocation();
-  const isMobile = useIsMobile();
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    if (location.pathname.includes("journal")) return "journal";
+    if (location.pathname.includes("notebook")) return "notebook";
+    if (location.pathname.includes("analytics")) return "analytics";
+    if (location.pathname.includes("backtesting")) return "backtesting";
+    return "journal";
+  });
 
-  // Close mobile sidebar when navigating to a new page
-  const handleNavigation = () => {
-    if (isMobile) {
-      setOpenMobile(false);
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    
+    if (value === "journal") navigate("/journal");
+    if (value === "notebook") navigate("/notebook");
+    if (value === "analytics") navigate("/analytics");
+    if (value === "backtesting") navigate("/backtesting");
+    
+    if (mobile && onClose) {
+      onClose();
     }
   };
 
   return (
-    <>
-      <Sidebar className="w-14 flex-shrink-0 border-r border-primary/20 hidden md:flex" collapsible="none">
-        <SidebarContent>
-          <div className="p-3 flex justify-center">
-            <Link to="/" className="flex items-center justify-center" onClick={handleNavigation}>
-              <BrainCircuit className="w-5 h-5 text-primary transition-all duration-300 hover:text-accent" />
-            </Link>
-          </div>
-          <SidebarGroup>
-            <SidebarGroupContent>
-              <SidebarMenu className="gap-1 py-1">
-                <TooltipProvider>
-                  {menuItems.map((item) => {
-                    const isActive = location.pathname === item.url;
-                    return (
-                      <SidebarMenuItem key={item.title} className="flex justify-center">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <SidebarMenuButton asChild className={`w-10 h-10 flex items-center justify-center ${isActive ? 'bg-primary/10' : ''}`}>
-                              <Link 
-                                to={item.url} 
-                                className="flex items-center justify-center"
-                                onClick={handleNavigation}
-                              >
-                                <item.icon className={`w-4 h-4 ${isActive ? 'text-primary' : ''}`} />
-                              </Link>
-                            </SidebarMenuButton>
-                          </TooltipTrigger>
-                          <TooltipContent side="right" className="bg-popover text-popover-foreground">
-                            {item.title}
-                          </TooltipContent>
-                        </Tooltip>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                  <SidebarMenuItem className="flex justify-center">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <SidebarMenuButton className="w-10 h-10 flex items-center justify-center" onClick={() => setShowMentorDialog(true)}>
-                          <UserCog className="w-4 h-4" />
-                        </SidebarMenuButton>
-                      </TooltipTrigger>
-                      <TooltipContent side="right" className="bg-popover text-popover-foreground">
-                        Mentor Mode
-                      </TooltipContent>
-                    </Tooltip>
-                  </SidebarMenuItem>
-                </TooltipProvider>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-      </Sidebar>
+    <div
+      className={`border-r border-border transition-all duration-300 ${
+        mobile 
+          ? "w-full h-full flex flex-col" 
+          : open 
+            ? "w-64" 
+            : "w-[70px]"
+      } bg-background/50 backdrop-blur-sm p-2 md:p-4`}
+    >
+      <div className="flex items-center justify-between h-12 mb-6">
+        {mobile && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="absolute right-2 top-2"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        )}
+        
+        {!mobile && (
+          <>
+            <div className={`${open ? "block" : "hidden"}`}>
+              <span className="font-bold text-xl">Trade Journal</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setOpen(!open)}
+              className="ml-auto"
+            >
+              {open ? (
+                <ChevronLeft className="h-5 w-5" />
+              ) : (
+                <ChevronRight className="h-5 w-5" />
+              )}
+            </Button>
+          </>
+        )}
+      </div>
 
-      <Dialog open={showMentorDialog} onOpenChange={setShowMentorDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Restricted Access</DialogTitle>
-            <DialogDescription>
-              Access to this feature is restricted. Only members of Tenacity Group are authorized to use it.
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-    </>
+      <Tabs
+        orientation="vertical"
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="w-full flex-1"
+      >
+        <TabsList className="flex flex-col items-start justify-start gap-1 bg-transparent h-auto w-full">
+          <SidebarItem
+            icon={<Calendar className="h-5 w-5" />}
+            label="Journal"
+            value="journal"
+            isExpanded={mobile || open}
+            isActive={activeTab === "journal"}
+          />
+          <SidebarItem
+            icon={<BookOpen className="h-5 w-5" />}
+            label="Notebook"
+            value="notebook"
+            isExpanded={mobile || open}
+            isActive={activeTab === "notebook"}
+          />
+          <SidebarItem
+            icon={<BarChart2 className="h-5 w-5" />}
+            label="Analytics"
+            value="analytics"
+            isExpanded={mobile || open}
+            isActive={activeTab === "analytics"}
+          />
+          <SidebarItem
+            icon={<RefreshCcw className="h-5 w-5" />}
+            label="Backtesting"
+            value="backtesting"
+            isExpanded={mobile || open}
+            isActive={activeTab === "backtesting"}
+          />
+        </TabsList>
+      </Tabs>
+
+      <div className="mt-auto">
+        <SidebarItem
+          icon={<ClipboardList className="h-5 w-5" />}
+          label="Subscription"
+          value="subscription"
+          isExpanded={mobile || open}
+          onClick={() => navigate("/pricing")}
+        />
+      </div>
+    </div>
   );
+};
+
+interface SidebarItemProps {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  isExpanded: boolean;
+  isActive?: boolean;
+  onClick?: () => void;
 }
+
+const SidebarItem = ({
+  icon,
+  label,
+  value,
+  isExpanded,
+  isActive,
+  onClick,
+}: SidebarItemProps) => {
+  if (onClick) {
+    return (
+      <Button
+        onClick={onClick}
+        variant="ghost"
+        className={`w-full justify-start px-2 py-6 h-auto ${
+          isActive ? "bg-muted" : ""
+        }`}
+      >
+        <span className="flex items-center gap-3">
+          {icon}
+          {isExpanded && <span>{label}</span>}
+        </span>
+      </Button>
+    );
+  }
+
+  return (
+    <TabsTrigger
+      value={value}
+      className={`w-full justify-start px-2 py-6 h-auto ${
+        isActive ? "data-[state=active]:bg-muted" : ""
+      }`}
+    >
+      <span className="flex items-center gap-3">
+        {icon}
+        {isExpanded && <span>{label}</span>}
+      </span>
+    </TabsTrigger>
+  );
+};
