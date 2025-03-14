@@ -260,7 +260,7 @@ export const StatsHeader = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-start gap-2 items-center flex-wrap">
+      <div className="flex flex-wrap items-center gap-2 overflow-x-auto pb-2">
         <Button
           variant="ghost"
           size="icon"
@@ -275,49 +275,61 @@ export const StatsHeader = () => {
           )}
         </Button>
         
-        <Button 
-          variant={timeFilter === "this-month" ? "default" : "outline"}
-          onClick={() => setTimeFilter("this-month")}
-          disabled={!hasEntries}
-        >
-          This Month
-        </Button>
-        <Button 
-          variant={timeFilter === "last-month" ? "default" : "outline"}
-          onClick={() => setTimeFilter("last-month")}
-          disabled={!hasEntries}
-        >
-          Last Month
-        </Button>
-        <Button 
-          variant={timeFilter === "last-three-months" ? "default" : "outline"}
-          onClick={() => setTimeFilter("last-three-months")}
-          disabled={!hasEntries}
-        >
-          Last Quarter
-        </Button>
-        <Button 
-          variant={timeFilter === "last-year" ? "default" : "outline"}
-          onClick={() => setTimeFilter("last-year")}
-          disabled={!hasEntries}
-        >
-          Last Year
-        </Button>
-        <Button 
-          variant={timeFilter === "eternal" ? "default" : "outline"}
-          onClick={() => setTimeFilter("eternal")}
-          disabled={!hasEntries}
-        >
-          Eternal
-        </Button>
+        <div className="flex flex-nowrap gap-1 overflow-x-auto scrollbar-none">
+          <Button 
+            variant={timeFilter === "this-month" ? "default" : "outline"}
+            onClick={() => setTimeFilter("this-month")}
+            disabled={!hasEntries}
+            className="text-xs md:text-sm whitespace-nowrap"
+            size="sm"
+          >
+            This Month
+          </Button>
+          <Button 
+            variant={timeFilter === "last-month" ? "default" : "outline"}
+            onClick={() => setTimeFilter("last-month")}
+            disabled={!hasEntries}
+            className="text-xs md:text-sm whitespace-nowrap"
+            size="sm"
+          >
+            Last Month
+          </Button>
+          <Button 
+            variant={timeFilter === "last-three-months" ? "default" : "outline"}
+            onClick={() => setTimeFilter("last-three-months")}
+            disabled={!hasEntries}
+            className="text-xs md:text-sm whitespace-nowrap"
+            size="sm"
+          >
+            Last Quarter
+          </Button>
+          <Button 
+            variant={timeFilter === "last-year" ? "default" : "outline"}
+            onClick={() => setTimeFilter("last-year")}
+            disabled={!hasEntries}
+            className="text-xs md:text-sm whitespace-nowrap"
+            size="sm"
+          >
+            Last Year
+          </Button>
+          <Button 
+            variant={timeFilter === "eternal" ? "default" : "outline"}
+            onClick={() => setTimeFilter("eternal")}
+            disabled={!hasEntries}
+            className="text-xs md:text-sm whitespace-nowrap"
+            size="sm"
+          >
+            Eternal
+          </Button>
+        </div>
         
-        <div className="relative ml-2">
+        <div className="relative ml-auto">
           {isSearching ? (
             <div className="flex items-center rounded-md bg-background/95 backdrop-blur-sm border border-primary/20 overflow-hidden">
               <Input
                 type="text"
                 placeholder="Search entries..."
-                className="h-9 border-none focus-visible:ring-0 bg-transparent rounded-none"
+                className="h-8 border-none focus-visible:ring-0 bg-transparent rounded-none w-[120px] md:w-auto"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
@@ -325,7 +337,7 @@ export const StatsHeader = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 rounded-none"
+                className="h-8 w-8 rounded-none"
                 onClick={() => {
                   setSearchQuery("");
                   setIsSearching(false);
@@ -343,11 +355,12 @@ export const StatsHeader = () => {
           ) : (
             <Button
               variant="outline"
-              className="flex items-center gap-2"
+              size="sm"
+              className="flex items-center gap-1 text-xs md:text-sm"
               onClick={() => setIsSearching(true)}
             >
-              <Search className="h-4 w-4" />
-              <span>Search</span>
+              <Search className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="md:inline">Search</span>
             </Button>
           )}
           
@@ -418,44 +431,44 @@ export const StatsHeader = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4 hover:shadow-lg transition-shadow">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-muted-foreground">Net P&L</span>
-            <DollarSign className="h-4 w-4 text-primary" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+        <Card className="p-3 md:p-4 hover:shadow-lg transition-shadow">
+          <div className="flex items-center justify-between mb-1 md:mb-2">
+            <span className="text-xs md:text-sm font-medium text-muted-foreground">Net P&L</span>
+            <DollarSign className="h-3 w-3 md:h-4 md:w-4 text-primary" />
           </div>
-          <div className="text-2xl font-bold text-foreground">
+          <div className="text-base md:text-2xl font-bold text-foreground">
             ${hasEntries ? Math.abs(netPnL).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
           </div>
-          <div className={`text-sm ${netPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+          <div className={`text-xs md:text-sm ${netPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
             {hasEntries ? (netPnL >= 0 ? '▲ Profit' : '▼ Loss') : '-'}
           </div>
         </Card>
 
-        <Card className="p-4 hover:shadow-lg transition-shadow">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-muted-foreground">Emotion Meter</span>
-            <Smile className="h-4 w-4 text-accent-dark" />
+        <Card className="p-3 md:p-4 hover:shadow-lg transition-shadow">
+          <div className="flex items-center justify-between mb-1 md:mb-2">
+            <span className="text-xs md:text-sm font-medium text-muted-foreground">Emotion Meter</span>
+            <Smile className="h-3 w-3 md:h-4 md:w-4 text-accent-dark" />
           </div>
-          <div className="text-2xl font-bold text-foreground">
+          <div className="text-base md:text-2xl font-bold text-foreground">
             {hasEntries ? emotionScore.toFixed(0) : '0'}%
           </div>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-xs md:text-sm text-muted-foreground">
             Positive Emotions
           </div>
         </Card>
 
         <TradeWinPercentage timeFilter={timeFilter} hasEntries={hasEntries} />
 
-        <Card className="p-4 hover:shadow-lg transition-shadow">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-muted-foreground">Daily Streak</span>
-            <Flame className="h-4 w-4 text-orange-500" />
+        <Card className="p-3 md:p-4 hover:shadow-lg transition-shadow">
+          <div className="flex items-center justify-between mb-1 md:mb-2">
+            <span className="text-xs md:text-sm font-medium text-muted-foreground">Daily Streak</span>
+            <Flame className="h-3 w-3 md:h-4 md:w-4 text-orange-500" />
           </div>
-          <div className="text-2xl font-bold text-foreground">
+          <div className="text-base md:text-2xl font-bold text-foreground">
             {stats.dailyStreak}
           </div>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-xs md:text-sm text-muted-foreground">
             Days Active
           </div>
         </Card>
@@ -463,4 +476,3 @@ export const StatsHeader = () => {
     </div>
   );
 };
-

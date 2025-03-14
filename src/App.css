@@ -1,7 +1,8 @@
+
 #root {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0;
   text-align: center;
 }
 
@@ -39,4 +40,15 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .card {
+    padding: 1em;
+  }
+  
+  body {
+    overflow-x: hidden;
+  }
 }
