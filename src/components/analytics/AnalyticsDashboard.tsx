@@ -21,13 +21,11 @@ import { EquityCurve } from "./EquityCurve";
 import { EmotionFrequency } from "./EmotionFrequency";
 import { SetupPerformance } from "./SetupPerformance";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const queryClient = new QueryClient();
 
 export const AnalyticsDashboard = () => {
   const [activeView, setActiveView] = useState<'all' | 'psychological' | 'trading'>('all');
-  const isMobile = useIsMobile();
 
   const psychologicalComponents = [
     EmotionTrend,
@@ -41,7 +39,7 @@ export const AnalyticsDashboard = () => {
   const tradingComponents = [
     EquityCurve,
     TimeBasedPerformance,
-    SetupPerformance,
+    SetupPerformance, // Added new component
     AssetPairPerformance,
     PerformanceBreakdown,
     RuleAdherence,
@@ -67,44 +65,41 @@ export const AnalyticsDashboard = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className={`${isMobile ? 'p-1' : 'p-4'} space-y-4 md:space-y-6`}>
-        <div className="space-y-3 md:space-y-4">
-          <div className="space-y-1 md:space-y-2">
-            <h2 className="text-xl md:text-3xl font-bold">Trading Analytics</h2>
-            <p className="text-xs md:text-base text-muted-foreground">
+      <div className="container mx-auto p-4 space-y-6">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <h2 className="text-2xl md:text-3xl font-bold">Trading Analytics</h2>
+            <p className="text-sm md:text-base text-muted-foreground">
               Analyze your trading performance and emotional patterns
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-2">
             <Button
               variant={activeView === 'all' ? 'default' : 'outline'}
               onClick={() => setActiveView('all')}
-              className="text-xs md:text-sm py-1 md:py-2 px-2 md:px-3 h-auto"
-              size={isMobile ? "sm" : "default"}
+              className="flex-1 sm:flex-none"
             >
               All Analytics
             </Button>
             <Button
               variant={activeView === 'psychological' ? 'default' : 'outline'}
               onClick={() => setActiveView('psychological')}
-              className="text-xs md:text-sm py-1 md:py-2 px-2 md:px-3 h-auto"
-              size={isMobile ? "sm" : "default"}
+              className="flex-1 sm:flex-none"
             >
-              Psychological
+              Psychological Analytics
             </Button>
             <Button
               variant={activeView === 'trading' ? 'default' : 'outline'}
               onClick={() => setActiveView('trading')}
-              className="text-xs md:text-sm py-1 md:py-2 px-2 md:px-3 h-auto"
-              size={isMobile ? "sm" : "default"}
+              className="flex-1 sm:flex-none"
             >
               Trading Analytics
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {getFilteredComponents().map((Component, index) => (
             <Component key={index} />
           ))}

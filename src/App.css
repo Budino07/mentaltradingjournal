@@ -53,24 +53,10 @@
     max-height: calc(100vh - 56px);
     overflow: auto;
     -webkit-overflow-scrolling: touch;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
   }
   
   .sheet-content-mobile {
     max-height: 100vh;
     overflow-y: auto;
-  }
-  
-  /* Fix for overlapping sidebar in analytics */
-  .sidebar-open main {
-    opacity: 0.3;
-    pointer-events: none;
-  }
-  
-  /* Ensure cards are properly sized on mobile */
-  .card {
-    padding: 1em;
-    width: 100% !important;
   }
 }
