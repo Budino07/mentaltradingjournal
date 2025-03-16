@@ -136,23 +136,23 @@ const Features = () => {
             </Button>
           </div>
 
-          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
+          <div className="relative rounded-3xl overflow-hidden shadow-xl lg:-mt-12">
             <div className="absolute inset-0 bg-primary/20 blur-3xl transform scale-95 opacity-75" />
             <img 
               src="/lovable-uploads/6dc0af88-bdd4-4e40-bac9-41e9c628210c.png"
               alt="Pre-Session Check In Interface"
-              className="w-full h-auto relative z-10 rounded-none"
+              className="w-full h-auto relative z-10 rounded-3xl"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
-          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12 order-2 lg:order-1">
+          <div className="relative rounded-3xl overflow-hidden shadow-xl lg:-mt-12 order-2 lg:order-1">
             <div className="absolute inset-0 bg-accent/20 blur-3xl transform scale-95 opacity-75" />
             <img 
               src="/lovable-uploads/de242c5d-0542-40eb-8e59-2f098cac49b6.png"
               alt="Post-Session Review Interface"
-              className="w-full h-auto relative z-10 rounded-none"
+              className="w-full h-auto relative z-10 rounded-3xl"
             />
           </div>
 
@@ -190,23 +190,23 @@ const Features = () => {
             </Button>
           </div>
 
-          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
+          <div className="relative rounded-3xl overflow-hidden shadow-xl lg:-mt-12">
             <div className="absolute inset-0 bg-primary/20 blur-3xl transform scale-95 opacity-75" />
             <img 
               src="/lovable-uploads/b06d7989-09be-4722-818f-0ba153938e66.png"
               alt="Notes Preview"
-              className="w-full h-auto relative z-10 rounded-none"
+              className="w-full h-auto relative z-10 rounded-3xl"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
-          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12 order-2 lg:order-1">
+          <div className="relative rounded-3xl overflow-hidden shadow-xl lg:-mt-12 order-2 lg:order-1">
             <div className="absolute inset-0 bg-accent/20 blur-3xl transform scale-95 opacity-75" />
             <img 
               src="/lovable-uploads/a32bb899-4b99-4c2b-b6fc-431be6694e55.png"
               alt="Analytics Charts"
-              className="w-full h-auto relative z-10 rounded-none"
+              className="w-full h-auto relative z-10 rounded-3xl"
             />
           </div>
 
@@ -244,12 +244,12 @@ const Features = () => {
             </Button>
           </div>
 
-          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
+          <div className="relative rounded-3xl overflow-hidden shadow-xl lg:-mt-12">
             <div className="absolute inset-0 bg-primary/20 blur-3xl transform scale-95 opacity-75" />
             <img 
               src="/lovable-uploads/96f163b4-4cee-480d-bc9e-986594419582.png"
               alt="Backtesting Journal Interface"
-              className="w-full h-auto relative z-10 rounded-none"
+              className="w-full h-auto relative z-10 rounded-3xl"
             />
           </div>
         </div>
