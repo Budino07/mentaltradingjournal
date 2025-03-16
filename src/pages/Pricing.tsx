@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link } from "react-router-dom";
 import { Check, User } from "lucide-react";
@@ -14,6 +13,11 @@ import {
 import { Input } from "@/components/ui/input";
 
 const Pricing = () => {
+  // Add useEffect to scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const navigate = useNavigate();
   const { user, signOut, updateUsername } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
