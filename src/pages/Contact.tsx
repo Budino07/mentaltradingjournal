@@ -1,15 +1,10 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Footer } from "@/components/landing/Footer";
 import { Mail, Instagram, Twitter, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Contact = () => {
-  // Add useEffect to scroll to top when component mounts
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <div className="min-h-screen relative bg-[#1A1F2C] overflow-x-hidden">
       {/* Background effects - similar to landing page for consistency */}

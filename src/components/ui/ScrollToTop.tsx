@@ -6,10 +6,8 @@ export const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: "instant", // Using "instant" instead of "smooth" to avoid animation issues
-    });
+    // Force scroll to top immediately when pathname changes
+    window.scrollTo(0, 0);
   }, [pathname]);
 
   return null;

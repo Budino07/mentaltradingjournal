@@ -4,11 +4,6 @@ import { Twitter, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
-  // Helper function to scroll to top when internal links are clicked
-  const handleLinkClick = () => {
-    window.scrollTo(0, 0);
-  };
-
   return (
     <footer className="bg-[#1A1F2C] py-8 sm:py-12 md:py-16 border-t border-white/5">
       <div className="container mx-auto px-3 md:px-4">
@@ -27,22 +22,22 @@ export const Footer = () => {
           <div className="flex justify-center mt-4 md:mt-0">
             <ul className="space-y-2 sm:space-y-3">
               <li>
-                <Link to="/login" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base" onClick={handleLinkClick}>
+                <Link to="/login" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
                   Log In
                 </Link>
               </li>
               <li>
-                <Link to="/features" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base" onClick={handleLinkClick}>
+                <Link to="/features" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
                   Features
                 </Link>
               </li>
               <li>
-                <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base" onClick={handleLinkClick}>
+                <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base" onClick={handleLinkClick}>
+                <Link to="/contact" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
                   Contact Us
                 </Link>
               </li>
