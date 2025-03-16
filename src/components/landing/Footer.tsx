@@ -37,6 +37,11 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/contact" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
+                  Contact Us
+                </Link>
+              </li>
+              <li>
                 <a 
                   href="https://discord.gg/pBXQnErHYg" 
                   target="_blank" 
@@ -52,20 +57,24 @@ export const Footer = () => {
           {/* Social Media */}
           <div className="flex flex-col items-center md:items-end mt-4 md:mt-0">
             <div className="flex space-x-3">
-              <Link 
-                to="#" 
+              <a 
+                href="https://x.com/mentaltjournal" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-8 h-8 sm:w-10 sm:h-10 rounded-md bg-[#12151E] flex items-center justify-center text-gray-300 hover:text-primary-light transition-colors"
                 aria-label="Twitter"
               >
                 <Twitter className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Link>
-              <Link 
-                to="#" 
+              </a>
+              <a 
+                href="https://instagram.com/mentaltradingjournal" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-8 h-8 sm:w-10 sm:h-10 rounded-md bg-[#12151E] flex items-center justify-center text-gray-300 hover:text-primary-light transition-colors"
                 aria-label="Instagram"
               >
                 <Instagram className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Link>
+              </a>
             </div>
           </div>
         </div>

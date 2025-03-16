@@ -9,6 +9,7 @@ import { ThemeProvider } from "next-themes";
 import Landing from "./pages/Landing";
 import Features from "./pages/Features";
 import Pricing from "./pages/Pricing";
+import Contact from "./pages/Contact";
 import Index from "./pages/Index";
 import Journal from "./pages/Journal";
 import Analytics from "./pages/Analytics";
@@ -61,6 +62,7 @@ const App = () => {
                   <Route path="/" element={<Landing />} />
                   <Route path="/features" element={<Features />} />
                   <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/contact" element={<Contact />} />
                   <Route path="/login" element={<Login />} />
                   
                   {/* Protected routes */}
