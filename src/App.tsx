@@ -19,6 +19,7 @@ import Notebook from "./pages/Notebook";
 import Login from "./pages/Login";
 import MfeMae from "./pages/MfeMae";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { ScrollToTop } from "./components/ui/ScrollToTop";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,6 +58,7 @@ const App = () => {
               <Toaster />
               <Sonner />
               <BrowserRouter>
+                <ScrollToTop />
                 <Routes>
                   {/* Public routes */}
                   <Route path="/" element={<Landing />} />
