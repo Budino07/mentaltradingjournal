@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { AnalyticsSection } from "@/components/landing/AnalyticsSection";
@@ -8,11 +9,6 @@ import { Link } from "react-router-dom";
 
 const Landing = () => {
   const navigate = useNavigate();
-
-  // Add useEffect to scroll to top when component mounts
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <div className="min-h-screen relative bg-[#1A1F2C] overflow-x-hidden">
