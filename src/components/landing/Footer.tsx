@@ -1,16 +1,20 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Twitter, Instagram, Shield, FileText } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Footer = () => {
-  // Add a function to handle scrolling to top on link click
-  const handleLinkClick = () => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "instant" // Use instant instead of smooth for immediate effect
-    });
+  const navigate = useNavigate();
+  
+  // Handle link click with navigation and forced scroll
+  const handleLinkClick = (path: string, e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent default link behavior
+    window.scrollTo(0, 0); // Immediately scroll to top
+    
+    // Use setTimeout to ensure scroll happens before navigation
+    setTimeout(() => {
+      navigate(path);
+    }, 0);
   };
 
   return (
@@ -31,40 +35,40 @@ export const Footer = () => {
           <div className="flex justify-center mt-4 md:mt-0">
             <ul className="space-y-2 sm:space-y-3">
               <li>
-                <Link 
-                  to="/login" 
+                <a 
+                  href="/login" 
                   className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
-                  onClick={handleLinkClick}
+                  onClick={(e) => handleLinkClick('/login', e)}
                 >
                   Log In
-                </Link>
+                </a>
               </li>
               <li>
-                <Link 
-                  to="/features" 
+                <a 
+                  href="/features" 
                   className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
-                  onClick={handleLinkClick}
+                  onClick={(e) => handleLinkClick('/features', e)}
                 >
                   Features
-                </Link>
+                </a>
               </li>
               <li>
-                <Link 
-                  to="/pricing" 
+                <a 
+                  href="/pricing" 
                   className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
-                  onClick={handleLinkClick}
+                  onClick={(e) => handleLinkClick('/pricing', e)}
                 >
                   Pricing
-                </Link>
+                </a>
               </li>
               <li>
-                <Link 
-                  to="/contact" 
+                <a 
+                  href="/contact" 
                   className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
-                  onClick={handleLinkClick}
+                  onClick={(e) => handleLinkClick('/contact', e)}
                 >
                   Contact Us
-                </Link>
+                </a>
               </li>
               <li>
                 <a 
@@ -104,22 +108,22 @@ export const Footer = () => {
             
             {/* Legal Links */}
             <div className="mt-5 flex flex-col items-center md:items-end space-y-2">
-              <Link 
-                to="/privacy-policy" 
+              <a 
+                href="/privacy-policy" 
                 className="text-xs sm:text-sm text-gray-400 hover:text-primary-light transition-colors flex items-center gap-1.5"
-                onClick={handleLinkClick}
+                onClick={(e) => handleLinkClick('/privacy-policy', e)}
               >
                 <Shield className="h-3.5 w-3.5" />
                 Privacy Policy
-              </Link>
-              <Link 
-                to="/terms-of-service" 
+              </a>
+              <a 
+                href="/terms-of-service" 
                 className="text-xs sm:text-sm text-gray-400 hover:text-primary-light transition-colors flex items-center gap-1.5"
-                onClick={handleLinkClick}
+                onClick={(e) => handleLinkClick('/terms-of-service', e)}
               >
                 <FileText className="h-3.5 w-3.5" />
                 Terms of Service
-              </Link>
+              </a>
             </div>
           </div>
         </div>
@@ -131,4 +135,3 @@ export const Footer = () => {
     </footer>
   );
 };
-
