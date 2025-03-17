@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Twitter, Instagram, Shield } from "lucide-react";
+import { Twitter, Instagram, Shield, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
@@ -77,14 +77,21 @@ export const Footer = () => {
               </a>
             </div>
             
-            {/* Privacy Policy Link */}
-            <div className="mt-5 flex items-center">
+            {/* Legal Links */}
+            <div className="mt-5 flex flex-col items-center md:items-end space-y-2">
               <Link 
                 to="/privacy-policy" 
                 className="text-xs sm:text-sm text-gray-400 hover:text-primary-light transition-colors flex items-center gap-1.5"
               >
                 <Shield className="h-3.5 w-3.5" />
                 Privacy Policy
+              </Link>
+              <Link 
+                to="/terms-of-service" 
+                className="text-xs sm:text-sm text-gray-400 hover:text-primary-light transition-colors flex items-center gap-1.5"
+              >
+                <FileText className="h-3.5 w-3.5" />
+                Terms of Service
               </Link>
             </div>
           </div>
