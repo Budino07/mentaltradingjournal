@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Twitter, Instagram } from "lucide-react";
+import { Twitter, Instagram, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
@@ -75,6 +75,17 @@ export const Footer = () => {
               >
                 <Instagram className="h-4 w-4 sm:h-5 sm:w-5" />
               </a>
+            </div>
+            
+            {/* Privacy Policy Link */}
+            <div className="mt-5 flex items-center">
+              <Link 
+                to="/privacy-policy" 
+                className="text-xs sm:text-sm text-gray-400 hover:text-primary-light transition-colors flex items-center gap-1.5"
+              >
+                <Shield className="h-3.5 w-3.5" />
+                Privacy Policy
+              </Link>
             </div>
           </div>
         </div>
