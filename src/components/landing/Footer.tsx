@@ -4,6 +4,15 @@ import { Twitter, Instagram, Shield, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
+  // Add a function to handle scrolling to top on link click
+  const handleLinkClick = () => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant" // Use instant instead of smooth for immediate effect
+    });
+  };
+
   return (
     <footer className="bg-[#1A1F2C] py-8 sm:py-12 md:py-16 border-t border-white/5">
       <div className="container mx-auto px-3 md:px-4">
@@ -22,22 +31,38 @@ export const Footer = () => {
           <div className="flex justify-center mt-4 md:mt-0">
             <ul className="space-y-2 sm:space-y-3">
               <li>
-                <Link to="/login" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
+                <Link 
+                  to="/login" 
+                  className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
+                  onClick={handleLinkClick}
+                >
                   Log In
                 </Link>
               </li>
               <li>
-                <Link to="/features" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
+                <Link 
+                  to="/features" 
+                  className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
+                  onClick={handleLinkClick}
+                >
                   Features
                 </Link>
               </li>
               <li>
-                <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
+                <Link 
+                  to="/pricing" 
+                  className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
+                  onClick={handleLinkClick}
+                >
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
+                <Link 
+                  to="/contact" 
+                  className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
+                  onClick={handleLinkClick}
+                >
                   Contact Us
                 </Link>
               </li>
@@ -82,6 +107,7 @@ export const Footer = () => {
               <Link 
                 to="/privacy-policy" 
                 className="text-xs sm:text-sm text-gray-400 hover:text-primary-light transition-colors flex items-center gap-1.5"
+                onClick={handleLinkClick}
               >
                 <Shield className="h-3.5 w-3.5" />
                 Privacy Policy
@@ -89,6 +115,7 @@ export const Footer = () => {
               <Link 
                 to="/terms-of-service" 
                 className="text-xs sm:text-sm text-gray-400 hover:text-primary-light transition-colors flex items-center gap-1.5"
+                onClick={handleLinkClick}
               >
                 <FileText className="h-3.5 w-3.5" />
                 Terms of Service
@@ -104,3 +131,4 @@ export const Footer = () => {
     </footer>
   );
 };
+
