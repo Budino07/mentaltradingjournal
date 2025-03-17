@@ -7,7 +7,11 @@ export const ScrollToTop = () => {
 
   useEffect(() => {
     // Force scroll to top immediately when pathname changes
-    window.scrollTo(0, 0);
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant" // Use instant instead of smooth for immediate effect
+    });
   }, [pathname]);
 
   return null;
