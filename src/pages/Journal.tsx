@@ -1,3 +1,4 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -14,6 +15,7 @@ import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
 import { startOfDay, endOfDay } from "date-fns";
 import { useLocation } from "react-router-dom";
 import { SubscriptionGuard } from "@/components/subscription/SubscriptionGuard";
+import { JournalTradesList } from "@/components/journal/TradesList";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
@@ -252,6 +254,9 @@ const Journal = () => {
                 )}
               </ScrollArea>
             </Card>
+            
+            {/* Add the Trades List component */}
+            <JournalTradesList />
           </div>
         </TimeFilterProvider>
       </SubscriptionGuard>
