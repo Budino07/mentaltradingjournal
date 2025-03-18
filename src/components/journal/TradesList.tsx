@@ -20,7 +20,7 @@ export const JournalTradesList = () => {
         // Fetch all journal entries with trades
         const { data, error } = await supabase
           .from('journal_entries')
-          .select('trades')
+          .select('trades, created_at')
           .eq('user_id', user.id)
           .not('trades', 'is', null);
           
@@ -30,11 +30,20 @@ export const JournalTradesList = () => {
         }
         
         // Extract trades from all entries and flatten them into a single array
-        const extractedTrades: Trade[] = data
-          .flatMap(entry => entry.trades || [])
-          .filter(trade => trade && Object.keys(trade).length > 0);
-          
-        setTrades(extractedTrades);
+        const extractedTrades: Trade[] = [];
+        
+        data.forEach(entry => {
+          if (entry.trades && Array.isArray(entry.trades)) {
+            // Add created_at to each trade for journaling linking
+            const tradesWithDate = entry.trades.map((trade: any) => ({
+              ...trade,
+              journalDate: entry.created_at
+            }));
+            extractedTrades.push(...tradesWithDate);
+          }
+        });
+        
+        setTrades(extractedTrades.filter(trade => trade && Object.keys(trade).length > 0));
       } catch (error) {
         console.error('Error in fetching trades:', error);
       } finally {
