@@ -9,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { ArrowUp, ArrowDown, Star, Edit, Trash, Plus } from "lucide-react";
+import { ArrowUp, ArrowDown, Star, Edit, Trash, Plus, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/utils/dateUtils";
 import { Trade } from "@/types/trade";
@@ -19,9 +19,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import { TradeDeleteDialog } from "@/components/journal/entry/trade-item/TradeDeleteDialog";
 import { Card } from "@/components/ui/card";
 
+type SortField = 'entryDate' | 'instrument' | 'direction' | 'setup' | 'pnl' | 'exitDate';
+type SortDirection = 'asc' | 'desc';
+
 export const TradesTable = ({ trades }: { trades: Trade[] }) => {
   const { user } = useAuth();
   const [isAddTradeOpen, setIsAddTradeOpen] = useState(false);
+  const [sortField, setSortField] = useState<SortField>('entryDate');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [sortedTrades, setSortedTrades] = useState<Trade[]>([]);
+  
   const {
     isEditDialogOpen,
     setIsEditDialogOpen,
@@ -33,6 +40,51 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
     handleDeleteConfirm,
     handleTradeUpdate
   } = useTradeActions(user);
+
+  useEffect(() => {
+    const sorted = [...trades].sort((a, b) => {
+      switch (sortField) {
+        case 'entryDate':
+          if (!a.entryDate) return sortDirection === 'asc' ? 1 : -1;
+          if (!b.entryDate) return sortDirection === 'asc' ? -1 : 1;
+          return sortDirection === 'asc' 
+            ? new Date(a.entryDate).getTime() - new Date(b.entryDate).getTime()
+            : new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime();
+        
+        case 'exitDate':
+          if (!a.exitDate) return sortDirection === 'asc' ? 1 : -1;
+          if (!b.exitDate) return sortDirection === 'asc' ? -1 : 1;
+          return sortDirection === 'asc' 
+            ? new Date(a.exitDate).getTime() - new Date(b.exitDate).getTime()
+            : new Date(b.exitDate).getTime() - new Date(a.exitDate).getTime();
+            
+        case 'pnl':
+          const aPnl = parseFloat(String(a.pnl || a.profit_loss || 0));
+          const bPnl = parseFloat(String(b.pnl || b.profit_loss || 0));
+          return sortDirection === 'asc' ? aPnl - bPnl : bPnl - aPnl;
+          
+        case 'instrument':
+          return sortDirection === 'asc' 
+            ? (a.instrument || '').localeCompare(b.instrument || '')
+            : (b.instrument || '').localeCompare(a.instrument || '');
+        
+        case 'direction':
+          return sortDirection === 'asc' 
+            ? (a.direction || '').localeCompare(b.direction || '')
+            : (b.direction || '').localeCompare(a.direction || '');
+        
+        case 'setup':
+          return sortDirection === 'asc' 
+            ? (a.setup || '').localeCompare(b.setup || '')
+            : (b.setup || '').localeCompare(a.setup || '');
+            
+        default:
+          return 0;
+      }
+    });
+    
+    setSortedTrades(sorted);
+  }, [trades, sortField, sortDirection]);
 
   const getTradePnLColor = (pnl: number | string | undefined) => {
     if (!pnl) return "text-gray-400";
@@ -59,6 +111,26 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
     }, 100);
   };
 
+  const handleSort = (field: SortField) => {
+    if (field === sortField) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Default to descending for new field
+      setSortField(field);
+      setSortDirection('desc');
+    }
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />;
+    }
+    return sortDirection === 'asc' 
+      ? <ArrowUp className="ml-1 h-4 w-4" /> 
+      : <ArrowDown className="ml-1 h-4 w-4" />;
+  };
+
   return (
     <Card className="p-6 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
       <div className="flex justify-between items-center mb-4">
@@ -76,18 +148,48 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]"></TableHead>
-              <TableHead>Entry Date</TableHead>
-              <TableHead>Instrument</TableHead>
-              <TableHead>Direction</TableHead>
-              <TableHead>Setup</TableHead>
-              <TableHead className="text-right">P&L</TableHead>
-              <TableHead>Exit Date</TableHead>
+              <TableHead onClick={() => handleSort('entryDate')} className="cursor-pointer">
+                <div className="flex items-center">
+                  Entry Date
+                  {getSortIcon('entryDate')}
+                </div>
+              </TableHead>
+              <TableHead onClick={() => handleSort('instrument')} className="cursor-pointer">
+                <div className="flex items-center">
+                  Instrument
+                  {getSortIcon('instrument')}
+                </div>
+              </TableHead>
+              <TableHead onClick={() => handleSort('direction')} className="cursor-pointer">
+                <div className="flex items-center">
+                  Direction
+                  {getSortIcon('direction')}
+                </div>
+              </TableHead>
+              <TableHead onClick={() => handleSort('setup')} className="cursor-pointer">
+                <div className="flex items-center">
+                  Setup
+                  {getSortIcon('setup')}
+                </div>
+              </TableHead>
+              <TableHead onClick={() => handleSort('pnl')} className="cursor-pointer text-right">
+                <div className="flex items-center justify-end">
+                  P&L
+                  {getSortIcon('pnl')}
+                </div>
+              </TableHead>
+              <TableHead onClick={() => handleSort('exitDate')} className="cursor-pointer">
+                <div className="flex items-center">
+                  Exit Date
+                  {getSortIcon('exitDate')}
+                </div>
+              </TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {trades.length > 0 ? (
-              trades.map((trade) => (
+            {sortedTrades.length > 0 ? (
+              sortedTrades.map((trade) => (
                 <TableRow 
                   key={trade.id} 
                   className="hover:bg-muted/50 cursor-pointer"
