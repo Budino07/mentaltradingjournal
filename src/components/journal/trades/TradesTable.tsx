@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { ArrowUp, ArrowDown, Star, Edit, Trash, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/components/journal/entry/utils/dateUtils";
+import { formatDate } from "@/utils/dateUtils";
 import { Trade } from "@/types/trade";
 import { AddTradeDialog } from "@/components/analytics/AddTradeDialog";
 import { useTradeActions } from "@/components/journal/entry/hooks/useTradeActions";
@@ -38,6 +38,25 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
     if (!pnl) return "text-gray-400";
     const numPnl = typeof pnl === 'string' ? parseFloat(pnl) : pnl;
     return numPnl > 0 ? "text-green-500" : numPnl < 0 ? "text-red-500" : "text-gray-400";
+  };
+
+  const handleRowClick = (trade: Trade) => {
+    if (!trade.entryDate) return;
+
+    // Create a custom event to select this date in the calendar
+    const date = new Date(trade.entryDate);
+    const event = new CustomEvent('journal-date-select', { 
+      detail: { date }
+    });
+    window.dispatchEvent(event);
+    
+    // Scroll to journal entries section
+    setTimeout(() => {
+      const journalEntriesSection = document.querySelector('#journal-entries');
+      if (journalEntriesSection) {
+        journalEntriesSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   return (
@@ -69,7 +88,15 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
           <TableBody>
             {trades.length > 0 ? (
               trades.map((trade) => (
-                <TableRow key={trade.id} className="hover:bg-muted/50">
+                <TableRow 
+                  key={trade.id} 
+                  className="hover:bg-muted/50 cursor-pointer"
+                  onClick={(e) => {
+                    // Don't trigger row click when clicking on action buttons
+                    if ((e.target as HTMLElement).closest('button')) return;
+                    handleRowClick(trade);
+                  }}
+                >
                   <TableCell>
                     {trade.direction === 'buy' ? (
                       <ArrowUp className="h-4 w-4 text-green-500" />
@@ -77,7 +104,7 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
                       <ArrowDown className="h-4 w-4 text-red-500" />
                     )}
                   </TableCell>
-                  <TableCell>{trade.entryDate ? formatDate(new Date(trade.entryDate)) : '-'}</TableCell>
+                  <TableCell>{trade.entryDate ? formatDate(trade.entryDate) : '-'}</TableCell>
                   <TableCell>{trade.instrument || '-'}</TableCell>
                   <TableCell className={trade.direction === 'buy' ? 'text-green-500' : 'text-red-500'}>
                     {trade.direction?.toUpperCase() || '-'}
@@ -88,13 +115,16 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
                       Number(trade.pnl || trade.profit_loss).toFixed(2) : 
                       '-'}
                   </TableCell>
-                  <TableCell>{trade.exitDate ? formatDate(new Date(trade.exitDate)) : '-'}</TableCell>
+                  <TableCell>{trade.exitDate ? formatDate(trade.exitDate) : '-'}</TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        onClick={() => handleEditClick(trade)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditClick(trade);
+                        }}
                         title="Edit trade"
                       >
                         <Edit className="h-4 w-4" />
@@ -102,7 +132,10 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        onClick={() => handleDeleteClick(trade)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(trade);
+                        }}
                         title="Delete trade"
                       >
                         <Trash className="h-4 w-4" />

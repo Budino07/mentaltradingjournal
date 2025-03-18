@@ -31,7 +31,10 @@ export const JournalTradesList = () => {
         
         // Extract trades from all entries and flatten them into a single array
         const extractedTrades: Trade[] = data
-          .flatMap(entry => entry.trades || [])
+          .flatMap(entry => {
+            const trades = entry.trades as unknown as Trade[];
+            return trades || [];
+          })
           .filter(trade => trade && Object.keys(trade).length > 0);
           
         setTrades(extractedTrades);
