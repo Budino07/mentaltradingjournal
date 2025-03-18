@@ -1,4 +1,3 @@
-
 import {
   BarChart,
   Bar,
@@ -9,6 +8,8 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceLine,
+  Cell,
+  Line,
 } from "recharts";
 import { ChartData } from "../types";
 import { useNavigate } from "react-router-dom";
@@ -41,6 +42,34 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         }
       });
     }
+  };
+
+  // Custom function to render a white line for captured move
+  const renderCustomizedBar = (props: any) => {
+    const { x, y, width, height, value, capturedMove } = props;
+    
+    if (!value || !capturedMove) return null;
+    
+    // Calculate position for the horizontal line
+    // For positive bars (updraw), the line should be drawn from the bottom
+    // For negative bars (drawdown), the line should be drawn from the top
+    const isPositive = value > 0;
+    const capturedMoveHeight = Math.abs(capturedMove) / 100 * height;
+    const lineY = isPositive ? y + height - capturedMoveHeight : y + capturedMoveHeight;
+    
+    return (
+      <g>
+        <rect x={x} y={y} width={width} height={height} fill={isPositive ? "#FEC6A1" : "#9b87f5"} />
+        <line 
+          x1={x} 
+          y1={lineY} 
+          x2={x + width} 
+          y2={lineY} 
+          stroke="white" 
+          strokeWidth={2} 
+        />
+      </g>
+    );
   };
 
   return (
@@ -131,29 +160,25 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
             color: 'hsl(var(--card-foreground))'
           }}
         />
+        
+        {/* Updraw Bar with custom shape to include the white line */}
         <Bar 
           dataKey="mfeRelativeToTp" 
           fill="#FEC6A1" 
           name="Updraw" 
           stackId="stack"
           cursor="pointer"
-        >
-          {dataWithNumbers.map((entry, index) => (
-            <circle
-              key={`dot-${index}`}
-              cx={`${index * (100 / (dataWithNumbers.length - 1))}%`}
-              cy={`${50 - (entry.capturedMove || 0) / 2}%`}
-              r={4}
-              fill="#0EA5E9"
-            />
-          ))}
-        </Bar>
+          shape={(props) => renderCustomizedBar({...props, capturedMove: props.payload.capturedMove})}
+        />
+        
+        {/* Drawdown Bar with custom shape to include the white line */}
         <Bar 
           dataKey="maeRelativeToSl" 
           fill="#9b87f5" 
           name="Drawdown" 
           stackId="stack"
           cursor="pointer"
+          shape={(props) => renderCustomizedBar({...props, capturedMove: props.payload.capturedMove})}
         />
       </BarChart>
     </ResponsiveContainer>
