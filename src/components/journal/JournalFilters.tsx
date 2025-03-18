@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -58,13 +57,6 @@ export const JournalFilters = () => {
         onClick={() => navigate('/journal-entry')}
       >
         Pre-Session
-      </Button>
-      <Button 
-        variant="outline"
-        onClick={() => setIsTradeFormOpen(true)}
-        className="gap-1"
-      >
-        <Plus className="h-4 w-4" /> Add Trade
       </Button>
       <Button 
         variant="outline"

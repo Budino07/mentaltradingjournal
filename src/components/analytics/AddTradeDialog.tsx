@@ -48,9 +48,8 @@ export const AddTradeDialog = (props: AddTradeDialogProps) => {
       onSubmit={handleTradeSubmit}
       editTrade={props.editTrade}
     >
-      <DialogTrigger asChild>
-        <Button variant="outline">Add Trade</Button>
-      </DialogTrigger>
+      {/* Empty children to avoid rendering a trigger button */}
+      <></>
     </TradeFormDialog>
   );
 };
