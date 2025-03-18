@@ -40,22 +40,16 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
     return numPnl > 0 ? "text-green-500" : numPnl < 0 ? "text-red-500" : "text-gray-400";
   };
 
-  const ActionButtons = () => (
-    <div className="flex gap-2 mb-4">
-      <Button onClick={() => setIsAddTradeOpen(true)} size="sm" className="gap-1">
-        <Plus className="h-4 w-4" />
-        Add Trade
-      </Button>
-    </div>
-  );
-
   return (
     <Card className="p-6 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
           Trades List
         </h2>
-        <ActionButtons />
+        <Button onClick={() => setIsAddTradeOpen(true)} size="sm" className="gap-1">
+          <Plus className="h-4 w-4" />
+          Add Trade
+        </Button>
       </div>
 
       <div className="rounded-md border">
