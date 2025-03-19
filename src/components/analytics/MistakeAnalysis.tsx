@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   PieChart,
@@ -44,7 +43,7 @@ const CustomTooltip = ({ active, payload }: {
           <div className="w-2 h-2 rounded-full bg-red-400" />
           <span className="text-muted-foreground">Loss Impact:</span>
           <span className="font-medium text-foreground">
-            ${data.payload.loss.toLocaleString()}
+            ${data.payload.loss.toLocaleString(undefined, {maximumFractionDigits: 2})}
           </span>
         </div>
       </div>
@@ -174,7 +173,7 @@ export const MistakeAnalysis = () => {
                 {data[0].name} is your most frequent mistake, occurring in {data[0].value.toFixed(1)}% of losing trades.
               </p>
               <p>
-                This mistake has cost you ${data[0].loss.toLocaleString()} in losses.
+                This mistake has cost you ${data[0].loss.toLocaleString(undefined, {maximumFractionDigits: 2})} in losses.
               </p>
             </>
           ) : (
@@ -185,4 +184,3 @@ export const MistakeAnalysis = () => {
     </Card>
   );
 };
-
