@@ -134,14 +134,9 @@ export const MistakeAnalysis = () => {
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
           {data.length > 0 ? (
-            <>
-              <p>
-                {data[0].name} is your most frequent mistake, occurring in {data[0].value.toFixed(1)}% of losing trades.
-              </p>
-              <p>
-                This mistake has cost you ${data[0].loss.toLocaleString(undefined, {maximumFractionDigits: 2})}.
-              </p>
-            </>
+            <p>
+              {data[0].name} is your most frequent mistake, occurring in {data[0].value.toFixed(1)}% of losing trades.
+            </p>
           ) : (
             <p>Start logging your trading mistakes to get insights on areas for improvement.</p>
           )}

@@ -30,7 +30,9 @@ export const CustomTooltip = ({ active, payload, label, valueFormatter }: Toolti
             {entry.name}:
           </span>
           <span className="font-medium text-white dark:text-foreground">
-            {valueFormatter ? valueFormatter(entry.value) : `${entry.value}${entry.dataKey?.toLowerCase().includes('percentage') ? '%' : ''}`}
+            {valueFormatter 
+              ? valueFormatter(entry.value) 
+              : `${entry.value.toFixed(1)}${entry.dataKey?.toLowerCase().includes('percentage') ? '%' : '%'}`}
           </span>
         </div>
       ))}
