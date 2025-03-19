@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   PieChart,
@@ -25,6 +26,8 @@ const CustomTooltip = ({ active, payload }: {
   if (!active || !payload || !payload.length) return null;
 
   const data = payload[0];
+  console.log("Tooltip data:", data);
+  
   return (
     <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
       <p className="font-medium text-sm text-foreground mb-2">{data.name}</p>
@@ -43,7 +46,7 @@ const CustomTooltip = ({ active, payload }: {
           <div className="w-2 h-2 rounded-full bg-red-400" />
           <span className="text-muted-foreground">Loss Impact:</span>
           <span className="font-medium text-foreground">
-            ${data.payload.loss.toLocaleString(undefined, {maximumFractionDigits: 2})}
+            ${Number(data.payload.loss).toLocaleString(undefined, {maximumFractionDigits: 2})}
           </span>
         </div>
       </div>
@@ -71,6 +74,8 @@ export const MistakeAnalysis = () => {
   // Process mistakes and calculate percentages
   const mistakes = Object.entries(analytics.mistakeFrequencies);
   const totalMistakes = mistakes.reduce((sum, [_, { count }]) => sum + count, 0);
+  
+  console.log("Mistake frequencies data:", analytics.mistakeFrequencies);
 
   // Get all possible mistake categories except "No Trading Mistakes"
   const allMistakeCategories = mistakeCategories
@@ -129,6 +134,8 @@ export const MistakeAnalysis = () => {
   }).filter(item => item.value > 0)
     .sort((a, b) => b.loss - a.loss)
     .slice(0, 6);  // Show top 6 mistakes by loss impact
+  
+  console.log("Processed chart data:", data);
 
   const COLORS = ['#6E59A5', '#0EA5E9', '#FEC6A1', '#F87171', '#A78BFA', '#34D399'];
 
