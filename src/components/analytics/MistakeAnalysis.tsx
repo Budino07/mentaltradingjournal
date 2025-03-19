@@ -69,6 +69,9 @@ export const MistakeAnalysis = () => {
     );
   }
 
+  // Debug the mistakes data
+  console.log("Mistake frequencies data:", analytics.mistakeFrequencies);
+
   // Process mistakes and calculate percentages
   const mistakes = Object.entries(analytics.mistakeFrequencies);
   const totalMistakes = mistakes.reduce((sum, [_, { count }]) => sum + count, 0);
@@ -125,7 +128,7 @@ export const MistakeAnalysis = () => {
     return {
       name: category.label,
       value: (mistakeData.count / totalMistakes) * 100,
-      loss: mistakeData.loss,
+      loss: mistakeData.loss || 0,
     };
   }).filter(item => item.value > 0)
     .sort((a, b) => b.loss - a.loss)
@@ -185,4 +188,3 @@ export const MistakeAnalysis = () => {
     </Card>
   );
 };
-
