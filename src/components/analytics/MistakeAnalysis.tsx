@@ -11,48 +11,7 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 import { mistakeCategories } from "@/components/journal/emotionConfig";
-
-interface TooltipData {
-  name: string;
-  value: number;
-  loss: number;
-  fill: string;
-}
-
-const CustomTooltip = ({ active, payload }: { 
-  active?: boolean; 
-  payload?: any[]; 
-}) => {
-  if (!active || !payload || !payload.length) return null;
-
-  const data = payload[0];
-  console.log("Tooltip data:", data);
-  
-  return (
-    <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
-      <p className="font-medium text-sm text-foreground mb-2">{data.name}</p>
-      <div className="space-y-1">
-        <div className="flex items-center gap-2 text-sm">
-          <div
-            className="w-2 h-2 rounded-full"
-            style={{ backgroundColor: data.fill }}
-          />
-          <span className="text-muted-foreground">Frequency:</span>
-          <span className="font-medium text-foreground">
-            {data.value.toFixed(1)}%
-          </span>
-        </div>
-        <div className="flex items-center gap-2 text-sm">
-          <div className="w-2 h-2 rounded-full bg-red-400" />
-          <span className="text-muted-foreground">Loss Impact:</span>
-          <span className="font-medium text-foreground">
-            ${Number(data.payload.loss).toLocaleString(undefined, {maximumFractionDigits: 2})}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
+import { CustomTooltip } from "./shared/CustomTooltip";
 
 export const MistakeAnalysis = () => {
   const { data: analytics, isLoading } = useQuery({
@@ -180,7 +139,7 @@ export const MistakeAnalysis = () => {
                 {data[0].name} is your most frequent mistake, occurring in {data[0].value.toFixed(1)}% of losing trades.
               </p>
               <p>
-                This mistake has cost you ${data[0].loss.toLocaleString(undefined, {maximumFractionDigits: 2})} in losses.
+                This mistake has cost you ${data[0].loss.toLocaleString(undefined, {maximumFractionDigits: 2})}.
               </p>
             </>
           ) : (

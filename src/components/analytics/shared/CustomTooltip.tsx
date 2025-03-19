@@ -35,17 +35,6 @@ export const CustomTooltip = ({ active, payload, label, valueFormatter }: Toolti
         </div>
       ))}
       
-      {/* Display Loss Impact if available in the payload */}
-      {payload[0]?.payload?.loss !== undefined && (
-        <div className="flex items-center gap-2 text-sm mt-1">
-          <div className="w-2 h-2 rounded-full bg-red-400" />
-          <span className="text-white/75 dark:text-muted-foreground">Loss Impact:</span>
-          <span className="font-medium text-red-400">
-            ${Number(payload[0].payload.loss).toLocaleString(undefined, {maximumFractionDigits: 2})}
-          </span>
-        </div>
-      )}
-      
       {/* Display Net P&L if available in the payload */}
       {payload[0]?.payload?.pnl !== undefined && (
         <div className="flex items-center gap-2 text-sm mt-1">
