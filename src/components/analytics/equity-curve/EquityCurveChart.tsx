@@ -41,8 +41,8 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
       // Convert string date to Date object
       const date = new Date(dateString);
       if (!isNaN(date.getTime())) {
-        // Navigate to journal page with date in state
-        navigate('/journal', { state: { selectedDate: date } });
+        // Navigate to dashboard page with date in state
+        navigate('/dashboard', { state: { selectedDate: date } });
       }
     } catch (error) {
       console.error("Error navigating to date:", error);
