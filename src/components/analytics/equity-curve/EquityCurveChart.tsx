@@ -86,10 +86,8 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
   const CustomDot = (props: any) => {
     const { cx, cy, payload } = props;
     
-    // Modify dot display logic to show more dots, especially for days with multiple trades
-    const shouldShowDot = data.length < 40 || 
-      data.indexOf(payload) % Math.max(1, Math.floor(data.length / 20)) === 0 ||
-      (payload.dailyPnL !== 0); // Always show dots for days with P&L activity
+    // Only show dots for days with non-zero P&L activity
+    const shouldShowDot = payload.dailyPnL !== 0;
     
     if (!shouldShowDot) return null;
     
@@ -131,6 +129,9 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
   // Custom active dot to ensure all points are clickable when interacting with chart
   const CustomActiveDot = (props: any) => {
     const { cx, cy, payload } = props;
+    
+    // Only show active dots for days with non-zero P&L
+    if (payload.dailyPnL === 0) return null;
     
     return (
       <g 
