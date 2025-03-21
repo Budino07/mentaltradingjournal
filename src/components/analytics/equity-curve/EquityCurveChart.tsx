@@ -8,6 +8,8 @@ import {
   ResponsiveContainer,
   ReferenceLine,
   CartesianGrid,
+  Area,
+  ComposedChart
 } from "recharts";
 import { CustomTooltip } from "../shared/CustomTooltip";
 import { cn } from "@/lib/utils";
@@ -95,7 +97,7 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
       <div className="absolute inset-0 opacity-10 bg-gradient-to-b from-purple-50/5 to-purple-900/10 pointer-events-none" />
       
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart
+        <ComposedChart
           data={data}
           margin={{
             top: 20,
@@ -110,6 +112,14 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
               <stop offset="0%" stopColor="#9b87f5" stopOpacity={0.8} />
               <stop offset="100%" stopColor="#6E59A5" stopOpacity={0.2} />
             </linearGradient>
+            
+            {/* Gradient for the area under the curve */}
+            <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#9b87f5" stopOpacity={0.3} />
+              <stop offset="75%" stopColor="#9b87f5" stopOpacity={0.05} />
+              <stop offset="100%" stopColor="#9b87f5" stopOpacity={0} />
+            </linearGradient>
+            
             <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur stdDeviation="3" result="blur" />
               <feComposite in="SourceGraphic" in2="blur" operator="over" />
@@ -175,6 +185,15 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
             }}
           />
           
+          {/* Area under the curve with gradient */}
+          <Area
+            type="monotone"
+            dataKey="balance"
+            stroke="none"
+            fill="url(#areaGradient)"
+            fillOpacity={1}
+          />
+          
           {/* Main line with gradient and glow effect */}
           <Line
             type="monotone"
@@ -187,19 +206,7 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
             connectNulls={true}
             filter="url(#glow)"
           />
-          
-          {/* Subtle background line for visual interest */}
-          <Line
-            type="monotone"
-            dataKey="balance"
-            stroke="#8B5CF6"
-            strokeWidth={1}
-            dot={CustomDot}
-            opacity={0.3}
-            name="Balance"
-            connectNulls={true}
-          />
-        </LineChart>
+        </ComposedChart>
       </ResponsiveContainer>
     </div>
   );
