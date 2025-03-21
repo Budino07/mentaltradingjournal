@@ -86,9 +86,10 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
   const CustomDot = (props: any) => {
     const { cx, cy, payload } = props;
     
-    // Only show dots on some data points for cleaner look
-    const shouldShowDot = data.length < 30 || 
-      data.indexOf(payload) % Math.max(1, Math.floor(data.length / 15)) === 0;
+    // Modify dot display logic to show more dots, especially for days with multiple trades
+    const shouldShowDot = data.length < 40 || 
+      data.indexOf(payload) % Math.max(1, Math.floor(data.length / 20)) === 0 ||
+      (payload.dailyPnL !== 0); // Always show dots for days with P&L activity
     
     if (!shouldShowDot) return null;
     
@@ -122,6 +123,27 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
           cy={cy} 
           r={10} 
           fill="transparent" 
+        />
+      </g>
+    );
+  };
+
+  // Custom active dot to ensure all points are clickable when interacting with chart
+  const CustomActiveDot = (props: any) => {
+    const { cx, cy, payload } = props;
+    
+    return (
+      <g 
+        onClick={() => handleDotClick(props)}
+        style={{ cursor: 'pointer' }}
+      >
+        <circle 
+          cx={cx} 
+          cy={cy} 
+          r={6} 
+          fill="#9b87f5"
+          stroke="#FFFFFF" 
+          strokeWidth={2}
         />
       </g>
     );
@@ -201,8 +223,10 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
           <Tooltip
             content={<CustomTooltip
               valueFormatter={(value) => `$${value.toLocaleString()}`}
+              onDateClick={handleDotClick}
             />}
             wrapperStyle={{ outline: 'none' }}
+            cursor={{ strokeDasharray: '3 3' }}
           />
           
           <ReferenceLine 
@@ -237,10 +261,21 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
             stroke="url(#equityGradient)"
             strokeWidth={3}
             dot={false}
-            activeDot={CustomDot}
+            activeDot={CustomActiveDot}
             name="Balance"
             connectNulls={true}
             filter="url(#glow)"
+            isAnimationActive={false} // Disable animation to improve performance
+          />
+          
+          {/* Additional line just for dots, to make them more visible and clickable */}
+          <Line
+            type="monotone"
+            dataKey="balance"
+            stroke="none"
+            dot={CustomDot}
+            isAnimationActive={false}
+            connectNulls={true}
           />
         </ComposedChart>
       </ResponsiveContainer>

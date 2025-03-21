@@ -1,3 +1,4 @@
+
 interface TooltipProps {
   active?: boolean;
   payload?: Array<{
@@ -11,10 +12,10 @@ interface TooltipProps {
   }>;
   label?: string;
   valueFormatter?: (value: number) => string;
-  onDateClick?: (date: string) => void;
+  onDateClick?: (date: any) => void;
 }
 
-export const CustomTooltip = ({ active, payload, label, valueFormatter }: TooltipProps) => {
+export const CustomTooltip = ({ active, payload, label, valueFormatter, onDateClick }: TooltipProps) => {
   if (!active || !payload || !payload.length) return null;
 
   // Filter out duplicate entries and normalize capitalization
@@ -42,8 +43,19 @@ export const CustomTooltip = ({ active, payload, label, valueFormatter }: Toolti
     return acc;
   }, []);
 
+  // Handle click on the tooltip to navigate to journal entries
+  const handleTooltipClick = () => {
+    if (onDateClick && uniquePayload[0]?.payload) {
+      onDateClick(uniquePayload[0]);
+    }
+  };
+
   return (
-    <div className="bg-black/90 dark:bg-background/90 border border-border/50 rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95 backdrop-blur-sm">
+    <div 
+      className="bg-black/90 dark:bg-background/90 border border-border/50 rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95 backdrop-blur-sm"
+      onClick={handleTooltipClick}
+      style={{ cursor: onDateClick ? 'pointer' : 'default' }}
+    >
       <div className="flex flex-col gap-2">
         <p className="font-medium text-sm text-white dark:text-foreground mb-1 border-b border-white/10 pb-1.5 flex items-center">
           {label}
