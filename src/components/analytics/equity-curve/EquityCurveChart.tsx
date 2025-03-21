@@ -7,7 +7,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
-  CartesianGrid,
 } from "recharts";
 import { CustomTooltip } from "../shared/CustomTooltip";
 
@@ -55,7 +54,7 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
   const [yMin, yMax] = calculateYDomain();
 
   return (
-    <div className="h-[400px] w-full relative">
+    <div className="h-[400px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={data}
@@ -66,22 +65,14 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
             bottom: 5
           }}
         >
-          <CartesianGrid 
-            strokeDasharray="3 3" 
-            vertical={true}
-            horizontal={true}
-            stroke="rgba(255,255,255,0.07)"
-          />
           <XAxis
             dataKey="date"
-            tick={{ fontSize: 12, fill: "rgba(255,255,255,0.6)" }}
+            tick={{ fontSize: 12 }}
             interval="preserveStartEnd"
-            axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
-            tickLine={{ stroke: "rgba(255,255,255,0.1)" }}
           />
           <YAxis
             domain={[yMin, yMax]}
-            tick={{ fontSize: 12, fill: "rgba(255,255,255,0.6)" }}
+            tick={{ fontSize: 12 }}
             tickFormatter={(value) => `$${value.toLocaleString()}`}
             label={{
               value: 'Account Balance ($)',
@@ -90,12 +81,10 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
               style: {
                 fontSize: '12px',
                 textAnchor: 'middle',
-                fill: 'rgba(255,255,255,0.7)'
+                fill: 'currentColor'
               },
               dx: -45
             }}
-            axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
-            tickLine={{ stroke: "rgba(255,255,255,0.1)" }}
           />
           <Tooltip
             content={<CustomTooltip
@@ -104,47 +93,22 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
           />
           <ReferenceLine 
             y={initialBalance} 
-            stroke="rgba(255,255,255,0.3)" 
+            stroke="hsl(var(--muted-foreground))" 
             strokeDasharray="3 3"
             ifOverflow="extendDomain"
             label={{
               value: 'Initial Balance',
               position: 'right',
-              style: { fill: 'rgba(255,255,255,0.5)' }
+              style: { fill: 'hsl(var(--muted-foreground))' }
             }}
           />
-          
-          {/* Premium styled line with gradient and glow */}
-          <defs>
-            <linearGradient id="equity-line-gradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#6E59A5" stopOpacity={1} />
-              <stop offset="100%" stopColor="#9b87f5" stopOpacity={0.8} />
-            </linearGradient>
-            <filter id="glow" height="200%" width="200%" x="-50%" y="-50%">
-              <feGaussianBlur stdDeviation="2" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
-          </defs>
-          
           <Line
             type="monotone"
             dataKey="balance"
-            stroke="url(#equity-line-gradient)"
-            strokeWidth={3}
-            dot={{
-              fill: "#6E59A5",
-              stroke: "#9b87f5",
-              strokeWidth: 2,
-              r: 4
-            }}
-            activeDot={{
-              fill: "#FFFFFF",
-              stroke: "#6E59A5",
-              strokeWidth: 2,
-              r: 6
-            }}
+            stroke="hsl(var(--primary))"
+            dot={false}
+            strokeWidth={2}
             name="Balance"
-            filter="url(#glow)"
           />
         </LineChart>
       </ResponsiveContainer>
