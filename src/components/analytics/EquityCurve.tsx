@@ -56,7 +56,7 @@ export const EquityCurve = () => {
 
   if (isLoading || !analytics) {
     return (
-      <Card className="p-4 md:p-6 space-y-4 col-span-2">
+      <Card className="p-4 md:p-6 space-y-4 col-span-2 bg-gradient-to-b from-[#151526] to-[#1A1A30] border-0">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-accent/10 rounded w-3/4"></div>
           <div className="h-[400px] bg-accent/10 rounded"></div>
@@ -106,13 +106,13 @@ export const EquityCurve = () => {
   });
 
   return (
-    <Card className="p-4 md:p-6 space-y-4 col-span-2">
+    <Card className="p-4 md:p-6 space-y-4 col-span-2 bg-gradient-to-b from-[#151526] to-[#1A1A30] border-0 text-white">
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h3 className="text-xl md:text-2xl font-bold">Equity Curve</h3>
           <CapitalSettingsDialog onSave={handleCapitalUpdate} />
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-gray-300">
           Track your account balance progression over time
         </p>
       </div>
