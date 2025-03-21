@@ -1,3 +1,4 @@
+
 interface TooltipProps {
   active?: boolean;
   payload?: Array<{
@@ -11,9 +12,10 @@ interface TooltipProps {
   }>;
   label?: string;
   valueFormatter?: (value: number) => string;
+  onDateClick?: (date: string) => void;
 }
 
-export const CustomTooltip = ({ active, payload, label, valueFormatter }: TooltipProps) => {
+export const CustomTooltip = ({ active, payload, label, valueFormatter, onDateClick }: TooltipProps) => {
   if (!active || !payload || !payload.length) return null;
 
   // Filter out duplicate entries and normalize capitalization
@@ -41,10 +43,27 @@ export const CustomTooltip = ({ active, payload, label, valueFormatter }: Toolti
     return acc;
   }, []);
 
+  const handleDateClick = () => {
+    if (onDateClick && label) {
+      onDateClick(label);
+    }
+  };
+
   return (
-    <div className="bg-black/90 dark:bg-background/90 border border-border/50 rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95 backdrop-blur-sm">
+    <div 
+      className="bg-black/90 dark:bg-background/90 border border-border/50 rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95 backdrop-blur-sm"
+      onClick={handleDateClick}
+      style={{ cursor: onDateClick ? 'pointer' : 'default' }}
+    >
       <div className="flex flex-col gap-2">
-        <p className="font-medium text-sm text-white dark:text-foreground mb-1 border-b border-white/10 pb-1.5">{label}</p>
+        <p className="font-medium text-sm text-white dark:text-foreground mb-1 border-b border-white/10 pb-1.5 flex items-center">
+          {label}
+          {onDateClick && (
+            <span className="ml-2 text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded-sm">
+              Click to view
+            </span>
+          )}
+        </p>
         
         {uniquePayload.map((entry, index) => (
           <div key={index} className="flex items-center gap-2 text-sm">

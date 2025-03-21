@@ -1,4 +1,5 @@
 
+import { useNavigate } from "react-router-dom";
 import {
   LineChart,
   Line,
@@ -13,6 +14,13 @@ import {
 } from "recharts";
 import { CustomTooltip } from "../shared/CustomTooltip";
 import { cn } from "@/lib/utils";
+import { formatDate } from "@/utils/dateUtils";
+import { 
+  Tooltip as UITooltip, 
+  TooltipContent, 
+  TooltipProvider, 
+  TooltipTrigger 
+} from "@/components/ui/tooltip";
 
 interface EquityCurveChartProps {
   data: Array<{
@@ -24,6 +32,22 @@ interface EquityCurveChartProps {
 }
 
 export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps) => {
+  const navigate = useNavigate();
+
+  // Handle date click to navigate to journal entries for that date
+  const handleDateClick = (dateString: string) => {
+    try {
+      // Convert string date to Date object
+      const date = new Date(dateString);
+      if (!isNaN(date.getTime())) {
+        // Navigate to journal page with date in state
+        navigate('/journal', { state: { selectedDate: date } });
+      }
+    } catch (error) {
+      console.error("Error navigating to date:", error);
+    }
+  };
+
   // Calculate the dynamic domain for Y-axis
   const calculateYDomain = () => {
     if (data.length === 0) {
@@ -165,6 +189,7 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
           <Tooltip
             content={<CustomTooltip
               valueFormatter={(value) => `$${value.toLocaleString()}`}
+              onDateClick={handleDateClick}
             />}
             wrapperStyle={{ outline: 'none' }}
           />
@@ -208,6 +233,21 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
           />
         </ComposedChart>
       </ResponsiveContainer>
+      
+      <TooltipProvider>
+        <UITooltip>
+          <TooltipTrigger asChild>
+            <div className="absolute bottom-0 right-0 p-2">
+              <div className="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center">
+                <span className="text-xs text-primary">?</span>
+              </div>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="text-xs">Click on data points to see journal entries for that date</p>
+          </TooltipContent>
+        </UITooltip>
+      </TooltipProvider>
     </div>
   );
 };
