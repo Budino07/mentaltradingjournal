@@ -7,8 +7,10 @@ import {
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
+  CartesianGrid,
 } from "recharts";
 import { CustomTooltip } from "../shared/CustomTooltip";
+import { cn } from "@/lib/utils";
 
 interface EquityCurveChartProps {
   data: Array<{
@@ -53,8 +55,45 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
 
   const [yMin, yMax] = calculateYDomain();
 
+  // Custom dot component with glowing effect
+  const CustomDot = (props: any) => {
+    const { cx, cy, payload } = props;
+    
+    // Only show dots on some data points for cleaner look
+    const shouldShowDot = data.length < 30 || 
+      data.indexOf(payload) % Math.max(1, Math.floor(data.length / 15)) === 0;
+    
+    if (!shouldShowDot) return null;
+    
+    return (
+      <g>
+        {/* Subtle glow effect */}
+        <circle 
+          cx={cx} 
+          cy={cy} 
+          r={4} 
+          fill="rgba(155, 135, 245, 0.3)" 
+          filter="blur(2px)" 
+        />
+        {/* Visible dot */}
+        <circle 
+          cx={cx} 
+          cy={cy} 
+          r={3} 
+          stroke="#FFFFFF" 
+          strokeWidth={1.5} 
+          fill="#9b87f5"
+          className="opacity-80" 
+        />
+      </g>
+    );
+  };
+
   return (
-    <div className="h-[400px] w-full">
+    <div className="h-[400px] w-full relative">
+      {/* Premium chart container with subtle gradient overlay */}
+      <div className="absolute inset-0 opacity-10 bg-gradient-to-b from-purple-50/5 to-purple-900/10 pointer-events-none" />
+      
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={data}
@@ -64,16 +103,42 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
             left: 60,
             bottom: 5
           }}
+          className="premium-chart"
         >
+          <defs>
+            <linearGradient id="equityGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#9b87f5" stopOpacity={0.8} />
+              <stop offset="100%" stopColor="#6E59A5" stopOpacity={0.2} />
+            </linearGradient>
+            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+          
+          <CartesianGrid 
+            strokeDasharray="3 3" 
+            vertical={true} 
+            horizontal={true} 
+            stroke="hsl(var(--muted-foreground)/0.15)" 
+          />
+          
           <XAxis
             dataKey="date"
             tick={{ fontSize: 12 }}
             interval="preserveStartEnd"
+            stroke="hsl(var(--muted-foreground)/0.6)"
+            tickLine={{ stroke: "hsl(var(--muted-foreground)/0.3)" }}
+            axisLine={{ stroke: "hsl(var(--muted-foreground)/0.3)" }}
           />
+          
           <YAxis
             domain={[yMin, yMax]}
             tick={{ fontSize: 12 }}
             tickFormatter={(value) => `$${value.toLocaleString()}`}
+            stroke="hsl(var(--muted-foreground)/0.6)"
+            tickLine={{ stroke: "hsl(var(--muted-foreground)/0.3)" }}
+            axisLine={{ stroke: "hsl(var(--muted-foreground)/0.3)" }}
             label={{
               value: 'Account Balance ($)',
               angle: -90,
@@ -81,34 +146,58 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
               style: {
                 fontSize: '12px',
                 textAnchor: 'middle',
-                fill: 'currentColor'
+                fill: 'hsl(var(--muted-foreground)/0.8)'
               },
               dx: -45
             }}
           />
+          
           <Tooltip
             content={<CustomTooltip
               valueFormatter={(value) => `$${value.toLocaleString()}`}
             />}
+            wrapperStyle={{ outline: 'none' }}
           />
+          
           <ReferenceLine 
             y={initialBalance} 
-            stroke="hsl(var(--muted-foreground))" 
+            stroke="hsl(var(--muted-foreground)/0.5)" 
             strokeDasharray="3 3"
             ifOverflow="extendDomain"
             label={{
               value: 'Initial Balance',
               position: 'right',
-              style: { fill: 'hsl(var(--muted-foreground))' }
+              style: { 
+                fill: 'hsl(var(--muted-foreground)/0.8)',
+                fontSize: '11px',
+                fontWeight: '500'
+              }
             }}
           />
+          
+          {/* Main line with gradient and glow effect */}
           <Line
             type="monotone"
             dataKey="balance"
-            stroke="hsl(var(--primary))"
+            stroke="url(#equityGradient)"
+            strokeWidth={3}
             dot={false}
-            strokeWidth={2}
+            activeDot={CustomDot}
             name="Balance"
+            connectNulls={true}
+            filter="url(#glow)"
+          />
+          
+          {/* Subtle background line for visual interest */}
+          <Line
+            type="monotone"
+            dataKey="balance"
+            stroke="#8B5CF6"
+            strokeWidth={1}
+            dot={CustomDot}
+            opacity={0.3}
+            name="Balance"
+            connectNulls={true}
           />
         </LineChart>
       </ResponsiveContainer>
