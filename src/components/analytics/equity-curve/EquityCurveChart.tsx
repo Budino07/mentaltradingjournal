@@ -56,9 +56,6 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
 
   return (
     <div className="h-[400px] w-full relative">
-      {/* Premium dark background with gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#151526] to-[#1A1A30] rounded-lg"></div>
-      
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={data}
