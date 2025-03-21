@@ -16,12 +16,28 @@ interface TooltipProps {
 export const CustomTooltip = ({ active, payload, label, valueFormatter }: TooltipProps) => {
   if (!active || !payload || !payload.length) return null;
 
-  // Filter out duplicate entries with the same name
-  // This keeps only the first occurrence of each unique name
+  // Filter out duplicate entries and normalize capitalization
+  // This keeps only the capitalized version of each name (e.g., "Balance" not "balance")
   const uniquePayload = payload.reduce((acc: any[], current) => {
-    if (!acc.find(item => item.name === current.name)) {
+    // Normalize the name to lowercase for comparison
+    const normalizedName = current.name.toLowerCase();
+    
+    // Check if we already have an entry with the same normalized name
+    const existingEntryIndex = acc.findIndex(item => item.name.toLowerCase() === normalizedName);
+    
+    if (existingEntryIndex === -1) {
+      // If no entry exists, add this one
       acc.push(current);
+    } else {
+      // If entry exists and current one has capital first letter, replace the existing one
+      const currentHasCapital = current.name.charAt(0) === current.name.charAt(0).toUpperCase();
+      const existingHasCapital = acc[existingEntryIndex].name.charAt(0) === acc[existingEntryIndex].name.charAt(0).toUpperCase();
+      
+      if (currentHasCapital && !existingHasCapital) {
+        acc[existingEntryIndex] = current;
+      }
     }
+    
     return acc;
   }, []);
 
