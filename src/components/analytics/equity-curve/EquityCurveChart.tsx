@@ -34,9 +34,10 @@ interface EquityCurveChartProps {
 export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps) => {
   const navigate = useNavigate();
 
-  // Handle date click to navigate to journal entries for that date
-  const handleDateClick = (dateString: string) => {
+  // Handle dot click to navigate to journal entries for that date
+  const handleDotClick = (data: any) => {
     try {
+      const dateString = data.payload.date;
       // Convert string date to Date object
       const date = new Date(dateString);
       if (!isNaN(date.getTime())) {
@@ -81,7 +82,7 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
 
   const [yMin, yMax] = calculateYDomain();
 
-  // Custom dot component with glowing effect
+  // Custom dot component with glowing effect and click handler
   const CustomDot = (props: any) => {
     const { cx, cy, payload } = props;
     
@@ -92,7 +93,11 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
     if (!shouldShowDot) return null;
     
     return (
-      <g>
+      <g 
+        onClick={() => handleDotClick(props)}
+        style={{ cursor: 'pointer' }}
+        className="hover:opacity-100"
+      >
         {/* Subtle glow effect */}
         <circle 
           cx={cx} 
@@ -109,7 +114,14 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
           stroke="#FFFFFF" 
           strokeWidth={1.5} 
           fill="#9b87f5"
-          className="opacity-80" 
+          className="opacity-80 hover:opacity-100" 
+        />
+        {/* Larger invisible click area */}
+        <circle 
+          cx={cx} 
+          cy={cy} 
+          r={10} 
+          fill="transparent" 
         />
       </g>
     );
@@ -189,7 +201,6 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
           <Tooltip
             content={<CustomTooltip
               valueFormatter={(value) => `$${value.toLocaleString()}`}
-              onDateClick={handleDateClick}
             />}
             wrapperStyle={{ outline: 'none' }}
           />
@@ -244,7 +255,7 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
             </div>
           </TooltipTrigger>
           <TooltipContent>
-            <p className="text-xs">Click on data points to see journal entries for that date</p>
+            <p className="text-xs">Click on data points to view journal entries for that date</p>
           </TooltipContent>
         </UITooltip>
       </TooltipProvider>
