@@ -1,3 +1,4 @@
+
 import { 
   BarChart, 
   Bar, 
@@ -40,7 +41,7 @@ export const PerformanceChart = ({ data, domain, ticks }: PerformanceChartProps)
             bottom: 5 
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
+          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
           <XAxis 
             dataKey="emotion" 
             tick={{ fontSize: 12 }}
