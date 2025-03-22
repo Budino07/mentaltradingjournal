@@ -59,9 +59,12 @@ export const CustomTooltip = ({ active, payload, label, valueFormatter, onDateCl
       <div className="flex flex-col gap-2">
         <p className="font-medium text-sm text-white dark:text-foreground mb-1 border-b border-white/10 pb-1.5 flex items-center">
           {label}
-          <span className="ml-2 text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded-sm">
-            Click dot to view
-          </span>
+          {/* Only show the "Click dot to view" text for EquityCurveChart */}
+          {onDateClick && window.location.pathname.includes('equity-curve') && (
+            <span className="ml-2 text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded-sm">
+              Click dot to view
+            </span>
+          )}
         </p>
         
         {uniquePayload.map((entry, index) => (
