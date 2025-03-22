@@ -1,6 +1,5 @@
 
 import { Card } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowUpDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -15,7 +14,6 @@ interface TradeWinPercentageProps {
 }
 
 export const TradeWinPercentage = ({ timeFilter, hasEntries }: TradeWinPercentageProps) => {
-  const [emotionFilter, setEmotionFilter] = useState<string>("all");
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
@@ -128,23 +126,6 @@ export const TradeWinPercentage = ({ timeFilter, hasEntries }: TradeWinPercentag
             </PieChart>
           </ResponsiveContainer>
         </div>
-      </div>
-      <div className="mt-2">
-        <Select
-          value={emotionFilter}
-          onValueChange={setEmotionFilter}
-          disabled={!hasEntries}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Filter by emotion" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Emotions</SelectItem>
-            <SelectItem value="positive">Positive</SelectItem>
-            <SelectItem value="neutral">Neutral</SelectItem>
-            <SelectItem value="negative">Negative</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
     </Card>
   );
