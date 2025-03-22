@@ -7,6 +7,7 @@ import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useState } from "react";
 import { TimeFilter } from "@/hooks/useJournalFilters";
 import { startOfMonth, subMonths, isWithinInterval, endOfMonth, startOfYear, endOfYear, subYears } from "date-fns";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 interface TradeWinPercentageProps {
   timeFilter: TimeFilter;
@@ -80,6 +81,14 @@ export const TradeWinPercentage = ({ timeFilter, hasEntries }: TradeWinPercentag
   };
 
   const winRate = calculateWinRate();
+  
+  // Calculate the data for the pie chart
+  const pieData = hasEntries ? [
+    { name: "Wins", value: winRate, color: "#6E59A5" },
+    { name: "Losses", value: 100 - winRate, color: "#FEC6A1" }
+  ] : [
+    { name: "No Data", value: 100, color: "#e5e7eb" }
+  ];
 
   if (isLoading) {
     return (
@@ -95,8 +104,30 @@ export const TradeWinPercentage = ({ timeFilter, hasEntries }: TradeWinPercentag
         <span className="text-sm font-medium text-muted-foreground">Trade Win %</span>
         <ArrowUpDown className="h-4 w-4 text-primary" />
       </div>
-      <div className="text-2xl font-bold text-foreground">
-        {hasEntries ? winRate.toFixed(1) : '0.0'}%
+      <div className="flex justify-between items-center">
+        <div className="text-2xl font-bold text-foreground">
+          {hasEntries ? winRate.toFixed(1) : '0.0'}%
+        </div>
+        <div className="h-12 w-12">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={pieData}
+                cx="50%"
+                cy="50%"
+                innerRadius={14}
+                outerRadius={24}
+                paddingAngle={2}
+                dataKey="value"
+                strokeWidth={0}
+              >
+                {pieData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </div>
       <div className="mt-2">
         <Select

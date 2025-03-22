@@ -12,8 +12,7 @@ import {
   endOfYear, 
   subYears, 
   subMonths,
-  isAfter,
-  isBefore
+  subDays
 } from "date-fns";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +24,7 @@ import { useProgressTracking } from "@/hooks/useProgressTracking";
 import { Input } from "@/components/ui/input";
 import { formatDate } from "@/utils/dateUtils";
 import { JournalEntryType } from "@/types/journal";
+import { LineChart, Line, ResponsiveContainer, AreaChart, Area } from "recharts";
 
 export const StatsHeader = () => {
   const queryClient = useQueryClient();
@@ -211,7 +211,108 @@ export const StatsHeader = () => {
     }, 0);
   };
 
+  const generatePnLChartData = () => {
+    if (!analytics?.journalEntries || analytics.journalEntries.length === 0) return [];
+
+    const now = new Date();
+    const thirtyDaysAgo = subDays(now, 30);
+    
+    // Create an array of the last 30 days
+    const days = Array.from({ length: 30 }, (_, i) => {
+      return {
+        date: subDays(now, 30 - i - 1),
+        pnl: 0,
+      };
+    });
+    
+    // Fill in the PnL data for days with entries
+    analytics.journalEntries.forEach(entry => {
+      const entryDate = new Date(entry.created_at);
+      if (entryDate >= thirtyDaysAgo) {
+        const dayIndex = days.findIndex(day => 
+          day.date.getDate() === entryDate.getDate() && 
+          day.date.getMonth() === entryDate.getMonth() && 
+          day.date.getFullYear() === entryDate.getFullYear()
+        );
+        
+        if (dayIndex !== -1 && entry.trades && entry.trades.length > 0) {
+          entry.trades.forEach(trade => {
+            const pnlValue = trade.pnl || 0;
+            const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+            if (!isNaN(numericPnL)) {
+              days[dayIndex].pnl += numericPnL;
+            }
+          });
+        }
+      }
+    });
+
+    // Calculate cumulative PnL
+    let cumulativePnL = 0;
+    return days.map(day => {
+      cumulativePnL += day.pnl;
+      return {
+        date: day.date,
+        value: cumulativePnL,
+      };
+    });
+  };
+
+  const generateEmotionData = () => {
+    if (!analytics?.journalEntries || analytics.journalEntries.length === 0) return [];
+    
+    const now = new Date();
+    const thirtyDaysAgo = subDays(now, 30);
+    
+    // Create an array for the last 30 days
+    const days = Array.from({ length: 30 }, (_, i) => {
+      return {
+        date: subDays(now, 30 - i - 1),
+        positiveCount: 0,
+        totalCount: 0,
+      };
+    });
+    
+    // Fill in emotion data
+    analytics.journalEntries.forEach(entry => {
+      const entryDate = new Date(entry.created_at);
+      if (entryDate >= thirtyDaysAgo && entry.emotion) {
+        const dayIndex = days.findIndex(day => 
+          day.date.getDate() === entryDate.getDate() && 
+          day.date.getMonth() === entryDate.getMonth() && 
+          day.date.getFullYear() === entryDate.getFullYear()
+        );
+        
+        if (dayIndex !== -1) {
+          days[dayIndex].totalCount++;
+          if (entry.emotion.toLowerCase().includes('positive')) {
+            days[dayIndex].positiveCount++;
+          }
+        }
+      }
+    });
+    
+    // Calculate emotion score for each day (0-100%)
+    return days.map(day => {
+      return {
+        date: day.date,
+        value: day.totalCount > 0 ? (day.positiveCount / day.totalCount) * 100 : 0,
+      };
+    });
+  };
+
+  const generateStreakData = () => {
+    // Create a simple array for the flame visualization
+    return Array.from({ length: stats.dailyStreak }, (_, i) => ({
+      day: i + 1,
+      value: 1 // Just a constant value for visualization
+    }));
+  };
+
   const netPnL = calculateNetPnL();
+  const pnlChartData = generatePnLChartData();
+  const emotionData = generateEmotionData();
+  const streakData = generateStreakData();
 
   const filteredEntries = analytics?.journalEntries ? 
     (getTimeInterval() ? 
@@ -424,11 +525,45 @@ export const StatsHeader = () => {
             <span className="text-sm font-medium text-muted-foreground">Net P&L</span>
             <DollarSign className="h-4 w-4 text-primary" />
           </div>
-          <div className="text-2xl font-bold text-foreground">
-            ${hasEntries ? Math.abs(netPnL).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
-          </div>
-          <div className={`text-sm ${netPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-            {hasEntries ? (netPnL >= 0 ? '▲ Profit' : '▼ Loss') : '-'}
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-2xl font-bold text-foreground">
+                ${hasEntries ? Math.abs(netPnL).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
+              </div>
+              <div className={`text-sm ${netPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {hasEntries ? (netPnL >= 0 ? '▲ Profit' : '▼ Loss') : '-'}
+              </div>
+            </div>
+            <div className="h-14 w-24">
+              {hasEntries && pnlChartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={pnlChartData}>
+                    <defs>
+                      <linearGradient id="pnlColor" x1="0" y1="0" x2="0" y2="1">
+                        <stop 
+                          offset="5%" 
+                          stopColor={netPnL >= 0 ? "#10B981" : "#EF4444"} 
+                          stopOpacity={0.8}
+                        />
+                        <stop 
+                          offset="95%" 
+                          stopColor={netPnL >= 0 ? "#10B981" : "#EF4444"} 
+                          stopOpacity={0}
+                        />
+                      </linearGradient>
+                    </defs>
+                    <Area 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke={netPnL >= 0 ? "#10B981" : "#EF4444"} 
+                      fillOpacity={1} 
+                      fill="url(#pnlColor)" 
+                      isAnimationActive={false}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : null}
+            </div>
           </div>
         </Card>
 
@@ -437,11 +572,31 @@ export const StatsHeader = () => {
             <span className="text-sm font-medium text-muted-foreground">Emotion Meter</span>
             <Smile className="h-4 w-4 text-accent-dark" />
           </div>
-          <div className="text-2xl font-bold text-foreground">
-            {hasEntries ? emotionScore.toFixed(0) : '0'}%
-          </div>
-          <div className="text-sm text-muted-foreground">
-            Positive Emotions
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-2xl font-bold text-foreground">
+                {hasEntries ? emotionScore.toFixed(0) : '0'}%
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Positive Emotions
+              </div>
+            </div>
+            <div className="h-14 w-24">
+              {hasEntries && emotionData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={emotionData}>
+                    <Line 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#6E59A5" 
+                      strokeWidth={2} 
+                      dot={false} 
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : null}
+            </div>
           </div>
         </Card>
 
@@ -452,15 +607,39 @@ export const StatsHeader = () => {
             <span className="text-sm font-medium text-muted-foreground">Daily Streak</span>
             <Flame className="h-4 w-4 text-orange-500" />
           </div>
-          <div className="text-2xl font-bold text-foreground">
-            {stats.dailyStreak}
-          </div>
-          <div className="text-sm text-muted-foreground">
-            Days Active
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-2xl font-bold text-foreground">
+                {stats.dailyStreak}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Days Active
+              </div>
+            </div>
+            <div className="h-14 w-24">
+              {stats.dailyStreak > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={streakData}>
+                    <defs>
+                      <linearGradient id="streakColor" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#F97316" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#F97316" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <Area
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#F97316"
+                      fill="url(#streakColor)"
+                      isAnimationActive={false}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : null}
+            </div>
           </div>
         </Card>
       </div>
     </div>
   );
 };
-
