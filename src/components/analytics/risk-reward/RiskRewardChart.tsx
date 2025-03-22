@@ -1,16 +1,18 @@
 
 import {
-  ScatterChart,
-  Scatter,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
+  Scatter,
 } from "recharts";
+import { format, isValid } from "date-fns";
 
-interface DataPoint {
+interface RiskRewardData {
   date: Date;
   riskRewardRatio: number;
   isSignificant: boolean;
@@ -18,60 +20,98 @@ interface DataPoint {
 }
 
 interface RiskRewardChartProps {
-  data: DataPoint[];
+  data: RiskRewardData[];
 }
 
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    const date = new Date(data.date);
+    return (
+      <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+        <p className="font-medium text-sm text-foreground mb-2">Trade Details</p>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-muted-foreground">Date:</span>
+            <span className="font-medium text-foreground">
+              {isValid(date) ? format(date, 'MMM d, yyyy') : 'Invalid Date'}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-muted-foreground">Trade R:R:</span>
+            <span className="font-medium text-foreground">
+              {data.riskRewardRatio.toFixed(2)}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-muted-foreground">P&L:</span>
+            <span className={`font-medium ${data.pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              ${data.pnl.toFixed(2)}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export const RiskRewardChart = ({ data }: RiskRewardChartProps) => {
+  const formatDateTick = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return isValid(date) ? format(date, 'MMM d') : '';
+  };
+
+  // Ensure all dates are valid Date objects
+  const validData = data.map(item => ({
+    ...item,
+    date: item.date instanceof Date ? item.date : new Date(item.date),
+  })).filter(item => isValid(item.date));
+
   return (
     <div className="h-[250px] md:h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <ScatterChart margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-          <XAxis 
-            dataKey="date" 
+        <LineChart data={validData} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey="date"
+            tickFormatter={formatDateTick}
             tick={{ fontSize: 12 }}
-            name="Date"
-            tickFormatter={(date) => {
-              if (!(date instanceof Date)) return '';
-              return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            label={{
+              value: 'Trading Days',
+              position: 'bottom',
+              style: { fontSize: '12px' }
             }}
           />
-          <YAxis 
-            dataKey="riskRewardRatio" 
-            type="number"
-            name="R:R Ratio"
+          <YAxis
             tick={{ fontSize: 12 }}
-            domain={[0, 'dataMax + 1']}
-            label={{ 
-              value: 'Risk:Reward Ratio', 
-              angle: -90, 
+            label={{
+              value: 'R:R',
+              angle: -90,
               position: 'insideLeft',
               style: { fontSize: '12px' }
             }}
           />
-          <Tooltip 
-            formatter={(value: number) => [`${value.toFixed(2)}`, 'R:R Ratio']}
-            labelFormatter={(label: Date) => {
-              if (!(label instanceof Date)) return '';
-              return label.toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
-              });
-            }}
+          <Tooltip content={<CustomTooltip />} />
+          <ReferenceLine y={0} stroke="#666" />
+          <Line
+            type="monotone"
+            dataKey="riskRewardRatio"
+            stroke="#6E59A5"
+            strokeWidth={2}
+            dot={false}
           />
-          <ReferenceLine y={1} stroke="#8884d8" strokeDasharray="3 3" />
-          <ReferenceLine y={2} stroke="#82ca9d" strokeDasharray="3 3" />
-          <Scatter 
-            name="R:R Ratio" 
-            data={data} 
-            fill={(entry) => {
-              const dataPoint = entry as unknown as DataPoint;
-              return dataPoint.pnl > 0 ? "#4ade80" : "#f87171";
-            }}
-            shape="circle"
+          <Scatter
+            data={validData.filter(d => d.isSignificant)}
+            dataKey="riskRewardRatio"
+            fill="#FF6B6B"
+            shape="star"
+            r={6}
           />
-        </ScatterChart>
+        </LineChart>
       </ResponsiveContainer>
     </div>
   );
