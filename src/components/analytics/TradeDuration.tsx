@@ -112,7 +112,7 @@ export const TradeDuration = () => {
         {data.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis dataKey="duration" tick={{ fontSize: 12 }} />
               <YAxis 
                 tick={{ fontSize: 12 }} 

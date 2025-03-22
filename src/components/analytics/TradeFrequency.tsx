@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   AreaChart,
@@ -96,7 +95,7 @@ export const TradeFrequency = () => {
       <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
             <XAxis 
               dataKey="date" 
               tick={{ fontSize: 12 }}
@@ -135,4 +134,3 @@ export const TradeFrequency = () => {
     </Card>
   );
 };
-

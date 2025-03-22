@@ -1,3 +1,4 @@
+
 import {
   LineChart,
   Line,
@@ -114,7 +115,7 @@ export const EmotionalTendencies = () => {
       <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" className="opacity-50" />
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
             <XAxis 
               dataKey="date" 
               tick={{ fontSize: 12 }}
