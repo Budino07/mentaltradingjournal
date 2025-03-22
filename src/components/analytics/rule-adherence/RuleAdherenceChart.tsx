@@ -40,7 +40,7 @@ export const RuleAdherenceChart = ({ data }: RuleAdherenceChartProps) => {
     <div className="h-[250px] md:h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" className="opacity-50" />
+          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
           <XAxis 
             dataKey="name" 
             tick={{ fontSize: 12 }}
