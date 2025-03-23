@@ -3,7 +3,6 @@ import { Card } from "@/components/ui/card";
 import { ArrowUpDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
-import { useState } from "react";
 import { TimeFilter } from "@/hooks/useJournalFilters";
 import { startOfMonth, subMonths, isWithinInterval, endOfMonth, startOfYear, endOfYear, subYears } from "date-fns";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
