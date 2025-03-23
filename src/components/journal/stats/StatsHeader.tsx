@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -25,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { formatDate } from "@/utils/dateUtils";
 import { JournalEntryType } from "@/types/journal";
 import { LineChart, Line, ResponsiveContainer, AreaChart, Area } from "recharts";
+import { Progress } from "@/components/ui/progress";
 
 export const StatsHeader = () => {
   const queryClient = useQueryClient();
@@ -616,26 +616,14 @@ export const StatsHeader = () => {
                 Days Active
               </div>
             </div>
-            <div className="h-14 w-24">
-              {stats.dailyStreak > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={streakData}>
-                    <defs>
-                      <linearGradient id="streakColor" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#F97316" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#F97316" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <Area
-                      type="monotone"
-                      dataKey="value"
-                      stroke="#F97316"
-                      fill="url(#streakColor)"
-                      isAnimationActive={false}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              ) : null}
+            <div className="h-[60px] w-[60px] flex items-center justify-center">
+              <Progress 
+                variant="circular" 
+                value={(stats.dailyStreak / 30) * 100}
+                indicatorColor="stroke-orange-500"
+                trackColor="stroke-gray-700"
+                aria-label={`${stats.dailyStreak} days out of 30 day streak`}
+              />
             </div>
           </div>
         </Card>
