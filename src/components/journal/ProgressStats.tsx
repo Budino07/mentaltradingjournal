@@ -199,30 +199,14 @@ export const ProgressStats = ({
           unit="completed"
         />
 
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-full bg-orange-100/10">
-                <Flame className="h-4 w-4 text-orange-500" />
-              </div>
-              <div className="text-sm font-medium">Daily Activity Streak</div>
-            </div>
-            <div className="text-sm font-medium">
-              {stats.dailyStreak} <span className="text-xs text-muted-foreground">/ 30 days</span>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-center py-2">
-            <Progress 
-              variant="circular" 
-              value={(stats.dailyStreak / 30) * 100} 
-              indicatorColor="stroke-orange-500"
-              trackColor="stroke-gray-700"
-              className="h-[70px] w-[70px]"
-              aria-label={`${stats.dailyStreak} days out of 30 day streak`}
-            />
-          </div>
-        </div>
+        <ProgressItem
+          icon={Flame}
+          title="Daily Activity Streak"
+          value={stats.dailyStreak}
+          maxValue={30}
+          color="orange"
+          unit="days"
+        />
 
         <LevelProgress
           level={stats.level}
