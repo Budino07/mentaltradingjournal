@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Trophy, Flame, Star } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -202,10 +201,9 @@ export const ProgressStats = ({
           icon={Flame}
           title="Daily Activity Streak"
           value={stats.dailyStreak}
-          maxValue={22}
+          maxValue={30}
           color="accent"
           unit="days"
-          showRing={true}
         />
 
         <LevelProgress

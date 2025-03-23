@@ -208,13 +208,13 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
                   </TableCell>
                   <TableCell>{trade.entryDate ? formatDate(trade.entryDate) : '-'}</TableCell>
                   <TableCell>{trade.instrument || '-'}</TableCell>
-                  <TableCell>
+                  <TableCell className={trade.direction === 'buy' ? 'text-green-500' : 'text-red-500'}>
                     {trade.direction?.toUpperCase() || '-'}
                   </TableCell>
                   <TableCell>{trade.setup || '-'}</TableCell>
                   <TableCell className={`text-right ${getTradePnLColor(trade.pnl || trade.profit_loss)}`}>
                     {(trade.pnl || trade.profit_loss) ? 
-                      `$${Number(trade.pnl || trade.profit_loss).toFixed(2)}` : 
+                      Number(trade.pnl || trade.profit_loss).toFixed(2) : 
                       '-'}
                   </TableCell>
                   <TableCell>{trade.exitDate ? formatDate(trade.exitDate) : '-'}</TableCell>
