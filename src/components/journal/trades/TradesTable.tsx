@@ -131,13 +131,6 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
       : <ArrowDown className="ml-1 h-4 w-4" />;
   };
 
-  // Format PnL with $ sign
-  const formatPnL = (pnl: number | string | undefined): string => {
-    if (!pnl) return '-';
-    const numPnl = typeof pnl === 'string' ? parseFloat(pnl) : pnl;
-    return `$${numPnl.toFixed(2)}`;
-  };
-
   return (
     <Card className="p-6 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
       <div className="flex justify-between items-center mb-4">
@@ -215,12 +208,14 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
                   </TableCell>
                   <TableCell>{trade.entryDate ? formatDate(trade.entryDate) : '-'}</TableCell>
                   <TableCell>{trade.instrument || '-'}</TableCell>
-                  <TableCell>
+                  <TableCell className={trade.direction === 'buy' ? 'text-green-500' : 'text-red-500'}>
                     {trade.direction?.toUpperCase() || '-'}
                   </TableCell>
                   <TableCell>{trade.setup || '-'}</TableCell>
                   <TableCell className={`text-right ${getTradePnLColor(trade.pnl || trade.profit_loss)}`}>
-                    {formatPnL(trade.pnl || trade.profit_loss)}
+                    {(trade.pnl || trade.profit_loss) ? 
+                      Number(trade.pnl || trade.profit_loss).toFixed(2) : 
+                      '-'}
                   </TableCell>
                   <TableCell>{trade.exitDate ? formatDate(trade.exitDate) : '-'}</TableCell>
                   <TableCell className="text-right">
