@@ -28,9 +28,7 @@ export const TradeHeader = ({ trade }: TradeHeaderProps) => {
         <div className="truncate">
           <h3 className="font-medium text-sm">
             {trade.instrument || "Unknown"}{' '}
-            <span className={`text-xs font-normal ${
-              trade.direction === 'buy' ? 'text-green-600' : 'text-red-600'
-            }`}>
+            <span className="text-xs font-normal text-white">
               ({trade.direction === 'buy' ? 'Long' : 'Short'})
             </span>
           </h3>
