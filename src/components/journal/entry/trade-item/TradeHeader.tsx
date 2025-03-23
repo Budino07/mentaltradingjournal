@@ -28,9 +28,7 @@ export const TradeHeader = ({ trade }: TradeHeaderProps) => {
         <div className="truncate">
           <h3 className="font-medium text-sm">
             {trade.instrument || "Unknown"}{' '}
-            <span className={`text-xs font-normal ${
-              trade.direction === 'buy' ? 'text-green-600' : 'text-red-600'
-            }`}>
+            <span className="text-xs font-normal text-foreground">
               ({trade.direction === 'buy' ? 'Long' : 'Short'})
             </span>
           </h3>
@@ -44,7 +42,7 @@ export const TradeHeader = ({ trade }: TradeHeaderProps) => {
         <div className={`px-2 py-1 rounded text-xs font-medium ${
           isProfitable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
         }`}>
-          {isProfitable ? '+' : ''}{pnl.toFixed(2)}
+          {isProfitable ? '+' : ''}${pnl.toFixed(2)}
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
+
 import { Progress } from "@/components/ui/progress";
-import { LucideIcon, Check } from "lucide-react";
+import { LucideIcon, Check, Circle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactConfetti from "react-confetti";
 import { useEffect, useState } from "react";
@@ -44,6 +45,51 @@ export const ProgressItem = ({
     primary: "bg-primary/20 [&>div]:bg-primary",
     secondary: "bg-secondary/20 [&>div]:bg-secondary",
     accent: "bg-accent/20 [&>div]:bg-accent",
+  };
+
+  // Calculate circle progress for daily streak
+  const calculateCircleProgress = () => {
+    if (title.includes('Daily Activity')) {
+      // SVG circle dimensions
+      const size = 40;
+      const strokeWidth = 4;
+      const radius = (size - strokeWidth) / 2;
+      const circumference = 2 * Math.PI * radius;
+      const progressOffset = ((maxValue - value) / maxValue) * circumference;
+      
+      return (
+        <div className="relative h-10 w-10">
+          <svg width={size} height={size} className="rotate-[-90deg]">
+            {/* Background circle */}
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="none"
+              stroke="#4b5563"
+              strokeWidth={strokeWidth}
+              strokeOpacity={0.2}
+            />
+            {/* Progress circle */}
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="none"
+              stroke="#F97316" // Orange color
+              strokeWidth={strokeWidth}
+              strokeDasharray={circumference}
+              strokeDashoffset={progressOffset}
+              strokeLinecap="round"
+            />
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
+            {value}
+          </div>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -95,34 +141,30 @@ export const ProgressItem = ({
                 <Check className="w-4 h-4" />
               ) : (
                 <>
-                  {title.includes('Daily Activity') ? (
-                    <motion.span
-                      key={value}
-                      initial={{ scale: 1 }}
-                      animate={{ 
-                        scale: [1, 1.5, 1],
-                        transition: {
-                          duration: 0.5,
-                          times: [0, 0.5, 1],
-                          ease: "easeInOut"
-                        }
-                      }}
-                      className="inline-block"
-                    >
-                      {value}
-                    </motion.span>
-                  ) : (
-                    value
-                  )} {unit}
+                  {!title.includes('Daily Activity') && (
+                    <>
+                      {value} {unit}
+                    </>
+                  )}
                 </>
               )}
             </motion.span>
           </AnimatePresence>
         </div>
-        <Progress
-          value={progressValue}
-          className={`h-1 ${progressClasses[color]}`}
-        />
+        
+        {title.includes('Daily Activity') ? (
+          <div className="flex items-center">
+            {calculateCircleProgress()}
+            <div className="ml-2 text-xs text-muted-foreground">
+              {value} out of {maxValue} days
+            </div>
+          </div>
+        ) : (
+          <Progress
+            value={progressValue}
+            className={`h-1 ${progressClasses[color]}`}
+          />
+        )}
       </div>
     </motion.div>
   );
