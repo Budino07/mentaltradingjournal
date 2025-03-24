@@ -123,6 +123,7 @@ export type Database = {
       journal_entries: {
         Row: {
           created_at: string
+          daily_goals: string[] | null
           daily_url: string | null
           emotion: string
           emotion_detail: string
@@ -144,6 +145,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          daily_goals?: string[] | null
           daily_url?: string | null
           emotion: string
           emotion_detail: string
@@ -165,6 +167,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          daily_goals?: string[] | null
           daily_url?: string | null
           emotion?: string
           emotion_detail?: string

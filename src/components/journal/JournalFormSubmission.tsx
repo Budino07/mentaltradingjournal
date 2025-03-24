@@ -21,6 +21,10 @@ interface JournalFormSubmissionProps {
   fourHourUrl?: string;
   oneHourUrl?: string;
   dailyGoals?: string[];
+  weeklyLabel?: string;
+  dailyLabel?: string;
+  fourHourLabel?: string;
+  oneHourLabel?: string;
   resetForm: () => void;
   onSubmitSuccess?: () => void;
 }
@@ -40,6 +44,10 @@ export const useJournalFormSubmission = ({
   fourHourUrl,
   oneHourUrl,
   dailyGoals,
+  weeklyLabel,
+  dailyLabel,
+  fourHourLabel,
+  oneHourLabel,
   resetForm,
   onSubmitSuccess,
 }: JournalFormSubmissionProps) => {
@@ -80,6 +88,7 @@ export const useJournalFormSubmission = ({
 
     try {
       console.log("Submitting journal entry with outcome:", selectedOutcome);
+      console.log("Daily goals:", dailyGoals);
       
       const { error } = await supabase.from('journal_entries').insert({
         user_id: user.id,
@@ -97,6 +106,10 @@ export const useJournalFormSubmission = ({
         four_hour_url: fourHourUrl,
         one_hour_url: oneHourUrl,
         daily_goals: dailyGoals,
+        weekly_label: weeklyLabel,
+        daily_label: dailyLabel,
+        four_hour_label: fourHourLabel,
+        one_hour_label: oneHourLabel,
       });
 
       if (error) {
