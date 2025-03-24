@@ -21,4 +21,5 @@ export interface JournalEntryType {
   daily_label?: string;
   four_hour_label?: string;
   one_hour_label?: string;
+  daily_goals?: string[];
 }

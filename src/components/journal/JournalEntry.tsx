@@ -24,6 +24,7 @@ interface JournalEntry {
   followed_rules?: string[];
   post_submission_notes?: string;
   pre_trading_activities?: string[];
+  daily_goals?: string[];
   weekly_url?: string;
   daily_url?: string;
   four_hour_url?: string;
@@ -113,6 +114,7 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
           trades={entry.trades}
           postSubmissionNotes={entry.post_submission_notes}
           preTradingActivities={entry.pre_trading_activities}
+          dailyGoals={entry.daily_goals}
           weeklyUrl={entry.weekly_url}
           dailyUrl={entry.daily_url}
           fourHourUrl={entry.four_hour_url}

@@ -20,6 +20,7 @@ interface JournalFormSubmissionProps {
   dailyUrl?: string;
   fourHourUrl?: string;
   oneHourUrl?: string;
+  dailyGoals?: string[];
   resetForm: () => void;
   onSubmitSuccess?: () => void;
 }
@@ -38,6 +39,7 @@ export const useJournalFormSubmission = ({
   dailyUrl,
   fourHourUrl,
   oneHourUrl,
+  dailyGoals,
   resetForm,
   onSubmitSuccess,
 }: JournalFormSubmissionProps) => {
@@ -94,6 +96,7 @@ export const useJournalFormSubmission = ({
         daily_url: dailyUrl,
         four_hour_url: fourHourUrl,
         one_hour_url: oneHourUrl,
+        daily_goals: dailyGoals,
       });
 
       if (error) {
@@ -101,7 +104,7 @@ export const useJournalFormSubmission = ({
         throw error;
       }
 
-      await updateProgress(sessionType);
+      await updateProgress(sessionType as any);
       console.log(`Progress updated for ${sessionType} session`);
       showSuccessToast(sessionType);
       resetForm();

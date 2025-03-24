@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { TradesList } from "./TradesList";
 import { TradingRules } from "./TradingRules";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp, ListChecks, NotebookPen, LineChart, ExternalLink, Pencil } from "lucide-react";
+import { ChevronDown, ChevronUp, ListChecks, NotebookPen, LineChart, ExternalLink, Pencil, Target } from "lucide-react";
 import { Trade } from "@/types/trade";
 import { NoteEditDialog } from "./NoteEditDialog";
 
@@ -16,6 +17,7 @@ interface EntryContentProps {
   trades?: Trade[];
   postSubmissionNotes?: string;
   preTradingActivities?: string[];
+  dailyGoals?: string[];
   weeklyUrl?: string;
   dailyUrl?: string;
   fourHourUrl?: string;
@@ -34,6 +36,7 @@ export const EntryContent = ({
   trades,
   postSubmissionNotes,
   preTradingActivities,
+  dailyGoals,
   weeklyUrl,
   dailyUrl,
   fourHourUrl,
@@ -111,6 +114,20 @@ export const EntryContent = ({
             />
           </CollapsibleContent>
         </Collapsible>
+      )}
+
+      {dailyGoals && dailyGoals.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium flex items-center gap-1">
+            <Target className="w-4 h-4 text-primary" />
+            Daily Goals
+          </h4>
+          <ul className="text-sm list-disc pl-5 text-muted-foreground">
+            {dailyGoals.map((goal, index) => (
+              <li key={index}>{goal}</li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {preTradingActivities && preTradingActivities.length > 0 && (

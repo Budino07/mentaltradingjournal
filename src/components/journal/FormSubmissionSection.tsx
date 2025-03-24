@@ -9,7 +9,7 @@ interface FormSubmissionSectionProps {
   notes: string;
   setNotes: (notes: string) => void;
   trades: Trade[];
-  handleSubmit: () => void;
+  handleSubmit: (e?: React.FormEvent) => void;
   selectedOutcome?: string;
 }
 
@@ -36,7 +36,7 @@ export const FormSubmissionSection = ({
       />
 
       <Button 
-        onClick={handleSubmit}
+        onClick={() => handleSubmit()}
         className={`w-full ${isMobile ? 'h-10 text-base' : 'h-12 text-lg'} font-medium bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300`}
       >
         Log {sessionType === "pre" ? "Pre" : "Post"}-Session Entry
