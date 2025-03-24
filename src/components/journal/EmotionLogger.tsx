@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { SessionProgress } from "./SessionProgress";
@@ -14,6 +15,7 @@ import { TradingOutcomeSection } from "./post-session/TradingOutcomeSection";
 import { TradingRulesSection } from "./post-session/TradingRulesSection";
 import { ObservationsSection } from "./post-session/ObservationsSection";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { DailyGoals } from "./DailyGoals";
 
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",
@@ -49,6 +51,8 @@ export const EmotionLogger = ({
   const [dailyUrl, setDailyUrl] = useState('');
   const [fourHourUrl, setFourHourUrl] = useState('');
   const [oneHourUrl, setOneHourUrl] = useState('');
+  const [dailyGoals, setDailyGoals] = useState<string[]>([]);
+  const [completedGoals, setCompletedGoals] = useState<string[]>([]);
 
   const [weeklyLabel, setWeeklyLabel] = useState('Weekly');
   const [dailyLabel, setDailyLabel] = useState('Daily');
@@ -77,6 +81,8 @@ export const EmotionLogger = ({
     setDailyUrl('');
     setFourHourUrl('');
     setOneHourUrl('');
+    setDailyGoals([]);
+    setCompletedGoals([]);
   };
 
   const { handleSubmit } = useJournalFormSubmission({
@@ -93,6 +99,8 @@ export const EmotionLogger = ({
     dailyUrl,
     fourHourUrl,
     oneHourUrl,
+    dailyGoals,
+    completedGoals,
     resetForm,
     onSubmitSuccess: () => {
       setShowCelebration(true);
@@ -150,11 +158,18 @@ export const EmotionLogger = ({
         />
 
         {sessionType === "pre" && (
-          <PreTradingActivities
-            activities={PRE_TRADING_ACTIVITIES}
-            selectedActivities={preTradingActivities}
-            onActivityChange={setPreTradingActivities}
-          />
+          <>
+            <DailyGoals
+              dailyGoals={dailyGoals}
+              setDailyGoals={setDailyGoals}
+            />
+            
+            <PreTradingActivities
+              activities={PRE_TRADING_ACTIVITIES}
+              selectedActivities={preTradingActivities}
+              onActivityChange={setPreTradingActivities}
+            />
+          </>
         )}
         
         <div className="space-y-4 md:space-y-6">
@@ -196,6 +211,10 @@ export const EmotionLogger = ({
               setFourHourLabel={setFourHourLabel}
               oneHourLabel={oneHourLabel}
               setOneHourLabel={setOneHourLabel}
+              dailyGoals={dailyGoals}
+              setDailyGoals={setDailyGoals}
+              completedGoals={completedGoals}
+              setCompletedGoals={setCompletedGoals}
             />
           )}
 

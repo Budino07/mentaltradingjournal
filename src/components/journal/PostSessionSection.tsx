@@ -7,6 +7,7 @@ import { TradingOutcomeSection } from "./post-session/TradingOutcomeSection";
 import { TradingRulesSection } from "./post-session/TradingRulesSection";
 import { ObservationsSection } from "./post-session/ObservationsSection";
 import { MistakesSection } from "./post-session/MistakesSection";
+import { DailyGoals } from "./DailyGoals";
 
 interface PostSessionSectionProps {
   selectedOutcome: string;
@@ -35,6 +36,10 @@ interface PostSessionSectionProps {
   setFourHourLabel?: (label: string) => void;
   oneHourLabel?: string;
   setOneHourLabel?: (label: string) => void;
+  dailyGoals?: string[];
+  setDailyGoals?: (goals: string[]) => void;
+  completedGoals?: string[];
+  setCompletedGoals?: (goals: string[]) => void;
 }
 
 export const PostSessionSection = ({
@@ -64,6 +69,10 @@ export const PostSessionSection = ({
   setFourHourLabel,
   oneHourLabel = '1HR/15m',
   setOneHourLabel,
+  dailyGoals = [],
+  setDailyGoals,
+  completedGoals = [],
+  setCompletedGoals,
 }: PostSessionSectionProps) => {
   return (
     <div className="space-y-6">
@@ -73,6 +82,19 @@ export const PostSessionSection = ({
             selectedOutcome={selectedOutcome}
             setSelectedOutcome={setSelectedOutcome}
           />
+
+          {dailyGoals.length > 0 && (
+            <>
+              <Separator />
+              <DailyGoals
+                dailyGoals={dailyGoals}
+                setDailyGoals={setDailyGoals || (() => {})}
+                completedGoals={completedGoals}
+                setCompletedGoals={setCompletedGoals || (() => {})}
+                isPostSession={true}
+              />
+            </>
+          )}
 
           <Separator />
 

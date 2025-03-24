@@ -1,25 +1,30 @@
-
-import { useJournalToast } from "@/hooks/useJournalToast";
-import { useProgressTracking } from "@/hooks/useProgressTracking";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Trade } from "@/types/trade";
+import React from "react";
+import { useProgressTracking } from "@/hooks/useProgressTracking";
 
 interface JournalFormSubmissionProps {
-  sessionType: "pre" | "post";
+  sessionType: string;
   selectedEmotion: string;
   selectedEmotionDetail: string;
   notes: string;
   selectedOutcome?: string;
   followedRules?: string[];
   selectedMistakes?: string[];
-  preTradingActivities: string[];
-  trades: Trade[];
+  preTradingActivities?: string[];
+  trades?: Trade[];
   weeklyUrl?: string;
   dailyUrl?: string;
   fourHourUrl?: string;
   oneHourUrl?: string;
+  weeklyLabel?: string;
+  dailyLabel?: string;
+  fourHourLabel?: string;
+  oneHourLabel?: string;
+  dailyGoals?: string[]; // Add this new field
+  completedGoals?: string[]; // Add this new field
   resetForm: () => void;
   onSubmitSuccess?: () => void;
 }
@@ -33,85 +38,78 @@ export const useJournalFormSubmission = ({
   followedRules,
   selectedMistakes,
   preTradingActivities,
-  trades,
+  trades = [],
   weeklyUrl,
   dailyUrl,
   fourHourUrl,
   oneHourUrl,
+  weeklyLabel,
+  dailyLabel,
+  fourHourLabel,
+  oneHourLabel,
+  dailyGoals = [], // Add default value
+  completedGoals = [], // Add default value
   resetForm,
   onSubmitSuccess,
 }: JournalFormSubmissionProps) => {
-  const { showSuccessToast } = useJournalToast();
-  const { updateProgress } = useProgressTracking();
   const { user } = useAuth();
+  const { updateProgressStats } = useProgressTracking();
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!user) {
-      toast.error("Authentication Error", {
-        description: "You must be logged in to submit journal entries.",
-        duration: 5000,
-      });
+      toast.error("You must be logged in to submit a journal entry.");
       return;
     }
 
-    // Validate pre-session requirements
-    if (sessionType === "pre") {
-      if (!selectedEmotion || !selectedEmotionDetail || !notes || preTradingActivities.length === 0) {
-        toast.error("Missing Information", {
-          description: "Please fill in all required fields: emotion, details, activities, and notes.",
-          duration: 5000,
-        });
-        return;
-      }
+    if (!sessionType || !selectedEmotion || !selectedEmotionDetail || !notes) {
+      toast.error("Please fill in all required fields.");
+      return;
     }
 
-    // Validate post-session requirements
-    if (sessionType === "post") {
-      if (!selectedEmotion || !selectedEmotionDetail || !notes || !selectedOutcome || followedRules?.length === 0) {
-        toast.error("Missing Information", {
-          description: "Please fill in all required fields for post-session.",
-          duration: 5000,
-        });
-        return;
-      }
-    }
+    // Construct the journal entry data
+    const journalData = {
+      user_id: user?.id,
+      session_type: sessionType,
+      emotion: selectedEmotion,
+      emotion_detail: selectedEmotionDetail,
+      notes,
+      outcome: selectedOutcome || null,
+      followed_rules: followedRules || [],
+      mistakes: selectedMistakes || [],
+      pre_trading_activities: preTradingActivities || [],
+      trades: trades.length > 0 ? trades : [],
+      weekly_url: weeklyUrl || null,
+      daily_url: dailyUrl || null,
+      four_hour_url: fourHourUrl || null,
+      one_hour_url: oneHourUrl || null,
+      weekly_label: weeklyLabel || null,
+      daily_label: dailyLabel || null,
+      four_hour_label: fourHourLabel || null,
+      one_hour_label: oneHourLabel || null,
+      daily_goals: dailyGoals || [], // Add daily goals
+      completed_goals: completedGoals || [] // Add completed goals
+    };
 
     try {
-      console.log("Submitting journal entry with outcome:", selectedOutcome);
-      
-      const { error } = await supabase.from('journal_entries').insert({
-        user_id: user.id,
-        session_type: sessionType,
-        emotion: selectedEmotion,
-        emotion_detail: selectedEmotionDetail,
-        notes,
-        outcome: sessionType === "pre" ? null : selectedOutcome,
-        followed_rules: followedRules,
-        mistakes: selectedMistakes,
-        pre_trading_activities: preTradingActivities,
-        trades,
-        weekly_url: weeklyUrl,
-        daily_url: dailyUrl,
-        four_hour_url: fourHourUrl,
-        one_hour_url: oneHourUrl,
-      });
+      const { error } = await supabase
+        .from('journal_entries')
+        .insert([journalData]);
 
       if (error) {
-        console.error('Error submitting journal entry:', error);
         throw error;
       }
 
-      await updateProgress(sessionType);
-      console.log(`Progress updated for ${sessionType} session`);
-      showSuccessToast(sessionType);
+      toast.success("Journal entry submitted successfully!");
       resetForm();
       onSubmitSuccess?.();
-    } catch (error) {
-      console.error('Error submitting journal entry:', error);
-      toast.error("Error", {
-        description: error instanceof Error ? error.message : "Failed to submit journal entry. Please try again.",
-        duration: 5000,
-      });
+
+      // Update progress stats after successful submission
+      await updateProgressStats(user.id, sessionType);
+    } catch (error: any) {
+      console.error("Error submitting journal entry:", error);
+      toast.error(`Failed to submit journal entry: ${error.message}`);
     }
   };
 

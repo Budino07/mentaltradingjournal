@@ -21,4 +21,6 @@ export interface JournalEntryType {
   daily_label?: string;
   four_hour_label?: string;
   one_hour_label?: string;
+  daily_goals?: string[]; // Add this new field
+  completed_goals?: string[]; // Add this field to track which goals were completed
 }
