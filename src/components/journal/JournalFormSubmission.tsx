@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -53,7 +54,7 @@ export const useJournalFormSubmission = ({
   onSubmitSuccess,
 }: JournalFormSubmissionProps) => {
   const { user } = useAuth();
-  const { updateProgressStats } = useProgressTracking();
+  const { updateProgress } = useProgressTracking();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,7 +107,7 @@ export const useJournalFormSubmission = ({
       onSubmitSuccess?.();
 
       // Update progress stats after successful submission
-      await updateProgressStats(user.id, sessionType);
+      await updateProgress(sessionType as 'pre' | 'post');
     } catch (error: any) {
       console.error("Error submitting journal entry:", error);
       toast.error(`Failed to submit journal entry: ${error.message}`);
