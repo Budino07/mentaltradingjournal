@@ -223,7 +223,7 @@ export const EmotionLogger = ({
             notes={notes}
             setNotes={setNotes}
             trades={trades}
-            handleSubmit={handleSubmit}
+            handleSubmit={(e) => handleSubmit(e)}
             selectedOutcome={selectedOutcome}
           />
         </div>

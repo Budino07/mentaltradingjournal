@@ -9,7 +9,7 @@ interface FormSubmissionSectionProps {
   notes: string;
   setNotes: (notes: string) => void;
   trades: Trade[];
-  handleSubmit: () => void;
+  handleSubmit: (e: React.FormEvent) => void;
   selectedOutcome?: string;
 }
 
