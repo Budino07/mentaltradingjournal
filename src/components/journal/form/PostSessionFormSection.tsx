@@ -28,10 +28,6 @@ interface PostSessionFormSectionProps {
   setFourHourLabel: (label: string) => void;
   oneHourLabel: string;
   setOneHourLabel: (label: string) => void;
-  dailyGoals?: string[];
-  setDailyGoals?: (goals: string[]) => void;
-  completedGoals?: string[];
-  setCompletedGoals?: (goals: string[]) => void;
 }
 
 export const PostSessionFormSection = ({
@@ -59,10 +55,6 @@ export const PostSessionFormSection = ({
   setFourHourLabel,
   oneHourLabel,
   setOneHourLabel,
-  dailyGoals = [],
-  setDailyGoals,
-  completedGoals = [],
-  setCompletedGoals,
 }: PostSessionFormSectionProps) => {
   return (
     <PostSessionSection
@@ -92,10 +84,6 @@ export const PostSessionFormSection = ({
       setFourHourLabel={setFourHourLabel}
       oneHourLabel={oneHourLabel}
       setOneHourLabel={setOneHourLabel}
-      dailyGoals={dailyGoals}
-      setDailyGoals={setDailyGoals}
-      completedGoals={completedGoals}
-      setCompletedGoals={setCompletedGoals}
     />
   );
 };

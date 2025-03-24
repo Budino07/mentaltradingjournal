@@ -204,7 +204,7 @@ export const ProgressStats = ({
           title="Daily Activity Streak"
           value={stats.dailyStreak}
           maxValue={30}
-          color="accent"
+          color="orange"
           unit="days"
         />
 
