@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceLine,
+  Line,
 } from "recharts";
 import { ChartData } from "../types";
 import { useNavigate } from "react-router-dom";
@@ -41,6 +42,29 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         }
       });
     }
+  };
+
+  // Custom shape for captured move indicator
+  const CapturedMoveIndicator = ({ x, y, width, capturedMove, index }: any) => {
+    if (capturedMove === undefined) return null;
+    
+    // Calculate the position for the white line
+    // For a bar chart, we want to show where in the updraw the exit happened
+    const lineYPosition = capturedMove > 0 
+      ? y + ((100 - capturedMove) / 100) * width 
+      : y + width; // If negative or zero, place at bottom
+    
+    return (
+      <line
+        x1={x}
+        y1={lineYPosition}
+        x2={x + width}
+        y2={lineYPosition}
+        stroke="#FFFFFF"
+        strokeWidth={2}
+        strokeDasharray={capturedMove < 0 ? "4 2" : "none"} // Dashed if negative
+      />
+    );
   };
 
   return (
@@ -92,7 +116,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         />
         <Tooltip 
           cursor={{ fill: 'transparent', cursor: 'pointer' }}
-          content={({ active, payload }) => {
+          content={({ active, payload, label }) => {
             if (!active || !payload || !payload.length) return null;
 
             const data = payload[0].payload;
@@ -113,7 +137,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                     <span className="text-card-foreground">Drawdown: {Math.abs(data.maeRelativeToSl)?.toFixed(2)}%</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#0EA5E9]" />
+                    <div className="w-3 h-3 rounded-full bg-[#FFFFFF]" />
                     <span className="text-card-foreground">Captured Move: {data.capturedMove?.toFixed(2)}%</span>
                   </div>
                   <p className="text-card-foreground">R-Multiple: {data.rMultiple?.toFixed(2) || '0'}</p>
@@ -137,17 +161,29 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           name="Updraw" 
           stackId="stack"
           cursor="pointer"
-        >
-          {dataWithNumbers.map((entry, index) => (
-            <circle
-              key={`dot-${index}`}
-              cx={`${index * (100 / (dataWithNumbers.length - 1))}%`}
-              cy={`${50 - (entry.capturedMove || 0) / 2}%`}
-              r={4}
-              fill="#0EA5E9"
-            />
-          ))}
-        </Bar>
+          shape={(props) => {
+            const { x, y, width, height, capturedMove, index } = props;
+            return (
+              <>
+                <rect
+                  x={x}
+                  y={y}
+                  width={width}
+                  height={height}
+                  fill="#FEC6A1"
+                  radius={[4, 4, 0, 0]}
+                />
+                <CapturedMoveIndicator 
+                  x={x} 
+                  y={y} 
+                  width={width} 
+                  capturedMove={props.payload.capturedMove} 
+                  index={index} 
+                />
+              </>
+            );
+          }}
+        />
         <Bar 
           dataKey="maeRelativeToSl" 
           fill="#9b87f5" 

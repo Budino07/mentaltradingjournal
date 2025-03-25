@@ -11,6 +11,7 @@ export default function MfeMae() {
           <h1 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 text-gradient">MFE & MAE Analysis</h1>
           <p className="text-muted-foreground mb-4 sm:mb-6">
             Analyze the maximum favorable and adverse excursions in your trades, with AI-powered recommendations to improve your strategy.
+            The white horizontal line on each bar represents where you actually exited the trade.
           </p>
           <div className="overflow-x-auto">
             <MfeMaeChart />
