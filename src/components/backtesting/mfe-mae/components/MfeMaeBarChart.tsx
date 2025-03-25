@@ -171,7 +171,8 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                   width={width}
                   height={height}
                   fill="#FEC6A1"
-                  radius={[4, 4, 0, 0]}
+                  rx={4}
+                  ry={4}
                 />
                 <CapturedMoveIndicator 
                   x={x} 
