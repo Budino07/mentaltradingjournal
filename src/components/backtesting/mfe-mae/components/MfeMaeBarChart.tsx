@@ -1,3 +1,4 @@
+
 import {
   BarChart,
   Bar,
@@ -8,7 +9,6 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceLine,
-  Line,
 } from "recharts";
 import { ChartData } from "../types";
 import { useNavigate } from "react-router-dom";
@@ -57,6 +57,26 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
       ? "#4ade80" // Aesthetic green for positive values
       : "#f87171"; // Aesthetic red for negative values
     
+    // For negative captured moves, we need to draw them differently
+    // to ensure they're visible below the bar
+    if (capturedMove < 0) {
+      // Position below the bar for negative captured moves
+      const negativeLineY = y + width + 3; // Slightly below the bar
+      
+      return (
+        <line
+          x1={x}
+          y1={negativeLineY}
+          x2={x + width}
+          y2={negativeLineY}
+          stroke="#f87171" // Red for negative
+          strokeWidth={2}
+          strokeDasharray="4 2" // Dashed pattern
+        />
+      );
+    }
+    
+    // For positive captured moves
     return (
       <line
         x1={x}
@@ -65,7 +85,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         y2={lineYPosition}
         stroke={lineColor}
         strokeWidth={2}
-        strokeDasharray={capturedMove < 0 ? "4 2" : "none"} // Dashed if negative
+        strokeDasharray="none"
       />
     );
   };
@@ -167,7 +187,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           stackId="stack"
           cursor="pointer"
           shape={(props) => {
-            const { x, y, width, height, capturedMove, index } = props;
+            const { x, y, width, height } = props;
             return (
               <>
                 <rect
@@ -184,7 +204,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                   y={y} 
                   width={width} 
                   capturedMove={props.payload.capturedMove} 
-                  index={index} 
+                  index={props.index} 
                 />
               </>
             );
