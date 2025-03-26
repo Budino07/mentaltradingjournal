@@ -1,4 +1,3 @@
-
 import {
   BarChart,
   Bar,
@@ -52,16 +51,14 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
       ? "#4ade80" // Aesthetic green for positive values
       : "#f87171"; // Aesthetic red for negative values
     
-    // For negative captured moves, position at the bottom of the chart
+    // For negative captured moves, position at the bottom of the chart (-100%)
     if (capturedMove < 0) {
-      // For negative values, show a red line at the -100% position
-      // Using absolute yAxis position instead of relative to the bar
       return (
         <line
           x1={x}
-          y1={100} // Fixed Y position at the bottom of the chart (-100%)
+          y1={360} // Position at -100% on the Y-axis (bottom of chart)
           x2={x + width}
-          y2={100} // Fixed Y position at the bottom of the chart (-100%)
+          y2={360} // Position at -100% on the Y-axis (bottom of chart)
           stroke={lineColor}
           strokeWidth={3}
           strokeDasharray="none"
