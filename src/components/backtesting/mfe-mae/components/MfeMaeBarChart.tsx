@@ -44,39 +44,46 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
   };
 
   // Custom shape for captured move indicator
-  const CapturedMoveIndicator = ({ x, y, width, capturedMove, index }: any) => {
+  const CapturedMoveIndicator = ({ x, y, width, capturedMove }: any) => {
     if (capturedMove === undefined) return null;
-    
-    // Calculate the position for the line
-    const lineYPosition = capturedMove > 0 
-      ? y + ((100 - capturedMove) / 100) * width 
-      : y + width; // If negative or zero, place at bottom
     
     // Determine line color based on captured move value
     const lineColor = capturedMove > 0 
       ? "#4ade80" // Aesthetic green for positive values
       : "#f87171"; // Aesthetic red for negative values
     
-    // For negative captured moves, we need to draw them differently
-    // to ensure they're visible below the bar
+    // For negative captured moves, position below the bar
     if (capturedMove < 0) {
-      // Position below the bar for negative captured moves
-      const negativeLineY = y + width + 3; // Slightly below the bar
+      // Position at the bottom of the chart for negative captured moves
+      // Add slight offset to make it clearly visible
+      const negativeLineY = y + width + 5; 
       
       return (
-        <line
-          x1={x}
-          y1={negativeLineY}
-          x2={x + width}
-          y2={negativeLineY}
-          stroke="#f87171" // Red for negative
-          strokeWidth={2}
-          strokeDasharray="4 2" // Dashed pattern
-        />
+        <g>
+          <line
+            x1={x}
+            y1={negativeLineY}
+            x2={x + width}
+            y2={negativeLineY}
+            stroke={lineColor}
+            strokeWidth={3}
+            strokeDasharray="4 2" // Dashed pattern for negative values
+          />
+          {/* Add a small indicator to make it more visible */}
+          <circle
+            cx={x + width/2}
+            cy={negativeLineY}
+            r={2}
+            fill={lineColor}
+          />
+        </g>
       );
     }
     
     // For positive captured moves
+    // Calculate the position for the line
+    const lineYPosition = y + ((100 - capturedMove) / 100) * width;
+    
     return (
       <line
         x1={x}
@@ -204,7 +211,6 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                   y={y} 
                   width={width} 
                   capturedMove={props.payload.capturedMove} 
-                  index={props.index} 
                 />
               </>
             );

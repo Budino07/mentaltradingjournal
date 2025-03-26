@@ -11,7 +11,8 @@ export default function MfeMae() {
           <h1 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 text-gradient">MFE & MAE Analysis</h1>
           <p className="text-muted-foreground mb-4 sm:mb-6">
             Analyze the maximum favorable and adverse excursions in your trades, with AI-powered recommendations to improve your strategy.
-            The horizontal line on each bar (green for profit, red for loss) represents where you actually exited the trade.
+            The horizontal line on each bar shows where you exited the trade (green for positive capture, red for negative capture).
+            For negative captured moves, a dashed red line appears below the bar.
           </p>
           <div className="overflow-x-auto">
             <MfeMaeChart />
