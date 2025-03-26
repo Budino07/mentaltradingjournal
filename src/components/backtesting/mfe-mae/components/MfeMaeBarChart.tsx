@@ -52,31 +52,20 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
       ? "#4ade80" // Aesthetic green for positive values
       : "#f87171"; // Aesthetic red for negative values
     
-    // For negative captured moves, position below the bar
+    // For negative captured moves, position at the bottom of the chart
     if (capturedMove < 0) {
-      // Position at the bottom of the chart for negative captured moves
-      // Add slight offset to make it clearly visible
-      const negativeLineY = y + width + 5; 
-      
+      // For negative values, show a red line at the -100% position
+      // Using absolute yAxis position instead of relative to the bar
       return (
-        <g>
-          <line
-            x1={x}
-            y1={negativeLineY}
-            x2={x + width}
-            y2={negativeLineY}
-            stroke={lineColor}
-            strokeWidth={3}
-            strokeDasharray="4 2" // Dashed pattern for negative values
-          />
-          {/* Add a small indicator to make it more visible */}
-          <circle
-            cx={x + width/2}
-            cy={negativeLineY}
-            r={2}
-            fill={lineColor}
-          />
-        </g>
+        <line
+          x1={x}
+          y1={100} // Fixed Y position at the bottom of the chart (-100%)
+          x2={x + width}
+          y2={100} // Fixed Y position at the bottom of the chart (-100%)
+          stroke={lineColor}
+          strokeWidth={3}
+          strokeDasharray="none"
+        />
       );
     }
     
