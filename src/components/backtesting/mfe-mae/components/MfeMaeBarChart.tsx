@@ -1,4 +1,3 @@
-
 import {
   BarChart,
   Bar,
@@ -48,11 +47,15 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
   const CapturedMoveIndicator = ({ x, y, width, capturedMove, index }: any) => {
     if (capturedMove === undefined) return null;
     
-    // Calculate the position for the white line
-    // For a bar chart, we want to show where in the updraw the exit happened
+    // Calculate the position for the line
     const lineYPosition = capturedMove > 0 
       ? y + ((100 - capturedMove) / 100) * width 
       : y + width; // If negative or zero, place at bottom
+    
+    // Determine line color based on captured move value
+    const lineColor = capturedMove > 0 
+      ? "#4ade80" // Aesthetic green for positive values
+      : "#f87171"; // Aesthetic red for negative values
     
     return (
       <line
@@ -60,7 +63,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         y1={lineYPosition}
         x2={x + width}
         y2={lineYPosition}
-        stroke="#FFFFFF"
+        stroke={lineColor}
         strokeWidth={2}
         strokeDasharray={capturedMove < 0 ? "4 2" : "none"} // Dashed if negative
       />
@@ -137,7 +140,9 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                     <span className="text-card-foreground">Drawdown: {Math.abs(data.maeRelativeToSl)?.toFixed(2)}%</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#FFFFFF]" />
+                    <div className="w-3 h-3 rounded-full" style={{ 
+                      backgroundColor: data.capturedMove > 0 ? "#4ade80" : "#f87171" 
+                    }} />
                     <span className="text-card-foreground">Captured Move: {data.capturedMove?.toFixed(2)}%</span>
                   </div>
                   <p className="text-card-foreground">R-Multiple: {data.rMultiple?.toFixed(2) || '0'}</p>
