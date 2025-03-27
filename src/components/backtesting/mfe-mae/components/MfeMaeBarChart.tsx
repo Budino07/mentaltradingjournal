@@ -1,3 +1,4 @@
+
 import {
   BarChart,
   Bar,
@@ -47,27 +48,31 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
     if (capturedMove === undefined) return null;
     
     // Determine line color based on captured move value
-    const lineColor = capturedMove > 0 
+    const lineColor = capturedMove >= 0 
       ? "#4ade80" // Aesthetic green for positive values
       : "#f87171"; // Aesthetic red for negative values
     
-    // For negative captured moves, position at the bottom of the chart (-100%)
+    // For negative captured moves, position at the bottom of the chart
     if (capturedMove < 0) {
+      // Get the y-coordinate for the bottom of the chart (where -100% would be)
+      const negativeYPosition = 360; // Position at -100% on the Y-axis
+      
       return (
         <line
           x1={x}
-          y1={360} // Position at -100% on the Y-axis (bottom of chart)
+          y1={negativeYPosition}
           x2={x + width}
-          y2={360} // Position at -100% on the Y-axis (bottom of chart)
+          y2={negativeYPosition}
           stroke={lineColor}
-          strokeWidth={3}
+          strokeWidth={4} // Increased stroke width for better visibility
           strokeDasharray="none"
+          style={{ zIndex: 10 }} // Ensure it displays above other elements
         />
       );
     }
     
     // For positive captured moves
-    // Calculate the position for the line
+    // Calculate the position for the line based on the percentage
     const lineYPosition = y + ((100 - capturedMove) / 100) * width;
     
     return (
@@ -80,6 +85,35 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         strokeWidth={2}
         strokeDasharray="none"
       />
+    );
+  };
+
+  // Component to render negative captured moves separately to ensure visibility
+  const NegativeCapturedMoveLayer = ({ data }: { data: any[] }) => {
+    return (
+      <g className="negative-captured-moves">
+        {data.map((entry, index) => {
+          if (entry.capturedMove < 0) {
+            // Find the bar's x position
+            const barX = index * (500 / data.length); // Approximate bar position
+            const barWidth = 500 / data.length - 10; // Approximate bar width
+            
+            return (
+              <line
+                key={`neg-cap-${index}`}
+                x1={barX}
+                y1={360} // Position at -100% on Y-axis
+                x2={barX + barWidth}
+                y2={360}
+                stroke="#f87171" // Red for negative
+                strokeWidth={4}
+                style={{ zIndex: 100 }}
+              />
+            );
+          }
+          return null;
+        })}
+      </g>
     );
   };
 
@@ -154,7 +188,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ 
-                      backgroundColor: data.capturedMove > 0 ? "#4ade80" : "#f87171" 
+                      backgroundColor: data.capturedMove >= 0 ? "#4ade80" : "#f87171" 
                     }} />
                     <span className="text-card-foreground">Captured Move: {data.capturedMove?.toFixed(2)}%</span>
                   </div>
@@ -209,6 +243,8 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           stackId="stack"
           cursor="pointer"
         />
+        {/* Add an overlay to ensure negative captured move lines are visible */}
+        <NegativeCapturedMoveLayer data={dataWithNumbers} />
       </BarChart>
     </ResponsiveContainer>
   );

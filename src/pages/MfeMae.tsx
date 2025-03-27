@@ -12,7 +12,7 @@ export default function MfeMae() {
           <p className="text-muted-foreground mb-4 sm:mb-6">
             Analyze the maximum favorable and adverse excursions in your trades, with AI-powered recommendations to improve your strategy.
             The horizontal line on each bar shows where you exited the trade (green for positive capture, red for negative capture).
-            For negative captured moves (-100%), a red line appears at the bottom of the chart.
+            For negative captured moves, a red line appears at the bottom of the chart at the -100% mark.
           </p>
           <div className="overflow-x-auto">
             <MfeMaeChart />
