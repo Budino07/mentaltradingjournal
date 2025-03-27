@@ -57,21 +57,12 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
     
     if (capturedMove >= 0) {
       // For positive captured moves - position on the updraw (peach/orange) bar
-      lineYPosition = y + ((100 - capturedMove) / 100) * width;
+      lineYPosition = y + ((100 - capturedMove) / 100) * height;
     } else {
       // For negative captured moves - position on the drawdown (purple) bar
-      // We need to find the y position of the zero line and then position the line
-      // at the appropriate percentage of the drawdown bar
-      
-      // First get the y position of the 0 line (middle of the chart)
-      const zeroLineY = 180; // This is approximate - where the zero line is
-      
-      // Calculate how far down the line should be from the zero line
-      // based on the negative percentage
+      // We need to find the appropriate position relative to this bar's dimensions
       const negativePercentage = Math.abs(capturedMove);
-      
-      // Now position the line at the corresponding place on the drawdown bar
-      lineYPosition = zeroLineY + (negativePercentage / 100) * height;
+      lineYPosition = y + (negativePercentage / 100) * height;
     }
     
     return (
