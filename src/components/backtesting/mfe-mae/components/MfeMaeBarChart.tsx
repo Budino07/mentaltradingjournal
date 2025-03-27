@@ -52,28 +52,24 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
       ? "#4ade80" // Aesthetic green for positive values
       : "#f87171"; // Aesthetic red for negative values
     
-    // For negative captured moves, position at the bottom of the chart
-    if (capturedMove < 0) {
-      // Get the y-coordinate for the bottom of the chart (where -100% would be)
-      const negativeYPosition = 360; // Position at -100% on the Y-axis
-      
-      return (
-        <line
-          x1={x}
-          y1={negativeYPosition}
-          x2={x + width}
-          y2={negativeYPosition}
-          stroke={lineColor}
-          strokeWidth={4} // Increased stroke width for better visibility
-          strokeDasharray="none"
-          style={{ zIndex: 10 }} // Ensure it displays above other elements
-        />
-      );
-    }
-    
-    // For positive captured moves
     // Calculate the position for the line based on the percentage
-    const lineYPosition = y + ((100 - capturedMove) / 100) * width;
+    // For both positive and negative values
+    let lineYPosition;
+    
+    if (capturedMove >= 0) {
+      // For positive captured moves - same as before
+      lineYPosition = y + ((100 - capturedMove) / 100) * width;
+    } else {
+      // For negative captured moves - position at the actual negative percentage
+      // Map the negative percentage (-100 to 0) to the height of the negative chart area
+      const negativePercentage = Math.abs(capturedMove);
+      // Calculate the position from the middle (0% line) downward
+      // The Y position needs to move from the 0 line (usually around 180px) down 
+      // proportionally to how negative the capturedMove is
+      const zeroPosition = 180; // Approximate Y position of the 0 line
+      const negativeHeight = 180; // Approximate height of the negative chart area
+      lineYPosition = zeroPosition + (negativePercentage / 100) * negativeHeight;
+    }
     
     return (
       <line
@@ -82,38 +78,10 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         x2={x + width}
         y2={lineYPosition}
         stroke={lineColor}
-        strokeWidth={2}
+        strokeWidth={3}
         strokeDasharray="none"
+        style={{ zIndex: 10 }} // Ensure it displays above other elements
       />
-    );
-  };
-
-  // Component to render negative captured moves separately to ensure visibility
-  const NegativeCapturedMoveLayer = ({ data }: { data: any[] }) => {
-    return (
-      <g className="negative-captured-moves">
-        {data.map((entry, index) => {
-          if (entry.capturedMove < 0) {
-            // Find the bar's x position
-            const barX = index * (500 / data.length); // Approximate bar position
-            const barWidth = 500 / data.length - 10; // Approximate bar width
-            
-            return (
-              <line
-                key={`neg-cap-${index}`}
-                x1={barX}
-                y1={360} // Position at -100% on Y-axis
-                x2={barX + barWidth}
-                y2={360}
-                stroke="#f87171" // Red for negative
-                strokeWidth={4}
-                style={{ zIndex: 100 }}
-              />
-            );
-          }
-          return null;
-        })}
-      </g>
     );
   };
 
@@ -243,8 +211,6 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           stackId="stack"
           cursor="pointer"
         />
-        {/* Add an overlay to ensure negative captured move lines are visible */}
-        <NegativeCapturedMoveLayer data={dataWithNumbers} />
       </BarChart>
     </ResponsiveContainer>
   );
