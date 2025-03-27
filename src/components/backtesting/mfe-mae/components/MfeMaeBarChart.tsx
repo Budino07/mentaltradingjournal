@@ -44,7 +44,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
   };
 
   // Custom shape for captured move indicator
-  const CapturedMoveIndicator = ({ x, y, width, capturedMove }: any) => {
+  const CapturedMoveIndicator = ({ x, y, width, height, capturedMove }: any) => {
     if (capturedMove === undefined) return null;
     
     // Determine line color based on captured move value
@@ -53,22 +53,25 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
       : "#f87171"; // Aesthetic red for negative values
     
     // Calculate the position for the line based on the percentage
-    // For both positive and negative values
     let lineYPosition;
     
     if (capturedMove >= 0) {
-      // For positive captured moves - same as before
+      // For positive captured moves - position on the updraw (peach/orange) bar
       lineYPosition = y + ((100 - capturedMove) / 100) * width;
     } else {
-      // For negative captured moves - position at the actual negative percentage
-      // Map the negative percentage (-100 to 0) to the height of the negative chart area
+      // For negative captured moves - position on the drawdown (purple) bar
+      // We need to find the y position of the zero line and then position the line
+      // at the appropriate percentage of the drawdown bar
+      
+      // First get the y position of the 0 line (middle of the chart)
+      const zeroLineY = 180; // This is approximate - where the zero line is
+      
+      // Calculate how far down the line should be from the zero line
+      // based on the negative percentage
       const negativePercentage = Math.abs(capturedMove);
-      // Calculate the position from the middle (0% line) downward
-      // The Y position needs to move from the 0 line (usually around 180px) down 
-      // proportionally to how negative the capturedMove is
-      const zeroPosition = 180; // Approximate Y position of the 0 line
-      const negativeHeight = 180; // Approximate height of the negative chart area
-      lineYPosition = zeroPosition + (negativePercentage / 100) * negativeHeight;
+      
+      // Now position the line at the corresponding place on the drawdown bar
+      lineYPosition = zeroLineY + (negativePercentage / 100) * height;
     }
     
     return (
@@ -80,7 +83,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         stroke={lineColor}
         strokeWidth={3}
         strokeDasharray="none"
-        style={{ zIndex: 10 }} // Ensure it displays above other elements
+        style={{ zIndex: 1000 }} // Very high z-index to ensure visibility
       />
     );
   };
@@ -182,7 +185,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           stackId="stack"
           cursor="pointer"
           shape={(props) => {
-            const { x, y, width, height } = props;
+            const { x, y, width, height, payload } = props;
             return (
               <>
                 <rect
@@ -194,12 +197,15 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                   rx={4}
                   ry={4}
                 />
-                <CapturedMoveIndicator 
-                  x={x} 
-                  y={y} 
-                  width={width} 
-                  capturedMove={props.payload.capturedMove} 
-                />
+                {payload.capturedMove >= 0 && (
+                  <CapturedMoveIndicator 
+                    x={x} 
+                    y={y} 
+                    width={width}
+                    height={height}
+                    capturedMove={payload.capturedMove} 
+                  />
+                )}
               </>
             );
           }}
@@ -210,6 +216,31 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           name="Drawdown" 
           stackId="stack"
           cursor="pointer"
+          shape={(props) => {
+            const { x, y, width, height, payload } = props;
+            return (
+              <>
+                <rect
+                  x={x}
+                  y={y}
+                  width={width}
+                  height={height}
+                  fill="#9b87f5"
+                  rx={4}
+                  ry={4}
+                />
+                {payload.capturedMove < 0 && (
+                  <CapturedMoveIndicator 
+                    x={x} 
+                    y={y} 
+                    width={width}
+                    height={height}
+                    capturedMove={payload.capturedMove} 
+                  />
+                )}
+              </>
+            );
+          }}
         />
       </BarChart>
     </ResponsiveContainer>
