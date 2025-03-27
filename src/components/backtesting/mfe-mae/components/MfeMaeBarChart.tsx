@@ -60,9 +60,8 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           x2={x + width}
           y2={360} // Position at -100% on the Y-axis (bottom of chart)
           stroke={lineColor}
-          strokeWidth={4} // Increased stroke width for better visibility
+          strokeWidth={3}
           strokeDasharray="none"
-          style={{ zIndex: 10 }} // Add z-index to ensure it appears above other elements
         />
       );
     }
@@ -110,28 +109,6 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         <ReferenceLine y={0} stroke="hsl(var(--border))" strokeWidth={2} />
         <ReferenceLine y={100} stroke="#FEC6A1" strokeWidth={2} />
         <ReferenceLine y={-100} stroke="#9b87f5" strokeWidth={2} />
-        
-        {/* Add negative captured move indicators as custom SVG elements before the bars */}
-        {dataWithNumbers.map((entry, index) => {
-          if (entry.capturedMove < 0) {
-            const barWidth = 20; // Approximate bar width
-            const xPosition = 40 + index * (barWidth + 10); // Approximate position calculation
-            return (
-              <g key={`neg-capture-${index}`} style={{ zIndex: 5 }}>
-                <line
-                  x1={xPosition}
-                  y1={360}
-                  x2={xPosition + barWidth}
-                  y2={360}
-                  stroke="#f87171"
-                  strokeWidth={4}
-                />
-              </g>
-            );
-          }
-          return null;
-        })}
-        
         <XAxis 
           dataKey="tradeNum" 
           label={{ 
@@ -153,7 +130,6 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           }}
           tick={{ fill: 'hsl(var(--card-foreground))' }}
         />
-        
         <Tooltip 
           cursor={{ fill: 'transparent', cursor: 'pointer' }}
           content={({ active, payload, label }) => {
@@ -189,7 +165,6 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
             );
           }}
         />
-        
         <Legend 
           verticalAlign="top" 
           align="right"
