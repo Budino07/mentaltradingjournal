@@ -1,7 +1,6 @@
-
 import { DayProps } from "react-day-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { calculateDayStats, formatCurrency } from "./calendarUtils";
+import { calculateDayStats, formatCurrency, getEmotionStyle } from "./calendarUtils";
 import { Trade } from "@/types/trade";
 import { Circle } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -43,14 +42,22 @@ export const CalendarDay = ({
     })
   );
   
-  // Find the predominant emotion for this day
+  // Find the emotion for this day, specifically looking for pre-session entries
   const dayEntries = entries.filter(entry => 
     new Date(entry.date).toDateString() === dayDate.toDateString()
   );
   
-  // Prioritize pre-session emotions if available
-  const preSessionEntry = dayEntries.find(entry => entry.emotion);
+  // Find a pre-session entry for this day
+  // For debugging, log entries for the 24th to see what's happening
+  if (dayDate.getDate() === 24) {
+    console.log('Entries for the 24th:', dayEntries);
+  }
+  
+  const preSessionEntry = dayEntries.find(entry => entry.emotion && entry.session_type === 'pre');
   const predominantEmotion = preSessionEntry?.emotion || null;
+  
+  // Get styling based on the emotion
+  const emotionStyle = getEmotionStyle(predominantEmotion);
   
   const isToday = dayDate.toDateString() === new Date().toDateString();
   const hasEntries = stats !== null;
@@ -94,36 +101,6 @@ export const CalendarDay = ({
     checkWeeklyReview();
   }, [user, dayDate, isSaturday]);
 
-  const getEmotionColor = (emotion: string | null) => {
-    if (!emotion) return 'border-gray-200 dark:border-gray-700';
-    
-    switch (emotion.toLowerCase()) {
-      case 'positive':
-        return 'border-accent dark:border-accent';
-      case 'negative':
-        return 'border-primary dark:border-primary';
-      case 'neutral':
-        return 'border-secondary dark:border-secondary';
-      default:
-        return 'border-gray-200 dark:border-gray-700';
-    }
-  };
-
-  const getEmotionBackground = (emotion: string | null) => {
-    if (!emotion) return '';
-    
-    switch (emotion.toLowerCase()) {
-      case 'positive':
-        return 'bg-accent/10';
-      case 'negative':
-        return 'bg-primary/10';
-      case 'neutral':
-        return 'bg-secondary/10';
-      default:
-        return '';
-    }
-  };
-
   const getPnLColor = (amount: number) => {
     if (amount === 0) return 'text-gray-500 dark:text-gray-400';
     return amount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400';
@@ -135,9 +112,9 @@ export const CalendarDay = ({
       className={`
         ${className || ''} 
         relative flex flex-col h-full w-full
-        border-2 ${getEmotionColor(predominantEmotion)}
+        border-2 ${emotionStyle.border}
         rounded-lg
-        ${getEmotionBackground(predominantEmotion)}
+        ${emotionStyle.bg}
         hover:border-primary hover:shadow-lg
         transition-all duration-200 ease-in-out
         overflow-hidden

@@ -55,21 +55,21 @@ export const getEmotionStyle = (emotion: string | null) => {
   switch (emotion.toLowerCase()) {
     case 'positive':
       return {
-        bg: "bg-accent/10 dark:bg-accent/20",
-        border: "border-accent dark:border-accent",
-        shadow: "shadow-accent/20 dark:shadow-accent/20",
+        bg: "bg-orange-50 dark:bg-orange-900/20",  // Peach color
+        border: "border-orange-300 dark:border-orange-400",
+        shadow: "shadow-orange-100/50 dark:shadow-orange-800/30",
       };
     case 'negative':
       return {
-        bg: "bg-primary/10 dark:bg-primary/20",
-        border: "border-primary dark:border-primary",
-        shadow: "shadow-primary/20 dark:shadow-primary/20",
+        bg: "bg-purple-50 dark:bg-purple-900/20",  // Purple color
+        border: "border-purple-300 dark:border-purple-400",
+        shadow: "shadow-purple-100/50 dark:shadow-purple-800/30",
       };
     case 'neutral':
       return {
-        bg: "bg-secondary/10 dark:bg-secondary/20",
-        border: "border-secondary dark:border-secondary",
-        shadow: "shadow-secondary/20 dark:shadow-secondary/20",
+        bg: "bg-blue-50 dark:bg-blue-900/20",  // Blue color
+        border: "border-blue-300 dark:border-blue-400",
+        shadow: "shadow-blue-100/50 dark:shadow-blue-800/30",
       };
     default:
       return {
