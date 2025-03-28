@@ -1,3 +1,4 @@
+
 import { Trade } from "@/types/trade";
 
 export const calculateDayStats = (entries: Array<{ trades?: Trade[] }>) => {
@@ -44,28 +45,37 @@ export const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-export const getEmotionStyle = (stats: { totalPL: number } | null) => {
-  if (!stats) return null;
-
-  if (stats.totalPL === 0) {
-    return {
-      bg: "bg-gray-50 dark:bg-gray-800/30",
-      border: "border-gray-200 dark:border-gray-700",
-      shadow: "shadow-gray-100/50 dark:shadow-gray-900/50",
-    };
-  }
-
-  if (stats.totalPL > 0) {
-    return {
-      bg: "bg-emerald-50 dark:bg-emerald-950/30",
-      border: "border-emerald-500 dark:border-emerald-500",
-      shadow: "shadow-emerald-100/50 dark:shadow-emerald-900/50",
-    };
-  }
-
-  return {
-    bg: "bg-red-50 dark:bg-red-950/30",
-    border: "border-red-500 dark:border-red-500",
-    shadow: "shadow-red-100/50 dark:shadow-red-900/50",
+export const getEmotionStyle = (emotion: string | null) => {
+  if (!emotion) return {
+    bg: "bg-gray-50 dark:bg-gray-800/30",
+    border: "border-gray-200 dark:border-gray-700",
+    shadow: "shadow-gray-100/50 dark:shadow-gray-900/50",
   };
+
+  switch (emotion.toLowerCase()) {
+    case 'positive':
+      return {
+        bg: "bg-accent/10 dark:bg-accent/20",
+        border: "border-accent dark:border-accent",
+        shadow: "shadow-accent/20 dark:shadow-accent/20",
+      };
+    case 'negative':
+      return {
+        bg: "bg-primary/10 dark:bg-primary/20",
+        border: "border-primary dark:border-primary",
+        shadow: "shadow-primary/20 dark:shadow-primary/20",
+      };
+    case 'neutral':
+      return {
+        bg: "bg-secondary/10 dark:bg-secondary/20",
+        border: "border-secondary dark:border-secondary",
+        shadow: "shadow-secondary/20 dark:shadow-secondary/20",
+      };
+    default:
+      return {
+        bg: "bg-gray-50 dark:bg-gray-800/30",
+        border: "border-gray-200 dark:border-gray-700",
+        shadow: "shadow-gray-100/50 dark:shadow-gray-900/50",
+      };
+  }
 };

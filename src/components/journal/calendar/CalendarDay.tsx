@@ -43,6 +43,15 @@ export const CalendarDay = ({
     })
   );
   
+  // Find the predominant emotion for this day
+  const dayEntries = entries.filter(entry => 
+    new Date(entry.date).toDateString() === dayDate.toDateString()
+  );
+  
+  // Prioritize pre-session emotions if available
+  const preSessionEntry = dayEntries.find(entry => entry.emotion);
+  const predominantEmotion = preSessionEntry?.emotion || null;
+  
   const isToday = dayDate.toDateString() === new Date().toDateString();
   const hasEntries = stats !== null;
   const isSaturday = dayDate.getDay() === 6;
@@ -85,16 +94,39 @@ export const CalendarDay = ({
     checkWeeklyReview();
   }, [user, dayDate, isSaturday]);
 
+  const getEmotionColor = (emotion: string | null) => {
+    if (!emotion) return 'border-gray-200 dark:border-gray-700';
+    
+    switch (emotion.toLowerCase()) {
+      case 'positive':
+        return 'border-accent dark:border-accent';
+      case 'negative':
+        return 'border-primary dark:border-primary';
+      case 'neutral':
+        return 'border-secondary dark:border-secondary';
+      default:
+        return 'border-gray-200 dark:border-gray-700';
+    }
+  };
+
+  const getEmotionBackground = (emotion: string | null) => {
+    if (!emotion) return '';
+    
+    switch (emotion.toLowerCase()) {
+      case 'positive':
+        return 'bg-accent/10';
+      case 'negative':
+        return 'bg-primary/10';
+      case 'neutral':
+        return 'bg-secondary/10';
+      default:
+        return '';
+    }
+  };
+
   const getPnLColor = (amount: number) => {
     if (amount === 0) return 'text-gray-500 dark:text-gray-400';
     return amount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400';
-  };
-
-  const getBorderColor = (amount: number | null) => {
-    if (!amount) return 'border-gray-200 dark:border-gray-700';
-    if (amount > 0) return 'border-emerald-500 dark:border-emerald-500';
-    if (amount < 0) return 'border-red-500 dark:border-red-500';
-    return 'border-gray-200 dark:border-gray-700';
   };
 
   const dayButton = (
@@ -103,8 +135,9 @@ export const CalendarDay = ({
       className={`
         ${className || ''} 
         relative flex flex-col h-full w-full
-        border-2 ${getBorderColor(stats?.totalPL || null)}
+        border-2 ${getEmotionColor(predominantEmotion)}
         rounded-lg
+        ${getEmotionBackground(predominantEmotion)}
         hover:border-primary hover:shadow-lg
         transition-all duration-200 ease-in-out
         overflow-hidden
