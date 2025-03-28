@@ -116,7 +116,7 @@ export const CalendarDay = ({
     >
       {/* Emotion indicator stripe at the top */}
       {emotionColors && (
-        <div className={`absolute top-0 left-0 right-0 h-2 ${emotionColors.bg}`}></div>
+        <div className={`absolute top-0 left-0 right-0 h-1.5 ${emotionColors.bg}`}></div>
       )}
       
       <div className="absolute top-2 right-2">
@@ -144,7 +144,7 @@ export const CalendarDay = ({
       {/* Emotion indicator small circle in top left */}
       {emotionColors && (
         <div className="absolute top-2 left-2">
-          <div className={`w-4 h-4 rounded-full ${emotionColors.bg} border-2 ${emotionColors.border} shadow-sm`}></div>
+          <div className={`w-3 h-3 rounded-full ${emotionColors.bg} border ${emotionColors.border}`}></div>
         </div>
       )}
     </button>
