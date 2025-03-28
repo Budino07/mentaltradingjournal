@@ -1,4 +1,3 @@
-
 import {
   BarChart,
   Bar,
@@ -9,6 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceLine,
+  Line,
 } from "recharts";
 import { ChartData } from "../types";
 import { useNavigate } from "react-router-dom";
@@ -44,32 +44,18 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
   };
 
   // Custom shape for captured move indicator
-  const CapturedMoveIndicator = ({ x, y, width, capturedMove }: any) => {
+  const CapturedMoveIndicator = ({ x, y, width, capturedMove, index }: any) => {
     if (capturedMove === undefined) return null;
     
+    // Calculate the position for the line
+    const lineYPosition = capturedMove > 0 
+      ? y + ((100 - capturedMove) / 100) * width 
+      : y + width; // If negative or zero, place at bottom
+    
     // Determine line color based on captured move value
-    const lineColor = capturedMove >= 0 
+    const lineColor = capturedMove > 0 
       ? "#4ade80" // Aesthetic green for positive values
       : "#f87171"; // Aesthetic red for negative values
-    
-    // Calculate the position for the line based on the percentage
-    // For both positive and negative values
-    let lineYPosition;
-    
-    if (capturedMove >= 0) {
-      // For positive captured moves - same as before
-      lineYPosition = y + ((100 - capturedMove) / 100) * width;
-    } else {
-      // For negative captured moves - position at the actual negative percentage
-      // Map the negative percentage (-100 to 0) to the height of the negative chart area
-      const negativePercentage = Math.abs(capturedMove);
-      // Calculate the position from the middle (0% line) downward
-      // The Y position needs to move from the 0 line (usually around 180px) down 
-      // proportionally to how negative the capturedMove is
-      const zeroPosition = 180; // Approximate Y position of the 0 line
-      const negativeHeight = 180; // Approximate height of the negative chart area
-      lineYPosition = zeroPosition + (negativePercentage / 100) * negativeHeight;
-    }
     
     return (
       <line
@@ -78,9 +64,8 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         x2={x + width}
         y2={lineYPosition}
         stroke={lineColor}
-        strokeWidth={3}
-        strokeDasharray="none"
-        style={{ zIndex: 10 }} // Ensure it displays above other elements
+        strokeWidth={2}
+        strokeDasharray={capturedMove < 0 ? "4 2" : "none"} // Dashed if negative
       />
     );
   };
@@ -156,7 +141,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ 
-                      backgroundColor: data.capturedMove >= 0 ? "#4ade80" : "#f87171" 
+                      backgroundColor: data.capturedMove > 0 ? "#4ade80" : "#f87171" 
                     }} />
                     <span className="text-card-foreground">Captured Move: {data.capturedMove?.toFixed(2)}%</span>
                   </div>
@@ -182,7 +167,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           stackId="stack"
           cursor="pointer"
           shape={(props) => {
-            const { x, y, width, height } = props;
+            const { x, y, width, height, capturedMove, index } = props;
             return (
               <>
                 <rect
@@ -199,6 +184,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                   y={y} 
                   width={width} 
                   capturedMove={props.payload.capturedMove} 
+                  index={index} 
                 />
               </>
             );
