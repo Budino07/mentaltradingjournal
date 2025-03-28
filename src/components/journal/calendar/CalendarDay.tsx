@@ -1,4 +1,3 @@
-
 import { DayProps } from "react-day-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { calculateDayStats, formatCurrency, getEmotionColor } from "./calendarUtils";
@@ -93,6 +92,12 @@ export const CalendarDay = ({
   };
 
   const getBorderColor = (amount: number | null) => {
+    // If we have emotion colors, use those for the border
+    if (emotionColors) {
+      return emotionColors.border;
+    }
+    
+    // Otherwise, fall back to P&L based coloring
     if (!amount) return 'border-gray-200 dark:border-gray-700';
     if (amount > 0) return 'border-emerald-500 dark:border-emerald-500';
     if (amount < 0) return 'border-red-500 dark:border-red-500';
@@ -114,15 +119,10 @@ export const CalendarDay = ({
       `}
       {...props}
     >
-      {/* Emotion indicator stripe at the top */}
-      {emotionColors && (
-        <div className={`absolute top-0 left-0 right-0 h-1.5 ${emotionColors.bg}`}></div>
-      )}
-      
       <div className="absolute top-2 right-2">
         <span className={`
           text-sm font-medium
-          ${isToday ? 'bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent' : 'text-gray-500 dark:text-gray-400'}
+          ${emotionColors ? emotionColors.text : isToday ? 'bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent' : 'text-gray-500 dark:text-gray-400'}
         `}>
           {dayDate.getDate()}
         </span>
@@ -138,13 +138,6 @@ export const CalendarDay = ({
               {stats.numTrades} trade{stats.numTrades !== 1 ? 's' : ''}
             </p>
           </div>
-        </div>
-      )}
-      
-      {/* Emotion indicator small circle in top left */}
-      {emotionColors && (
-        <div className="absolute top-2 left-2">
-          <div className={`w-3 h-3 rounded-full ${emotionColors.bg} border ${emotionColors.border}`}></div>
         </div>
       )}
     </button>
