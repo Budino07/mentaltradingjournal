@@ -87,21 +87,21 @@ export const getEmotionColor = (emotion: string | null) => {
   switch (emotion.toLowerCase()) {
     case 'positive':
       return {
-        bg: "bg-[#FDE1D3]", // Soft Peach
-        indicator: "bg-[#FDE1D3]",
-        border: "border-[#FDE1D3]"
+        bg: "bg-[#FF9A76]", // Darker Peach
+        indicator: "bg-[#FF9A76]",
+        border: "border-[#FF9A76]"
       };
     case 'negative':
       return {
-        bg: "bg-[#E5DEFF]", // Soft Purple
-        indicator: "bg-[#E5DEFF]",
-        border: "border-[#E5DEFF]"
+        bg: "bg-[#9C7AF6]", // Darker Purple
+        indicator: "bg-[#9C7AF6]",
+        border: "border-[#9C7AF6]"
       };
     case 'neutral':
       return {
-        bg: "bg-[#D3E4FD]", // Soft Blue
-        indicator: "bg-[#D3E4FD]",
-        border: "border-[#D3E4FD]"
+        bg: "bg-[#5B9EFF]", // Darker Blue
+        indicator: "bg-[#5B9EFF]",
+        border: "border-[#5B9EFF]"
       };
     default:
       return null;
