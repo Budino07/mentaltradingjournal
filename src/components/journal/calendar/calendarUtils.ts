@@ -1,4 +1,3 @@
-
 import { Trade } from "@/types/trade";
 
 export const calculateDayStats = (entries: Array<{ trades?: Trade[] }>) => {
@@ -45,37 +44,28 @@ export const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-export const getEmotionStyle = (emotion: string | null) => {
-  if (!emotion) return {
-    bg: "bg-gray-50 dark:bg-gray-800/30",
-    border: "border-gray-200 dark:border-gray-700",
-    shadow: "shadow-gray-100/50 dark:shadow-gray-900/50",
-  };
+export const getEmotionStyle = (stats: { totalPL: number } | null) => {
+  if (!stats) return null;
 
-  switch (emotion.toLowerCase()) {
-    case 'positive':
-      return {
-        bg: "bg-orange-50 dark:bg-orange-900/20",  // Peach color
-        border: "border-orange-300 dark:border-orange-400",
-        shadow: "shadow-orange-100/50 dark:shadow-orange-800/30",
-      };
-    case 'negative':
-      return {
-        bg: "bg-purple-50 dark:bg-purple-900/20",  // Purple color
-        border: "border-purple-300 dark:border-purple-400",
-        shadow: "shadow-purple-100/50 dark:shadow-purple-800/30",
-      };
-    case 'neutral':
-      return {
-        bg: "bg-blue-50 dark:bg-blue-900/20",  // Blue color
-        border: "border-blue-300 dark:border-blue-400",
-        shadow: "shadow-blue-100/50 dark:shadow-blue-800/30",
-      };
-    default:
-      return {
-        bg: "bg-gray-50 dark:bg-gray-800/30",
-        border: "border-gray-200 dark:border-gray-700",
-        shadow: "shadow-gray-100/50 dark:shadow-gray-900/50",
-      };
+  if (stats.totalPL === 0) {
+    return {
+      bg: "bg-gray-50 dark:bg-gray-800/30",
+      border: "border-gray-200 dark:border-gray-700",
+      shadow: "shadow-gray-100/50 dark:shadow-gray-900/50",
+    };
   }
+
+  if (stats.totalPL > 0) {
+    return {
+      bg: "bg-emerald-50 dark:bg-emerald-950/30",
+      border: "border-emerald-500 dark:border-emerald-500",
+      shadow: "shadow-emerald-100/50 dark:shadow-emerald-900/50",
+    };
+  }
+
+  return {
+    bg: "bg-red-50 dark:bg-red-950/30",
+    border: "border-red-500 dark:border-red-500",
+    shadow: "shadow-red-100/50 dark:shadow-red-900/50",
+  };
 };

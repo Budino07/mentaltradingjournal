@@ -1,6 +1,7 @@
+
 import { DayProps } from "react-day-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { calculateDayStats, formatCurrency, getEmotionStyle } from "./calendarUtils";
+import { calculateDayStats, formatCurrency } from "./calendarUtils";
 import { Trade } from "@/types/trade";
 import { Circle } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -41,23 +42,6 @@ export const CalendarDay = ({
              new Date(entry.date).toDateString() === dayDate.toDateString();
     })
   );
-  
-  // Find the emotion for this day, specifically looking for pre-session entries
-  const dayEntries = entries.filter(entry => 
-    new Date(entry.date).toDateString() === dayDate.toDateString()
-  );
-  
-  // Find a pre-session entry for this day
-  // For debugging, log entries for the 24th to see what's happening
-  if (dayDate.getDate() === 24) {
-    console.log('Entries for the 24th:', dayEntries);
-  }
-  
-  const preSessionEntry = dayEntries.find(entry => entry.emotion && entry.session_type === 'pre');
-  const predominantEmotion = preSessionEntry?.emotion || null;
-  
-  // Get styling based on the emotion
-  const emotionStyle = getEmotionStyle(predominantEmotion);
   
   const isToday = dayDate.toDateString() === new Date().toDateString();
   const hasEntries = stats !== null;
@@ -106,15 +90,21 @@ export const CalendarDay = ({
     return amount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400';
   };
 
+  const getBorderColor = (amount: number | null) => {
+    if (!amount) return 'border-gray-200 dark:border-gray-700';
+    if (amount > 0) return 'border-emerald-500 dark:border-emerald-500';
+    if (amount < 0) return 'border-red-500 dark:border-red-500';
+    return 'border-gray-200 dark:border-gray-700';
+  };
+
   const dayButton = (
     <button 
       onClick={() => onSelect(dayDate)}
       className={`
         ${className || ''} 
         relative flex flex-col h-full w-full
-        border-2 ${emotionStyle.border}
+        border-2 ${getBorderColor(stats?.totalPL || null)}
         rounded-lg
-        ${emotionStyle.bg}
         hover:border-primary hover:shadow-lg
         transition-all duration-200 ease-in-out
         overflow-hidden
