@@ -1,6 +1,7 @@
+
 import { Trade } from "@/types/trade";
 
-export const calculateDayStats = (entries: Array<{ trades?: Trade[] }>) => {
+export const calculateDayStats = (entries: Array<{ trades?: Trade[], emotion?: string, session_type?: string }>) => {
   if (entries.length === 0) return null;
 
   // Create a Map to store unique trades with their latest values
@@ -29,9 +30,19 @@ export const calculateDayStats = (entries: Array<{ trades?: Trade[] }>) => {
     totalPL += isNaN(numericPnL) ? 0 : numericPnL;
   });
 
+  // Find pre-session emotion if it exists
+  let preSessionEmotion = null;
+  for (const entry of entries) {
+    if (entry.session_type === 'pre' && entry.emotion) {
+      preSessionEmotion = entry.emotion;
+      break;
+    }
+  }
+
   return {
     totalPL,
     numTrades: totalTrades,
+    preSessionEmotion
   };
 };
 
@@ -68,4 +79,31 @@ export const getEmotionStyle = (stats: { totalPL: number } | null) => {
     border: "border-red-500 dark:border-red-500",
     shadow: "shadow-red-100/50 dark:shadow-red-900/50",
   };
+};
+
+export const getEmotionColor = (emotion: string | null) => {
+  if (!emotion) return null;
+
+  switch (emotion.toLowerCase()) {
+    case 'positive':
+      return {
+        bg: "bg-[#FDE1D3]", // Soft Peach
+        indicator: "bg-[#FDE1D3]",
+        border: "border-[#FDE1D3]"
+      };
+    case 'negative':
+      return {
+        bg: "bg-[#E5DEFF]", // Soft Purple
+        indicator: "bg-[#E5DEFF]",
+        border: "border-[#E5DEFF]"
+      };
+    case 'neutral':
+      return {
+        bg: "bg-[#D3E4FD]", // Soft Blue
+        indicator: "bg-[#D3E4FD]",
+        border: "border-[#D3E4FD]"
+      };
+    default:
+      return null;
+  }
 };

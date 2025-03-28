@@ -1,7 +1,7 @@
 
 import { DayProps } from "react-day-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { calculateDayStats, formatCurrency } from "./calendarUtils";
+import { calculateDayStats, formatCurrency, getEmotionColor } from "./calendarUtils";
 import { Trade } from "@/types/trade";
 import { Circle } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -15,6 +15,7 @@ interface CalendarDayProps extends Omit<DayProps, 'displayMonth'> {
     date: Date;
     emotion: string;
     trades?: Trade[];
+    session_type?: string;
   }>;
   onSelect: (date: Date) => void;
   className?: string;
@@ -46,6 +47,7 @@ export const CalendarDay = ({
   const isToday = dayDate.toDateString() === new Date().toDateString();
   const hasEntries = stats !== null;
   const isSaturday = dayDate.getDay() === 6;
+  const emotionColors = stats?.preSessionEmotion ? getEmotionColor(stats.preSessionEmotion) : null;
 
   // Check if weekly review exists for this date
   useEffect(() => {
@@ -112,6 +114,11 @@ export const CalendarDay = ({
       `}
       {...props}
     >
+      {/* Emotion indicator stripe at the top */}
+      {emotionColors && (
+        <div className={`absolute top-0 left-0 right-0 h-1.5 ${emotionColors.bg}`}></div>
+      )}
+      
       <div className="absolute top-2 right-2">
         <span className={`
           text-sm font-medium
@@ -133,8 +140,19 @@ export const CalendarDay = ({
           </div>
         </div>
       )}
+      
+      {/* Emotion indicator small circle in top left */}
+      {emotionColors && (
+        <div className="absolute top-2 left-2">
+          <div className={`w-3 h-3 rounded-full ${emotionColors.bg} border ${emotionColors.border}`}></div>
+        </div>
+      )}
     </button>
   );
+
+  const tooltipContent = stats?.preSessionEmotion 
+    ? `Pre-session mood: ${stats.preSessionEmotion.charAt(0).toUpperCase() + stats.preSessionEmotion.slice(1)}` 
+    : 'Review your performance';
 
   return (
     <div className="w-full h-full p-0.5 relative">
@@ -144,7 +162,10 @@ export const CalendarDay = ({
             {dayButton}
           </TooltipTrigger>
           <TooltipContent>
-            <p>Review your performance</p>
+            <p>{tooltipContent}</p>
+            {stats?.totalPL !== undefined && (
+              <p>P&L: {formatCurrency(stats.totalPL)}</p>
+            )}
           </TooltipContent>
         </Tooltip>
       ) : (

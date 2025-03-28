@@ -194,7 +194,8 @@ const Journal = () => {
   const calendarEntries = entries.map(entry => ({
     date: new Date(entry.created_at),
     emotion: entry.emotion,
-    trades: entry.trades || []
+    trades: entry.trades || [],
+    session_type: entry.session_type
   }));
 
   return (

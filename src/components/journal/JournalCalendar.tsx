@@ -17,6 +17,7 @@ interface JournalCalendarProps {
     date: Date;
     emotion: string;
     trades?: Trade[];
+    session_type?: string;
   }>;
 }
 
