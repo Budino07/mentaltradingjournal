@@ -1,5 +1,5 @@
 
-import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, BrainCircuit, Notebook, LineChart } from "lucide-react";
+import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, BrainCircuit, Notebook, LineChart, List } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -26,6 +26,7 @@ const menuItems = [
   { title: "Journal Entry", icon: Home, url: "/journal-entry" },
   { title: "Dashboard", icon: BookOpen, url: "/dashboard" },
   { title: "Analytics", icon: BarChart2, url: "/analytics" },
+  { title: "Trades List", icon: List, url: "/trades" },
   { title: "Backtesting", icon: FlaskConical, url: "/backtesting" },
   { title: "MFE & MAE Analysis", icon: LineChart, url: "/mfe-mae" },
   { title: "Notebook", icon: Notebook, url: "/notebook" },

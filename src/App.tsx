@@ -20,6 +20,7 @@ import BlueprintSessions from "./pages/BlueprintSessions";
 import Notebook from "./pages/Notebook";
 import Login from "./pages/Login";
 import MfeMae from "./pages/MfeMae";
+import TradesList from "./pages/TradesList";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ScrollToTop } from "./components/ui/ScrollToTop";
 
@@ -93,6 +94,14 @@ const App = () => {
                     element={
                       <ProtectedRoute>
                         <Analytics />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/trades"
+                    element={
+                      <ProtectedRoute>
+                        <TradesList />
                       </ProtectedRoute>
                     }
                   />
