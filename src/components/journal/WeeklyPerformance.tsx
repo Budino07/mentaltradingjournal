@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { startOfMonth, endOfMonth, format, isWithinInterval, getWeeksInMonth, addWeeks, isSameMonth, isWithinInterval as isDateWithinInterval } from "date-fns";
+import { 
+  startOfMonth, endOfMonth, format, isWithinInterval, 
+  getWeeksInMonth, addWeeks, isSameMonth, isWithinInterval as isDateWithinInterval,
+  addDays, isFriday
+} from "date-fns";
 import { calculateDayStats } from "./calendar/calendarUtils";
 import { Trade } from "@/types/trade";
 import { ArrowUpRight, ArrowDownRight, DollarSign, LineChart, TrendingUp, BarChart } from "lucide-react";
@@ -42,9 +46,10 @@ export const WeeklyPerformance = ({ entries, currentMonth }: WeeklyPerformancePr
     for (let i = 0; i < numberOfWeeks; i++) {
       const weekStart = i === 0 ? monthStart : addWeeks(monthStart, i);
       const weekStartDate = weekStart;
-      const weekEndDate = i === numberOfWeeks - 1 
+      // Make sure the week end date includes the full Friday when checking intervals
+      let weekEndDate = i === numberOfWeeks - 1 
         ? monthEnd 
-        : new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6);
+        : new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6, 23, 59, 59, 999);
       
       // Skip weeks that don't belong to this month
       if (!isSameMonth(weekStartDate, currentMonth)) {
@@ -59,8 +64,14 @@ export const WeeklyPerformance = ({ entries, currentMonth }: WeeklyPerformancePr
       entries.forEach(entry => {
         const entryDate = new Date(entry.date);
         
+        // Special handling for Friday entries to ensure they're properly included
+        const isEntryFriday = isFriday(entryDate);
+        const dateToCheck = isEntryFriday ? 
+          new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate(), 23, 59, 59, 999) : 
+          entryDate;
+        
         // Only process entry if it belongs to this week and month
-        if (isDateWithinInterval(entryDate, {
+        if (isDateWithinInterval(dateToCheck, {
           start: weekStartDate,
           end: weekEndDate
         }) && isSameMonth(entryDate, currentMonth)) {
@@ -99,8 +110,14 @@ export const WeeklyPerformance = ({ entries, currentMonth }: WeeklyPerformancePr
               tradeDate = new Date(entry.date);
             }
             
+            // Special handling for Friday trades to ensure they're properly included in the right week
+            const isTradeFriday = isFriday(tradeDate);
+            const dateToCheck = isTradeFriday ? 
+              new Date(tradeDate.getFullYear(), tradeDate.getMonth(), tradeDate.getDate(), 23, 59, 59, 999) : 
+              tradeDate;
+            
             // Only process trade if it falls within this week and month
-            if (isDateWithinInterval(tradeDate, {
+            if (isDateWithinInterval(dateToCheck, {
               start: weekStartDate,
               end: weekEndDate
             }) && isSameMonth(tradeDate, currentMonth)) {
@@ -115,7 +132,7 @@ export const WeeklyPerformance = ({ entries, currentMonth }: WeeklyPerformancePr
                 const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
                 totalPL += isNaN(numericPnL) ? 0 : numericPnL;
                 
-                console.log(`Week ${i+1} (${weekStartDate.toLocaleDateString()} - ${weekEndDate.toLocaleDateString()}): Adding trade ${trade.id} with PnL ${numericPnL}`);
+                console.log(`Week ${i+1} (${weekStartDate.toLocaleDateString()} - ${weekEndDate.toLocaleDateString()}): Adding trade ${trade.id} with PnL ${numericPnL}, date: ${tradeDate.toLocaleDateString()}, isFriday: ${isTradeFriday}`);
               }
             }
           });
@@ -130,7 +147,7 @@ export const WeeklyPerformance = ({ entries, currentMonth }: WeeklyPerformancePr
         endDate: weekEndDate
       });
       
-      console.log(`Week ${i+1} summary: ${totalTrades} trades, PnL: ${totalPL}`);
+      console.log(`Week ${i+1} summary (${format(weekStartDate, 'MMM d')} - ${format(weekEndDate, 'MMM d')}): ${totalTrades} trades, PnL: ${totalPL}`);
     }
     
     setWeeklySummaries(summaries);
