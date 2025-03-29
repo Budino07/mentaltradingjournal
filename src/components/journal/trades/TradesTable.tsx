@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { 
   Table, 
@@ -9,7 +8,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { ArrowUp, ArrowDown, Star, Edit, Trash, Plus, ArrowUpDown } from "lucide-react";
+import { ArrowUp, ArrowDown, Star, Edit, Trash, Plus, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/utils/dateUtils";
 import { Trade } from "@/types/trade";
@@ -18,6 +17,7 @@ import { useTradeActions } from "@/components/journal/entry/hooks/useTradeAction
 import { useAuth } from "@/contexts/AuthContext";
 import { TradeDeleteDialog } from "@/components/journal/entry/trade-item/TradeDeleteDialog";
 import { Card } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type SortField = 'entryDate' | 'instrument' | 'direction' | 'setup' | 'pnl' | 'exitDate';
 type SortDirection = 'asc' | 'desc';
@@ -28,6 +28,11 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
   const [sortField, setSortField] = useState<SortField>('entryDate');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [sortedTrades, setSortedTrades] = useState<Trade[]>([]);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const tradesPerPage = 10;
+  const totalPages = Math.ceil(sortedTrades.length / tradesPerPage);
   
   const {
     isEditDialogOpen,
@@ -130,6 +135,24 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
       ? <ArrowUp className="ml-1 h-4 w-4" /> 
       : <ArrowDown className="ml-1 h-4 w-4" />;
   };
+  
+  // Get current trades for pagination
+  const indexOfLastTrade = currentPage * tradesPerPage;
+  const indexOfFirstTrade = indexOfLastTrade - tradesPerPage;
+  const currentTrades = sortedTrades.slice(indexOfFirstTrade, indexOfLastTrade);
+  
+  // Change page
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   return (
     <Card className="p-6 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
@@ -188,8 +211,8 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedTrades.length > 0 ? (
-              sortedTrades.map((trade) => (
+            {currentTrades.length > 0 ? (
+              currentTrades.map((trade) => (
                 <TableRow 
                   key={trade.id} 
                   className="hover:bg-muted/50 cursor-pointer"
@@ -256,6 +279,38 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
           </TableBody>
         </Table>
       </div>
+      
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4">
+          <div className="text-sm text-muted-foreground">
+            Showing {indexOfFirstTrade + 1}-{Math.min(indexOfLastTrade, sortedTrades.length)} of {sortedTrades.length} trades
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <div className="text-sm font-medium">
+              Page {currentPage} of {totalPages}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       <AddTradeDialog
         open={isAddTradeOpen}
