@@ -1,3 +1,4 @@
+
 import { Trade } from "@/types/trade";
 import { FormSections } from "./form-sections/FormSections";
 import { FormActions } from "./form-sections/FormActions";
@@ -105,9 +106,7 @@ export const TradeFormContent = ({
           onSetupChange={handleSetupChange}
         />
       </div>
-      <div className="sticky bottom-0 bg-background pt-2 pb-2 border-t">
-        <FormActions isEdit={!!editTrade} />
-      </div>
+      <FormActions isEdit={!!editTrade} />
     </form>
   );
 };
