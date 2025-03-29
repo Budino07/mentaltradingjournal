@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { EmotionTrend } from "./EmotionTrend";
@@ -40,7 +41,7 @@ export const AnalyticsDashboard = () => {
     EquityCurve,
     TimeBasedPerformance,
     SetupPerformance,
-    OvertradingHeatMap, // Add new component
+    OvertradingHeatMap,
     AssetPairPerformance,
     PerformanceBreakdown,
     RuleAdherence,
@@ -60,7 +61,8 @@ export const AnalyticsDashboard = () => {
       case 'trading':
         return tradingComponents;
       default:
-        return [EmotionTrend, EmotionFrequency, OvertradingHeatMap, ...psychologicalComponents.slice(2), ...tradingComponents.slice(1)];
+        // For 'all' view, show a curated selection that doesn't duplicate the OvertradingHeatMap
+        return [EmotionTrend, EmotionFrequency, EquityCurve, ...psychologicalComponents.slice(2), ...tradingComponents.slice(4)];
     }
   };
 
