@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -351,7 +350,10 @@ export const OvertradingHeatMap = () => {
                   style: { textAnchor: 'middle', fontSize: 12, fill: '#888' }
                 }}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip 
+                content={<CustomTooltip />} 
+                cursor={{fill: 'transparent'}}  // This removes the white background on hover
+              />
               <Legend />
               <ReferenceLine 
                 y={avgTradesPerDay} 
