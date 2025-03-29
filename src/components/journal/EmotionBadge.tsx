@@ -1,5 +1,6 @@
 
 import { Badge } from "@/components/ui/badge";
+import { useCalendarMode } from "@/contexts/CalendarModeContext";
 
 interface EmotionBadgeProps {
   emotion: string;
@@ -7,7 +8,15 @@ interface EmotionBadgeProps {
 }
 
 export const EmotionBadge = ({ emotion, detail }: EmotionBadgeProps) => {
+  const { mode } = useCalendarMode();
+
   const getEmotionStyles = (emotion: string) => {
+    // Performance mode always uses the same styling regardless of emotion
+    if (mode === 'performance') {
+      return 'border-gray-300 text-gray-600 bg-gray-50 dark:bg-gray-800/30 dark:text-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/40';
+    }
+
+    // Emotion mode styling
     switch (emotion.toLowerCase()) {
       case 'positive':
         return 'border-green-500/50 text-green-600 bg-green-500/5 hover:bg-green-500/10';

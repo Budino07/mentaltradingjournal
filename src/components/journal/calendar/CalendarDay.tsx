@@ -1,6 +1,6 @@
 import { DayProps } from "react-day-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { calculateDayStats, formatCurrency, getEmotionColor } from "./calendarUtils";
+import { calculateDayStats, formatCurrency, getEmotionColor, getBorderColor, getPnLColor } from "./calendarUtils";
 import { Trade } from "@/types/trade";
 import { Circle } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -8,6 +8,7 @@ import { WeeklyReviewDialog } from "../weekly/WeeklyReviewDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { useCalendarMode } from "@/contexts/CalendarModeContext";
 
 interface CalendarDayProps extends Omit<DayProps, 'displayMonth'> {
   entries: Array<{
@@ -30,6 +31,7 @@ export const CalendarDay = ({
   const [isWeeklyReviewOpen, setIsWeeklyReviewOpen] = useState(false);
   const [hasWeeklyReview, setHasWeeklyReview] = useState(false);
   const { user } = useAuth();
+  const { mode } = useCalendarMode();
   
   const stats = calculateDayStats(
     entries.filter(entry => {
@@ -46,7 +48,7 @@ export const CalendarDay = ({
   const isToday = dayDate.toDateString() === new Date().toDateString();
   const hasEntries = stats !== null;
   const isSaturday = dayDate.getDay() === 6;
-  const emotionColors = stats?.preSessionEmotion ? getEmotionColor(stats.preSessionEmotion) : null;
+  const emotionColors = stats?.preSessionEmotion ? getEmotionColor(stats.preSessionEmotion, mode) : null;
 
   // Check if weekly review exists for this date
   useEffect(() => {
@@ -86,37 +88,13 @@ export const CalendarDay = ({
     checkWeeklyReview();
   }, [user, dayDate, isSaturday]);
 
-  const getPnLColor = (amount: number) => {
-    // If we have emotion colors, use those for the P&L color
-    if (emotionColors) {
-      return emotionColors.text;
-    }
-    
-    // Otherwise, fall back to default P&L coloring
-    if (amount === 0) return 'text-gray-500 dark:text-gray-400';
-    return amount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400';
-  };
-
-  const getBorderColor = (amount: number | null) => {
-    // If we have emotion colors, use those for the border
-    if (emotionColors) {
-      return emotionColors.border;
-    }
-    
-    // Otherwise, fall back to P&L based coloring
-    if (!amount) return 'border-gray-200 dark:border-gray-700';
-    if (amount > 0) return 'border-emerald-500 dark:border-emerald-500';
-    if (amount < 0) return 'border-red-500 dark:border-red-500';
-    return 'border-gray-200 dark:border-gray-700';
-  };
-
   const dayButton = (
     <button 
       onClick={() => onSelect(dayDate)}
       className={`
         ${className || ''} 
         relative flex flex-col h-full w-full
-        border-2 ${getBorderColor(stats?.totalPL || null)}
+        border-2 ${getBorderColor(stats?.totalPL || null, mode, emotionColors)}
         rounded-lg
         hover:border-primary hover:shadow-lg
         transition-all duration-200 ease-in-out
@@ -128,7 +106,11 @@ export const CalendarDay = ({
       <div className="absolute top-2 right-2">
         <span className={`
           text-sm font-medium
-          ${emotionColors ? emotionColors.text : isToday ? 'bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent' : 'text-gray-500 dark:text-gray-400'}
+          ${emotionColors && mode === 'emotion' 
+            ? emotionColors.text 
+            : isToday 
+              ? 'bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent' 
+              : 'text-gray-500 dark:text-gray-400'}
         `}>
           {dayDate.getDate()}
         </span>
@@ -137,7 +119,7 @@ export const CalendarDay = ({
       {stats && (stats.totalPL !== 0 || stats.numTrades > 0) && (
         <div className="absolute inset-0 flex flex-col justify-end p-2 bg-gradient-to-t from-white/90 to-transparent dark:from-gray-900/90">
           <div className="space-y-1 text-center w-full">
-            <p className={`text-lg font-semibold ${getPnLColor(stats.totalPL)}`}>
+            <p className={`text-lg font-semibold ${getPnLColor(stats.totalPL, mode)}`}>
               {formatCurrency(stats.totalPL)}
             </p>
             <p className="text-xs text-gray-600 dark:text-gray-300">

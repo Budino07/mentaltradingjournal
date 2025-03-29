@@ -1,4 +1,3 @@
-
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -16,6 +15,7 @@ import { startOfDay, endOfDay } from "date-fns";
 import { useLocation } from "react-router-dom";
 import { SubscriptionGuard } from "@/components/subscription/SubscriptionGuard";
 import { JournalTradesList } from "@/components/journal/TradesList";
+import { CalendarModeProvider } from "@/contexts/CalendarModeContext";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
@@ -202,23 +202,24 @@ const Journal = () => {
     <AppLayout>
       <SubscriptionGuard>
         <TimeFilterProvider>
-          <div className="max-w-7xl mx-auto space-y-8 px-4">
-            <StatsHeader />
+          <CalendarModeProvider>
+            <div className="max-w-7xl mx-auto space-y-8 px-4">
+              <StatsHeader />
 
-            <JournalCalendar 
-              date={selectedDate}
-              onDateSelect={(date) => {
-                setSelectedDate(date);
-                setSearchQuery(""); // Clear search query when a date is directly selected
-                
-                // Dispatch an event to notify other components that search should be cleared
-                const clearSearchEvent = new CustomEvent('journal-search-clear');
-                window.dispatchEvent(clearSearchEvent);
-              }}
-              entries={calendarEntries}
-            />
+              <JournalCalendar 
+                date={selectedDate}
+                onDateSelect={(date) => {
+                  setSelectedDate(date);
+                  setSearchQuery(""); // Clear search query when a date is directly selected
+                  
+                  // Dispatch an event to notify other components that search should be cleared
+                  const clearSearchEvent = new CustomEvent('journal-search-clear');
+                  window.dispatchEvent(clearSearchEvent);
+                }}
+                entries={calendarEntries}
+              />
 
-            <Card id="journal-entries" className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
+              <Card id="journal-entries" className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
                   {searchQuery 
@@ -255,10 +256,10 @@ const Journal = () => {
                 )}
               </ScrollArea>
             </Card>
-            
-            {/* Add the Trades List component */}
-            <JournalTradesList />
-          </div>
+              
+              <JournalTradesList />
+            </div>
+          </CalendarModeProvider>
         </TimeFilterProvider>
       </SubscriptionGuard>
     </AppLayout>

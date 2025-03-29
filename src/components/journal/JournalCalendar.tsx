@@ -1,4 +1,3 @@
-
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +8,8 @@ import { CalendarDay } from "./calendar/CalendarDay";
 import { CalendarNavigation } from "./calendar/CalendarNavigation";
 import { Trade } from "@/types/trade";
 import { WeeklyPerformance } from "./WeeklyPerformance";
+import { CalendarModeToggle } from "./calendar/CalendarModeToggle";
+import { CalendarModeProvider } from "@/contexts/CalendarModeContext";
 
 interface JournalCalendarProps {
   date: Date | undefined;
@@ -100,55 +101,60 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr,300px] gap-6">
-      <TooltipProvider>
-        <Card className="p-8 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-xl rounded-2xl">
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={handleDateSelect}
-            onMonthChange={handleMonthChange}
-            className="w-full"
-            classNames={{
-              months: "w-full space-y-4",
-              month: "w-full space-y-4",
-              table: "w-full border-collapse h-[calc(100vh-12rem)]",
-              head_row: "flex w-full h-8",
-              head_cell: "text-sm font-medium bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent w-[14.28%] text-center",
-              row: "flex w-full h-24",
-              cell: "w-[14.28%] p-1 relative [&:has([aria-selected])]:bg-accent/50 cursor-pointer",
-              day: "h-full w-full transition-all duration-200 cursor-pointer group",
-              day_today: "relative before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary-light before:to-accent before:opacity-10 before:transition-opacity hover:before:opacity-20 dark:before:opacity-20 dark:hover:before:opacity-30",
-              day_selected: "border-primary-light border-2 shadow-lg shadow-primary-light/20 dark:border-primary-light dark:shadow-primary-light/20",
-              caption: "flex justify-center pt-1 relative items-center mb-4",
-              caption_label: "text-2xl font-semibold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent",
-              nav: "space-x-1 flex items-center",
-              nav_button: "h-9 w-9 bg-transparent p-0 hover:opacity-100 hover:bg-primary hover:bg-opacity-10 rounded-full flex items-center justify-center transition-all duration-200",
-              nav_button_previous: "absolute left-1",
-              nav_button_next: "absolute right-1",
-            }}
-            components={{
-              IconLeft: navigation.IconLeft,
-              IconRight: navigation.IconRight,
-              Day: ({ date: dayDate, ...props }) => (
-                <CalendarDay
-                  date={dayDate}
-                  entries={entries}
-                  onSelect={handleDateSelect}
-                  {...props}
-                />
-              ),
-            }}
+    <CalendarModeProvider>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr,300px] gap-6">
+        <TooltipProvider>
+          <Card className="p-8 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-xl rounded-2xl">
+            <div className="flex justify-end mb-4">
+              <CalendarModeToggle />
+            </div>
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={handleDateSelect}
+              onMonthChange={handleMonthChange}
+              className="w-full"
+              classNames={{
+                months: "w-full space-y-4",
+                month: "w-full space-y-4",
+                table: "w-full border-collapse h-[calc(100vh-12rem)]",
+                head_row: "flex w-full h-8",
+                head_cell: "text-sm font-medium bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent w-[14.28%] text-center",
+                row: "flex w-full h-24",
+                cell: "w-[14.28%] p-1 relative [&:has([aria-selected])]:bg-accent/50 cursor-pointer",
+                day: "h-full w-full transition-all duration-200 cursor-pointer group",
+                day_today: "relative before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary-light before:to-accent before:opacity-10 before:transition-opacity hover:before:opacity-20 dark:before:opacity-20 dark:hover:before:opacity-30",
+                day_selected: "border-primary-light border-2 shadow-lg shadow-primary-light/20 dark:border-primary-light dark:shadow-primary-light/20",
+                caption: "flex justify-center pt-1 relative items-center mb-4",
+                caption_label: "text-2xl font-semibold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent",
+                nav: "space-x-1 flex items-center",
+                nav_button: "h-9 w-9 bg-transparent p-0 hover:opacity-100 hover:bg-primary hover:bg-opacity-10 rounded-full flex items-center justify-center transition-all duration-200",
+                nav_button_previous: "absolute left-1",
+                nav_button_next: "absolute right-1",
+              }}
+              components={{
+                IconLeft: navigation.IconLeft,
+                IconRight: navigation.IconRight,
+                Day: ({ date: dayDate, ...props }) => (
+                  <CalendarDay
+                    date={dayDate}
+                    entries={entries}
+                    onSelect={handleDateSelect}
+                    {...props}
+                  />
+                ),
+              }}
+            />
+          </Card>
+        </TooltipProvider>
+        
+        <Card className="p-6 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-xl rounded-2xl">
+          <WeeklyPerformance 
+            entries={entries} 
+            currentMonth={currentMonth} 
           />
         </Card>
-      </TooltipProvider>
-      
-      <Card className="p-6 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-xl rounded-2xl">
-        <WeeklyPerformance 
-          entries={entries} 
-          currentMonth={currentMonth} 
-        />
-      </Card>
-    </div>
+      </div>
+    </CalendarModeProvider>
   );
 };
