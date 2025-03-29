@@ -87,6 +87,12 @@ export const CalendarDay = ({
   }, [user, dayDate, isSaturday]);
 
   const getPnLColor = (amount: number) => {
+    // If we have emotion colors, use those for the P&L color
+    if (emotionColors) {
+      return emotionColors.text;
+    }
+    
+    // Otherwise, fall back to default P&L coloring
     if (amount === 0) return 'text-gray-500 dark:text-gray-400';
     return amount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400';
   };
