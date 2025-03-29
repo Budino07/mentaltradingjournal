@@ -1,4 +1,3 @@
-
 import { Trade } from "@/types/trade";
 
 export const calculateDayStats = (entries: Array<{ trades?: Trade[], emotion?: string, session_type?: string }>) => {
@@ -97,8 +96,8 @@ export const getEmotionColor = (emotion: string | null) => {
       };
     case 'neutral':
       return {
-        border: "border-gray-200 dark:border-gray-700",
-        text: "text-gray-400 dark:text-gray-500"
+        border: "border-gray-400 dark:border-gray-500",
+        text: "text-gray-600 dark:text-gray-300"
       };
     default:
       return null;
