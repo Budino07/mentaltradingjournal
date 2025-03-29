@@ -31,15 +31,16 @@ export const AnalyticsDashboard = () => {
   const psychologicalComponents = [
     EmotionTrend,
     EmotionFrequency,
-    MistakeAnalysis,
-    EmotionRecovery,
     PreTradingEvents,
+    MistakeAnalysis, // Moved MistakeAnalysis to be after PreTradingEvents
+    EmotionRecovery, // Moved EmotionRecovery to be after MistakeAnalysis
     PersonalityPatterns,
   ];
 
   const tradingComponents = [
     EquityCurve,
     TimeBasedPerformance,
+    EmotionRecovery, // Added EmotionRecovery right after TimeBasedPerformance
     SetupPerformance,
     OvertradingHeatMap,
     AssetPairPerformance,
@@ -61,15 +62,18 @@ export const AnalyticsDashboard = () => {
       case 'trading':
         return tradingComponents;
       default:
-        // Include TimeBasedPerformance in the "all" view
+        // Include TimeBasedPerformance and other adjusted components in the "all" view
         return [
           EmotionTrend, 
           EmotionFrequency, 
           EquityCurve,
-          TimeBasedPerformance, // Added TimeBasedPerformance right after EquityCurve
+          TimeBasedPerformance, // TimeBasedPerformance after EquityCurve
+          EmotionRecovery, // Added EmotionRecovery right after TimeBasedPerformance
           OvertradingHeatMap,
-          ...psychologicalComponents.slice(2), 
-          ...tradingComponents.slice(5) // Changed from slice(4) to slice(5) to avoid including TimeBasedPerformance twice
+          PreTradingEvents,
+          MistakeAnalysis, // Moved MistakeAnalysis to be after PreTradingEvents
+          ...psychologicalComponents.slice(5), // Adjusted slice to avoid duplicates
+          ...tradingComponents.slice(6) // Adjusted slice to avoid duplicates
         ];
     }
   };
