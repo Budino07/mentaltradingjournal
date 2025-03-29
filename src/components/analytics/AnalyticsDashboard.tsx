@@ -61,14 +61,15 @@ export const AnalyticsDashboard = () => {
       case 'trading':
         return tradingComponents;
       default:
-        // Include OvertradingHeatMap in the "all" view
+        // Include TimeBasedPerformance in the "all" view
         return [
           EmotionTrend, 
           EmotionFrequency, 
           EquityCurve,
-          OvertradingHeatMap, // Added OvertradingHeatMap to the "all" view
+          TimeBasedPerformance, // Added TimeBasedPerformance right after EquityCurve
+          OvertradingHeatMap,
           ...psychologicalComponents.slice(2), 
-          ...tradingComponents.slice(5) // Changed from slice(4) to slice(5) to avoid including OvertradingHeatMap twice
+          ...tradingComponents.slice(5) // Changed from slice(4) to slice(5) to avoid including TimeBasedPerformance twice
         ];
     }
   };
