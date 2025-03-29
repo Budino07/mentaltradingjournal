@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -98,11 +99,17 @@ export const OvertradingHeatMap = () => {
     // Now set the fill color based on count and emotion
     Object.values(dayMap).forEach(day => {
       if (day.count > overtradingThreshold) {
-        day.fill = day.emotion === 'negative' ? '#ef4444' : '#f97316'; // Red or orange
+        if (day.emotion === 'negative') {
+          day.fill = '#ef4444'; // Red for negative emotions
+        } else if (day.emotion === 'neutral') {
+          day.fill = '#a855f7'; // Purple for neutral emotions
+        } else {
+          day.fill = '#f97316'; // Orange for positive emotions
+        }
       } else if (day.count > warningThreshold) {
-        day.fill = '#facc15'; // Yellow
+        day.fill = '#facc15'; // Yellow for approaching threshold
       } else {
-        day.fill = '#22c55e'; // Green
+        day.fill = '#22c55e'; // Green for normal trading
       }
     });
     
@@ -136,11 +143,17 @@ export const OvertradingHeatMap = () => {
     // Set the fill color based on count and emotion
     Object.values(hourMap).forEach(hour => {
       if (hour.count > overtradingThreshold) {
-        hour.fill = hour.emotion === 'negative' ? '#ef4444' : '#f97316'; // Red or orange
+        if (hour.emotion === 'negative') {
+          hour.fill = '#ef4444'; // Red for negative emotions
+        } else if (hour.emotion === 'neutral') {
+          hour.fill = '#a855f7'; // Purple for neutral emotions
+        } else {
+          hour.fill = '#f97316'; // Orange for positive emotions
+        }
       } else if (hour.count > warningThreshold) {
-        hour.fill = '#facc15'; // Yellow
+        hour.fill = '#facc15'; // Yellow for approaching threshold
       } else {
-        hour.fill = '#22c55e'; // Green
+        hour.fill = '#22c55e'; // Green for normal trading
       }
     });
     
@@ -151,11 +164,11 @@ export const OvertradingHeatMap = () => {
   const problematicPeriods = useMemo(() => {
     if (view === 'week') {
       return weekData
-        .filter(item => item.count > overtradingThreshold && item.emotion === 'negative')
+        .filter(item => item.count > overtradingThreshold && (item.emotion === 'negative' || item.emotion === 'neutral'))
         .map(item => item.day);
     } else {
       return hourlyData
-        .filter(item => item.count > overtradingThreshold && item.emotion === 'negative')
+        .filter(item => item.count > overtradingThreshold && (item.emotion === 'negative' || item.emotion === 'neutral'))
         .map(item => `${item.hour}:00`);
     }
   }, [weekData, hourlyData, overtradingThreshold, view]);
@@ -171,9 +184,9 @@ export const OvertradingHeatMap = () => {
     }
     
     if (view === 'week') {
-      return `Potential emotional overtrading detected on ${problematicPeriods.join(', ')}. These days show higher than normal trading activity during negative emotional states.`;
+      return `Potential emotional overtrading detected on ${problematicPeriods.join(', ')}. These days show higher than normal trading activity during negative or neutral emotional states.`;
     } else {
-      return `Potential emotional overtrading detected at ${problematicPeriods.join(', ')}. These hours show higher than normal trading activity during negative emotional states.`;
+      return `Potential emotional overtrading detected at ${problematicPeriods.join(', ')}. These hours show higher than normal trading activity during negative or neutral emotional states.`;
     }
   };
 
@@ -199,6 +212,7 @@ export const OvertradingHeatMap = () => {
       { color: "#22c55e", label: "Normal trading volume" },
       { color: "#facc15", label: "Approaching overtrading threshold" },
       { color: "#f97316", label: "Overtrading with positive emotions" },
+      { color: "#a855f7", label: "Overtrading with neutral emotions" },
       { color: "#ef4444", label: "Overtrading with negative emotions" },
     ];
   }, []);
@@ -226,10 +240,10 @@ export const OvertradingHeatMap = () => {
           <p className="text-sm">Emotion: <span className="font-semibold capitalize">{data.emotion}</span></p>
           <div className="mt-1">
             <Badge 
-              variant={isOvertrading ? "destructive" : isApproachingThreshold ? "warning" : "success"}
+              variant={isOvertrading ? (data.emotion === "negative" ? "destructive" : data.emotion === "neutral" ? "neutral" : "warning") : isApproachingThreshold ? "warning" : "success"}
               className="text-xs"
             >
-              {isOvertrading ? 'Overtrading' : isApproachingThreshold ? 'Approaching Limit' : 'Normal Volume'}
+              {isOvertrading ? `Overtrading (${data.emotion})` : isApproachingThreshold ? 'Approaching Limit' : 'Normal Volume'}
             </Badge>
           </div>
         </div>
@@ -321,8 +335,10 @@ export const OvertradingHeatMap = () => {
                 </div>
                 <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
                   Overtrading occurs when you exceed your daily average by more than 30%. 
-                  The emotional state associated with overtrading periods is important 
-                  as negative emotions may indicate emotional trading decisions.
+                  The emotional state associated with overtrading periods is important:
+                  negative emotions may indicate emotional trading decisions, 
+                  neutral emotions suggest potential autopilot trading,
+                  while positive emotions may lead to overconfidence.
                 </p>
               </div>
             </PopoverContent>
@@ -404,7 +420,7 @@ export const OvertradingHeatMap = () => {
               <h4 className="text-sm font-medium">Overtrading Alert</h4>
               <p className="text-sm text-muted-foreground">{generateInsights()}</p>
               <p className="text-xs text-muted-foreground mt-1">
-                {averageExplanation} <strong>Orange bars</strong> indicate overtrading with positive emotions, while <strong>red bars</strong> indicate overtrading with negative emotions.
+                {averageExplanation} <strong>Orange bars</strong> indicate overtrading with positive emotions, <strong>purple bars</strong> indicate overtrading with neutral emotions, while <strong>red bars</strong> indicate overtrading with negative emotions.
                 <button 
                   onClick={handleShowMoreInfo}
                   className="ml-1 text-primary underline hover:no-underline"
