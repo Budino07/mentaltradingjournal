@@ -67,10 +67,10 @@ export const AnalyticsDashboard = () => {
           EmotionFrequency, 
           EquityCurve,
           TimeBasedPerformance,
-          EmotionRecovery, // Moved to be right of TimeBasedPerformance
-          OvertradingHeatMap,
+          EmotionRecovery, // Right of TimeBasedPerformance
           PreTradingEvents,
-          MistakeAnalysis, // Moved to be right of PreTradingEvents
+          MistakeAnalysis, // Right of PreTradingEvents (moved here)
+          OvertradingHeatMap,
           PersonalityPatterns,
           SetupPerformance,
           AssetPairPerformance, 
