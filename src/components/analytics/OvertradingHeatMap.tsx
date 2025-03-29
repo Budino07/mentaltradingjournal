@@ -100,7 +100,7 @@ export const OvertradingHeatMap = () => {
     Object.values(dayMap).forEach(day => {
       if (day.count > overtradingThreshold) {
         if (day.emotion === 'negative') {
-          day.fill = '#9b87f5'; // Purple for negative emotions
+          day.fill = '#ef4444'; // Red for negative emotions
         } else if (day.emotion === 'neutral') {
           day.fill = '#38BDF8'; // Blue for neutral emotions
         } else {
@@ -144,7 +144,7 @@ export const OvertradingHeatMap = () => {
     Object.values(hourMap).forEach(hour => {
       if (hour.count > overtradingThreshold) {
         if (hour.emotion === 'negative') {
-          hour.fill = '#9b87f5'; // Purple for negative emotions
+          hour.fill = '#ef4444'; // Red for negative emotions
         } else if (hour.emotion === 'neutral') {
           hour.fill = '#38BDF8'; // Blue for neutral emotions
         } else {
@@ -213,7 +213,7 @@ export const OvertradingHeatMap = () => {
       { color: "#facc15", label: "Approaching overtrading threshold" },
       { color: "#FEC6A1", label: "Overtrading with positive emotions" },
       { color: "#38BDF8", label: "Overtrading with neutral emotions" },
-      { color: "#9b87f5", label: "Overtrading with negative emotions" },
+      { color: "#ef4444", label: "Overtrading with negative emotions" },
     ];
   }, []);
 
@@ -336,7 +336,7 @@ export const OvertradingHeatMap = () => {
                 <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
                   Overtrading occurs when you exceed your daily average by more than 30%. 
                   The emotional state associated with overtrading periods is important:
-                  negative emotions (purple) may indicate emotional trading decisions, 
+                  negative emotions (red) may indicate emotional trading decisions, 
                   neutral emotions (blue) suggest potential autopilot trading,
                   while positive emotions (peach) may lead to overconfidence.
                 </p>
@@ -420,7 +420,7 @@ export const OvertradingHeatMap = () => {
               <h4 className="text-sm font-medium">Overtrading Alert</h4>
               <p className="text-sm text-muted-foreground">{generateInsights()}</p>
               <p className="text-xs text-muted-foreground mt-1">
-                {averageExplanation} <strong>Peach bars</strong> indicate overtrading with positive emotions, <strong>blue bars</strong> indicate overtrading with neutral emotions, while <strong>purple bars</strong> indicate overtrading with negative emotions.
+                {averageExplanation} <strong>Peach bars</strong> indicate overtrading with positive emotions, <strong>blue bars</strong> indicate overtrading with neutral emotions, while <strong>red bars</strong> indicate overtrading with negative emotions.
                 <button 
                   onClick={handleShowMoreInfo}
                   className="ml-1 text-primary underline hover:no-underline"
