@@ -27,7 +27,7 @@ export default function Analytics() {
   return (
     <AppLayout>
       <SubscriptionGuard>
-        <div className={`container mx-auto ${isMobile ? 'px-3' : 'px-4 sm:px-6'}`}>
+        <div className={`container mx-auto ${isMobile ? 'px-3 pb-6' : 'px-4 sm:px-6 pb-8'}`}>
           <AnalyticsDashboard />
         </div>
       </SubscriptionGuard>
