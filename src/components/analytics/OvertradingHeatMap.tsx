@@ -61,10 +61,10 @@ export const OvertradingHeatMap = () => {
     if (allTrades.length === 0) return [];
     
     const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const dayMap: Record<string, { day: string, count: number, emotion: string }> = {};
+    const dayMap: Record<string, { day: string, count: number, emotion: string, fill: string }> = {};
     
     daysOfWeek.forEach(day => {
-      dayMap[day] = { day, count: 0, emotion: 'positive' };
+      dayMap[day] = { day, count: 0, emotion: 'positive', fill: '#22c55e' };
     });
     
     allTrades.forEach(trade => {
@@ -80,18 +80,29 @@ export const OvertradingHeatMap = () => {
       }
     });
     
+    // Now set the fill color based on count and emotion
+    Object.values(dayMap).forEach(day => {
+      if (day.count > overtradingThreshold) {
+        day.fill = day.emotion === 'negative' ? '#ef4444' : '#f97316'; // Red or orange
+      } else if (day.count > warningThreshold) {
+        day.fill = '#facc15'; // Yellow
+      } else {
+        day.fill = '#22c55e'; // Green
+      }
+    });
+    
     return Object.values(dayMap);
-  }, [allTrades]);
+  }, [allTrades, overtradingThreshold, warningThreshold]);
 
   // Prepare hourly data
   const hourlyData = useMemo(() => {
     if (allTrades.length === 0) return [];
     
     const hours = Array.from({ length: 24 }, (_, i) => i);
-    const hourMap: Record<number, { hour: number, count: number, emotion: string }> = {};
+    const hourMap: Record<number, { hour: number, count: number, emotion: string, fill: string }> = {};
     
     hours.forEach(hour => {
-      hourMap[hour] = { hour, count: 0, emotion: 'positive' };
+      hourMap[hour] = { hour, count: 0, emotion: 'positive', fill: '#22c55e' };
     });
     
     allTrades.forEach(trade => {
@@ -107,8 +118,19 @@ export const OvertradingHeatMap = () => {
       }
     });
     
+    // Set the fill color based on count and emotion
+    Object.values(hourMap).forEach(hour => {
+      if (hour.count > overtradingThreshold) {
+        hour.fill = hour.emotion === 'negative' ? '#ef4444' : '#f97316'; // Red or orange
+      } else if (hour.count > warningThreshold) {
+        hour.fill = '#facc15'; // Yellow
+      } else {
+        hour.fill = '#22c55e'; // Green
+      }
+    });
+    
     return Object.values(hourMap);
-  }, [allTrades]);
+  }, [allTrades, overtradingThreshold, warningThreshold]);
 
   // Identify problematic periods
   const problematicPeriods = useMemo(() => {
@@ -173,17 +195,6 @@ export const OvertradingHeatMap = () => {
       );
     }
     return null;
-  };
-
-  // Bar fill color based on count and emotion
-  const getBarFill = (entry: any) => {
-    if (entry.count > overtradingThreshold) {
-      return entry.emotion === 'negative' ? '#ef4444' : '#f97316'; // Red or orange
-    } else if (entry.count > warningThreshold) {
-      return '#facc15'; // Yellow
-    } else {
-      return '#22c55e'; // Green
-    }
   };
 
   if (isLoading) {
@@ -304,7 +315,6 @@ export const OvertradingHeatMap = () => {
                 animationEasing="ease-out"
                 isAnimationActive={true}
                 barSize={view === 'hour' ? 16 : 30}
-                fill={(entry: any) => getBarFill(entry)}
               />
             </BarChart>
           </ResponsiveContainer>
