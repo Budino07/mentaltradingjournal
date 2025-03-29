@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -212,7 +213,7 @@ export const OvertradingHeatMap = () => {
     });
   };
 
-  // Custom tooltip with completely transparent background
+  // Custom tooltip with transparent background
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -220,10 +221,10 @@ export const OvertradingHeatMap = () => {
       const isApproachingThreshold = data.count > warningThreshold && data.count <= overtradingThreshold;
       
       return (
-        <div className="bg-transparent backdrop-blur-sm p-3 rounded-md border border-border/30 shadow-md">
-          <p className="font-medium text-foreground">{view === 'week' ? data.day : `${data.hour}:00`}</p>
-          <p className="text-sm text-foreground">Trades: <span className="font-semibold">{data.count}</span></p>
-          <p className="text-sm text-foreground">Emotion: <span className="font-semibold capitalize">{data.emotion}</span></p>
+        <div className="bg-background/95 backdrop-blur-sm p-3 rounded-md border shadow-md">
+          <p className="font-medium">{view === 'week' ? data.day : `${data.hour}:00`}</p>
+          <p className="text-sm">Trades: <span className="font-semibold">{data.count}</span></p>
+          <p className="text-sm">Emotion: <span className="font-semibold capitalize">{data.emotion}</span></p>
           <div className="mt-1">
             <Badge 
               variant={isOvertrading ? "destructive" : isApproachingThreshold ? "warning" : "success"}
