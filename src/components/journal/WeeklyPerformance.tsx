@@ -1,7 +1,6 @@
-
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { startOfMonth, endOfMonth, format, isWithinInterval, getWeeksInMonth, addWeeks, isSameMonth } from "date-fns";
+import { startOfMonth, endOfMonth, format, isWithinInterval, getWeeksInMonth, addWeeks, isSameMonth, isWithinInterval as isDateWithinInterval } from "date-fns";
 import { calculateDayStats } from "./calendar/calendarUtils";
 import { Trade } from "@/types/trade";
 import { ArrowUpRight, ArrowDownRight, DollarSign, LineChart, TrendingUp, BarChart } from "lucide-react";
@@ -37,6 +36,9 @@ export const WeeklyPerformance = ({ entries, currentMonth }: WeeklyPerformancePr
     
     const summaries: WeekSummary[] = [];
     
+    // Create a map to store unique trades by ID
+    const processedTradeIds = new Set<string>();
+    
     for (let i = 0; i < numberOfWeeks; i++) {
       const weekStart = i === 0 ? monthStart : addWeeks(monthStart, i);
       const weekStartDate = weekStart;
@@ -49,29 +51,72 @@ export const WeeklyPerformance = ({ entries, currentMonth }: WeeklyPerformancePr
         continue;
       }
       
-      const weekEntries = entries.filter(entry => {
-        const entryDate = new Date(entry.date);
-        return isWithinInterval(entryDate, {
-          start: weekStartDate,
-          end: weekEndDate
-        }) && isSameMonth(entryDate, currentMonth);
-      });
-      
       let totalPL = 0;
       let totalTrades = 0;
-      const processedTradeIds = new Set<string>();
+      const weekTradeIds = new Set<string>();
       
-      weekEntries.forEach(entry => {
+      // First, collect all trades that belong to this week
+      entries.forEach(entry => {
+        const entryDate = new Date(entry.date);
+        
+        // Only process entry if it belongs to this week and month
+        if (isDateWithinInterval(entryDate, {
+          start: weekStartDate,
+          end: weekEndDate
+        }) && isSameMonth(entryDate, currentMonth)) {
+          
+          // Process trades from this entry
+          if (entry.trades && entry.trades.length > 0) {
+            entry.trades.forEach(trade => {
+              // Make sure we have a trade ID
+              if (!trade.id) return;
+              
+              // Check if this trade has already been processed (in case it appears in multiple entries)
+              if (!processedTradeIds.has(trade.id)) {
+                weekTradeIds.add(trade.id);
+                processedTradeIds.add(trade.id);
+              }
+            });
+          }
+        }
+      });
+      
+      // Process trades specifically by checking the trade dates
+      entries.forEach(entry => {
         if (entry.trades && entry.trades.length > 0) {
           entry.trades.forEach(trade => {
-            // Only count each trade once using its ID
-            if (trade.id && !processedTradeIds.has(trade.id)) {
-              processedTradeIds.add(trade.id);
-              totalTrades++;
+            if (!trade.id) return;
+            
+            // Check if this trade belongs to the current week
+            let tradeDate: Date | null = null;
+            
+            // First use entryDate if available, otherwise fallback to the entry date
+            if (trade.entryDate) {
+              tradeDate = new Date(trade.entryDate);
+            } else if (trade.exitDate) {
+              tradeDate = new Date(trade.exitDate);
+            } else {
+              tradeDate = new Date(entry.date);
+            }
+            
+            // Only process trade if it falls within this week and month
+            if (isDateWithinInterval(tradeDate, {
+              start: weekStartDate,
+              end: weekEndDate
+            }) && isSameMonth(tradeDate, currentMonth)) {
               
-              const pnlValue = trade.pnl || trade.profit_loss || 0;
-              const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
-              totalPL += isNaN(numericPnL) ? 0 : numericPnL;
+              // Only process if this is the first time we're seeing this trade
+              if (weekTradeIds.has(trade.id)) {
+                totalTrades++;
+                weekTradeIds.delete(trade.id); // Mark as processed for this week
+                
+                // Extract PnL value, handling different formats
+                const pnlValue = trade.pnl || trade.profit_loss || 0;
+                const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+                totalPL += isNaN(numericPnL) ? 0 : numericPnL;
+                
+                console.log(`Week ${i+1} (${weekStartDate.toLocaleDateString()} - ${weekEndDate.toLocaleDateString()}): Adding trade ${trade.id} with PnL ${numericPnL}`);
+              }
             }
           });
         }
@@ -84,6 +129,8 @@ export const WeeklyPerformance = ({ entries, currentMonth }: WeeklyPerformancePr
         startDate: weekStartDate,
         endDate: weekEndDate
       });
+      
+      console.log(`Week ${i+1} summary: ${totalTrades} trades, PnL: ${totalPL}`);
     }
     
     setWeeklySummaries(summaries);
