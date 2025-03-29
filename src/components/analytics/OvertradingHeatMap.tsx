@@ -213,7 +213,7 @@ export const OvertradingHeatMap = () => {
     });
   };
 
-  // Custom tooltip
+  // Custom tooltip with transparent background
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
