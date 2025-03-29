@@ -39,11 +39,6 @@ export const calculateDayStats = (entries: Array<{ trades?: Trade[], emotion?: s
     }
   }
 
-  // Default to neutral if no pre-session emotion exists
-  if (!preSessionEmotion && entries.length > 0) {
-    preSessionEmotion = 'neutral';
-  }
-
   return {
     totalPL,
     numTrades: totalTrades,
@@ -102,8 +97,8 @@ export const getEmotionColor = (emotion: string | null) => {
       };
     case 'neutral':
       return {
-        border: "border-[#F1F1F1] dark:border-[#E6E6E6]",
-        text: "text-[#AAADB0] dark:text-[#C8C8C9]"
+        border: "border-[#F5F1E6] dark:border-[#E6DFC8]",
+        text: "text-[#D9CCA7] dark:text-[#E6DFC8]"
       };
     default:
       return null;
