@@ -11,7 +11,7 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
     <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full flex-col md:flex-row bg-gradient-to-br from-primary-light/5 to-secondary-light/5">
         {!isMobile && <AppSidebar />}
-        <div className="flex-1 flex flex-col w-full">
+        <div className="flex-1 flex flex-col w-full md:ml-14"> {/* Added margin-left to accommodate fixed sidebar */}
           <AppHeader />
           <main className={`flex-1 ${isMobile ? 'p-0 h-[calc(100vh-56px)]' : 'p-6'} overflow-auto animate-fade-in`}>
             {children}
