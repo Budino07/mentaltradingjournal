@@ -77,7 +77,7 @@ export const OvertradingHeatMap = () => {
     if (allTrades.length === 0) return [];
     
     const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const dayMap: Record<string, { day: string, count: number, emotion: string, fill: string }> = {};
+    const dayMap: Record<string, { day: string; count: number; emotion: string; fill: string }> = {};
     
     daysOfWeek.forEach(day => {
       dayMap[day] = { day, count: 0, emotion: 'positive', fill: '#22c55e' };
@@ -115,7 +115,7 @@ export const OvertradingHeatMap = () => {
     if (allTrades.length === 0) return [];
     
     const hours = Array.from({ length: 24 }, (_, i) => i);
-    const hourMap: Record<number, { hour: number, count: number, emotion: string, fill: string }> = {};
+    const hourMap: Record<number, { hour: number; count: number; emotion: string; fill: string }> = {};
     
     hours.forEach(hour => {
       hourMap[hour] = { hour, count: 0, emotion: 'positive', fill: '#22c55e' };
@@ -168,7 +168,7 @@ export const OvertradingHeatMap = () => {
     }
     
     if (problematicPeriods.length === 0) {
-      return "No emotionally-driven overtrading detected. Your trading volume appears consistent with your typical patterns.";
+      return "No overtrading detected. Your trading volume appears consistent with your typical patterns.";
     }
     
     if (view === 'week') {

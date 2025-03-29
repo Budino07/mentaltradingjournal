@@ -61,15 +61,28 @@ export const AnalyticsDashboard = () => {
       case 'trading':
         return tradingComponents;
       default:
-        // Include TimeBasedPerformance in the "all" view
+        // Reordered components for the "all" view
         return [
           EmotionTrend, 
           EmotionFrequency, 
           EquityCurve,
-          TimeBasedPerformance, // Added TimeBasedPerformance right after EquityCurve
+          TimeBasedPerformance,
+          EmotionRecovery, // Moved to be right of TimeBasedPerformance
           OvertradingHeatMap,
-          ...psychologicalComponents.slice(2), 
-          ...tradingComponents.slice(5) // Changed from slice(4) to slice(5) to avoid including TimeBasedPerformance twice
+          PreTradingEvents,
+          MistakeAnalysis, // Moved to be right of PreTradingEvents
+          PersonalityPatterns,
+          SetupPerformance,
+          AssetPairPerformance, 
+          PerformanceBreakdown,
+          RuleAdherence,
+          TradeDuration,
+          ProfitLossDistribution,
+          TradeFrequency,
+          TradeFrequencyByWeek,
+          TradeFrequencyByMonth,
+          RiskRewardAnalysis,
+          WinLossRatio,
         ];
     }
   };
