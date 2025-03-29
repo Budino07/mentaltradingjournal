@@ -4,12 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { JournalEntry, Trade } from "@/types/analytics";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from "recharts";
-import { AlertTriangle, Flame, Info } from "lucide-react";
+import { AlertTriangle, Flame, HelpCircle, Info } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export const OvertradingHeatMap = () => {
   const [view, setView] = useState<'week' | 'hour'>('week');
@@ -193,6 +194,16 @@ export const OvertradingHeatMap = () => {
     return `Based on your ${tradingDaysCount} trading days, you average ${avgTradesPerDay} trades per day. Overtrading is defined as exceeding this average by 30% (${overtradingThreshold}+ trades).`;
   }, [avgTradesPerDay, overtradingThreshold, tradingDaysCount]);
 
+  // Color explanation to help users understand the chart
+  const colorExplanation = useMemo(() => {
+    return [
+      { color: "#22c55e", label: "Normal trading volume" },
+      { color: "#facc15", label: "Approaching overtrading threshold" },
+      { color: "#f97316", label: "Overtrading with positive emotions" },
+      { color: "#ef4444", label: "Overtrading with negative emotions" },
+    ];
+  }, []);
+
   // Show more info about the calculations
   const handleShowMoreInfo = () => {
     toast({
@@ -286,6 +297,39 @@ export const OvertradingHeatMap = () => {
         </div>
       </CardHeader>
       <CardContent>
+        <div className="flex items-center justify-end mb-2 gap-1">
+          <div className="text-xs text-muted-foreground">Understanding colors:</div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="inline-flex items-center justify-center rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground">
+                <HelpCircle className="h-4 w-4" />
+                <span className="sr-only">Color explanation</span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80" align="end">
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Heat Map Color Guide</h4>
+                <div className="space-y-1.5">
+                  {colorExplanation.map((item, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div 
+                        className="w-4 h-4 rounded" 
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className="text-xs">{item.label}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
+                  Overtrading occurs when you exceed your daily average by more than 30%. 
+                  The emotional state associated with overtrading periods is important 
+                  as negative emotions may indicate emotional trading decisions.
+                </p>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+
         <div className="h-[350px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
@@ -358,7 +402,7 @@ export const OvertradingHeatMap = () => {
               <h4 className="text-sm font-medium">Overtrading Alert</h4>
               <p className="text-sm text-muted-foreground">{generateInsights()}</p>
               <p className="text-xs text-muted-foreground mt-1">
-                {averageExplanation}
+                {averageExplanation} <strong>Orange bars</strong> indicate overtrading with positive emotions, while <strong>red bars</strong> indicate overtrading with negative emotions.
                 <button 
                   onClick={handleShowMoreInfo}
                   className="ml-1 text-primary underline hover:no-underline"
@@ -378,7 +422,7 @@ export const OvertradingHeatMap = () => {
               <p className="text-sm text-muted-foreground">{generateInsights()}</p>
               {tradingDaysCount > 0 && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  {averageExplanation}
+                  {averageExplanation} <strong>Green bars</strong> indicate normal trading volume, while <strong>yellow bars</strong> indicate approaching the overtrading threshold.
                   <button 
                     onClick={handleShowMoreInfo}
                     className="ml-1 text-primary underline hover:no-underline"
