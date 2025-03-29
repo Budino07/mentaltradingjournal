@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -12,7 +13,7 @@ import { toast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export const OvertradingHeatMap = () => {
-  const [view, setView<'week' | 'hour'>('week');
+  const [view, setView] = useState<'week' | 'hour'>('week');
   
   const { data: analyticsData, isLoading } = useQuery({
     queryKey: ['analytics'],
@@ -167,7 +168,7 @@ export const OvertradingHeatMap = () => {
     }
     
     if (problematicPeriods.length === 0) {
-      return "No overtrading detected. Your trading volume appears consistent with your typical patterns.";
+      return "No emotionally-driven overtrading detected. Your trading volume appears consistent with your typical patterns.";
     }
     
     if (view === 'week') {
