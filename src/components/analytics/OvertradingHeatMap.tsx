@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "@/hooks/use-toast";
 
 export const OvertradingHeatMap = () => {
   const [view, setView] = useState<'week' | 'hour'>('week');
@@ -55,6 +56,20 @@ export const OvertradingHeatMap = () => {
   // Calculate overtrading threshold (30% above average)
   const overtradingThreshold = Math.round(avgTradesPerDay * 1.3);
   const warningThreshold = Math.round(avgTradesPerDay * 1.1);
+
+  // Get the number of unique trading days for explanation
+  const tradingDaysCount = useMemo(() => {
+    if (allTrades.length === 0) return 0;
+    
+    const uniqueDays = new Set();
+    allTrades.forEach(trade => {
+      if (trade.entryDate) {
+        uniqueDays.add(format(new Date(trade.entryDate), 'yyyy-MM-dd'));
+      }
+    });
+    
+    return uniqueDays.size;
+  }, [allTrades]);
 
   // Prepare week data
   const weekData = useMemo(() => {
@@ -170,6 +185,22 @@ export const OvertradingHeatMap = () => {
       return hourlyData.some(item => item.count > overtradingThreshold);
     }
   }, [weekData, hourlyData, overtradingThreshold, view]);
+
+  // Explanation for how average is calculated
+  const averageExplanation = useMemo(() => {
+    if (tradingDaysCount === 0) return "";
+    
+    return `Based on your ${tradingDaysCount} trading days, you average ${avgTradesPerDay} trades per day. Overtrading is defined as exceeding this average by 30% (${overtradingThreshold}+ trades).`;
+  }, [avgTradesPerDay, overtradingThreshold, tradingDaysCount]);
+
+  // Show more info about the calculations
+  const handleShowMoreInfo = () => {
+    toast({
+      title: "How Overtrading is Calculated",
+      description: `Your average of ${avgTradesPerDay} trades per day is calculated by dividing your total trades (${allTrades.length}) by your unique trading days (${tradingDaysCount}). Trading more than ${overtradingThreshold} trades in a day is considered overtrading. The emotional state during overtrading periods is also considered.`,
+      duration: 8000,
+    });
+  };
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -323,9 +354,18 @@ export const OvertradingHeatMap = () => {
         {hasOvertrading && (
           <div className="mt-4 p-3 border rounded-md bg-destructive/10 flex gap-3 items-start">
             <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-            <div>
+            <div className="w-full">
               <h4 className="text-sm font-medium">Overtrading Alert</h4>
               <p className="text-sm text-muted-foreground">{generateInsights()}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {averageExplanation}
+                <button 
+                  onClick={handleShowMoreInfo}
+                  className="ml-1 text-primary underline hover:no-underline"
+                >
+                  Learn more
+                </button>
+              </p>
             </div>
           </div>
         )}
@@ -333,9 +373,20 @@ export const OvertradingHeatMap = () => {
         {!hasOvertrading && (
           <div className="mt-4 p-3 border rounded-md bg-primary/10 flex gap-3 items-start">
             <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-            <div>
+            <div className="w-full">
               <h4 className="text-sm font-medium">Trading Volume Analysis</h4>
               <p className="text-sm text-muted-foreground">{generateInsights()}</p>
+              {tradingDaysCount > 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {averageExplanation}
+                  <button 
+                    onClick={handleShowMoreInfo}
+                    className="ml-1 text-primary underline hover:no-underline"
+                  >
+                    Learn more
+                  </button>
+                </p>
+              )}
             </div>
           </div>
         )}
