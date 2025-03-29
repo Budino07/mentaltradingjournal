@@ -1,3 +1,4 @@
+
 import { DayProps } from "react-day-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { calculateDayStats, formatCurrency, getEmotionColor, getBorderColor, getPnLColor } from "./calendarUtils";
@@ -106,7 +107,7 @@ export const CalendarDay = ({
       <div className="absolute top-2 right-2">
         <span className={`
           text-sm font-medium
-          ${emotionColors && mode === 'emotion' 
+          ${mode === 'emotion' && emotionColors 
             ? emotionColors.text 
             : isToday 
               ? 'bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent' 
