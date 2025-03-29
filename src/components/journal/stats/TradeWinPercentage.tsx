@@ -80,10 +80,10 @@ export const TradeWinPercentage = ({ timeFilter, hasEntries }: TradeWinPercentag
 
   const winRate = calculateWinRate();
   
-  // Calculate the data for the pie chart
+  // Calculate the data for the pie chart - INVERTED COLORS HERE
   const pieData = hasEntries ? [
-    { name: "Wins", value: winRate, color: "#6E59A5" },
-    { name: "Losses", value: 100 - winRate, color: "#FEC6A1" }
+    { name: "Wins", value: winRate, color: "#FEC6A1" },  // Changed to peach color
+    { name: "Losses", value: 100 - winRate, color: "#9b87f5" }  // Changed to purple
   ] : [
     { name: "No Data", value: 100, color: "#e5e7eb" }
   ];
