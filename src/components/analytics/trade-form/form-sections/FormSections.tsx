@@ -9,9 +9,15 @@ interface FormSectionsProps {
   direction: 'buy' | 'sell' | null;
   setDirection: (direction: 'buy' | 'sell') => void;
   formValues?: Partial<Trade>;
+  onSetupChange?: (setup: string) => void;
 }
 
-export const FormSections = ({ direction, setDirection, formValues }: FormSectionsProps) => {
+export const FormSections = ({ 
+  direction, 
+  setDirection, 
+  formValues,
+  onSetupChange
+}: FormSectionsProps) => {
   const isMobile = useIsMobile();
   
   return (
@@ -20,6 +26,7 @@ export const FormSections = ({ direction, setDirection, formValues }: FormSectio
         direction={direction} 
         setDirection={setDirection}
         formValues={formValues}
+        onSetupChange={onSetupChange}
       />
       <TradeEntrySection formValues={formValues} />
       <TradeExitSection formValues={formValues} />

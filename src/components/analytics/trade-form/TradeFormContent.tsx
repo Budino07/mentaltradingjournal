@@ -89,6 +89,13 @@ export const TradeFormContent = ({
     }, 0);
   };
 
+  const handleSetupChange = (setup: string) => {
+    setFormValues({
+      ...formValues,
+      setup
+    });
+  };
+
   return (
     <form onSubmit={handleSubmit} className={`flex flex-col ${isMobile ? 'h-[calc(100vh-120px)]' : 'h-[calc(90vh-60px)]'}`}>
       <div className="flex-1 overflow-y-auto">
@@ -96,6 +103,7 @@ export const TradeFormContent = ({
           direction={direction} 
           setDirection={handleDirectionChange} 
           formValues={formValues}
+          onSetupChange={handleSetupChange}
         />
       </div>
       <FormActions isEdit={!!editTrade} />

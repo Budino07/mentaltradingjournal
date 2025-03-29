@@ -3,14 +3,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Trade } from "@/types/trade";
+import { SetupSelector } from "./SetupSelector";
 
 interface GeneralSectionProps {
   direction: 'buy' | 'sell' | null;
   setDirection: (direction: 'buy' | 'sell') => void;
   formValues?: Partial<Trade>;
+  onSetupChange?: (setup: string) => void;
 }
 
-export const GeneralSection = ({ direction, setDirection, formValues }: GeneralSectionProps) => {
+export const GeneralSection = ({ 
+  direction, 
+  setDirection, 
+  formValues, 
+  onSetupChange 
+}: GeneralSectionProps) => {
   const setTodayDate = (inputId: string) => {
     const now = new Date();
     const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
@@ -19,6 +26,18 @@ export const GeneralSection = ({ direction, setDirection, formValues }: GeneralS
     const input = document.getElementById(inputId) as HTMLInputElement;
     if (input) {
       input.value = localDateTime;
+    }
+  };
+
+  const handleSetupChange = (setup: string) => {
+    if (onSetupChange) {
+      onSetupChange(setup);
+    }
+    
+    // Also update the hidden input for form submission
+    const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
+    if (setupInput) {
+      setupInput.value = setup;
     }
   };
 
@@ -56,16 +75,19 @@ export const GeneralSection = ({ direction, setDirection, formValues }: GeneralS
             defaultValue={formValues?.instrument || ""}
           />
         </div>
-        <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="setup">Setup</Label>
-          <Input
-            type="text"
-            id="setup"
-            name="setup"
-            placeholder="Enter your trading setup"
-            defaultValue={formValues?.setup || ""}
-          />
-        </div>
+        
+        <SetupSelector 
+          value={formValues?.setup || ""}
+          onChange={handleSetupChange}
+        />
+        
+        {/* Hidden input to preserve form submission */}
+        <input 
+          type="hidden" 
+          name="setup" 
+          value={formValues?.setup || ""} 
+        />
+        
         <div className="grid w-full gap-1.5">
           <Label>Direction *</Label>
           <div className="flex gap-2">
