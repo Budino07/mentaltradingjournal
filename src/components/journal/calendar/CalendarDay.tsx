@@ -120,7 +120,7 @@ export const CalendarDay = ({
       {stats && (stats.totalPL !== 0 || stats.numTrades > 0) && (
         <div className="absolute inset-0 flex flex-col justify-end p-2 bg-gradient-to-t from-white/90 to-transparent dark:from-gray-900/90">
           <div className="space-y-1 text-center w-full">
-            <p className={`text-lg font-semibold ${getPnLColor(stats.totalPL, mode)}`}>
+            <p className={`text-lg font-semibold ${mode === 'emotion' && emotionColors ? emotionColors.text : getPnLColor(stats.totalPL, mode)}`}>
               {formatCurrency(stats.totalPL)}
             </p>
             <p className="text-xs text-gray-600 dark:text-gray-300">
