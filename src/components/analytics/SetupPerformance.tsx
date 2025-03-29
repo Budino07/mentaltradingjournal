@@ -99,6 +99,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
+// Helper function to truncate setup names
+const truncateSetupName = (name: string, maxLength = 12): string => {
+  if (!name) return '';
+  return name.length > maxLength ? `${name.substring(0, maxLength)}...` : name;
+};
+
 export const SetupPerformance = () => {
   const [selectedSetup, setSelectedSetup] = useState<{ trades: Trade[]; name: string } | null>(null);
   const { data: analytics, isLoading } = useQuery({
@@ -230,6 +236,12 @@ export const SetupPerformance = () => {
     return '#dc2626';                    // Strong red for big losses
   };
 
+  // Prepare data with truncated names for display
+  const displayData = sortedSetupStats.map(setup => ({
+    ...setup,
+    displayName: truncateSetupName(setup.name)
+  }));
+
   return (
     <Card className="p-4 md:p-6 space-y-4 col-span-2">
       <div className="space-y-2">
@@ -242,8 +254,8 @@ export const SetupPerformance = () => {
       <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart 
-            data={sortedSetupStats} 
-            margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+            data={displayData} 
+            margin={{ top: 20, right: 30, left: 20, bottom: 60 }} // Increased bottom margin
             onClick={(data) => {
               if (data && data.activePayload && data.activePayload[0]) {
                 const setupData = data.activePayload[0].payload;
@@ -256,12 +268,12 @@ export const SetupPerformance = () => {
           >
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
             <XAxis 
-              dataKey="name"
-              angle={0}
-              textAnchor="middle"
-              height={60}
+              dataKey="displayName"
+              angle={-45} // Angle the labels to prevent overlap
+              textAnchor="end"
+              height={80} // Increased height for angled labels
               interval={0}
-              tick={{ fontSize: 12 }}
+              tick={{ fontSize: 11 }}
             />
             <YAxis 
               tickFormatter={(value) => `$${formatCurrency(value)}`}
@@ -275,8 +287,9 @@ export const SetupPerformance = () => {
               dataKey="totalPnl" 
               radius={[4, 4, 0, 0]}
               fillOpacity={0.9}
+              name="P&L"
             >
-              {sortedSetupStats.map((entry, index) => (
+              {displayData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={getBarColor(entry.totalPnl)} />
               ))}
             </Bar>
