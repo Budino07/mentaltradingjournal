@@ -12,7 +12,7 @@ export const EmotionBadge = ({ emotion, detail }: EmotionBadgeProps) => {
       case 'positive':
         return 'border-green-500/50 text-green-600 bg-green-500/5 hover:bg-green-500/10';
       case 'neutral':
-        return 'border-gray-400 text-gray-600 bg-white dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600';
+        return 'border-blue-300 text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-500 hover:bg-blue-100 dark:hover:bg-blue-800/40';
       case 'negative':
         return 'border-red-500/50 text-red-500 bg-red-500/5 hover:bg-red-500/10';
       default:
