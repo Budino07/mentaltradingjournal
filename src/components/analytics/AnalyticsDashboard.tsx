@@ -61,8 +61,15 @@ export const AnalyticsDashboard = () => {
       case 'trading':
         return tradingComponents;
       default:
-        // For 'all' view, show a curated selection that doesn't duplicate the OvertradingHeatMap
-        return [EmotionTrend, EmotionFrequency, EquityCurve, ...psychologicalComponents.slice(2), ...tradingComponents.slice(4)];
+        // Include OvertradingHeatMap in the "all" view
+        return [
+          EmotionTrend, 
+          EmotionFrequency, 
+          EquityCurve,
+          OvertradingHeatMap, // Added OvertradingHeatMap to the "all" view
+          ...psychologicalComponents.slice(2), 
+          ...tradingComponents.slice(5) // Changed from slice(4) to slice(5) to avoid including OvertradingHeatMap twice
+        ];
     }
   };
 
