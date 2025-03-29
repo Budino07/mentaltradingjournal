@@ -20,7 +20,6 @@ import { TimeBasedPerformance } from "./TimeBasedPerformance";
 import { EquityCurve } from "./EquityCurve";
 import { EmotionFrequency } from "./EmotionFrequency";
 import { SetupPerformance } from "./SetupPerformance";
-import { OvertradingHeatMap } from "./OvertradingHeatMap";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -40,8 +39,7 @@ export const AnalyticsDashboard = () => {
   const tradingComponents = [
     EquityCurve,
     TimeBasedPerformance,
-    SetupPerformance,
-    OvertradingHeatMap, // Added new component
+    SetupPerformance, // Added new component
     AssetPairPerformance,
     PerformanceBreakdown,
     RuleAdherence,
@@ -61,7 +59,7 @@ export const AnalyticsDashboard = () => {
       case 'trading':
         return tradingComponents;
       default:
-        return [EmotionTrend, EmotionFrequency, OvertradingHeatMap, ...psychologicalComponents.slice(2), ...tradingComponents.slice(1)];
+        return [EmotionTrend, EmotionFrequency, ...psychologicalComponents.slice(2), ...tradingComponents];
     }
   };
 
