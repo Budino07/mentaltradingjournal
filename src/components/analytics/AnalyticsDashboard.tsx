@@ -35,13 +35,13 @@ export const AnalyticsDashboard = () => {
     EmotionRecovery,
     PreTradingEvents,
     PersonalityPatterns,
+    OvertradingHeatMap,
   ];
 
   const tradingComponents = [
     EquityCurve,
     TimeBasedPerformance,
     SetupPerformance,
-    OvertradingHeatMap,
     AssetPairPerformance,
     PerformanceBreakdown,
     RuleAdherence,
@@ -62,19 +62,23 @@ export const AnalyticsDashboard = () => {
         return tradingComponents;
       default:
         // Reordered components for the "all" view
+        // First psychological components, then trading components
         return [
+          // Psychological components starting with EmotionTrend
           EmotionTrend, 
-          EmotionFrequency, 
+          EmotionFrequency,
+          MistakeAnalysis,
+          EmotionRecovery,
+          PreTradingEvents,
+          PersonalityPatterns,
+          OvertradingHeatMap,
+          
+          // Trading components
           EquityCurve,
           TimeBasedPerformance,
-          EmotionRecovery, // Right of TimeBasedPerformance
-          PreTradingEvents,
-          MistakeAnalysis, // Right of PreTradingEvents (moved here)
-          OvertradingHeatMap,
-          PersonalityPatterns,
           SetupPerformance,
-          AssetPairPerformance, 
-          PerformanceBreakdown,
+          AssetPairPerformance,
+          PerformanceBreakdown, 
           RuleAdherence,
           TradeDuration,
           ProfitLossDistribution,
