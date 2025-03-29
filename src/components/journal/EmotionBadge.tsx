@@ -1,3 +1,4 @@
+
 import { Badge } from "@/components/ui/badge";
 
 interface EmotionBadgeProps {
@@ -11,7 +12,7 @@ export const EmotionBadge = ({ emotion, detail }: EmotionBadgeProps) => {
       case 'positive':
         return 'border-green-500/50 text-green-600 bg-green-500/5 hover:bg-green-500/10';
       case 'neutral':
-        return 'border-yellow-500/50 text-yellow-600 bg-yellow-500/5 hover:bg-yellow-500/10';
+        return 'border-gray-300/50 text-gray-500 bg-gray-200/5 hover:bg-gray-200/10';
       case 'negative':
         return 'border-red-500/50 text-red-500 bg-red-500/5 hover:bg-red-500/10';
       default:

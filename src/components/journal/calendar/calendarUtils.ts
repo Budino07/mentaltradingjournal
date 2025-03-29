@@ -97,8 +97,8 @@ export const getEmotionColor = (emotion: string | null) => {
       };
     case 'neutral':
       return {
-        border: "border-[#F5F1E6] dark:border-[#E6DFC8]",
-        text: "text-[#D9CCA7] dark:text-[#E6DFC8]"
+        border: "border-gray-200 dark:border-gray-700",
+        text: "text-gray-400 dark:text-gray-500"
       };
     default:
       return null;
