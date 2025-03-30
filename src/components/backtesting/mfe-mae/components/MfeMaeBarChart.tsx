@@ -1,4 +1,3 @@
-
 import {
   BarChart,
   Bar,
@@ -9,6 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceLine,
+  Line,
 } from "recharts";
 import { ChartData } from "../types";
 import { useNavigate } from "react-router-dom";
@@ -43,12 +43,19 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
     }
   };
 
-  // Custom shape for positive captured move indicator (green line on orange)
-  const CapturedMoveIndicator = ({ x, y, width, height, capturedMove }: any) => {
-    if (capturedMove === undefined || capturedMove <= 0) return null;
+  // Custom shape for captured move indicator
+  const CapturedMoveIndicator = ({ x, y, width, capturedMove, index }: any) => {
+    if (capturedMove === undefined) return null;
     
     // Calculate the position for the line
-    const lineYPosition = y + ((100 - capturedMove) / 100) * height;
+    const lineYPosition = capturedMove > 0 
+      ? y + ((100 - capturedMove) / 100) * width 
+      : y + width; // If negative or zero, place at bottom
+    
+    // Determine line color based on captured move value
+    const lineColor = capturedMove > 0 
+      ? "#4ade80" // Aesthetic green for positive values
+      : "#f87171"; // Aesthetic red for negative values
     
     return (
       <line
@@ -56,31 +63,9 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         y1={lineYPosition}
         x2={x + width}
         y2={lineYPosition}
-        stroke="#4ade80" // Green for positive values
+        stroke={lineColor}
         strokeWidth={2}
-        strokeDasharray="none"
-      />
-    );
-  };
-
-  // Custom shape for negative captured move indicator (red line on purple)
-  const NegativeCapturedMoveIndicator = ({ x, y, width, height, capturedMove }: any) => {
-    if (capturedMove === undefined || capturedMove >= 0) return null;
-    
-    // For negative values, calculate position within the drawdown bar
-    // If capturedMove is -100%, position at the bottom of the bar
-    // If capturedMove is 0%, position at the top of the bar
-    const lineYPosition = y + ((Math.abs(capturedMove) / 100) * height);
-    
-    return (
-      <line
-        x1={x}
-        y1={lineYPosition}
-        x2={x + width}
-        y2={lineYPosition}
-        stroke="#ef4444" // Red for negative values
-        strokeWidth={2}
-        strokeDasharray="none"
+        strokeDasharray={capturedMove < 0 ? "4 2" : "none"} // Dashed if negative
       />
     );
   };
@@ -156,7 +141,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ 
-                      backgroundColor: data.capturedMove > 0 ? "#4ade80" : "#ef4444" 
+                      backgroundColor: data.capturedMove > 0 ? "#4ade80" : "#f87171" 
                     }} />
                     <span className="text-card-foreground">Captured Move: {data.capturedMove?.toFixed(2)}%</span>
                   </div>
@@ -194,15 +179,13 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                   rx={4}
                   ry={4}
                 />
-                {props.payload.capturedMove > 0 && (
-                  <CapturedMoveIndicator 
-                    x={x} 
-                    y={y} 
-                    width={width} 
-                    height={height}
-                    capturedMove={props.payload.capturedMove} 
-                  />
-                )}
+                <CapturedMoveIndicator 
+                  x={x} 
+                  y={y} 
+                  width={width} 
+                  capturedMove={props.payload.capturedMove} 
+                  index={index} 
+                />
               </>
             );
           }}
@@ -213,32 +196,6 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           name="Drawdown" 
           stackId="stack"
           cursor="pointer"
-          isAnimationActive={true}
-          shape={(props) => {
-            const { x, y, width, height } = props;
-            return (
-              <>
-                <rect
-                  x={x}
-                  y={y}
-                  width={width}
-                  height={height}
-                  fill="#9b87f5"
-                  rx={4}
-                  ry={4}
-                />
-                {props.payload.capturedMove < 0 && (
-                  <NegativeCapturedMoveIndicator
-                    x={x} 
-                    y={y} 
-                    width={width}
-                    height={height}
-                    capturedMove={props.payload.capturedMove}
-                  />
-                )}
-              </>
-            );
-          }}
         />
       </BarChart>
     </ResponsiveContainer>
