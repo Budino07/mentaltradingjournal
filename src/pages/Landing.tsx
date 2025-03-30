@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { AnalyticsSection } from "@/components/landing/AnalyticsSection";
 import { AboutUsSection } from "@/components/landing/AboutUsSection";
+import { PricingSection } from "@/components/landing/PricingSection";
 import { Footer } from "@/components/landing/Footer";
 import { User, ArrowRightCircle, BarChart3, Brain, Lightbulb, TrendingUp, Clock, Target } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -279,6 +280,9 @@ const Landing = () => {
 
         {/* About Us Section */}
         <AboutUsSection />
+
+        {/* Pricing Section */}
+        <PricingSection />
 
         {/* Footer */}
         <Footer />
