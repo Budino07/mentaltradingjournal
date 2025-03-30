@@ -241,3 +241,44 @@
     @apply text-sm font-medium;
   }
 }
+
+/* Data visualization enhancements */
+.chart-bar {
+  @apply relative rounded-t-sm transition-all duration-500 ease-in-out;
+  min-height: 4px;
+}
+
+.chart-bar-positive {
+  @apply bg-gradient-to-t from-primary/80 to-primary-light;
+}
+
+.chart-bar-negative {
+  @apply bg-gradient-to-t from-red-500/80 to-red-400;
+}
+
+.circle-progress {
+  @apply relative rounded-full;
+  background: conic-gradient(var(--progress-color) var(--progress-value), #222 0);
+}
+
+/* Trading card styles */
+.trade-card {
+  @apply bg-[#0A101F] rounded-lg border border-white/5 transition-all duration-300;
+}
+
+.trade-card:hover {
+  @apply border-primary/20 shadow-md shadow-primary/5;
+}
+
+.stat-value {
+  @apply text-2xl font-bold mb-1;
+}
+
+.stat-label {
+  @apply text-sm text-white/60;
+}
+
+/* Insights card styles */
+.insight-card {
+  @apply bg-gradient-to-br from-primary/40 to-primary-dark/60 rounded-xl border border-primary/30 p-5;
+}
