@@ -1,4 +1,3 @@
-
 import { Home, BookOpen, BarChart2, Menu, User, BrainCircuit, FlaskConical, Notebook, LineChart, Settings, UserCog } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -75,7 +74,7 @@ export function AppHeader() {
     <header className="border-b border-border/40 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
-          <span className="font-bold text-xl bg-gradient-to-r from-[#D6BCFA] to-[#FEC6A1] bg-clip-text text-transparent">Mental</span>
+          <span className="font-bold text-xl bg-gradient-to-r from-[#9b87f5] to-[#FEC6A1] bg-clip-text text-transparent">Mental</span>
         </Link>
 
         {/* Desktop Navigation */}
