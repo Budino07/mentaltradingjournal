@@ -45,13 +45,13 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
   };
 
   // Custom shape for captured move indicator
-  const CapturedMoveIndicator = ({ x, y, width, height, capturedMove }: any) => {
+  const CapturedMoveIndicator = ({ x, y, width, capturedMove, index }: any) => {
     if (capturedMove === undefined) return null;
     
     // Calculate the position for the line
     const lineYPosition = capturedMove > 0 
-      ? y + ((100 - capturedMove) / 100) * height 
-      : y + height + ((capturedMove) / 100) * height; // For negative values, position below the x-axis
+      ? y + ((100 - capturedMove) / 100) * width 
+      : y; // For green indicator on Updraw bars
     
     // Determine line color based on captured move value
     const lineColor = capturedMove > 0 
@@ -66,64 +66,28 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         y2={lineYPosition}
         stroke={lineColor}
         strokeWidth={2}
-        strokeDasharray={capturedMove < 0 ? "4 2" : "none"} // Dashed if negative
+        strokeDasharray="none"
       />
     );
   };
 
-  // Separate custom shape component for Updraw bars to include the captured move indicator
-  const CustomUpdrawBar = (props: any) => {
-    const { x, y, width, height, capturedMove } = props;
+  // Custom shape for negative captured move indicator (red line on purple)
+  const NegativeCapturedMoveIndicator = ({ x, y, width, height, capturedMove }: any) => {
+    if (capturedMove === undefined || capturedMove >= 0) return null;
+    
+    // For negative values, calculate position within the drawdown bar
+    const lineYPosition = y + (Math.abs(capturedMove) / 100) * height;
     
     return (
-      <>
-        <rect
-          x={x}
-          y={y}
-          width={width}
-          height={height}
-          fill="#FEC6A1"
-          rx={4}
-          ry={4}
-        />
-        {props.payload.capturedMove > 0 && (
-          <CapturedMoveIndicator 
-            x={x} 
-            y={y} 
-            width={width} 
-            height={height}
-            capturedMove={props.payload.capturedMove} 
-          />
-        )}
-      </>
-    );
-  };
-
-  // Separate custom shape component for Drawdown bars to include the captured move indicator
-  const CustomDrawdownBar = (props: any) => {
-    const { x, y, width, height } = props;
-    
-    return (
-      <>
-        <rect
-          x={x}
-          y={y}
-          width={width}
-          height={height}
-          fill="#9b87f5"
-          rx={4}
-          ry={4}
-        />
-        {props.payload.capturedMove < 0 && (
-          <CapturedMoveIndicator 
-            x={x} 
-            y={y} 
-            width={width} 
-            height={height}
-            capturedMove={props.payload.capturedMove} 
-          />
-        )}
-      </>
+      <line
+        x1={x}
+        y1={lineYPosition}
+        x2={x + width}
+        y2={lineYPosition}
+        stroke="#ef4444" // Red for negative values
+        strokeWidth={2}
+        strokeDasharray="none"
+      />
     );
   };
 
@@ -223,7 +187,31 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           name="Updraw" 
           stackId="stack"
           cursor="pointer"
-          shape={CustomUpdrawBar}
+          shape={(props) => {
+            const { x, y, width, height, capturedMove, index } = props;
+            return (
+              <>
+                <rect
+                  x={x}
+                  y={y}
+                  width={width}
+                  height={height}
+                  fill="#FEC6A1"
+                  rx={4}
+                  ry={4}
+                />
+                {props.payload.capturedMove > 0 && (
+                  <CapturedMoveIndicator 
+                    x={x} 
+                    y={y} 
+                    width={width} 
+                    capturedMove={props.payload.capturedMove} 
+                    index={index} 
+                  />
+                )}
+              </>
+            );
+          }}
         />
         <Bar 
           dataKey="maeRelativeToSl" 
@@ -231,7 +219,31 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           name="Drawdown" 
           stackId="stack"
           cursor="pointer"
-          shape={CustomDrawdownBar}
+          shape={(props) => {
+            const { x, y, width, height } = props;
+            return (
+              <>
+                <rect
+                  x={x}
+                  y={y}
+                  width={width}
+                  height={height}
+                  fill="#9b87f5"
+                  rx={4}
+                  ry={4}
+                />
+                {props.payload.capturedMove < 0 && (
+                  <NegativeCapturedMoveIndicator
+                    x={x} 
+                    y={y} 
+                    width={width}
+                    height={height}
+                    capturedMove={props.payload.capturedMove}
+                  />
+                )}
+              </>
+            );
+          }}
         />
       </BarChart>
     </ResponsiveContainer>
