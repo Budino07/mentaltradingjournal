@@ -109,14 +109,6 @@ const App = () => {
                       }
                     />
                     <Route
-                      path="/mental-wrapped"
-                      element={
-                        <ProtectedRoute>
-                          <MentalWrapped />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
                       path="/backtesting"
                       element={
                         <ProtectedRoute>
@@ -137,6 +129,14 @@ const App = () => {
                       element={
                         <ProtectedRoute>
                           <Notebook />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/mental-wrapped"
+                      element={
+                        <ProtectedRoute>
+                          <MentalWrapped />
                         </ProtectedRoute>
                       }
                     />

@@ -1,59 +1,66 @@
 
-import React from "react";
-import { motion } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-import { CalendarIcon } from "lucide-react";
+import React from 'react';
+import { WrappedMonth } from '@/utils/wrappedUtils';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface MonthSelectorProps {
-  months: string[];
-  onSelectMonth: (month: string) => void;
+  months: WrappedMonth[];
+  selectedMonth: WrappedMonth | null;
+  onChange: (month: WrappedMonth) => void;
 }
 
-export const MonthSelector: React.FC<MonthSelectorProps> = ({ months, onSelectMonth }) => {
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+export const MonthSelector: React.FC<MonthSelectorProps> = ({ 
+  months, 
+  selectedMonth, 
+  onChange 
+}) => {
+  const groupedByYear: Record<number, WrappedMonth[]> = {};
+  
+  // Group months by year
+  months.forEach(month => {
+    if (!groupedByYear[month.year]) {
+      groupedByYear[month.year] = [];
     }
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
+    groupedByYear[month.year].push(month);
+  });
 
   return (
-    <motion.div
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-      variants={container}
-      initial="hidden"
-      animate="show"
-    >
-      {months.map((month) => (
-        <motion.div key={month} variants={item}>
-          <Card 
-            className="overflow-hidden cursor-pointer transform hover:scale-[1.02] transition-all duration-300 border border-primary/20 group"
-            onClick={() => onSelectMonth(month)}
-          >
-            <CardContent className="p-0">
-              <div className="relative h-48 w-full bg-gradient-to-br from-primary/10 to-accent/10 flex flex-col items-center justify-center">
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-30 bg-gradient-to-b from-primary/40 to-accent/40 transition-opacity duration-300" />
-                
-                <CalendarIcon className="h-12 w-12 text-primary mb-4" />
-                
-                <h3 className="text-2xl font-bold text-primary drop-shadow-sm group-hover:scale-110 transition-transform duration-300">{month}</h3>
-                
-                <p className="text-sm text-muted-foreground mt-2 opacity-70">
-                  Click to view your monthly wrapped insights
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      ))}
-    </motion.div>
+    <Card className="p-6">
+      <h2 className="text-xl font-semibold mb-4">Select Month</h2>
+      
+      <div className="space-y-6">
+        {Object.entries(groupedByYear).map(([year, yearMonths]) => (
+          <div key={year} className="space-y-2">
+            <h3 className="text-lg font-medium text-muted-foreground">{year}</h3>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {yearMonths.map(month => (
+                <button
+                  key={`${month.year}-${month.month}`}
+                  onClick={() => month.hasData && onChange(month)}
+                  disabled={!month.hasData}
+                  className={cn(
+                    "p-3 flex items-center justify-between rounded-md transition-colors",
+                    month.hasData ? "hover:bg-accent/50 cursor-pointer" : "opacity-50 cursor-not-allowed",
+                    selectedMonth?.month === month.month && selectedMonth?.year === month.year ? "bg-accent/50" : "bg-card"
+                  )}
+                >
+                  <span>{month.month}</span>
+                  {month.hasData ? (
+                    <Badge variant="secondary" className="ml-2 bg-primary/20 text-xs">
+                      Available
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="ml-2 text-xs">No data</Badge>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
   );
 };

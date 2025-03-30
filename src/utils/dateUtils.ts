@@ -1,21 +1,39 @@
 
-// Format date to YYYY-MM-DD
-export const formatDate = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+import { differenceInDays, isWeekend, format, isMonday } from 'date-fns';
+
+export const shouldResetStreak = (lastActivity: Date): boolean => {
+  const today = new Date();
+  const daysSinceLastActivity = differenceInDays(today, lastActivity);
   
-  return `${year}-${month}-${day}`;
+  // If today is Monday and last activity was on Friday, don't reset streak
+  if (isMonday(today) && daysSinceLastActivity <= 3 && isWeekend(new Date(lastActivity.getTime() + 24 * 60 * 60 * 1000))) {
+    return false;
+  }
+  
+  // Check each day between last activity and today
+  for (let i = 1; i <= daysSinceLastActivity; i++) {
+    const checkDate = new Date(lastActivity);
+    checkDate.setDate(checkDate.getDate() + i);
+    
+    // Only consider missed weekday as streak breaker
+    if (!isWeekend(checkDate) && i > 1) {
+      // If we find any non-weekend day that was missed, reset the streak
+      return true;
+    }
+  }
+  
+  return false;
 };
 
-// Extract time from date
-export const getTimeFromDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  const hours = date.getHours();
-  const minutes = String(date.getMinutes()).padStart(2, '0');
+// Add format function for date formatting
+export const formatDate = (date: string | Date): string => {
+  if (!date) return '';
   
-  const period = hours >= 12 ? 'PM' : 'AM';
-  const formattedHours = hours % 12 || 12;
-  
-  return `${formattedHours}:${minutes} ${period}`;
+  try {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return format(dateObj, 'MMM dd, yyyy HH:mm');
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return '';
+  }
 };

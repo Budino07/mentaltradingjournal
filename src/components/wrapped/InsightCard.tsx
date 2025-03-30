@@ -1,247 +1,268 @@
 
-import React from "react";
-import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { BadgePercent, Calendar, Clock, Award, TrendingUp, TrendingDown, Flame } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, PieChart, Pie } from "recharts";
+import React, { useEffect, useRef } from 'react';
+import { WrappedInsight } from '@/utils/wrappedUtils';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 
 interface InsightCardProps {
-  type: 
-    | "win-rate" 
-    | "streak" 
-    | "time" 
-    | "setup" 
-    | "mood-performance" 
-    | "overtrading" 
-    | "emotional-heatmap";
-  title: string;
-  value: string;
-  description: string;
-  color: "primary" | "destructive" | "green" | "blue" | "purple" | "amber" | "pink" | "orange" | "cyan";
-  comparison?: {
-    value: number;
-    label: string;
-  };
-  moodData?: Record<string, number>;
-  emotionalData?: Record<string, any>;
+  insight: WrappedInsight;
+  month: string;
+  year: number;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  onRestart?: () => void;
 }
 
-const getGradientClass = (color: string) => {
-  switch (color) {
-    case "primary":
-      return "from-primary/20 to-primary/10";
-    case "destructive":
-      return "from-destructive/20 to-destructive/10";
-    case "green":
-      return "from-green-500/20 to-green-500/10";
-    case "blue":
-      return "from-blue-500/20 to-blue-500/10";
-    case "purple":
-      return "from-purple-500/20 to-purple-500/10";
-    case "amber":
-      return "from-amber-500/20 to-amber-500/10";
-    case "pink":
-      return "from-pink-500/20 to-pink-500/10";
-    case "orange":
-      return "from-orange-500/20 to-orange-500/10";
-    case "cyan":
-      return "from-cyan-500/20 to-cyan-500/10";
-    default:
-      return "from-primary/20 to-primary/10";
-  }
-};
-
-const getTextColorClass = (color: string) => {
-  switch (color) {
-    case "primary":
-      return "text-primary";
-    case "destructive":
-      return "text-destructive";
-    case "green":
-      return "text-green-500";
-    case "blue":
-      return "text-blue-500";
-    case "purple":
-      return "text-purple-500";
-    case "amber":
-      return "text-amber-500";
-    case "pink":
-      return "text-pink-500";
-    case "orange":
-      return "text-orange-500";
-    case "cyan":
-      return "text-cyan-500";
-    default:
-      return "text-primary";
-  }
-};
-
-const getIconByType = (type: string, color: string) => {
-  const colorClass = getTextColorClass(color);
-
-  switch (type) {
-    case "win-rate":
-      return <BadgePercent className={`h-8 w-8 ${colorClass}`} />;
-    case "streak":
-      return <Flame className={`h-8 w-8 ${colorClass}`} />;
-    case "time":
-      return <Clock className={`h-8 w-8 ${colorClass}`} />;
-    case "setup":
-      return <Award className={`h-8 w-8 ${colorClass}`} />;
-    case "mood-performance":
-      return <TrendingUp className={`h-8 w-8 ${colorClass}`} />;
-    case "overtrading":
-      return <TrendingDown className={`h-8 w-8 ${colorClass}`} />;
-    case "emotional-heatmap":
-      return <Calendar className={`h-8 w-8 ${colorClass}`} />;
-    default:
-      return <BadgePercent className={`h-8 w-8 ${colorClass}`} />;
-  }
-};
-
-export const InsightCard: React.FC<InsightCardProps> = ({
-  type,
-  title,
-  value,
-  description,
-  color,
-  comparison,
-  moodData,
-  emotionalData,
+export const InsightCard: React.FC<InsightCardProps> = ({ 
+  insight,
+  month,
+  year,
+  onPrevious,
+  onNext,
+  onRestart
 }) => {
-  const gradientClass = getGradientClass(color);
-  const textColorClass = getTextColorClass(color);
-  const icon = getIconByType(type, color);
-
-  const renderComparisonValue = () => {
-    if (!comparison) return null;
-    
-    const isPositive = comparison.value > 0;
-    
-    return (
-      <div className="flex items-center gap-1 text-sm">
-        {isPositive ? (
-          <TrendingUp className="h-4 w-4 text-green-500" />
-        ) : (
-          <TrendingDown className="h-4 w-4 text-destructive" />
-        )}
-        <span className={isPositive ? "text-green-500" : "text-destructive"}>
-          {isPositive ? "+" : ""}{comparison.value.toFixed(1)}%
-        </span>
-        <span className="text-muted-foreground">{comparison.label}</span>
-      </div>
-    );
-  };
-
-  const renderMoodPerformanceChart = () => {
-    if (!moodData) return null;
-    
-    const data = Object.entries(moodData).map(([mood, winRate]) => ({
-      name: mood.charAt(0).toUpperCase() + mood.slice(1),
-      value: winRate,
-    }));
-    
-    const COLORS = ["#6E59A5", "#34D399", "#F87171"];
-    
-    return (
-      <ResponsiveContainer width="100%" height={180}>
-        <BarChart data={data} margin={{ top: 20, right: 30, left: 10, bottom: 10 }}>
-          <XAxis dataKey="name" axisLine={false} tickLine={false} />
-          <YAxis hide />
-          <Tooltip 
-            formatter={(value) => [`${value.toFixed(1)}%`, "Win Rate"]}
-            contentStyle={{ background: "var(--background)", borderRadius: "8px", border: "1px solid var(--border)" }}
-          />
-          <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
-    );
-  };
-
-  const renderEmotionalHeatmap = () => {
-    if (!emotionalData) return null;
-    
-    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-    const data = days.map(day => ({
-      name: day,
-      positive: emotionalData[day]?.positive || 0,
-      negative: emotionalData[day]?.negative || 0,
-      neutral: emotionalData[day]?.neutral || 0,
-    }));
-    
-    return (
-      <ResponsiveContainer width="100%" height={180}>
-        <BarChart data={data} margin={{ top: 20, right: 30, left: 10, bottom: 10 }}>
-          <XAxis dataKey="name" axisLine={false} tickLine={false} />
-          <YAxis hide />
-          <Tooltip 
-            formatter={(value, name) => [value, name.charAt(0).toUpperCase() + name.slice(1)]}
-            contentStyle={{ background: "var(--background)", borderRadius: "8px", border: "1px solid var(--border)" }}
-          />
-          <Bar dataKey="positive" stackId="a" fill="#34D399" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="neutral" stackId="a" fill="#6E59A5" />
-          <Bar dataKey="negative" stackId="a" fill="#F87171" />
-        </BarChart>
-      </ResponsiveContainer>
-    );
-  };
-
-  const renderChart = () => {
-    switch (type) {
-      case "mood-performance":
-        return renderMoodPerformanceChart();
-      case "emotional-heatmap":
-        return renderEmotionalHeatmap();
-      default:
-        return null;
+  const valueRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const patternType = insight.id.includes('win') || insight.id.includes('profit') ? 'gradient' : 
+                      insight.id.includes('time') ? 'bars' : 'stairs';
+  
+  useEffect(() => {
+    // Apply animation when the card appears
+    const element = valueRef.current;
+    if (element) {
+      element.classList.add('animate-enter');
+      
+      return () => {
+        element.classList.remove('animate-enter');
+      };
     }
-  };
+  }, [insight.id]);
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas dimensions to match parent container
+    const resizeCanvas = () => {
+      const parent = canvas.parentElement;
+      if (parent) {
+        canvas.width = parent.offsetWidth;
+        canvas.height = parent.offsetHeight;
+      }
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Animation variables
+    let animationId: number;
+    let time = 0;
+
+    // Color scheme based on insight color
+    const colorScheme = getColorScheme(insight.color);
+
+    const drawPattern = () => {
+      time += 0.005;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (patternType === 'gradient') {
+        drawGradientPattern(ctx, canvas.width, canvas.height, time, colorScheme);
+      } else if (patternType === 'stairs') {
+        drawStairsPattern(ctx, canvas.width, canvas.height, time, colorScheme);
+      } else if (patternType === 'bars') {
+        drawBarsPattern(ctx, canvas.width, canvas.height, time, colorScheme);
+      }
+
+      animationId = requestAnimationFrame(drawPattern);
+    };
+
+    drawPattern();
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      cancelAnimationFrame(animationId);
+    };
+  }, [insight.color, patternType]);
+  
   return (
-    <Card className="w-full overflow-hidden border border-primary/20 shadow-lg">
-      <div className={`h-full bg-gradient-to-br ${gradientClass}`}>
-        <CardHeader className="pb-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {icon}
-              <h3 className={`text-xl font-bold ${textColorClass}`}>{title}</h3>
-            </div>
-            {renderComparisonValue()}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.1 }}
-            className="flex flex-col items-center justify-center py-6"
-          >
-            <motion.p
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className={`text-5xl font-bold ${textColorClass}`}
-            >
-              {value}
-            </motion.p>
-            
-            <motion.p
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="text-center text-muted-foreground mt-4"
-            >
-              {description}
-            </motion.p>
-          </motion.div>
-          
-          {renderChart()}
-        </CardContent>
+    <Card className="overflow-hidden h-full relative">
+      <div className="absolute inset-0 z-0 opacity-50">
+        <canvas 
+          ref={canvasRef} 
+          className="w-full h-full" 
+        />
       </div>
+      
+      <CardHeader className={cn("py-6 relative z-10", insight.color)}>
+        <div className="flex justify-between items-center text-white">
+          <h3 className="text-xl font-bold">{month} {year}</h3>
+          <div className="text-sm">Mental Wrapped</div>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="p-6 flex flex-col items-center text-center space-y-6 relative z-10">
+        <div className="text-5xl my-4">{insight.icon}</div>
+        
+        <h2 className="text-2xl font-bold">{insight.title}</h2>
+        
+        <div 
+          ref={valueRef}
+          className={cn(
+            "text-5xl md:text-6xl font-bold my-6",
+            `animate-${insight.animation}`
+          )}
+        >
+          {insight.value}
+        </div>
+        
+        <p className="text-muted-foreground text-lg max-w-md">
+          {insight.description}
+        </p>
+        
+        {/* Navigation buttons */}
+        <div className="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 flex justify-between px-4 z-20">
+          {onPrevious ? (
+            <Button 
+              variant="secondary" 
+              size="icon" 
+              onClick={onPrevious}
+              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+          ) : (
+            <div className="w-10"></div> {/* Spacer */}
+          )}
+          
+          {onNext ? (
+            <Button 
+              variant="secondary" 
+              size="icon" 
+              onClick={onNext}
+              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          ) : onRestart ? (
+            <Button 
+              variant="secondary" 
+              size="icon" 
+              onClick={onRestart}
+              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent"
+            >
+              <RotateCcw className="h-5 w-5" />
+            </Button>
+          ) : (
+            <div className="w-10"></div> {/* Spacer */}
+          )}
+        </div>
+      </CardContent>
     </Card>
   );
 };
+
+// Helper functions for background patterns
+function getColorScheme(color: string): string[] {
+  // Extract colors from Tailwind classes like "bg-green-500"
+  if (color.includes('green')) {
+    return ['#10B981', '#059669', '#047857', '#065F46'];
+  } else if (color.includes('blue')) {
+    return ['#3B82F6', '#2563EB', '#1D4ED8', '#1E40AF'];
+  } else if (color.includes('purple')) {
+    return ['#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6'];
+  } else if (color.includes('orange')) {
+    return ['#F97316', '#EA580C', '#C2410C', '#9A3412'];
+  } else if (color.includes('yellow')) {
+    return ['#FBBF24', '#F59E0B', '#D97706', '#B45309'];
+  } else if (color.includes('indigo')) {
+    return ['#6366F1', '#4F46E5', '#4338CA', '#3730A3'];
+  } else if (color.includes('red')) {
+    return ['#EF4444', '#DC2626', '#B91C1C', '#991B1B'];
+  } else if (color.includes('gray')) {
+    return ['#6B7280', '#4B5563', '#374151', '#1F2937'];
+  } else {
+    return ['#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6']; // Default purple
+  }
+}
+
+function drawGradientPattern(
+  ctx: CanvasRenderingContext2D, 
+  width: number, 
+  height: number, 
+  time: number, 
+  colors: string[]
+) {
+  // Create moving gradient bands
+  for (let i = 0; i < 12; i++) {
+    const y = (height * 0.1) * i + (time * 100) % height;
+    const gradient = ctx.createLinearGradient(0, y, width, y);
+    
+    const colorIndex = i % colors.length;
+    gradient.addColorStop(0, colors[colorIndex]);
+    gradient.addColorStop(1, colors[(colorIndex + 1) % colors.length]);
+    
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.moveTo(0, y - 30);
+    ctx.lineTo(width, y);
+    ctx.lineTo(width, y + height * 0.1);
+    ctx.lineTo(0, y + height * 0.1 - 30);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawStairsPattern(
+  ctx: CanvasRenderingContext2D, 
+  width: number, 
+  height: number, 
+  time: number, 
+  colors: string[]
+) {
+  // Create moving stair pattern like in the image
+  const steps = 15;
+  const stepHeight = height / steps;
+  
+  for (let i = 0; i < steps; i++) {
+    const offset = (time * 100) % (stepHeight * 2);
+    const y = i * stepHeight - offset;
+    
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width - i * (width / steps), y);
+    ctx.lineTo(width - i * (width / steps), y + stepHeight);
+    ctx.lineTo(0, y + stepHeight);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawBarsPattern(
+  ctx: CanvasRenderingContext2D, 
+  width: number, 
+  height: number, 
+  time: number, 
+  colors: string[]
+) {
+  // Create vertical moving bars
+  const barCount = 10;
+  const barWidth = width / barCount;
+  
+  for (let i = 0; i < barCount * 2; i++) {
+    const x = (i * barWidth) + (time * 50) % (barWidth * 2) - barWidth;
+    const barHeight = Math.sin(time + i * 0.5) * (height * 0.15) + (height * 0.3);
+    const y = height - barHeight;
+    
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.beginPath();
+    ctx.rect(x, y, barWidth - 5, barHeight);
+    ctx.fill();
+  }
+}
