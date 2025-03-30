@@ -22,10 +22,10 @@ const MentalWrapped = () => {
   return (
     <AppLayout>
       <div className="w-full flex flex-col gap-6 animate-fade-in">
-        <div className="flex flex-col gap-4">
-          <h1 className="text-3xl font-bold tracking-tight">Mental Wrapped</h1>
-          <p className="text-muted-foreground">
-            Your monthly trading journey, visualized like never before.
+        <div className="flex flex-col items-center text-center gap-4">
+          <h1 className="text-4xl font-bold tracking-tight text-gradient">Mental Wrapped</h1>
+          <p className="text-muted-foreground max-w-lg">
+            Your personal trading journey recap. Discover insights about your performance and psychology each month.
           </p>
         </div>
 

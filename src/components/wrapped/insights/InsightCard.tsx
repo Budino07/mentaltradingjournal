@@ -117,7 +117,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
 
       <CardContent className="p-6 flex flex-col h-full relative z-1">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="text-2xl font-bold text-primary">{insight.title}</h3>
+          <h3 className="text-2xl font-bold text-gradient">{insight.title}</h3>
           <div className="text-sm text-muted-foreground">{currentIndex + 1}/{totalInsights}</div>
         </div>
 
