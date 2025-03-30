@@ -49,23 +49,23 @@ export const EmotionalHeatmapInsight: React.FC<EmotionalHeatmapInsightProps> = (
     .sort((a, b) => b[1] - a[1])[0][0];
 
   return (
-    <div className="w-full flex flex-col items-center gap-6 text-center animate-fade-in">
-      <div className="bg-violet-500/10 p-6 rounded-full">
-        <Calendar className="h-12 w-12 text-violet-500 animate-pulse" />
+    <div className="w-full h-full flex flex-col items-center justify-between py-3">
+      <div className="bg-violet-500/10 p-5 rounded-full">
+        <Calendar className="h-10 w-10 text-violet-500 animate-pulse" />
       </div>
       
-      <div className="space-y-2">
+      <div className="space-y-1">
         <h2 className="text-2xl font-bold">Emotional Heatmap</h2>
-        <p className="text-lg text-muted-foreground">Your emotional patterns throughout the week</p>
+        <p className="text-base text-muted-foreground">Your emotional patterns throughout the week</p>
       </div>
       
-      <div className="w-full max-w-md mt-4">
+      <div className="w-full max-w-md">
         <div className="grid grid-cols-5 gap-2">
           {weekdays.map(({ day, label }) => (
             <div key={day} className="flex flex-col items-center">
-              <div className="text-sm font-medium mb-2">{label}</div>
+              <div className="text-sm font-medium mb-1">{label}</div>
               <div 
-                className={`w-12 h-12 rounded-full flex items-center justify-center opacity-80 ${getEmotionColorClass(data.emotionalHeatmap[day])}`}
+                className={`w-10 h-10 rounded-full flex items-center justify-center opacity-80 ${getEmotionColorClass(data.emotionalHeatmap[day])}`}
               >
                 <span className="text-white font-medium text-xs">
                   {getEmotionName(data.emotionalHeatmap[day]).substring(0, 3)}
@@ -76,8 +76,8 @@ export const EmotionalHeatmapInsight: React.FC<EmotionalHeatmapInsightProps> = (
         </div>
       </div>
       
-      <div className="mt-4 max-w-xs">
-        <p className="text-lg">
+      <div className="max-w-xs">
+        <p className="text-base">
           {mostCommonEmotion === 'positive' 
             ? "You're generally in a positive mood during trading days!" 
             : mostCommonEmotion === 'negative'

@@ -26,32 +26,32 @@ export const EmotionPerformanceInsight: React.FC<EmotionPerformanceInsightProps>
     (Math.abs(bestEmotion.value) / totalPerformance > 0.5);
 
   return (
-    <div className="w-full flex flex-col items-center gap-6 text-center animate-fade-in">
-      <h2 className="text-2xl font-bold">Mood vs. Performance</h2>
+    <div className="w-full h-full flex flex-col items-center justify-between py-3">
+      <h2 className="text-2xl font-bold mb-4">Mood vs. Performance</h2>
       
-      <div className="w-full grid grid-cols-3 gap-4">
+      <div className="w-full grid grid-cols-3 gap-3">
         {emotions.map((emotion) => (
           <div 
             key={emotion.type} 
-            className={`flex flex-col items-center bg-${emotion.color}-500/10 p-4 rounded-lg transition-transform hover:scale-105`}
+            className={`flex flex-col items-center bg-${emotion.color}-500/10 p-3 rounded-lg`}
           >
-            <emotion.icon className={`h-8 w-8 text-${emotion.color}-500 mb-2`} />
-            <div className="text-lg font-medium">{emotion.label}</div>
-            <div className={`text-xl font-bold ${emotion.value >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            <emotion.icon className={`h-7 w-7 text-${emotion.color}-500 mb-1`} />
+            <div className="text-base font-medium">{emotion.label}</div>
+            <div className={`text-lg font-bold ${emotion.value >= 0 ? 'text-green-500' : 'text-red-500'}`}>
               {emotion.value.toFixed(2)}
             </div>
           </div>
         ))}
       </div>
       
-      <div className="mt-4 max-w-sm">
+      <div className="max-w-sm mt-4">
         <p className="text-lg">
           {hasStrongCorrelation 
             ? `Your trades performed best when you felt ${bestEmotion.label.toLowerCase()}!` 
             : "There's no strong correlation between your emotions and trading performance yet."}
         </p>
         
-        <p className="mt-2 text-primary">
+        <p className="mt-2 text-primary text-base">
           {data.emotionPerformance.positive > data.emotionPerformance.negative
             ? "Trading while positive seems to work for you!"
             : data.emotionPerformance.negative > 0

@@ -9,11 +9,11 @@ interface WinRateInsightProps {
 
 export const WinRateInsight: React.FC<WinRateInsightProps> = ({ data }) => {
   return (
-    <div className="w-full flex flex-col items-center gap-6 text-center animate-fade-in">
+    <div className="w-full h-full flex flex-col items-center justify-between py-4">
       {/* Trophy icon with glowing effect */}
       <div className="bg-primary/20 p-6 rounded-full relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/30 rounded-full animate-pulse-slow"></div>
-        <Trophy className="h-12 w-12 text-primary relative z-10" />
+        <Trophy className="h-10 w-10 text-primary relative z-10" />
       </div>
       
       {/* Win rate percentage */}
@@ -26,7 +26,7 @@ export const WinRateInsight: React.FC<WinRateInsightProps> = ({ data }) => {
       </div>
       
       {/* Strategy tip */}
-      <div className="mt-4 text-lg p-4 backdrop-blur-sm rounded-lg bg-primary/5 border border-primary/10">
+      <div className="mt-2 text-lg p-4 backdrop-blur-sm rounded-lg bg-primary/5 border border-primary/10">
         <p className="flex items-center justify-center gap-2">
           <TrendingUp className={data.winRate >= 50 ? "text-green-500" : "text-primary"} />
           <span>

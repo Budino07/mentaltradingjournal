@@ -36,26 +36,28 @@ export const HoldingTimeInsight: React.FC<HoldingTimeInsightProps> = ({ data }) 
   };
 
   return (
-    <div className="w-full flex flex-col items-center gap-6 text-center animate-fade-in">
-      <div className="bg-indigo-500/10 p-6 rounded-full relative overflow-hidden glass-effect">
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-indigo-500/20 rounded-full animate-pulse-slow"></div>
-        <Timer className="h-12 w-12 text-indigo-500 relative z-10" />
+    <div className="w-full flex flex-col items-center justify-between h-full py-2">
+      <div className="flex flex-col items-center gap-4">
+        <div className="bg-indigo-500/10 p-5 rounded-full relative overflow-hidden glass-effect">
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-indigo-500/20 rounded-full animate-pulse-slow"></div>
+          <Timer className="h-10 w-10 text-indigo-500 relative z-10" />
+        </div>
+        
+        <div className="space-y-2 relative">
+          <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/10 to-indigo-500/5 rounded-full blur-md -z-10"></div>
+          <h2 className="text-3xl font-bold">{formatHoldingTime(data.avgHoldingTime)}</h2>
+          <p className="text-xl text-muted-foreground">Average Holding Time</p>
+        </div>
       </div>
       
-      <div className="space-y-3 relative">
-        <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/10 to-indigo-500/5 rounded-full blur-md -z-10"></div>
-        <h2 className="text-3xl font-bold">{formatHoldingTime(data.avgHoldingTime)}</h2>
-        <p className="text-2xl text-muted-foreground">Average Holding Time</p>
-      </div>
-      
-      <div className="mt-4 max-w-xs backdrop-blur-sm rounded-lg p-4 glass-effect">
+      <div className="backdrop-blur-sm rounded-lg p-3 glass-effect max-w-xs">
         <p className="text-lg">
           Based on your holding time, you trade like a
+          <span className="text-xl font-bold text-primary block mt-1">{holdingTimeCategory()}</span>
         </p>
-        <p className="text-2xl font-bold text-primary mt-2">{holdingTimeCategory()}</p>
       </div>
       
-      <div className="w-full max-w-sm mt-4">
+      <div className="w-full max-w-xs">
         <div className="h-3 w-full bg-gray-200/30 rounded-full relative overflow-hidden glass-effect">
           <div 
             className="h-full bg-gradient-to-r from-blue-400 to-indigo-600 rounded-full absolute"

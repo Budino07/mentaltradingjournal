@@ -116,18 +116,18 @@ export const InsightCard: React.FC<InsightCardProps> = ({
       </div>
 
       <CardContent className="p-6 flex flex-col h-full relative z-1">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-2">
           <h3 className="text-2xl font-bold text-primary">{insight.title}</h3>
           <div className="text-sm text-muted-foreground">{currentIndex + 1}/{totalInsights}</div>
         </div>
 
-        <div className="flex-1 flex items-center justify-center py-4 overflow-hidden">
-          <div className="max-h-[420px] overflow-y-auto overflow-x-hidden px-2 w-full scrollbar-thin">
+        <div className="flex-1 flex items-center justify-center py-2 overflow-hidden">
+          <div className="h-[460px] w-full flex items-center justify-center">
             {insight.component}
           </div>
         </div>
 
-        <div className="flex justify-between mt-4">
+        <div className="flex justify-between mt-2">
           <Button 
             variant="outline" 
             size="icon" 
