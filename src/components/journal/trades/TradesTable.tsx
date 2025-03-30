@@ -8,7 +8,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { ArrowUp, ArrowDown, Star, Edit, Trash, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowUp, ArrowDown, Star, Edit, Trash, Plus, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/utils/dateUtils";
 import { Trade } from "@/types/trade";
@@ -18,7 +18,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { TradeDeleteDialog } from "@/components/journal/entry/trade-item/TradeDeleteDialog";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowUpDown } from "lucide-react";
 
 type SortField = 'entryDate' | 'instrument' | 'direction' | 'setup' | 'pnl' | 'exitDate';
 type SortDirection = 'asc' | 'desc';
