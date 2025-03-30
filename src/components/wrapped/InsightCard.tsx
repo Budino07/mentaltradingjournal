@@ -1,18 +1,27 @@
+
 import React, { useEffect, useRef } from 'react';
 import { WrappedInsight } from '@/utils/wrappedUtils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 
 interface InsightCardProps {
   insight: WrappedInsight;
   month: string;
   year: number;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  onRestart?: () => void;
 }
 
 export const InsightCard: React.FC<InsightCardProps> = ({ 
   insight,
   month,
-  year
+  year,
+  onPrevious,
+  onNext,
+  onRestart
 }) => {
   const valueRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -82,7 +91,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
   }, [insight.color, patternType]);
   
   return (
-    <Card className="overflow-hidden h-full">
+    <Card className="overflow-hidden h-full relative">
       <div className="absolute inset-0 z-0 opacity-50">
         <canvas 
           ref={canvasRef} 
@@ -115,13 +124,50 @@ export const InsightCard: React.FC<InsightCardProps> = ({
         <p className="text-muted-foreground text-lg max-w-md">
           {insight.description}
         </p>
+        
+        {/* Navigation buttons */}
+        <div className="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 flex justify-between px-4 z-20">
+          {onPrevious ? (
+            <Button 
+              variant="secondary" 
+              size="icon" 
+              onClick={onPrevious}
+              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+          ) : (
+            <div className="w-10"></div> {/* Spacer */}
+          )}
+          
+          {onNext ? (
+            <Button 
+              variant="secondary" 
+              size="icon" 
+              onClick={onNext}
+              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          ) : onRestart ? (
+            <Button 
+              variant="secondary" 
+              size="icon" 
+              onClick={onRestart}
+              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent"
+            >
+              <RotateCcw className="h-5 w-5" />
+            </Button>
+          ) : (
+            <div className="w-10"></div> {/* Spacer */}
+          )}
+        </div>
       </CardContent>
     </Card>
   );
 };
 
 // Helper functions for background patterns
-
 function getColorScheme(color: string): string[] {
   // Extract colors from Tailwind classes like "bg-green-500"
   if (color.includes('green')) {
