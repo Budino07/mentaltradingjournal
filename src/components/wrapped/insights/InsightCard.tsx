@@ -69,7 +69,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
   };
 
   return (
-    <Card className="min-h-[500px] md:min-h-[600px] border-primary/20 animate-scale-in transition-all duration-300 relative overflow-hidden">
+    <Card className="h-[600px] border-primary/20 animate-scale-in transition-all duration-300 relative overflow-hidden">
       {/* Progress indicator */}
       <div className="absolute top-0 left-0 right-0 flex gap-1 p-2 z-10">
         {Array.from({ length: totalInsights }).map((_, index) => (
@@ -116,16 +116,18 @@ export const InsightCard: React.FC<InsightCardProps> = ({
       </div>
 
       <CardContent className="p-6 flex flex-col h-full relative z-1">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-4">
           <h3 className="text-2xl font-bold text-primary">{insight.title}</h3>
           <div className="text-sm text-muted-foreground">{currentIndex + 1}/{totalInsights}</div>
         </div>
 
-        <div className="flex-1 flex items-center justify-center py-6 overflow-hidden">
-          {insight.component}
+        <div className="flex-1 flex items-center justify-center py-4 overflow-hidden">
+          <div className="max-h-[420px] overflow-y-auto overflow-x-hidden px-2 w-full scrollbar-thin">
+            {insight.component}
+          </div>
         </div>
 
-        <div className="flex justify-between mt-6">
+        <div className="flex justify-between mt-4">
           <Button 
             variant="outline" 
             size="icon" 
