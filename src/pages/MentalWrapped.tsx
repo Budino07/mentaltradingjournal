@@ -9,7 +9,7 @@ import { InsightStory } from "@/components/wrapped/InsightStory";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { SubscriptionGuard } from "@/components/subscription/SubscriptionGuard";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 const MentalWrapped = () => {
   const { user } = useAuth();
@@ -45,11 +45,16 @@ const MentalWrapped = () => {
         selectedMonth.year
       );
       setInsights(insights);
-      setDialogOpen(true);
+      
+      // Explicitly open the dialog when insights are loaded
+      if (insights.length > 0) {
+        setDialogOpen(true);
+      }
     }
   }, [analytics, selectedMonth]);
 
   const handleMonthChange = (month: WrappedMonth) => {
+    console.log("Month selected:", month);
     setSelectedMonth(month);
   };
 
@@ -92,9 +97,12 @@ const MentalWrapped = () => {
           )}
         </div>
         
-        {/* Insight Story Dialog */}
+        {/* Insight Story Dialog with proper accessibility components */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-none">
+            <DialogTitle className="sr-only">
+              Monthly Insights
+            </DialogTitle>
             {selectedMonth && insights.length > 0 ? (
               <InsightStory 
                 insights={insights}
