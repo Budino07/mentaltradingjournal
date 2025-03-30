@@ -1,194 +1,259 @@
+import React, { useEffect, useRef } from 'react';
+import { WrappedInsight } from '@/utils/wrappedUtils';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 
-import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { 
-  Trophy, Flame, TrendingDown, Clock, Target, 
-  Hourglass, Smile, Activity, Calendar, ChevronLeft, ChevronRight 
-} from "lucide-react";
-import { InsightData } from "@/types/wrapped";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+interface InsightCardProps {
+  insight: WrappedInsight;
+  month: string;
+  year: number;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  onRestart?: () => void;
+}
 
-type InsightProps = {
-  insight: {
-    type: string;
-    data: InsightData;
-  };
-  onNext: () => void;
-  onPrevious: () => void;
-  currentIndex: number;
-  totalInsights: number;
-};
-
-export const InsightCard: React.FC<InsightProps> = ({ 
-  insight, 
-  onNext, 
+export const InsightCard: React.FC<InsightCardProps> = ({ 
+  insight,
+  month,
+  year,
   onPrevious,
-  currentIndex,
-  totalInsights
+  onNext,
+  onRestart
 }) => {
-  const { type, data } = insight;
-
-  // Background animations based on insight type
-  const getBackgroundClass = () => {
-    switch (type) {
-      case "winRate":
-        return "bg-gradient-to-br from-green-500/20 to-blue-500/20";
-      case "streak":
-        return "bg-gradient-to-br from-yellow-500/20 to-red-500/20";
-      case "losingStreak":
-        return "bg-gradient-to-br from-red-500/20 to-purple-500/20";
-      case "activeTime":
-        return "bg-gradient-to-br from-blue-500/20 to-indigo-500/20";
-      case "favoriteSetup":
-        return "bg-gradient-to-br from-indigo-500/20 to-pink-500/20";
-      case "holdingTime":
-        return "bg-gradient-to-br from-pink-500/20 to-orange-500/20";
-      case "moodPerformance":
-        return "bg-gradient-to-br from-primary/20 to-green-500/20";
-      case "overtrading":
-        return "bg-gradient-to-br from-orange-500/20 to-red-500/20";
-      case "emotionalHeatmap":
-        return "bg-gradient-to-br from-purple-500/20 to-primary/20";
-      default:
-        return "bg-gradient-to-br from-gray-500/20 to-blue-500/20";
-    }
-  };
-
-  // Animated dots background
-  const BackgroundAnimation = () => (
-    <div className="absolute inset-0 overflow-hidden opacity-30">
-      <div className="absolute top-0 left-0 w-full h-full flex flex-wrap gap-3 animate-pulse">
-        {Array.from({ length: 30 }).map((_, i) => (
-          <div 
-            key={i}
-            className="w-2 h-2 rounded-full bg-primary"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              opacity: Math.random() * 0.5 + 0.2
-            }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-
-  // Icon selector based on insight type
-  const getIcon = () => {
-    switch (type) {
-      case "winRate":
-        return <Trophy className="h-8 w-8 text-green-500" />;
-      case "streak":
-        return <Flame className="h-8 w-8 text-yellow-500" />;
-      case "losingStreak":
-        return <TrendingDown className="h-8 w-8 text-red-500" />;
-      case "activeTime":
-        return <Clock className="h-8 w-8 text-blue-500" />;
-      case "favoriteSetup":
-        return <Target className="h-8 w-8 text-indigo-500" />;
-      case "holdingTime":
-        return <Hourglass className="h-8 w-8 text-pink-500" />;
-      case "moodPerformance":
-        return <Smile className="h-8 w-8 text-primary" />;
-      case "overtrading":
-        return <Activity className="h-8 w-8 text-orange-500" />;
-      case "emotionalHeatmap":
-        return <Calendar className="h-8 w-8 text-purple-500" />;
-      default:
-        return <Trophy className="h-8 w-8 text-primary" />;
-    }
-  };
-
-  // Generate title based on insight type
-  const getTitle = () => {
-    switch (type) {
-      case "winRate":
-        return "Win Rate";
-      case "streak":
-        return "Winning Streak";
-      case "losingStreak":
-        return "Challenges Faced";
-      case "activeTime":
-        return "Prime Trading Hours";
-      case "favoriteSetup":
-        return "Your Go-To Strategy";
-      case "holdingTime":
-        return "Trade Duration";
-      case "moodPerformance":
-        return "Mood Impact";
-      case "overtrading":
-        return "Trading Frequency";
-      case "emotionalHeatmap":
-        return "Emotional Patterns";
-      default:
-        return "Trading Insight";
-    }
-  };
-
-  // Navigation buttons are now directly on the insight card
-  const NavigationButtons = () => (
-    <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-2 z-10">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 rounded-full bg-background/80 hover:bg-background shadow-md"
-        onClick={(e) => {
-          e.stopPropagation();
-          onPrevious();
-        }}
-        disabled={currentIndex === 0}
-      >
-        <ChevronLeft className="h-5 w-5" />
-      </Button>
+  const valueRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const patternType = insight.id.includes('win') || insight.id.includes('profit') ? 'gradient' : 
+                      insight.id.includes('time') ? 'bars' : 'stairs';
+  
+  useEffect(() => {
+    // Apply animation when the card appears
+    const element = valueRef.current;
+    if (element) {
+      element.classList.add('animate-enter');
       
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 rounded-full bg-background/80 hover:bg-background shadow-md"
-        onClick={(e) => {
-          e.stopPropagation();
-          onNext();
-        }}
-        disabled={currentIndex === totalInsights - 1}
-      >
-        <ChevronRight className="h-5 w-5" />
-      </Button>
-    </div>
-  );
+      return () => {
+        element.classList.remove('animate-enter');
+      };
+    }
+  }, [insight.id]);
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas dimensions to match parent container
+    const resizeCanvas = () => {
+      const parent = canvas.parentElement;
+      if (parent) {
+        canvas.width = parent.offsetWidth;
+        canvas.height = parent.offsetHeight;
+      }
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Animation variables
+    let animationId: number;
+    let time = 0;
+
+    // Color scheme based on insight color
+    const colorScheme = getColorScheme(insight.color);
+
+    const drawPattern = () => {
+      time += 0.005;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (patternType === 'gradient') {
+        drawGradientPattern(ctx, canvas.width, canvas.height, time, colorScheme);
+      } else if (patternType === 'stairs') {
+        drawStairsPattern(ctx, canvas.width, canvas.height, time, colorScheme);
+      } else if (patternType === 'bars') {
+        drawBarsPattern(ctx, canvas.width, canvas.height, time, colorScheme);
+      }
+
+      animationId = requestAnimationFrame(drawPattern);
+    };
+
+    drawPattern();
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      cancelAnimationFrame(animationId);
+    };
+  }, [insight.color, patternType]);
+  
   return (
-    <Card className={cn(
-      "border-0 shadow-lg relative overflow-hidden transition-all duration-500 animate-fade-in",
-      getBackgroundClass()
-    )}>
-      <BackgroundAnimation />
-      <NavigationButtons />
+    <Card className="overflow-hidden h-full relative">
+      <div className="absolute inset-0 z-0 opacity-50">
+        <canvas 
+          ref={canvasRef} 
+          className="w-full h-full" 
+        />
+      </div>
       
-      <CardContent className="p-6 min-h-[400px] flex flex-col items-center justify-center text-center">
-        <div className="mb-2 p-3 bg-background rounded-full shadow-lg">
-          {getIcon()}
+      <CardHeader className={cn("py-6 relative z-10", insight.color)}>
+        <div className="flex justify-between items-center text-white">
+          <h3 className="text-xl font-bold">{month} {year}</h3>
+          <div className="text-sm">Mental Wrapped</div>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="p-6 flex flex-col items-center text-center space-y-6 relative z-10">
+        {/* Navigation buttons on the insight card */}
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between px-2 z-20 pointer-events-none">
+          {onPrevious && (
+            <Button 
+              variant="secondary" 
+              size="icon" 
+              onClick={onPrevious}
+              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent pointer-events-auto"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+          )}
+          
+          {(onNext || onRestart) && (
+            <Button 
+              variant="secondary" 
+              size="icon" 
+              onClick={onNext || onRestart}
+              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent pointer-events-auto"
+            >
+              {onNext ? (
+                <ChevronRight className="h-5 w-5" />
+              ) : (
+                <RotateCcw className="h-5 w-5" />
+              )}
+            </Button>
+          )}
+        </div>
+
+        <div className="text-5xl my-4">{insight.icon}</div>
+        
+        <h2 className="text-2xl font-bold">{insight.title}</h2>
+        
+        <div 
+          ref={valueRef}
+          className={cn(
+            "text-5xl md:text-6xl font-bold my-6",
+            `animate-${insight.animation}`
+          )}
+        >
+          {insight.value}
         </div>
         
-        <h3 className="text-2xl font-bold mt-4 mb-3">
-          {getTitle()}
-        </h3>
-        
-        <div className="text-4xl font-extrabold mb-4 text-primary animate-scale-in">
-          {data.value}
-        </div>
-        
-        <p className="text-lg max-w-md">
-          {data.description}
+        <p className="text-muted-foreground text-lg max-w-md">
+          {insight.description}
         </p>
         
-        {data.additionalInfo && (
-          <div className="mt-4 text-sm text-muted-foreground max-w-md">
-            {data.additionalInfo}
-          </div>
-        )}
       </CardContent>
     </Card>
   );
 };
+
+// Helper functions for background patterns
+function getColorScheme(color: string): string[] {
+  // Extract colors from Tailwind classes like "bg-green-500"
+  if (color.includes('green')) {
+    return ['#10B981', '#059669', '#047857', '#065F46'];
+  } else if (color.includes('blue')) {
+    return ['#3B82F6', '#2563EB', '#1D4ED8', '#1E40AF'];
+  } else if (color.includes('purple')) {
+    return ['#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6'];
+  } else if (color.includes('orange')) {
+    return ['#F97316', '#EA580C', '#C2410C', '#9A3412'];
+  } else if (color.includes('yellow')) {
+    return ['#FBBF24', '#F59E0B', '#D97706', '#B45309'];
+  } else if (color.includes('indigo')) {
+    return ['#6366F1', '#4F46E5', '#4338CA', '#3730A3'];
+  } else if (color.includes('red')) {
+    return ['#EF4444', '#DC2626', '#B91C1C', '#991B1B'];
+  } else if (color.includes('gray')) {
+    return ['#6B7280', '#4B5563', '#374151', '#1F2937'];
+  } else {
+    return ['#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6']; // Default purple
+  }
+}
+
+function drawGradientPattern(
+  ctx: CanvasRenderingContext2D, 
+  width: number, 
+  height: number, 
+  time: number, 
+  colors: string[]
+) {
+  // Create moving gradient bands
+  for (let i = 0; i < 12; i++) {
+    const y = (height * 0.1) * i + (time * 100) % height;
+    const gradient = ctx.createLinearGradient(0, y, width, y);
+    
+    const colorIndex = i % colors.length;
+    gradient.addColorStop(0, colors[colorIndex]);
+    gradient.addColorStop(1, colors[(colorIndex + 1) % colors.length]);
+    
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.moveTo(0, y - 30);
+    ctx.lineTo(width, y);
+    ctx.lineTo(width, y + height * 0.1);
+    ctx.lineTo(0, y + height * 0.1 - 30);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawStairsPattern(
+  ctx: CanvasRenderingContext2D, 
+  width: number, 
+  height: number, 
+  time: number, 
+  colors: string[]
+) {
+  // Create moving stair pattern like in the image
+  const steps = 15;
+  const stepHeight = height / steps;
+  
+  for (let i = 0; i < steps; i++) {
+    const offset = (time * 100) % (stepHeight * 2);
+    const y = i * stepHeight - offset;
+    
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width - i * (width / steps), y);
+    ctx.lineTo(width - i * (width / steps), y + stepHeight);
+    ctx.lineTo(0, y + stepHeight);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawBarsPattern(
+  ctx: CanvasRenderingContext2D, 
+  width: number, 
+  height: number, 
+  time: number, 
+  colors: string[]
+) {
+  // Create vertical moving bars
+  const barCount = 10;
+  const barWidth = width / barCount;
+  
+  for (let i = 0; i < barCount * 2; i++) {
+    const x = (i * barWidth) + (time * 50) % (barWidth * 2) - barWidth;
+    const barHeight = Math.sin(time + i * 0.5) * (height * 0.15) + (height * 0.3);
+    const y = height - barHeight;
+    
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.beginPath();
+    ctx.rect(x, y, barWidth - 5, barHeight);
+    ctx.fill();
+  }
+}

@@ -125,18 +125,18 @@ const App = () => {
                       }
                     />
                     <Route
-                      path="/mental-wrapped"
-                      element={
-                        <ProtectedRoute>
-                          <MentalWrapped />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
                       path="/notebook"
                       element={
                         <ProtectedRoute>
                           <Notebook />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/mental-wrapped"
+                      element={
+                        <ProtectedRoute>
+                          <MentalWrapped />
                         </ProtectedRoute>
                       }
                     />

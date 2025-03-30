@@ -1,53 +1,66 @@
 
-import React from "react";
-import { CalendarIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import React from 'react';
+import { WrappedMonth } from '@/utils/wrappedUtils';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
-type MonthSelectorProps = {
-  months: { value: string; label: string }[];
-  onSelectMonth: (month: string) => void;
-  isLoading: boolean;
-};
+interface MonthSelectorProps {
+  months: WrappedMonth[];
+  selectedMonth: WrappedMonth | null;
+  onChange: (month: WrappedMonth) => void;
+}
 
 export const MonthSelector: React.FC<MonthSelectorProps> = ({ 
   months, 
-  onSelectMonth,
-  isLoading 
+  selectedMonth, 
+  onChange 
 }) => {
-  if (months.length === 0) {
-    return (
-      <div className="text-center p-8">
-        <p className="text-muted-foreground">
-          No completed months available yet. Keep trading and check back later!
-        </p>
-      </div>
-    );
-  }
+  const groupedByYear: Record<number, WrappedMonth[]> = {};
+  
+  // Group months by year
+  months.forEach(month => {
+    if (!groupedByYear[month.year]) {
+      groupedByYear[month.year] = [];
+    }
+    groupedByYear[month.year].push(month);
+  });
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {months.map((month) => (
-        <Button
-          key={month.value}
-          variant="outline"
-          className="h-24 flex flex-col items-center justify-center gap-2 hover:bg-primary/5 hover:border-primary/30 transition-all duration-300"
-          onClick={() => onSelectMonth(month.value)}
-          disabled={isLoading}
-        >
-          <CalendarIcon className="h-5 w-5 text-primary" />
-          <span className="font-medium">{month.label}</span>
-        </Button>
-      ))}
+    <Card className="p-6">
+      <h2 className="text-xl font-semibold mb-4">Select Month</h2>
       
-      {isLoading && (
-        <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
-          <div className="flex flex-col items-center gap-2">
-            <Skeleton className="h-12 w-12 rounded-full animate-pulse bg-primary/20" />
-            <p className="text-sm text-muted-foreground">Loading insights...</p>
+      <div className="space-y-6">
+        {Object.entries(groupedByYear).map(([year, yearMonths]) => (
+          <div key={year} className="space-y-2">
+            <h3 className="text-lg font-medium text-muted-foreground">{year}</h3>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {yearMonths.map(month => (
+                <button
+                  key={`${month.year}-${month.month}`}
+                  onClick={() => month.hasData && onChange(month)}
+                  disabled={!month.hasData}
+                  className={cn(
+                    "p-3 flex items-center justify-between rounded-md transition-colors",
+                    month.hasData ? "hover:bg-accent/50 cursor-pointer" : "opacity-50 cursor-not-allowed",
+                    selectedMonth?.month === month.month && selectedMonth?.year === month.year ? "bg-accent/50" : "bg-card"
+                  )}
+                >
+                  <span>{month.month}</span>
+                  {month.hasData ? (
+                    <Badge variant="secondary" className="ml-2 bg-primary/20 text-xs">
+                      Available
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="ml-2 text-xs">No data</Badge>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        ))}
+      </div>
+    </Card>
   );
 };
