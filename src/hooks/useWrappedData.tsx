@@ -204,8 +204,11 @@ export function useWrappedData() {
           
           monthEntries.forEach(entry => {
             if (entry.emotion && entry.trades) {
+              // Fix: Properly handle type conversion for each trade's PnL
               const totalPnL = (entry.trades || []).reduce((sum, trade: any) => {
-                const tradePnl = Number(trade.pnl || 0);
+                // Ensure the pnl is converted to a number
+                const tradePnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+                                typeof trade.pnl === 'number' ? trade.pnl : 0;
                 return sum + tradePnl;
               }, 0);
               
