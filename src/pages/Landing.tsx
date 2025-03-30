@@ -114,7 +114,7 @@ const Landing = () => {
                 className="px-6 py-6 bg-primary hover:bg-primary/90 text-white font-medium shadow-lg shadow-primary/20"
                 onClick={() => navigate("/login")}
               >
-                Get Started Free
+                Get Started
               </Button>
               <Button
                 variant="outline"

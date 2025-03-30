@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -57,9 +58,15 @@ export const AnalyticsSection = () => {
   return (
     <section className="relative py-32">
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[#1A1F2C]/95" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-accent/5 to-transparent opacity-30" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center_bottom,_var(--tw-gradient-stops))] from-[#7E69AB]/20 via-background/80 to-transparent" />
+        {/* Using the same background styles as the hero section for consistency */}
+        <div className="absolute inset-0 bg-[#1A1F2C]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 opacity-40" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent opacity-30" />
+        <div className="absolute inset-0">
+          <div className="absolute top-40 -left-20 w-80 h-80 bg-primary/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 right-0 w-80 h-80 bg-accent/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-700" />
+        </div>
+        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02]" />
         <div className="absolute inset-0 backdrop-blur-[100px]" />
       </div>
       
