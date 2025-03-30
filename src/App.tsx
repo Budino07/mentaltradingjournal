@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -20,6 +21,7 @@ import Notebook from "./pages/Notebook";
 import Login from "./pages/Login";
 import MfeMae from "./pages/MfeMae";
 import TradesList from "./pages/TradesList";
+import MentalWrapped from "./pages/MentalWrapped";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ScrollToTop } from "./components/ui/ScrollToTop";
 import { NotificationsProvider } from "./contexts/NotificationsContext";
@@ -119,6 +121,14 @@ const App = () => {
                       element={
                         <ProtectedRoute>
                           <MfeMae />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/mental-wrapped"
+                      element={
+                        <ProtectedRoute>
+                          <MentalWrapped />
                         </ProtectedRoute>
                       }
                     />

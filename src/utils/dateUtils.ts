@@ -1,39 +1,29 @@
-
-import { differenceInDays, isWeekend, format, isMonday } from 'date-fns';
-
-export const shouldResetStreak = (lastActivity: Date): boolean => {
-  const today = new Date();
-  const daysSinceLastActivity = differenceInDays(today, lastActivity);
+/**
+ * Generates options for month selection in the Mental Wrapped feature.
+ * In a real implementation, this would filter only completed months with data.
+ */
+export function generateMonthOptions() {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
   
-  // If today is Monday and last activity was on Friday, don't reset streak
-  if (isMonday(today) && daysSinceLastActivity <= 3 && isWeekend(new Date(lastActivity.getTime() + 24 * 60 * 60 * 1000))) {
-    return false;
-  }
+  // Generate the last 12 months (excluding current month)
+  const months = [];
   
-  // Check each day between last activity and today
-  for (let i = 1; i <= daysSinceLastActivity; i++) {
-    const checkDate = new Date(lastActivity);
-    checkDate.setDate(checkDate.getDate() + i);
+  for (let i = 1; i <= 12; i++) {
+    const monthIndex = (currentMonth - i + 12) % 12;
+    let year = currentYear;
     
-    // Only consider missed weekday as streak breaker
-    if (!isWeekend(checkDate) && i > 1) {
-      // If we find any non-weekend day that was missed, reset the streak
-      return true;
+    if (monthIndex > currentMonth) {
+      year -= 1;
     }
+    
+    const date = new Date(year, monthIndex, 1);
+    const monthValue = date.toISOString().substring(0, 7); // YYYY-MM format
+    const monthLabel = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+    
+    months.push({ value: monthValue, label: monthLabel });
   }
   
-  return false;
-};
-
-// Add format function for date formatting
-export const formatDate = (date: string | Date): string => {
-  if (!date) return '';
-  
-  try {
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return format(dateObj, 'MMM dd, yyyy HH:mm');
-  } catch (error) {
-    console.error("Error formatting date:", error);
-    return '';
-  }
-};
+  return months;
+}
