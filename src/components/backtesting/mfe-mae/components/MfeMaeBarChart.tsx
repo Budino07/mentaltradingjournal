@@ -43,36 +43,9 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
     }
   };
 
-  // Custom shape for captured move indicator
-  const CapturedMoveIndicator = ({ x, y, width, capturedMove, index }: any) => {
-    if (capturedMove === undefined) return null;
-    
-    // Calculate the position for the line
-    const lineYPosition = capturedMove > 0 
-      ? y + ((100 - capturedMove) / 100) * width 
-      : y + width; // If negative or zero, place at bottom
-    
-    // Determine line color based on captured move value
-    const lineColor = capturedMove > 0 
-      ? "#4ade80" // Aesthetic green for positive values
-      : "#f87171"; // Aesthetic red for negative values
-    
-    return (
-      <line
-        x1={x}
-        y1={lineYPosition}
-        x2={x + width}
-        y2={lineYPosition}
-        stroke={lineColor}
-        strokeWidth={2}
-        strokeDasharray={capturedMove < 0 ? "4 2" : "none"} // Dashed if negative
-      />
-    );
-  };
-
   // Custom shape for the updraw bar to include the captured move indicator
   const CustomUpdrawBar = (props: any) => {
-    const { x, y, width, height, capturedMove, payload } = props;
+    const { x, y, width, height, payload } = props;
     
     return (
       <>
@@ -86,12 +59,12 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           ry={4}
         />
         {/* Only show green line for positive captured move */}
-        {capturedMove > 0 && (
+        {payload.capturedMove > 0 && (
           <line
             x1={x}
-            y1={y + ((100 - capturedMove) / 100) * height}
+            y1={y + ((100 - payload.capturedMove) / 100) * height}
             x2={x + width}
-            y2={y + ((100 - capturedMove) / 100) * height}
+            y2={y + ((100 - payload.capturedMove) / 100) * height}
             stroke="#4ade80"
             strokeWidth={2}
           />
