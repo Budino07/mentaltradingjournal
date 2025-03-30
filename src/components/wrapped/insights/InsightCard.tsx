@@ -1,9 +1,8 @@
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X, Pause, Play } from "lucide-react";
-import { ThreeDBackground } from "../ThreeDBackground";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 interface InsightCardProps {
   insight: {
@@ -24,37 +23,13 @@ export const InsightCard: React.FC<InsightCardProps> = ({
   onNext,
   onPrevious
 }) => {
-  const [isAutoPlay, setIsAutoPlay] = useState(true);
-  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
-
-  // Setup auto-advancing
-  useEffect(() => {
-    if (isAutoPlay) {
-      const newTimer = setTimeout(() => {
-        onNext();
-      }, 5000); // Advance every 5 seconds
-      setTimer(newTimer);
-    }
-    
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
-  }, [isAutoPlay, currentIndex, onNext]);
-
   // Handle keyboard navigation
-  useEffect(() => {
+  React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') {
-        if (timer) clearTimeout(timer);
         onNext();
       } else if (e.key === 'ArrowLeft') {
-        if (timer) clearTimeout(timer);
         onPrevious();
-      } else if (e.key === ' ') {
-        // Space bar toggles play/pause
-        setIsAutoPlay(prev => !prev);
       }
     };
 
@@ -62,21 +37,10 @@ export const InsightCard: React.FC<InsightCardProps> = ({
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [onNext, onPrevious, timer]);
-
-  const toggleAutoPlay = () => {
-    setIsAutoPlay(!isAutoPlay);
-    if (timer) {
-      clearTimeout(timer);
-      setTimer(null);
-    }
-  };
+  }, [onNext, onPrevious]);
 
   return (
     <Card className="min-h-[500px] md:min-h-[600px] border-primary/20 animate-scale-in transition-all duration-300 relative overflow-hidden">
-      {/* 3D Background */}
-      <ThreeDBackground />
-      
       {/* Progress indicator */}
       <div className="absolute top-0 left-0 right-0 flex gap-1 p-2 z-10">
         {Array.from({ length: totalInsights }).map((_, index) => (
@@ -90,20 +54,19 @@ export const InsightCard: React.FC<InsightCardProps> = ({
         ))}
       </div>
 
+      {/* Gradient background effect inspired by the image */}
+      <div 
+        className="absolute inset-0 bg-gradient-to-br from-purple-500/30 via-pink-500/20 to-red-500/30 opacity-30"
+        style={{ 
+          transform: 'rotate(-10deg) scale(1.5)',
+          filter: 'blur(60px)'
+        }}
+      />
+
       <CardContent className="p-6 flex flex-col h-full relative z-0">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-bold text-primary">{insight.title}</h3>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleAutoPlay}
-              className="rounded-full h-8 w-8 hover:bg-primary/10"
-            >
-              {isAutoPlay ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-            </Button>
-            <div className="text-sm text-muted-foreground">{currentIndex + 1}/{totalInsights}</div>
-          </div>
+          <div className="text-sm text-muted-foreground">{currentIndex + 1}/{totalInsights}</div>
         </div>
 
         <div className="flex-1 flex items-center justify-center py-6 overflow-hidden">

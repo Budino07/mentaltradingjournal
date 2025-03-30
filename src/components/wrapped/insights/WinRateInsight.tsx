@@ -10,18 +10,18 @@ interface WinRateInsightProps {
 export const WinRateInsight: React.FC<WinRateInsightProps> = ({ data }) => {
   return (
     <div className="w-full flex flex-col items-center gap-6 text-center animate-fade-in">
-      <div className="bg-primary/10 p-6 rounded-full backdrop-blur-lg">
+      <div className="bg-primary/10 p-6 rounded-full">
         <Trophy className="h-12 w-12 text-primary animate-pulse" />
       </div>
       
-      <div className="space-y-4 backdrop-blur-md bg-black/10 p-4 rounded-xl">
-        <h2 className="text-5xl font-bold tracking-tight">{data.winRate.toFixed(1)}%</h2>
+      <div className="space-y-4">
+        <h2 className="text-4xl font-bold">{data.winRate.toFixed(1)}%</h2>
         <p className="text-2xl text-muted-foreground">Win Rate</p>
       </div>
       
-      <div className="mt-4 text-lg backdrop-blur-md bg-black/10 p-3 rounded-lg">
+      <div className="mt-4 text-lg">
         <p className="flex items-center justify-center gap-2">
-          <TrendingUp className={data.winRate >= 50 ? "text-green-500" : "text-red-500"} />
+          <TrendingUp className="text-green-500" />
           <span>
             {data.winRate >= 50 
               ? "You're winning more trades than you're losing!" 

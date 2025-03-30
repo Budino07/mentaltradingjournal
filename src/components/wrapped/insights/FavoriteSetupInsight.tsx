@@ -10,16 +10,16 @@ interface FavoriteSetupInsightProps {
 export const FavoriteSetupInsight: React.FC<FavoriteSetupInsightProps> = ({ data }) => {
   return (
     <div className="w-full flex flex-col items-center gap-6 text-center animate-fade-in">
-      <div className="bg-amber-500/10 p-6 rounded-full backdrop-blur-lg">
+      <div className="bg-amber-500/10 p-6 rounded-full">
         <Target className="h-12 w-12 text-amber-500 animate-pulse" />
       </div>
       
-      <div className="space-y-3 backdrop-blur-md bg-black/10 p-4 rounded-xl">
+      <div className="space-y-3">
         <h2 className="text-4xl font-bold capitalize">{data.favoriteSetup || "No Setup Data"}</h2>
         <p className="text-2xl text-muted-foreground">Your Favorite Trading Setup</p>
       </div>
       
-      <div className="mt-4 max-w-xs backdrop-blur-md bg-black/10 p-3 rounded-lg">
+      <div className="mt-4 max-w-xs">
         <p className="text-lg">
           {data.favoriteSetup === 'None' 
             ? "Try adding 'Setup' information to your trades to see insights here."

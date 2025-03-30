@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, parseISO, differenceInMinutes, setHours, setMinutes, startOfMonth, endOfMonth, isSameMonth } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
-import { Trade } from "@/types/trade";
 
 export interface WrappedMonthData {
   month: string;
@@ -27,13 +26,6 @@ export interface WrappedMonthData {
     thursday: string;
     friday: string;
   };
-}
-
-interface JournalEntryFromDB {
-  created_at: string;
-  emotion?: string;
-  trades?: any[];
-  // Add other properties as needed
 }
 
 export function useWrappedData() {
@@ -94,29 +86,13 @@ export function useWrappedData() {
           const monthEntries = entries.filter(entry => {
             const entryDate = parseISO(entry.created_at);
             return isSameMonth(entryDate, monthStart);
-          }) as JournalEntryFromDB[];
-
-          // Extract trades from all entries and convert to Trade objects
-          const allTrades: Trade[] = [];
-          monthEntries.forEach(entry => {
-            if (entry.trades && Array.isArray(entry.trades)) {
-              entry.trades.forEach(tradeData => {
-                const trade: Trade = {
-                  ...tradeData,
-                  pnl: typeof tradeData.pnl === 'string' ? parseFloat(tradeData.pnl) : tradeData.pnl,
-                  entryDate: tradeData.entryDate || tradeData.entry_date,
-                  exitDate: tradeData.exitDate || tradeData.exit_date,
-                };
-                allTrades.push(trade);
-              });
-            }
           });
+
+          // Extract trades from all entries
+          const allTrades = monthEntries.flatMap(entry => entry.trades || []);
           
           // Calculate win rate
-          const winningTrades = allTrades.filter(trade => {
-            const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl as string) : Number(trade.pnl);
-            return pnl > 0;
-          });
+          const winningTrades = allTrades.filter(trade => Number(trade.pnl) > 0);
           const winRate = allTrades.length > 0 ? (winningTrades.length / allTrades.length) * 100 : 0;
           
           // Calculate winning and losing streaks
@@ -126,14 +102,12 @@ export function useWrappedData() {
           let maxLoseStreak = 0;
           
           // Sort trades by date
-          const sortedTrades = [...allTrades].sort((a, b) => {
-            const dateA = new Date(a.exitDate || a.entryDate || '');
-            const dateB = new Date(b.exitDate || b.entryDate || '');
-            return dateA.getTime() - dateB.getTime();
-          });
+          const sortedTrades = [...allTrades].sort((a, b) => 
+            new Date(a.exitDate || a.entryDate).getTime() - new Date(b.exitDate || b.entryDate).getTime()
+          );
           
           sortedTrades.forEach(trade => {
-            const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl as string) : Number(trade.pnl);
+            const pnl = Number(trade.pnl);
             if (pnl > 0) {
               currentWinStreak++;
               currentLoseStreak = 0;
@@ -149,7 +123,7 @@ export function useWrappedData() {
           const tradeTimes: Record<number, number> = {};
           allTrades.forEach(trade => {
             if (trade.entryDate) {
-              const entryTime = parseISO(trade.entryDate as string);
+              const entryTime = parseISO(trade.entryDate);
               const hour = entryTime.getHours();
               tradeTimes[hour] = (tradeTimes[hour] || 0) + 1;
             }
@@ -195,8 +169,8 @@ export function useWrappedData() {
           
           allTrades.forEach(trade => {
             if (trade.entryDate && trade.exitDate) {
-              const entryTime = parseISO(trade.entryDate as string);
-              const exitTime = parseISO(trade.exitDate as string);
+              const entryTime = parseISO(trade.entryDate);
+              const exitTime = parseISO(trade.exitDate);
               const holdingTimeMinutes = differenceInMinutes(exitTime, entryTime);
               
               if (holdingTimeMinutes > 0) {
@@ -217,11 +191,7 @@ export function useWrappedData() {
           
           monthEntries.forEach(entry => {
             if (entry.emotion && entry.trades) {
-              const entryTrades = entry.trades as any[];
-              const totalPnL = entryTrades.reduce((sum, trade) => {
-                const tradePnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : Number(trade.pnl || 0);
-                return sum + tradePnl;
-              }, 0);
+              const totalPnL = entry.trades.reduce((sum, trade) => sum + Number(trade.pnl || 0), 0);
               
               if (entry.emotion === 'positive') {
                 emotionPerformance.positive += totalPnL;
@@ -238,7 +208,7 @@ export function useWrappedData() {
           
           allTrades.forEach(trade => {
             if (trade.entryDate) {
-              const date = format(parseISO(trade.entryDate as string), 'yyyy-MM-dd');
+              const date = format(parseISO(trade.entryDate), 'yyyy-MM-dd');
               tradesPerDay[date] = (tradesPerDay[date] || 0) + 1;
             }
           });
