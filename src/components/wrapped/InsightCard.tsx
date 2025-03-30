@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { WrappedInsight } from '@/utils/wrappedUtils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -107,6 +106,35 @@ export const InsightCard: React.FC<InsightCardProps> = ({
       </CardHeader>
       
       <CardContent className="p-6 flex flex-col items-center text-center space-y-6 relative z-10">
+        {/* Navigation buttons on the insight card */}
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between px-2 z-20 pointer-events-none">
+          {onPrevious && (
+            <Button 
+              variant="secondary" 
+              size="icon" 
+              onClick={onPrevious}
+              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent pointer-events-auto"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+          )}
+          
+          {(onNext || onRestart) && (
+            <Button 
+              variant="secondary" 
+              size="icon" 
+              onClick={onNext || onRestart}
+              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent pointer-events-auto"
+            >
+              {onNext ? (
+                <ChevronRight className="h-5 w-5" />
+              ) : (
+                <RotateCcw className="h-5 w-5" />
+              )}
+            </Button>
+          )}
+        </div>
+
         <div className="text-5xl my-4">{insight.icon}</div>
         
         <h2 className="text-2xl font-bold">{insight.title}</h2>
@@ -125,43 +153,6 @@ export const InsightCard: React.FC<InsightCardProps> = ({
           {insight.description}
         </p>
         
-        {/* Navigation buttons */}
-        <div className="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 flex justify-between px-4 z-20">
-          {onPrevious ? (
-            <Button 
-              variant="secondary" 
-              size="icon" 
-              onClick={onPrevious}
-              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-          ) : (
-            <div className="w-10"></div> {/* Spacer */}
-          )}
-          
-          {onNext ? (
-            <Button 
-              variant="secondary" 
-              size="icon" 
-              onClick={onNext}
-              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          ) : onRestart ? (
-            <Button 
-              variant="secondary" 
-              size="icon" 
-              onClick={onRestart}
-              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent"
-            >
-              <RotateCcw className="h-5 w-5" />
-            </Button>
-          ) : (
-            <div className="w-10"></div> {/* Spacer */}
-          )}
-        </div>
       </CardContent>
     </Card>
   );

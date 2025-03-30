@@ -3,9 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { WrappedInsight } from '@/utils/wrappedUtils';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { InsightCard } from './InsightCard';
-import { Progress } from '@/components/ui/progress';
 import ReactConfetti from 'react-confetti';
 import { useWindowSize } from '@/hooks/use-window-size';
 
@@ -26,7 +25,6 @@ export const InsightStory: React.FC<InsightStoryProps> = ({
   const [showConfetti, setShowConfetti] = useState(false);
   const { width, height } = useWindowSize();
   const totalInsights = insights.length;
-  const progress = ((currentIndex + 1) / totalInsights) * 100;
 
   // Show confetti when the story begins
   useEffect(() => {
@@ -57,7 +55,7 @@ export const InsightStory: React.FC<InsightStoryProps> = ({
   };
 
   return (
-    <div className="relative bg-background rounded-lg overflow-hidden max-h-[90vh]">
+    <div className="relative bg-background rounded-lg overflow-visible max-h-[90vh]">
       {showConfetti && <ReactConfetti width={width} height={height} recycle={false} />}
       
       {/* Header with close button */}
