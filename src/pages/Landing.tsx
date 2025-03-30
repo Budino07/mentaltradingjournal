@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -119,12 +118,12 @@ const Landing = () => {
               </Button>
             </div>
             
-            {/* Dashboard preview image */}
+            {/* Dashboard preview image - UPDATED */}
             <div className="relative mt-16 max-w-5xl mx-auto">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-accent/30 rounded-lg blur-sm opacity-70"></div>
               <div className="relative bg-[#1A1F2C]/80 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10 shadow-2xl">
                 <img
-                  src="/lovable-uploads/41d25c2c-a7f8-47df-998f-00271ae82bcb.png"
+                  src="/lovable-uploads/2d5aff3d-084a-4b65-958f-3fa50c7b0c39.png"
                   alt="Mental Trading Dashboard"
                   className="w-full h-auto rounded-lg transform hover:scale-[1.02] transition-transform duration-500"
                 />
