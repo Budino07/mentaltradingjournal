@@ -1,3 +1,4 @@
+
 import {
   BarChart,
   Bar,
@@ -8,7 +9,6 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceLine,
-  Line,
 } from "recharts";
 import { ChartData } from "../types";
 import { useNavigate } from "react-router-dom";
@@ -67,6 +67,67 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         strokeWidth={2}
         strokeDasharray={capturedMove < 0 ? "4 2" : "none"} // Dashed if negative
       />
+    );
+  };
+
+  // Custom shape for the updraw bar to include the captured move indicator
+  const CustomUpdrawBar = (props: any) => {
+    const { x, y, width, height, capturedMove, payload } = props;
+    
+    return (
+      <>
+        <rect
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          fill="#FEC6A1"
+          rx={4}
+          ry={4}
+        />
+        {/* Only show green line for positive captured move */}
+        {capturedMove > 0 && (
+          <line
+            x1={x}
+            y1={y + ((100 - capturedMove) / 100) * height}
+            x2={x + width}
+            y2={y + ((100 - capturedMove) / 100) * height}
+            stroke="#4ade80"
+            strokeWidth={2}
+          />
+        )}
+      </>
+    );
+  };
+  
+  // Custom shape for the drawdown bar to include the captured move indicator
+  const CustomDrawdownBar = (props: any) => {
+    const { x, y, width, height, payload } = props;
+    
+    return (
+      <>
+        <rect
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          fill="#9b87f5"
+          rx={4}
+          ry={4}
+        />
+        {/* Only show red line for negative captured move */}
+        {payload.capturedMove < 0 && (
+          <line
+            x1={x}
+            y1={y + Math.abs(payload.capturedMove) / 100 * height}
+            x2={x + width}
+            y2={y + Math.abs(payload.capturedMove) / 100 * height}
+            stroke="#f87171"
+            strokeWidth={2}
+            strokeDasharray="4 2"
+          />
+        )}
+      </>
     );
   };
 
@@ -166,29 +227,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           name="Updraw" 
           stackId="stack"
           cursor="pointer"
-          shape={(props) => {
-            const { x, y, width, height, capturedMove, index } = props;
-            return (
-              <>
-                <rect
-                  x={x}
-                  y={y}
-                  width={width}
-                  height={height}
-                  fill="#FEC6A1"
-                  rx={4}
-                  ry={4}
-                />
-                <CapturedMoveIndicator 
-                  x={x} 
-                  y={y} 
-                  width={width} 
-                  capturedMove={props.payload.capturedMove} 
-                  index={index} 
-                />
-              </>
-            );
-          }}
+          shape={(props) => <CustomUpdrawBar {...props} capturedMove={props.payload.capturedMove} />}
         />
         <Bar 
           dataKey="maeRelativeToSl" 
@@ -196,6 +235,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           name="Drawdown" 
           stackId="stack"
           cursor="pointer"
+          shape={(props) => <CustomDrawdownBar {...props} />}
         />
       </BarChart>
     </ResponsiveContainer>
