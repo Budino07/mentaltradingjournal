@@ -12,6 +12,11 @@ import {
 import { useNotifications, Notification } from "@/contexts/NotificationsContext";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
@@ -50,24 +55,32 @@ export function NotificationBell() {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="relative"
-          onClick={() => setOpen(true)}
-        >
-          <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
-            <Badge 
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500"
-              variant="destructive"
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="relative"
+              onClick={() => setOpen(true)}
             >
-              {unreadCount > 9 ? '9+' : unreadCount}
-            </Badge>
-          )}
-        </Button>
-      </PopoverTrigger>
+              <Bell className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <div className="absolute -top-1 -right-1 flex items-center justify-center">
+                  <Badge 
+                    className="h-5 w-5 rounded-full flex items-center justify-center p-0 bg-blue-500 border-0 text-white font-medium"
+                  >
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </Badge>
+                </div>
+              )}
+            </Button>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Notifications</p>
+        </TooltipContent>
+      </Tooltip>
       <PopoverContent 
         className="w-[350px] p-0" 
         align="end"
