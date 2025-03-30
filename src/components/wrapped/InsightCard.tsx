@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import { WrappedInsight } from '@/utils/wrappedUtils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -109,7 +110,9 @@ export const InsightCard: React.FC<InsightCardProps> = ({
             `animate-${insight.animation}`
           )}
         >
-          {insight.value}
+          {typeof insight.value === 'number' && insight.id.includes('percentage') 
+            ? `${insight.value.toFixed(1)}%` 
+            : insight.value}
         </div>
         
         <p className="text-muted-foreground text-lg max-w-md">
