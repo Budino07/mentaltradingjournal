@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -92,18 +93,17 @@ const Landing = () => {
               Elevate Your Trading
             </div>
             
-            {/* Main headline */}
+            {/* Main headline - UPDATED */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white max-w-4xl mx-auto">
-              Take your trading to the next level with personalized{" "}
+              Take Your Trading to the Next Level by{" "}
               <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-                AI Insights
+                Unlocking New Sides of You
               </span>
             </h1>
             
-            {/* Subheading */}
+            {/* Subheading - UPDATED */}
             <p className="mt-6 text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
-              Use our AI-powered platform to analyze your trades and make better decisions. 
-              We will analyze your data and find your edge for you. Track your progress with intuitive, fast analytics.
+              Our platform helps you understand the behaviors you've never noticed before—so you can trade with more awareness, discipline, and confidence. Track your progress, analyze your trades, and unlock your true edge.
             </p>
             
             {/* Call to action buttons */}
@@ -125,7 +125,7 @@ const Landing = () => {
               </Button>
             </div>
             
-            {/* Dashboard preview image - UPDATED */}
+            {/* Dashboard preview image */}
             <div className="relative mt-16 max-w-5xl mx-auto">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-accent/30 rounded-lg blur-sm opacity-70"></div>
               <div className="relative bg-[#1A1F2C]/80 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10 shadow-2xl">
@@ -142,16 +142,16 @@ const Landing = () => {
         {/* Redesigned Second Section - Features */}
         <section className="relative py-20 md:py-28">
           <div className="container mx-auto px-4">
-            {/* Header */}
+            {/* Header - UPDATED */}
             <div className="text-center mb-14">
               <div className="inline-block px-4 py-1.5 mb-4 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 text-sm text-white/70">
                 Why traders choose our platform
               </div>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
-                Trade. Learn. <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">Evolve.</span>
+                You're Focused on the <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">Wrong Thing.</span>
               </h2>
               <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                Use AI-powered insights, emotional analysis, and psychological pattern detection to improve your trading strategies and work toward consistent profitability.
+                Technicals alone is not enough to create breakthroughs, you must understand how your emotional states directly impact how you interpret market movement. Our journal shows you exactly how your emotions can make or break your trading performance in a way no other trading journal has ever done.
               </p>
             </div>
 
