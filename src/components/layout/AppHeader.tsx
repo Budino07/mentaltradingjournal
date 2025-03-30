@@ -20,6 +20,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { NotificationBell } from "@/components/ui/notification-bell";
 
 export function AppHeader() {
   const location = useLocation();
@@ -100,6 +101,8 @@ export function AppHeader() {
 
           <ThemeToggle />
 
+          {user && <NotificationBell />}
+
           {user ? (
             <Popover>
               <PopoverTrigger asChild>
@@ -171,6 +174,12 @@ export function AppHeader() {
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="w-[280px] sm:w-[320px]">
+            {user && (
+              <div className="flex justify-end mt-2 mb-2">
+                <NotificationBell />
+              </div>
+            )}
+            
             <nav className="flex flex-col gap-4 mt-6">
               {/* App Navigation Items */}
               <div className="space-y-4">
