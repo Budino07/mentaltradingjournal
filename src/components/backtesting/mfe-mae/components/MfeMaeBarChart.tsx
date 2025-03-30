@@ -1,4 +1,3 @@
-
 import {
   BarChart,
   Bar,
@@ -9,7 +8,6 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceLine,
-  Line,
 } from "recharts";
 import { ChartData } from "../types";
 import { useNavigate } from "react-router-dom";
@@ -44,19 +42,12 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
     }
   };
 
-  // Custom shape for captured move indicator
-  const CapturedMoveIndicator = ({ x, y, width, capturedMove, index }: any) => {
-    if (capturedMove === undefined) return null;
+  // Custom shape for positive captured move indicator (green line on orange)
+  const CapturedMoveIndicator = ({ x, y, width, height, capturedMove }: any) => {
+    if (capturedMove === undefined || capturedMove <= 0) return null;
     
     // Calculate the position for the line
-    const lineYPosition = capturedMove > 0 
-      ? y + ((100 - capturedMove) / 100) * width 
-      : y; // For green indicator on Updraw bars
-    
-    // Determine line color based on captured move value
-    const lineColor = capturedMove > 0 
-      ? "#4ade80" // Aesthetic green for positive values
-      : "#ef4444"; // Aesthetic red for negative values
+    const lineYPosition = y + ((100 - capturedMove) / 100) * height;
     
     return (
       <line
@@ -64,7 +55,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         y1={lineYPosition}
         x2={x + width}
         y2={lineYPosition}
-        stroke={lineColor}
+        stroke="#4ade80" // Green for positive values
         strokeWidth={2}
         strokeDasharray="none"
       />
@@ -76,7 +67,9 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
     if (capturedMove === undefined || capturedMove >= 0) return null;
     
     // For negative values, calculate position within the drawdown bar
-    const lineYPosition = y + (Math.abs(capturedMove) / 100) * height;
+    // If capturedMove is -100%, position at the bottom of the bar
+    // If capturedMove is 0%, position at the top of the bar
+    const lineYPosition = y + ((Math.abs(capturedMove) / 100) * height);
     
     return (
       <line
@@ -205,8 +198,8 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                     x={x} 
                     y={y} 
                     width={width} 
+                    height={height}
                     capturedMove={props.payload.capturedMove} 
-                    index={index} 
                   />
                 )}
               </>
@@ -219,6 +212,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           name="Drawdown" 
           stackId="stack"
           cursor="pointer"
+          isAnimationActive={true}
           shape={(props) => {
             const { x, y, width, height } = props;
             return (
