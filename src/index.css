@@ -154,6 +154,15 @@
   50% { transform: translateY(-20px); }
 }
 
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
 /* Mobile-specific adjustments */
 @media (max-width: 640px) {
   /* Ensure proper container padding */

@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { WrappedMonthData } from "@/hooks/useWrappedData";
 import { InsightCard } from "./insights/InsightCard";
 import { WinRateInsight } from "./insights/WinRateInsight";
@@ -61,13 +61,13 @@ export const WrappedInsights: React.FC<WrappedInsightsProps> = ({ data }) => {
     }
   ];
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setCurrentInsight((prev) => (prev + 1) % insights.length);
-  };
+  }, [insights.length]);
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     setCurrentInsight((prev) => (prev - 1 + insights.length) % insights.length);
-  };
+  }, [insights.length]);
 
   return (
     <div className="w-full">
