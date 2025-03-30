@@ -78,53 +78,57 @@ const Landing = () => {
           </div>
         </header>
 
-        {/* Hero Section - Improved for mobile */}
-        <section className="relative pt-24 sm:pt-32 md:pt-40 min-h-[90vh] flex items-center px-4">
-          <div className="container mx-auto px-0 md:px-6 flex flex-col md:flex-row items-center gap-8 md:gap-12">
-            {/* Left Content */}
-            <div className="flex-1 space-y-6 md:space-y-8 md:pr-8">
-              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight text-white">
-                You've never seen a{" "}
-                <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-                  trading journal
-                </span>
-                {" "}like this before
-              </h1>
-              <p className="text-lg sm:text-xl md:text-2xl text-gray-300 max-w-2xl leading-relaxed">
-                Find your breakthrough with a data-driven journal that utilizes both technicals AND psychology
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Button
-                  size="lg"
-                  className="text-base sm:text-lg px-6 py-5 sm:px-8 sm:py-6 bg-primary hover:bg-primary/90 backdrop-blur-lg shadow-lg shadow-primary/20"
-                  onClick={() => navigate("/login")}
-                >
-                  Get Started
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="text-base sm:text-lg px-6 py-5 sm:px-8 sm:py-6 border-gray-700 hover:bg-gray-800/50 backdrop-blur-lg"
-                  onClick={() => navigate("/features")}
-                >
-                  Features
-                </Button>
-              </div>
+        {/* New Hero Section */}
+        <section className="relative pt-24 sm:pt-32 md:pt-40 min-h-[90vh] flex flex-col items-center justify-center px-4 text-center">
+          <div className="container mx-auto px-4">
+            {/* Subtle badge */}
+            <div className="inline-block px-4 py-1.5 mb-5 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 text-sm text-white/70">
+              Elevate Your Trading
             </div>
-
-            {/* Right Content - App Preview - Hidden on very small screens */}
-            <div className="flex-1 relative w-full max-w-xs sm:max-w-sm md:max-w-2xl mt-8 md:mt-0">
-              <div className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-2xl">
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-accent/20 backdrop-blur-2xl" />
+            
+            {/* Main headline */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white max-w-4xl mx-auto">
+              Take your trading to the next level with personalized{" "}
+              <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
+                AI Insights
+              </span>
+            </h1>
+            
+            {/* Subheading */}
+            <p className="mt-6 text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
+              Use our AI-powered platform to analyze your trades and make better decisions. 
+              We will analyze your data and find your edge for you. Track your progress with intuitive, fast analytics.
+            </p>
+            
+            {/* Call to action buttons */}
+            <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+              <Button
+                size="lg"
+                className="px-6 py-6 bg-primary hover:bg-primary/90 text-white font-medium shadow-lg shadow-primary/20"
+                onClick={() => navigate("/login")}
+              >
+                Get Started Free
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="px-6 py-6 border-gray-700 hover:bg-gray-800/50 text-white"
+                onClick={() => navigate("/features")}
+              >
+                View Features
+              </Button>
+            </div>
+            
+            {/* Dashboard preview image */}
+            <div className="relative mt-16 max-w-5xl mx-auto">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-accent/30 rounded-lg blur-sm opacity-70"></div>
+              <div className="relative bg-[#1A1F2C]/80 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10 shadow-2xl">
                 <img
-                  src="/lovable-uploads/4aaa437e-1af2-4948-b2af-997f02883d4c.png"
-                  alt="Trading Calendar Preview"
-                  className="w-full h-full object-cover rounded-lg transform hover:scale-105 transition-transform duration-500"
+                  src="/lovable-uploads/41d25c2c-a7f8-47df-998f-00271ae82bcb.png"
+                  alt="Mental Trading Dashboard"
+                  className="w-full h-auto rounded-lg transform hover:scale-[1.02] transition-transform duration-500"
                 />
               </div>
-              
-              {/* Enhanced glow effect */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-primary/30 to-accent/30 blur-3xl -z-10" />
             </div>
           </div>
         </section>
