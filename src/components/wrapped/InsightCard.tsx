@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { WrappedInsight } from '@/utils/wrappedUtils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -81,9 +80,9 @@ export const InsightCard: React.FC<InsightCardProps> = ({
       cancelAnimationFrame(animationId);
     };
   }, [insight.color, patternType]);
-
+  
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden h-full">
       <div className="absolute inset-0 z-0 opacity-50">
         <canvas 
           ref={canvasRef} 

@@ -9,12 +9,14 @@ import { InsightStory } from "@/components/wrapped/InsightStory";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { SubscriptionGuard } from "@/components/subscription/SubscriptionGuard";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const MentalWrapped = () => {
   const { user } = useAuth();
   const [availableMonths, setAvailableMonths] = useState<WrappedMonth[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<WrappedMonth | null>(null);
   const [insights, setInsights] = useState<WrappedInsight[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics', user?.id],
@@ -43,8 +45,17 @@ const MentalWrapped = () => {
         selectedMonth.year
       );
       setInsights(insights);
+      setDialogOpen(true);
     }
   }, [analytics, selectedMonth]);
+
+  const handleMonthChange = (month: WrappedMonth) => {
+    setSelectedMonth(month);
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
 
   return (
     <AppLayout>
@@ -73,30 +84,34 @@ const MentalWrapped = () => {
               </p>
             </Card>
           ) : (
-            <>
-              <MonthSelector 
-                months={availableMonths} 
-                selectedMonth={selectedMonth} 
-                onChange={setSelectedMonth} 
-              />
-              
-              {selectedMonth && insights.length > 0 ? (
-                <InsightStory 
-                  insights={insights}
-                  month={selectedMonth.month}
-                  year={selectedMonth.year}
-                />
-              ) : (
-                <Card className="p-8 text-center">
-                  <h3 className="text-xl font-bold">No Insights Available</h3>
-                  <p className="text-muted-foreground mt-2">
-                    There's not enough data for the selected month.
-                  </p>
-                </Card>
-              )}
-            </>
+            <MonthSelector 
+              months={availableMonths} 
+              selectedMonth={selectedMonth} 
+              onChange={handleMonthChange} 
+            />
           )}
         </div>
+        
+        {/* Insight Story Dialog */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-none">
+            {selectedMonth && insights.length > 0 ? (
+              <InsightStory 
+                insights={insights}
+                month={selectedMonth.month}
+                year={selectedMonth.year}
+                onClose={handleDialogClose}
+              />
+            ) : dialogOpen && (
+              <Card className="p-8 text-center">
+                <h3 className="text-xl font-bold">No Insights Available</h3>
+                <p className="text-muted-foreground mt-2">
+                  There's not enough data for the selected month.
+                </p>
+              </Card>
+            )}
+          </DialogContent>
+        </Dialog>
       </SubscriptionGuard>
     </AppLayout>
   );
