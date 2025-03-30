@@ -1,3 +1,4 @@
+
 import {
   BarChart,
   Bar,
@@ -55,7 +56,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
     // Determine line color based on captured move value
     const lineColor = capturedMove > 0 
       ? "#4ade80" // Aesthetic green for positive values
-      : "#f87171"; // Aesthetic red for negative values
+      : "#ef4444"; // Aesthetic red for negative values
     
     return (
       <line
@@ -141,7 +142,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ 
-                      backgroundColor: data.capturedMove > 0 ? "#4ade80" : "#f87171" 
+                      backgroundColor: data.capturedMove > 0 ? "#4ade80" : "#ef4444" 
                     }} />
                     <span className="text-card-foreground">Captured Move: {data.capturedMove?.toFixed(2)}%</span>
                   </div>
