@@ -66,7 +66,7 @@ export const InsightStory: React.FC<InsightStoryProps> = ({
           {month} {year} Wrapped
         </h2>
         {onClose && (
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={onClose} className="ml-auto">
             <X className="h-4 w-4" />
           </Button>
         )}
@@ -110,17 +110,18 @@ export const InsightStory: React.FC<InsightStoryProps> = ({
           ))}
         </div>
         
-        <div className="flex justify-between mt-6 items-center">
+        <div className="flex justify-between mt-6 items-center relative z-10">
           <Button
             variant="outline"
             size="icon"
             onClick={goToPrevious}
             disabled={currentIndex === 0}
+            className="absolute left-0 top-1/2 -translate-y-1/2 bg-background shadow-md hover:bg-accent"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
           
-          <div className="text-center">
+          <div className="text-center mx-auto">
             <p className="text-sm text-muted-foreground">
               {currentIndex + 1} of {totalInsights}
             </p>
@@ -131,6 +132,7 @@ export const InsightStory: React.FC<InsightStoryProps> = ({
               variant="outline"
               size="icon"
               onClick={goToNext}
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-background shadow-md hover:bg-accent"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -139,6 +141,7 @@ export const InsightStory: React.FC<InsightStoryProps> = ({
               variant="outline"
               onClick={restartStory}
               size="sm"
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-background shadow-md hover:bg-accent"
             >
               Restart
             </Button>

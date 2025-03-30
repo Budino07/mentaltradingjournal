@@ -45,17 +45,14 @@ const MentalWrapped = () => {
         selectedMonth.year
       );
       setInsights(insights);
-      
-      // Explicitly open the dialog when insights are loaded
-      if (insights.length > 0) {
-        setDialogOpen(true);
-      }
     }
   }, [analytics, selectedMonth]);
 
   const handleMonthChange = (month: WrappedMonth) => {
     console.log("Month selected:", month);
     setSelectedMonth(month);
+    // Open dialog when a month is clicked
+    setDialogOpen(true);
   };
 
   const handleDialogClose = () => {
