@@ -2,25 +2,17 @@ import React, { useEffect, useRef } from 'react';
 import { WrappedInsight } from '@/utils/wrappedUtils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 
 interface InsightCardProps {
   insight: WrappedInsight;
   month: string;
   year: number;
-  onPrevious?: () => void;
-  onNext?: () => void;
-  onRestart?: () => void;
 }
 
 export const InsightCard: React.FC<InsightCardProps> = ({ 
   insight,
   month,
-  year,
-  onPrevious,
-  onNext,
-  onRestart
+  year
 }) => {
   const valueRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -90,7 +82,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
   }, [insight.color, patternType]);
   
   return (
-    <Card className="overflow-hidden h-full relative">
+    <Card className="overflow-hidden h-full">
       <div className="absolute inset-0 z-0 opacity-50">
         <canvas 
           ref={canvasRef} 
@@ -106,35 +98,6 @@ export const InsightCard: React.FC<InsightCardProps> = ({
       </CardHeader>
       
       <CardContent className="p-6 flex flex-col items-center text-center space-y-6 relative z-10">
-        {/* Navigation buttons on the insight card */}
-        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between px-2 z-20 pointer-events-none">
-          {onPrevious && (
-            <Button 
-              variant="secondary" 
-              size="icon" 
-              onClick={onPrevious}
-              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent pointer-events-auto"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-          )}
-          
-          {(onNext || onRestart) && (
-            <Button 
-              variant="secondary" 
-              size="icon" 
-              onClick={onNext || onRestart}
-              className="rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-accent pointer-events-auto"
-            >
-              {onNext ? (
-                <ChevronRight className="h-5 w-5" />
-              ) : (
-                <RotateCcw className="h-5 w-5" />
-              )}
-            </Button>
-          )}
-        </div>
-
         <div className="text-5xl my-4">{insight.icon}</div>
         
         <h2 className="text-2xl font-bold">{insight.title}</h2>
@@ -152,13 +115,13 @@ export const InsightCard: React.FC<InsightCardProps> = ({
         <p className="text-muted-foreground text-lg max-w-md">
           {insight.description}
         </p>
-        
       </CardContent>
     </Card>
   );
 };
 
 // Helper functions for background patterns
+
 function getColorScheme(color: string): string[] {
   // Extract colors from Tailwind classes like "bg-green-500"
   if (color.includes('green')) {

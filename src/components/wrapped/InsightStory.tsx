@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { WrappedInsight } from '@/utils/wrappedUtils';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { InsightCard } from './InsightCard';
+import { Progress } from '@/components/ui/progress';
 import ReactConfetti from 'react-confetti';
 import { useWindowSize } from '@/hooks/use-window-size';
 
@@ -25,6 +26,7 @@ export const InsightStory: React.FC<InsightStoryProps> = ({
   const [showConfetti, setShowConfetti] = useState(false);
   const { width, height } = useWindowSize();
   const totalInsights = insights.length;
+  const progress = ((currentIndex + 1) / totalInsights) * 100;
 
   // Show confetti when the story begins
   useEffect(() => {
@@ -55,7 +57,7 @@ export const InsightStory: React.FC<InsightStoryProps> = ({
   };
 
   return (
-    <div className="relative bg-background rounded-lg overflow-visible max-h-[90vh]">
+    <div className="relative bg-background rounded-lg overflow-hidden">
       {showConfetti && <ReactConfetti width={width} height={height} recycle={false} />}
       
       {/* Header with close button */}
@@ -64,7 +66,7 @@ export const InsightStory: React.FC<InsightStoryProps> = ({
           {month} {year} Wrapped
         </h2>
         {onClose && (
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={onClose} className="ml-auto">
             <X className="h-4 w-4" />
           </Button>
         )}
@@ -103,18 +105,47 @@ export const InsightStory: React.FC<InsightStoryProps> = ({
                 insight={insight} 
                 month={month}
                 year={year}
-                onPrevious={currentIndex > 0 ? goToPrevious : undefined}
-                onNext={currentIndex < totalInsights - 1 ? goToNext : undefined}
-                onRestart={currentIndex === totalInsights - 1 ? restartStory : undefined}
               />
             </div>
           ))}
         </div>
         
-        <div className="text-center mt-4">
-          <p className="text-sm text-muted-foreground">
-            {currentIndex + 1} of {totalInsights}
-          </p>
+        <div className="flex justify-between mt-6 items-center relative z-10">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={goToPrevious}
+            disabled={currentIndex === 0}
+            className="absolute left-0 top-1/2 -translate-y-1/2 bg-background shadow-md hover:bg-accent"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          
+          <div className="text-center mx-auto">
+            <p className="text-sm text-muted-foreground">
+              {currentIndex + 1} of {totalInsights}
+            </p>
+          </div>
+          
+          {currentIndex < totalInsights - 1 ? (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={goToNext}
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-background shadow-md hover:bg-accent"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={restartStory}
+              size="sm"
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-background shadow-md hover:bg-accent"
+            >
+              Restart
+            </Button>
+          )}
         </div>
       </div>
     </div>

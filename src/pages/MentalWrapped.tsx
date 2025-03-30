@@ -96,7 +96,7 @@ const MentalWrapped = () => {
         
         {/* Insight Story Dialog with proper accessibility components */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="max-w-4xl p-0 border-none overflow-visible">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-none">
             <DialogTitle className="sr-only">
               Monthly Insights
             </DialogTitle>
