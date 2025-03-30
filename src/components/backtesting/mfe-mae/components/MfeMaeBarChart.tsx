@@ -200,7 +200,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           name="Updraw" 
           stackId="stack"
           cursor="pointer"
-          shape={(props) => <CustomUpdrawBar {...props} capturedMove={props.payload.capturedMove} />}
+          shape={<CustomUpdrawBar />}
         />
         <Bar 
           dataKey="maeRelativeToSl" 
@@ -208,7 +208,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           name="Drawdown" 
           stackId="stack"
           cursor="pointer"
-          shape={(props) => <CustomDrawdownBar {...props} />}
+          shape={<CustomDrawdownBar />}
         />
       </BarChart>
     </ResponsiveContainer>
