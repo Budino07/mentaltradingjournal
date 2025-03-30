@@ -28,6 +28,21 @@ export interface WrappedMonthData {
   };
 }
 
+interface Trade {
+  pnl: number;
+  entryDate: string;
+  exitDate?: string;
+  setup?: string;
+  // Add other trade properties as needed
+}
+
+interface JournalEntry {
+  created_at: string;
+  emotion?: string;
+  trades?: Trade[];
+  // Add other entry properties as needed
+}
+
 export function useWrappedData() {
   const [isLoading, setIsLoading] = useState(true);
   const [availableMonths, setAvailableMonths] = useState<string[]>([]);
@@ -86,10 +101,10 @@ export function useWrappedData() {
           const monthEntries = entries.filter(entry => {
             const entryDate = parseISO(entry.created_at);
             return isSameMonth(entryDate, monthStart);
-          });
+          }) as JournalEntry[];
 
           // Extract trades from all entries
-          const allTrades = monthEntries.flatMap(entry => entry.trades || []);
+          const allTrades = monthEntries.flatMap(entry => entry.trades || []) as Trade[];
           
           // Calculate win rate
           const winningTrades = allTrades.filter(trade => Number(trade.pnl) > 0);
