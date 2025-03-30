@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { 
   Table, 
@@ -8,7 +9,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { ArrowUp, ArrowDown, Star, Edit, Trash, Plus, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowUp, ArrowDown, Star, Edit, Trash, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/utils/dateUtils";
 import { Trade } from "@/types/trade";
@@ -129,7 +130,7 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
 
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) {
-      return <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />;
+      return <span className="ml-1 opacity-0 w-4 h-4 inline-block"></span>;
     }
     return sortDirection === 'asc' 
       ? <ArrowUp className="ml-1 h-4 w-4" /> 
@@ -170,7 +171,6 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50px]"></TableHead>
               <TableHead onClick={() => handleSort('entryDate')} className="cursor-pointer">
                 <div className="flex items-center">
                   Entry Date
@@ -222,13 +222,6 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
                     handleRowClick(trade);
                   }}
                 >
-                  <TableCell>
-                    {trade.direction === 'buy' ? (
-                      <ArrowUp className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <ArrowDown className="h-4 w-4 text-red-500" />
-                    )}
-                  </TableCell>
                   <TableCell>{trade.entryDate ? formatDate(trade.entryDate) : '-'}</TableCell>
                   <TableCell>{trade.instrument || '-'}</TableCell>
                   <TableCell className="text-white">
@@ -271,7 +264,7 @@ export const TradesTable = ({ trades }: { trades: Trade[] }) => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="h-24 text-center">
+                <TableCell colSpan={7} className="h-24 text-center">
                   No trades found.
                 </TableCell>
               </TableRow>
