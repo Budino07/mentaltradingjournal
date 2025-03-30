@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { InsightCard } from './InsightCard';
 import { Progress } from '@/components/ui/progress';
-import ReactConfetti from 'react-confetti';
+import confetti from 'react-confetti';
 import { useWindowSize } from '@/hooks/use-window-size';
 
 interface InsightStoryProps {
@@ -56,7 +56,7 @@ export const InsightStory: React.FC<InsightStoryProps> = ({
 
   return (
     <div className="relative">
-      {showConfetti && <ReactConfetti width={width} height={height} recycle={false} />}
+      {showConfetti && <confetti width={width} height={height} recycle={false} />}
       
       <div className="mb-2 relative">
         <div className="flex gap-1 absolute top-0 left-0 right-0 z-10">
