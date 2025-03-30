@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { 
   Table, 
@@ -19,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { TradeDeleteDialog } from "@/components/journal/entry/trade-item/TradeDeleteDialog";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ArrowUpDown } from "lucide-react";
 
 type SortField = 'entryDate' | 'instrument' | 'direction' | 'setup' | 'pnl' | 'exitDate';
 type SortDirection = 'asc' | 'desc';
