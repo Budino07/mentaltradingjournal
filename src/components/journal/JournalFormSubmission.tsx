@@ -77,9 +77,21 @@ export const useJournalFormSubmission = ({
 
     // Validate post-session requirements
     if (sessionType === "post") {
-      if (!selectedEmotion || !selectedEmotionDetail || !notes || !selectedOutcome || followedRules?.length === 0) {
+      // For loss outcome, we don't require followedRules
+      const isRulesRequired = selectedOutcome !== "loss";
+      
+      if (!selectedEmotion || !selectedEmotionDetail || !notes || !selectedOutcome) {
         toast.error("Missing Information", {
           description: "Please fill in all required fields for post-session.",
+          duration: 5000,
+        });
+        return;
+      }
+      
+      // Only validate followedRules if outcome is not "loss"
+      if (isRulesRequired && (!followedRules || followedRules.length === 0)) {
+        toast.error("Missing Information", {
+          description: "Please select which trading rules you followed.",
           duration: 5000,
         });
         return;
