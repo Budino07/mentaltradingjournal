@@ -4,6 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, parseISO, differenceInMinutes, setHours, setMinutes, startOfMonth, endOfMonth, isSameMonth } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 
+// Define proper trade type to handle JSON data
+interface TradeData {
+  pnl: number | string;
+  entryDate?: string;
+  exitDate?: string;
+  setup?: string;
+  [key: string]: any;
+}
+
 export interface WrappedMonthData {
   month: string;
   formattedMonth: string;
@@ -88,8 +97,10 @@ export function useWrappedData() {
             return isSameMonth(entryDate, monthStart);
           });
 
-          // Extract trades from all entries
-          const allTrades = monthEntries.flatMap(entry => entry.trades || []);
+          // Extract trades from all entries and cast to TradeData
+          const allTrades = monthEntries.flatMap(entry => 
+            (entry.trades || []).map((trade: any) => trade as TradeData)
+          );
           
           // Calculate win rate
           const winningTrades = allTrades.filter(trade => Number(trade.pnl) > 0);
@@ -102,9 +113,11 @@ export function useWrappedData() {
           let maxLoseStreak = 0;
           
           // Sort trades by date
-          const sortedTrades = [...allTrades].sort((a, b) => 
-            new Date(a.exitDate || a.entryDate).getTime() - new Date(b.exitDate || b.entryDate).getTime()
-          );
+          const sortedTrades = [...allTrades].sort((a, b) => {
+            const dateA = new Date(a.exitDate || a.entryDate || 0).getTime();
+            const dateB = new Date(b.exitDate || b.entryDate || 0).getTime();
+            return dateA - dateB;
+          });
           
           sortedTrades.forEach(trade => {
             const pnl = Number(trade.pnl);
@@ -191,7 +204,10 @@ export function useWrappedData() {
           
           monthEntries.forEach(entry => {
             if (entry.emotion && entry.trades) {
-              const totalPnL = entry.trades.reduce((sum, trade) => sum + Number(trade.pnl || 0), 0);
+              const totalPnL = (entry.trades || []).reduce((sum, trade: any) => {
+                const tradePnl = Number(trade.pnl || 0);
+                return sum + tradePnl;
+              }, 0);
               
               if (entry.emotion === 'positive') {
                 emotionPerformance.positive += totalPnL;

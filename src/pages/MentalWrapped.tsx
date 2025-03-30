@@ -5,6 +5,7 @@ import { WrappedInsights } from "@/components/wrapped/WrappedInsights";
 import { WrappedSelector } from "@/components/wrapped/WrappedSelector";
 import { useWrappedData } from "@/hooks/useWrappedData";
 import { Card, CardContent } from "@/components/ui/card";
+import { Gift } from "lucide-react";
 
 const MentalWrapped = () => {
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
