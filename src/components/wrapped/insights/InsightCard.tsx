@@ -23,8 +23,13 @@ export const InsightCard: React.FC<InsightCardProps> = ({
   onNext,
   onPrevious
 }) => {
-  // Auto-play functionality
+  // Track if autoplay should be enabled
+  const [autoplayEnabled, setAutoplayEnabled] = useState(true);
+  
+  // Auto-play functionality that can be disabled
   useEffect(() => {
+    if (!autoplayEnabled) return;
+    
     const autoPlayInterval = setInterval(() => {
       onNext();
     }, 5000); // 5 seconds transition
@@ -32,14 +37,16 @@ export const InsightCard: React.FC<InsightCardProps> = ({
     return () => {
       clearInterval(autoPlayInterval);
     };
-  }, [onNext]);
+  }, [onNext, autoplayEnabled]);
 
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') {
+        setAutoplayEnabled(false); // Disable autoplay on keyboard navigation
         onNext();
       } else if (e.key === 'ArrowLeft') {
+        setAutoplayEnabled(false); // Disable autoplay on keyboard navigation
         onPrevious();
       }
     };
@@ -49,6 +56,17 @@ export const InsightCard: React.FC<InsightCardProps> = ({
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [onNext, onPrevious]);
+
+  // Custom handlers to disable autoplay when buttons are clicked
+  const handleNextClick = () => {
+    setAutoplayEnabled(false);
+    onNext();
+  };
+
+  const handlePreviousClick = () => {
+    setAutoplayEnabled(false);
+    onPrevious();
+  };
 
   return (
     <Card className="min-h-[500px] md:min-h-[600px] border-primary/20 animate-scale-in transition-all duration-300 relative overflow-hidden">
@@ -67,7 +85,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
 
       {/* Dynamic animated background */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-20">
           {/* Animated floating circles */}
           {Array.from({ length: 15 }).map((_, index) => (
             <div
@@ -97,7 +115,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
         />
       </div>
 
-      <CardContent className="p-6 flex flex-col h-full relative z-1 backdrop-blur-sm glass-effect">
+      <CardContent className="p-6 flex flex-col h-full relative z-1">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-bold text-primary">{insight.title}</h3>
           <div className="text-sm text-muted-foreground">{currentIndex + 1}/{totalInsights}</div>
@@ -111,7 +129,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
           <Button 
             variant="outline" 
             size="icon" 
-            onClick={onPrevious}
+            onClick={handlePreviousClick}
             className="rounded-full hover:bg-primary/10 backdrop-blur-md bg-white/10 border border-white/20"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -119,7 +137,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
           <Button 
             variant="outline" 
             size="icon" 
-            onClick={onNext}
+            onClick={handleNextClick}
             className="rounded-full hover:bg-primary/10 backdrop-blur-md bg-white/10 border border-white/20"
           >
             <ChevronRight className="h-5 w-5" />
