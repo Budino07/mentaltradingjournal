@@ -129,6 +129,9 @@ export const EmotionLogger = ({
     setTrades([...trades, tradeData]);
   };
 
+  // Determine if rules selection is required based on the outcome
+  const isRulesRequired = sessionType === "post" && selectedOutcome !== "loss";
+
   return (
     <div className={`grid gap-4 md:gap-6 lg:grid-cols-[1fr,300px] mt-0 md:mt-0 ${isMobile ? 'mx-0' : ''}`}>
       <Card className={`${isMobile ? 'p-3' : 'p-4 md:p-8'} space-y-6 md:space-y-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl`}>
@@ -144,8 +147,8 @@ export const EmotionLogger = ({
           activitiesSelected={preTradingActivities.length > 0}
           notesEntered={notes.length > 0}
           outcomeSelected={!!selectedOutcome}
-          rulesSelected={followedRules.length > 0}
-          mistakesReviewed={selectedMistakes.length > 0}
+          rulesSelected={isRulesRequired ? followedRules.length > 0 : true}
+          mistakesReviewed={selectedOutcome === "loss" ? selectedMistakes.length > 0 : true}
           tradesAdded={trades.length > 0}
           isPostSession={sessionType === "post"}
           showCelebration={showCelebration}

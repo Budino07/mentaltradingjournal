@@ -1,17 +1,25 @@
+
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface TradingRulesSectionProps {
   followedRules: string[];
   setFollowedRules: (rules: string[]) => void;
+  selectedOutcome?: string;
 }
 
 export const TradingRulesSection = ({
   followedRules,
   setFollowedRules,
+  selectedOutcome,
 }: TradingRulesSectionProps) => {
+  // If session outcome is "loss", it should not require rule selection
+  const isOptional = selectedOutcome === "loss";
+
   return (
     <div>
-      <h3 className="text-lg font-medium mb-4">Trading Rules Followed</h3>
+      <h3 className="text-lg font-medium mb-4">
+        Trading Rules Followed {isOptional && <span className="text-sm font-normal text-muted-foreground ml-1">(optional)</span>}
+      </h3>
       <div className="grid gap-4">
         <div className="flex items-center space-x-2">
           <Checkbox 
