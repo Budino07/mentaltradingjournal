@@ -1,12 +1,11 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { AnalyticsSection } from "@/components/landing/AnalyticsSection";
 import { Footer } from "@/components/landing/Footer";
-import { PlatformFeatures } from "@/components/landing/PlatformFeatures";
-import { User, ArrowRightCircle, Target } from "lucide-react";
+import { User, ArrowRightCircle, BarChart3, Brain, Lightbulb, TrendingUp, Clock, Target } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
 import { 
   Accordion,
   AccordionContent,
@@ -85,7 +84,7 @@ const Landing = () => {
           </div>
         </header>
 
-        {/* Hero Section */}
+        {/* New Hero Section */}
         <section className="relative pt-24 sm:pt-32 md:pt-40 min-h-[90vh] flex flex-col items-center justify-center px-4 text-center">
           <div className="container mx-auto px-4">
             {/* Subtle badge */}
@@ -126,7 +125,7 @@ const Landing = () => {
               </Button>
             </div>
             
-            {/* Dashboard preview image */}
+            {/* Dashboard preview image - UPDATED */}
             <div className="relative mt-16 max-w-5xl mx-auto">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-accent/30 rounded-lg blur-sm opacity-70"></div>
               <div className="relative bg-[#1A1F2C]/80 backdrop-blur-sm rounded-lg overflow-hidden border border-white/10 shadow-2xl">
@@ -140,8 +139,139 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* Platform Features Section */}
-        <PlatformFeatures />
+        {/* Redesigned Second Section - Features */}
+        <section className="relative py-20 md:py-28">
+          <div className="container mx-auto px-4">
+            {/* Header */}
+            <div className="text-center mb-14">
+              <div className="inline-block px-4 py-1.5 mb-4 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 text-sm text-white/70">
+                Why traders choose our platform
+              </div>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
+                Trade. Learn. <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">Evolve.</span>
+              </h2>
+              <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                Use AI-powered insights, emotional analysis, and psychological pattern detection to improve your trading strategies and work toward consistent profitability.
+              </p>
+            </div>
+
+            {/* Three Premium Feature Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+              {/* Card 1 - Emotional Intelligence */}
+              <Card className="bg-gradient-to-br from-[#1E2235]/80 to-[#2A2F45]/80 border border-white/10 backdrop-blur-md shadow-xl hover:shadow-primary/10 hover:border-primary/20 transition-all duration-300 overflow-hidden group">
+                <CardContent className="p-6 sm:p-8">
+                  <div className="mb-5">
+                    <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-4 group-hover:bg-primary/30 transition-colors duration-300">
+                      <Brain className="w-6 h-6 text-primary-light" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3">Emotional Intelligence</h3>
+                    <p className="text-gray-300">
+                      Track how emotions affect your trading decisions and learn to master your psychological responses to market movements.
+                    </p>
+                  </div>
+                  
+                  <div className="mt-8 pt-6 border-t border-white/10">
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="emotional-stats" className="border-b-0">
+                        <AccordionTrigger className="text-sm font-medium text-white/70 py-2 hover:text-primary-light no-underline hover:no-underline">
+                          Key emotional metrics
+                        </AccordionTrigger>
+                        <AccordionContent className="text-sm text-white/60">
+                          <ul className="space-y-2">
+                            <li className="flex items-center">
+                              <div className="w-2 h-2 rounded-full bg-primary-light mr-2"></div>
+                              <span>Emotional stability score</span>
+                            </li>
+                            <li className="flex items-center">
+                              <div className="w-2 h-2 rounded-full bg-accent mr-2"></div>
+                              <span>Fear/greed analysis</span>
+                            </li>
+                            <li className="flex items-center">
+                              <div className="w-2 h-2 rounded-full bg-purple-400 mr-2"></div>
+                              <span>Decision confidence rating</span>
+                            </li>
+                          </ul>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Card 2 - Pattern Recognition */}
+              <Card className="bg-gradient-to-br from-[#1E2235]/80 to-[#2A2F45]/80 border border-white/10 backdrop-blur-md shadow-xl hover:shadow-primary/10 hover:border-primary/20 transition-all duration-300 overflow-hidden group">
+                <CardContent className="p-6 sm:p-8">
+                  <div className="mb-5">
+                    <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-4 group-hover:bg-primary/30 transition-colors duration-300">
+                      <TrendingUp className="w-6 h-6 text-primary-light" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3">Pattern Recognition</h3>
+                    <p className="text-gray-300">
+                      Our AI automatically identifies behavioral patterns that impact your trading performance and help you develop strategies to overcome them.
+                    </p>
+                  </div>
+                  
+                  <div className="mt-8 pt-6 border-t border-white/10">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-white/60">Win rate</span>
+                      <span className="text-sm font-semibold text-white">72%</span>
+                    </div>
+                    <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-primary-light to-accent rounded-full" style={{ width: "72%" }}></div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mt-4 mb-2">
+                      <span className="text-sm text-white/60">Behavioral consistency</span>
+                      <span className="text-sm font-semibold text-white">87%</span>
+                    </div>
+                    <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-primary-light to-accent rounded-full" style={{ width: "87%" }}></div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Card 3 - Advanced AI Insights */}
+              <Card className="bg-gradient-to-br from-[#1E2235]/80 to-[#2A2F45]/80 border border-white/10 backdrop-blur-md shadow-xl hover:shadow-primary/10 hover:border-primary/20 transition-all duration-300 overflow-hidden group">
+                <CardContent className="p-6 sm:p-8">
+                  <div className="mb-5">
+                    <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-4 group-hover:bg-primary/30 transition-colors duration-300">
+                      <Lightbulb className="w-6 h-6 text-primary-light" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3">AI-Generated Insights</h3>
+                    <p className="text-gray-300">
+                      Get personalized recommendations to improve your psychological approach to trading based on your unique data profile.
+                    </p>
+                  </div>
+                  
+                  <div className="mt-8 pt-6 border-t border-white/10">
+                    <div className="p-3 bg-primary/10 rounded-lg border border-primary/20 mb-3">
+                      <p className="text-sm text-primary-light font-medium">
+                        "Your FOMO trades show 68% lower success rate. Consider implementing a 10-minute decision rule."
+                      </p>
+                    </div>
+                    <div className="flex items-center text-white/60 text-sm">
+                      <Clock className="h-4 w-4 mr-2" />
+                      <span>Updated 2 hours ago</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* CTA Button */}
+            <div className="flex justify-center mt-12">
+              <Button
+                size="lg"
+                className="px-8 py-6 bg-gradient-to-r from-primary/80 to-accent/80 hover:from-primary hover:to-accent text-white font-medium border border-white/10 shadow-lg shadow-primary/20"
+                onClick={() => navigate("/features")}
+              >
+                <Target className="mr-2 h-5 w-5" />
+                Discover all features
+              </Button>
+            </div>
+          </div>
+        </section>
 
         {/* Analytics Section */}
         <AnalyticsSection />
