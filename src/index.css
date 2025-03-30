@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -160,6 +161,11 @@
 @keyframes pulse-slow {
   0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
+}
+
+/* Drop shadow glow for SVG paths */
+.drop-shadow-glow {
+  filter: drop-shadow(0 0 5px rgba(155, 135, 245, 0.6));
 }
 
 /* Mobile-specific adjustments */
