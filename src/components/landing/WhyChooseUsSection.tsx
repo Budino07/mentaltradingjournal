@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Users, DollarSign, BarChart3, Zap, MessageSquare, ArrowRightCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -63,7 +64,7 @@ export const WhyChooseUsSection = ({
     },
     {
       title: "Pre & Post Session",
-      description: "Begin and end your trading day with intention and reflection. Our pre and post-session are designed to navigate through your emotions, assess your mindset, and turn every day into a learning opportunity.",
+      description: "Start and end your day with purpose. Our pre and post-sessions help you navigate emotions, assess your mindset, and turn every day into growth. No cheating, pure truth.",
       color: "from-secondary/20 to-secondary/40",
       image: "/lovable-uploads/26b287b8-7163-4228-a802-5742bc6b9627.png"
     }
