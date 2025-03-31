@@ -42,9 +42,9 @@ export const OvertradingHeatMap = () => {
     const dayTradeMap = allTrades.reduce((acc, trade) => {
       if (!trade.entryDate) return acc;
       
-      const day = format(new Date(trade.entryDate), 'yyyy-MM-dd');
-      if (!acc[day]) acc[day] = 0;
-      acc[day]++;
+      const date = format(new Date(trade.entryDate), 'yyyy-MM-dd');
+      if (!acc[date]) acc[date] = 0;
+      acc[date]++;
       return acc;
     }, {} as Record<string, number>);
     
@@ -76,7 +76,8 @@ export const OvertradingHeatMap = () => {
   const weekData = useMemo(() => {
     if (allTrades.length === 0) return [];
     
-    const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    // Only include weekdays (Monday to Friday)
+    const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     const dayMap: Record<string, { day: string; count: number; emotion: string; fill: string }> = {};
     
     daysOfWeek.forEach(day => {
@@ -85,6 +86,9 @@ export const OvertradingHeatMap = () => {
     
     allTrades.forEach(trade => {
       if (!trade.day) return;
+      
+      // Skip weekend days
+      if (trade.day === 'Sat' || trade.day === 'Sun') return;
       
       dayMap[trade.day].count++;
       
