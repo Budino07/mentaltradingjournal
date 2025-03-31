@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/tooltip";
 import { 
   MessageCircle,
-  Target,
-  ShowerHead,
+  Book,
+  Apple,
   Sun,
   Award
 } from "lucide-react";
@@ -33,11 +33,11 @@ const ACTIVITY_TOOLTIPS: Record<string, { text: string; icon: JSX.Element }> = {
   },
   "Journaling": {
     text: "Brings intention to your actions for the day, ensuring you make tangible progress toward your goals.",
-    icon: <Target className="h-4 w-4" />
+    icon: <Book className="h-4 w-4" />
   },
   "Healthy Eating": {
     text: "Fuels your body and mind with the right nutrients for optimal performance and decision-making.",
-    icon: <ShowerHead className="h-4 w-4" />
+    icon: <Apple className="h-4 w-4" />
   },
   "Good Sleep": {
     text: "Foundational requirement to peak performance & health, non-negotiable 7/8 hours a night.",
