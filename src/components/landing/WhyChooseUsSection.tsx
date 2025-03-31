@@ -76,20 +76,22 @@ export const WhyChooseUsSection = () => {
           ))}
         </div>
 
-        {/* Additional Features */}
+        {/* Additional Features - Fixed alignment issue */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
           {additionalFeatures.map((feature, index) => (
             <div 
               key={index}
-              className="relative p-6 rounded-lg border border-white/10 bg-[#1A1F2C]/60 backdrop-blur-md overflow-hidden group hover:border-primary/20 transition-all duration-300 flex"
+              className="relative p-6 rounded-lg border border-white/10 bg-[#1A1F2C]/60 backdrop-blur-md overflow-hidden group hover:border-primary/20 transition-all duration-300"
             >
               <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="w-14 h-14 rounded-xl bg-[#1A1F2C]/80 flex-shrink-0 flex items-center justify-center mr-5 border border-white/5 group-hover:border-primary/20 transition-colors duration-300 relative">
-                <feature.icon className="w-7 h-7 text-primary-light" />
-              </div>
-              <div className="relative">
-                <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
-                <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+              <div className="relative flex items-start">
+                <div className="w-14 h-14 flex-shrink-0 rounded-xl bg-[#1A1F2C]/80 flex items-center justify-center mr-5 border border-white/5 group-hover:border-primary/20 transition-colors duration-300">
+                  <feature.icon className="w-7 h-7 text-primary-light" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+                  <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                </div>
               </div>
             </div>
           ))}
