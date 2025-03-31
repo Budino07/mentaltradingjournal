@@ -35,29 +35,30 @@ export const WhyChooseUsSection = () => {
   ];
 
   return (
-    <section className="relative py-24 md:py-32">
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[#1A1F2C]/95" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent opacity-30" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_var(--tw-gradient-stops))] from-[#7E69AB]/20 via-background/80 to-transparent" />
-        <div className="absolute inset-0 backdrop-blur-[100px]" />
-      </div>
-
-      <div className="relative container mx-auto px-4">
-        <div className="text-center mb-12">
-          <div className="inline-block px-4 py-1.5 mb-4 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 text-sm text-white/70">
-            Why Traders Choose Us
+    <section className="py-24">
+      {/* Remove background elements to blend seamlessly with previous section */}
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          {/* Left column - Title */}
+          <div>
+            <div className="inline-block px-4 py-1.5 mb-4 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 text-sm text-white/70">
+              Why Traders Choose Us
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
+              Empower Your <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">Trading Journey</span>
+            </h2>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
-            Empower Your <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">Trading Journey</span>
-          </h2>
-          <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            Try our platform to analyze your trades, track your progress, and make informed decisions with ease. We will keep suggesting areas you can improve.
-          </p>
+
+          {/* Right column - Description and CTA */}
+          <div>
+            <p className="text-base sm:text-lg text-gray-300 leading-relaxed mb-8">
+              Try our platform to analyze your trades, track your progress, and make informed decisions with ease. We will keep suggesting areas you can improve.
+            </p>
+          </div>
         </div>
 
         {/* Main Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
           {features.map((feature, index) => (
             <div 
               key={index}
@@ -76,7 +77,7 @@ export const WhyChooseUsSection = () => {
         </div>
 
         {/* Additional Features */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
           {additionalFeatures.map((feature, index) => (
             <div 
               key={index}
