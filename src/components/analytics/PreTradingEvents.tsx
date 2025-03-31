@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -15,8 +14,8 @@ import { useQuery } from "@tanstack/react-query";
 const PREDEFINED_ACTIVITIES = [
   "Meditation",
   "Exercise",
-  "Review\nDaily\nGoals",
-  "Cold Shower",
+  "Journaling",
+  "Healthy Eating",
   "Good Sleep",
   "Affirmation"
 ];
@@ -102,8 +101,10 @@ export const PreTradingEvents = () => {
     
     // Associate this P&L with all activities from today
     activitiesForToday.forEach(activity => {
-      // Replace spaces with newlines for consistent comparison
-      const normalizedActivity = activity.replace("Review Daily Goals", "Review\nDaily\nGoals");
+      // Map old activity names to new ones
+      let normalizedActivity = activity;
+      if (activity === "Review Daily Goals") normalizedActivity = "Journaling";
+      if (activity === "Cold Shower") normalizedActivity = "Healthy Eating";
       
       if (PREDEFINED_ACTIVITIES.includes(normalizedActivity)) {
         activityImpact[normalizedActivity].totalPnL += dailyPnL;

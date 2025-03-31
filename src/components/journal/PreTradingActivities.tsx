@@ -31,12 +31,12 @@ const ACTIVITY_TOOLTIPS: Record<string, { text: string; icon: JSX.Element }> = {
     text: "Builds resilience to stress, increases your ability to focus.",
     icon: <MessageCircle className="h-4 w-4" />
   },
-  "Review Daily Goals": {
+  "Journaling": {
     text: "Brings intention to your actions for the day, ensuring you make tangible progress toward your goals.",
     icon: <Target className="h-4 w-4" />
   },
-  "Cold Shower": {
-    text: "Increases energy from the beginning of your day, proven to benefit peak performers.",
+  "Healthy Eating": {
+    text: "Fuels your body and mind with the right nutrients for optimal performance and decision-making.",
     icon: <ShowerHead className="h-4 w-4" />
   },
   "Good Sleep": {

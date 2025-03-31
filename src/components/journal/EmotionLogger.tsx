@@ -17,8 +17,8 @@ import { DailyGoals } from "./DailyGoals";
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",
   "Exercise",
-  "Review Daily Goals",
-  "Cold Shower",
+  "Journaling",
+  "Healthy Eating",
   "Good Sleep",
   "Affirmations"
 ];
