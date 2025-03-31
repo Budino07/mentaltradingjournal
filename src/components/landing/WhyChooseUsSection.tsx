@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Users, DollarSign, BarChart3, Zap, MessageSquare, ArrowRight } from "lucide-react";
+import { Users, DollarSign, BarChart3, Zap, MessageSquare, ArrowRightCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export interface WhyChooseUsSectionProps {
@@ -52,21 +52,21 @@ export const WhyChooseUsSection = ({
   const dashboardFeatures = [
     {
       title: "Dive deeper into your strategy",
-      description: "Over 50+ reports to help you visualize your trading performance and understand your edge.",
-      color: "from-primary/80 to-primary",
-      image: "/lovable-uploads/c6cd3584-964a-48af-bbbb-ef7f945fbda6.png"
+      description: "Tired of cutting winners short and letting losses run? Mental analyzes every trade to uncover exit mistakes and optimize your entry and exit points for better performance.",
+      color: "from-primary/20 to-primary/40",
+      image: "/lovable-uploads/89acfc6b-ca39-4102-a8bb-f5b9ac70bc70.png"
     },
     {
       title: "Understand your trading behaviors",
       description: "Gain key insights into your emotional states and how they affect your decision-making process.",
-      color: "from-accent/80 to-accent",
-      image: "/lovable-uploads/c6cd3584-964a-48af-bbbb-ef7f945fbda6.png"
+      color: "from-accent/20 to-accent/40",
+      image: "/lovable-uploads/89acfc6b-ca39-4102-a8bb-f5b9ac70bc70.png"
     },
     {
       title: "Get a summary of what's working for you",
       description: "Curated summaries that highlight your strengths and areas for improvement as a trader.",
-      color: "from-secondary/80 to-secondary",
-      image: "/lovable-uploads/c6cd3584-964a-48af-bbbb-ef7f945fbda6.png"
+      color: "from-secondary/20 to-secondary/40",
+      image: "/lovable-uploads/89acfc6b-ca39-4102-a8bb-f5b9ac70bc70.png"
     }
   ];
 
@@ -94,24 +94,21 @@ export const WhyChooseUsSection = ({
         </div>
 
         {useDashboardCards ? (
-          // Dashboard-style preview cards
+          // Dashboard-style preview cards - UPDATED
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
             {dashboardFeatures.map((feature, index) => (
               <div 
                 key={index}
-                className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${feature.color} hover:shadow-lg hover:scale-[1.01] transition-all duration-300`}
+                className="relative overflow-hidden rounded-xl bg-[#1A1F2C]/80 border border-white/10 hover:border-primary/20 backdrop-blur-sm hover:shadow-lg hover:scale-[1.01] transition-all duration-300"
               >
-                <div className="p-8 flex flex-col h-[450px]">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 opacity-40"></div>
+                <div className="p-8 flex flex-col h-[450px] relative z-10">
                   <div className="flex-none">
-                    <h3 className="text-2xl font-bold text-white mb-3">{feature.title}</h3>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-2xl font-bold text-white">{feature.title}</h3>
+                      <ArrowRightCircle className="h-5 w-5 text-primary-light" />
+                    </div>
                     <p className="text-white/90 mb-6">{feature.description}</p>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="bg-white/10 backdrop-blur text-white border-white/20 hover:bg-white/20 hover:text-white"
-                    >
-                      Explore <ArrowRight className="ml-1 h-4 w-4" />
-                    </Button>
                   </div>
                   <div className="flex-grow flex items-end mt-auto">
                     <div className="rounded-lg overflow-hidden w-full h-60 bg-black/20 backdrop-blur-sm shadow-lg border border-white/10">
