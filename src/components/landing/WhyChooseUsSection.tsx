@@ -52,9 +52,9 @@ export const WhyChooseUsSection = ({
   const dashboardFeatures = [
     {
       title: "Dive deeper into your strategy",
-      description: "Tired of cutting winners short and letting losses run? Mental analyzes every trade to uncover exit mistakes and optimize your entry and exit points for better performance.",
+      description: "Frustrated with cutting winners short and letting losses run? Mental uncovers your exit mistakes and helps you optimize every trade.",
       color: "from-primary/20 to-primary/40",
-      image: "/lovable-uploads/89acfc6b-ca39-4102-a8bb-f5b9ac70bc70.png"
+      image: "/lovable-uploads/22b46326-9cbf-421a-9a60-852c1b97e579.png"
     },
     {
       title: "Understand your trading behaviors",
