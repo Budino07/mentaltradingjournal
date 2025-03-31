@@ -94,7 +94,7 @@ export const WhyChooseUsSection = ({
         </div>
 
         {useDashboardCards ? (
-          // Dashboard-style preview cards - UPDATED
+          // Dashboard-style preview cards - UPDATED with better image display
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
             {dashboardFeatures.map((feature, index) => (
               <div 
@@ -111,11 +111,12 @@ export const WhyChooseUsSection = ({
                     <p className="text-white/90 mb-6">{feature.description}</p>
                   </div>
                   <div className="flex-grow flex items-end mt-auto">
-                    <div className="rounded-lg overflow-hidden w-full h-60 bg-black/20 backdrop-blur-sm shadow-lg border border-white/10">
+                    {/* Modified image container for better visibility and no cropping */}
+                    <div className="rounded-lg overflow-hidden w-full bg-black/20 backdrop-blur-sm shadow-lg border border-white/10 flex items-center justify-center px-4">
                       <img 
                         src={feature.image} 
                         alt={feature.title} 
-                        className="w-full h-full object-cover object-center"
+                        className="max-w-full max-h-[220px] object-contain my-3"
                       />
                     </div>
                   </div>
