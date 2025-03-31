@@ -57,10 +57,10 @@ export const WhyChooseUsSection = ({
       image: "/lovable-uploads/22b46326-9cbf-421a-9a60-852c1b97e579.png"
     },
     {
-      title: "Understand your trading behaviors",
-      description: "Gain key insights into your emotional states and how they affect your decision-making process.",
+      title: "Be Notified, Be Disciplined.",
+      description: "Get real-time alerts when you're at risk of overtrading, in the perfect mental state for homerun trades, earning badges, and more. Stay driven, stay sharp, and elevate your mindset.",
       color: "from-accent/20 to-accent/40",
-      image: "/lovable-uploads/89acfc6b-ca39-4102-a8bb-f5b9ac70bc70.png"
+      image: "/lovable-uploads/e312f011-7531-4e25-836a-8d3794bdcbc9.png"
     },
     {
       title: "Get a summary of what's working for you",
