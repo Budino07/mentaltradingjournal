@@ -38,9 +38,9 @@ export const WhyChooseUsSection = () => {
     <section className="py-24">
       {/* Remove background elements to blend seamlessly with previous section */}
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
           {/* Left column - Title */}
-          <div>
+          <div className="lg:w-1/2">
             <div className="inline-block px-4 py-1.5 mb-4 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 text-sm text-white/70">
               Why Traders Choose Us
             </div>
@@ -49,9 +49,9 @@ export const WhyChooseUsSection = () => {
             </h2>
           </div>
 
-          {/* Right column - Description and CTA */}
-          <div>
-            <p className="text-base sm:text-lg text-gray-300 leading-relaxed mb-8">
+          {/* Right column - Description - MOVED HORIZONTALLY next to the heading instead of below it */}
+          <div className="lg:w-1/2 lg:pt-14">
+            <p className="text-base sm:text-lg text-gray-300 leading-relaxed">
               Try our platform to analyze your trades, track your progress, and make informed decisions with ease. We will keep suggesting areas you can improve.
             </p>
           </div>
