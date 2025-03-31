@@ -1,9 +1,9 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { AnalyticsSection } from "@/components/landing/AnalyticsSection";
 import { AboutUsSection } from "@/components/landing/AboutUsSection";
+import { WhyChooseUsSection } from "@/components/landing/WhyChooseUsSection";
 import { Footer } from "@/components/landing/Footer";
 import { User, ArrowRightCircle, BarChart3, Brain, Lightbulb, TrendingUp, Clock, Target } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -273,6 +273,9 @@ const Landing = () => {
             </div>
           </div>
         </section>
+
+        {/* Why Choose Us Section */}
+        <WhyChooseUsSection />
 
         {/* Analytics Section */}
         <AnalyticsSection />
