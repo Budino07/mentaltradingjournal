@@ -2,6 +2,7 @@
 import React from "react";
 import { Users, DollarSign, BarChart3, Zap, MessageSquare, ArrowRightCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export interface WhyChooseUsSectionProps {
   badge?: string;
@@ -18,6 +19,12 @@ export const WhyChooseUsSection = ({
   description = "Empower your trading with a platform designed to help you analyze, track, and improve your performance. Our actionable insights guide you towards smarter decisions, making your growth our priority.",
   useDashboardCards = false
 }: WhyChooseUsSectionProps) => {
+  const navigate = useNavigate();
+  
+  const handleGetStarted = () => {
+    navigate("/login");
+  };
+
   const features = [
     {
       icon: Users,
@@ -106,7 +113,10 @@ export const WhyChooseUsSection = ({
                   <div className="flex-none">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-2xl font-bold text-white">{feature.title}</h3>
-                      <ArrowRightCircle className="h-5 w-5 text-primary-light" />
+                      <ArrowRightCircle 
+                        className="h-5 w-5 text-primary-light cursor-pointer hover:scale-110 transition-transform" 
+                        onClick={handleGetStarted}
+                      />
                     </div>
                     <p className="text-white/90 mb-6">{feature.description}</p>
                   </div>
