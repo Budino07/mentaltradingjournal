@@ -278,8 +278,13 @@ const Landing = () => {
         {/* Why Choose Us Section */}
         <WhyChooseUsSection />
         
-        {/* Duplicate Why Choose Us Section */}
-        <WhyChooseUsSection />
+        {/* Duplicate Why Choose Us Section with custom content */}
+        <WhyChooseUsSection 
+          badge="Community Favorites"
+          title="Discover"
+          titleHighlight="top features loved by our Traders"
+          description="Voted by our community, these tools are game-changers, you don't want to miss this."
+        />
 
         {/* Analytics Section */}
         <AnalyticsSection />

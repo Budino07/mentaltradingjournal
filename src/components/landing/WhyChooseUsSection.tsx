@@ -2,7 +2,19 @@
 import React from "react";
 import { Users, DollarSign, BarChart3, Zap, MessageSquare } from "lucide-react";
 
-export const WhyChooseUsSection = () => {
+export interface WhyChooseUsSectionProps {
+  badge?: string;
+  title?: string;
+  titleHighlight?: string;
+  description?: string;
+}
+
+export const WhyChooseUsSection = ({
+  badge = "Why Traders Choose Us",
+  title = "Empower Your",
+  titleHighlight = "Trading Journey",
+  description = "Empower your trading with a platform designed to help you analyze, track, and improve your performance. Our actionable insights guide you towards smarter decisions, making your growth our priority."
+}: WhyChooseUsSectionProps) => {
   const features = [
     {
       icon: Users,
@@ -42,17 +54,17 @@ export const WhyChooseUsSection = () => {
           {/* Left column - Title */}
           <div className="lg:w-1/2">
             <div className="inline-block px-4 py-1.5 mb-4 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 text-sm text-white/70">
-              Why Traders Choose Us
+              {badge}
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
-              Empower Your <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">Trading Journey</span>
+              {title} <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">{titleHighlight}</span>
             </h2>
           </div>
 
           {/* Right column - Description - MOVED HORIZONTALLY next to the heading instead of below it */}
           <div className="lg:w-1/2 lg:pt-14">
             <p className="text-base sm:text-lg text-gray-300 leading-relaxed">
-              Empower your trading with a platform designed to help you analyze, track, and improve your performance. Our actionable insights guide you towards smarter decisions, making your growth our priority.
+              {description}
             </p>
           </div>
         </div>
