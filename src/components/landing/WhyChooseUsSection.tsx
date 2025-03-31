@@ -7,12 +7,12 @@ export const WhyChooseUsSection = () => {
     {
       icon: Users,
       title: "Community-Driven Innovation",
-      description: "Our founders actively engage with traders, listen to feedback, and continuously add features that matter. If you've ever wished for a tool built by traders, for traders, this is it."
+      description: "We're in this together. Our founders listen, adapt, and build alongside you—because this journal is yours as much as ours."
     },
     {
       icon: DollarSign,
       title: "No Overpriced Extras",
-      description: "Stop overpaying for features you don't use. Mental is designed with only the essentials—everything you need, nothing you don't. Get the best value in the market: $9/month or $90/year—simple, transparent pricing."
+      description: "We focus on features that help you build an edge. Get the best value in the market: $9/month or $90/year —simple, transparent pricing."
     },
     {
       icon: BarChart3,
@@ -24,13 +24,13 @@ export const WhyChooseUsSection = () => {
   const additionalFeatures = [
     {
       icon: Zap,
-      title: "Comprehensive Analysis",
-      description: "Get a holistic view of your trading performance with our advanced analytics tools that combine technical and psychological data."
+      title: "Personalized Actionable Insights",
+      description: "Unlock real-time insights from our analytics that evolve as you trade, helping you make smarter decisions."
     },
     {
       icon: MessageSquare,
-      title: "Personalized Feedback",
-      description: "Experience tailored insights with our optimized analysis engine that helps you understand your trading behaviors and patterns."
+      title: "Accountability Made Easy",
+      description: "Our pre-session and post-session check-ins, you'll take control of your trading journey, stay accountable, and constantly improve—every step of the way."
     }
   ];
 
@@ -52,7 +52,7 @@ export const WhyChooseUsSection = () => {
           {/* Right column - Description - MOVED HORIZONTALLY next to the heading instead of below it */}
           <div className="lg:w-1/2 lg:pt-14">
             <p className="text-base sm:text-lg text-gray-300 leading-relaxed">
-              Try our platform to analyze your trades, track your progress, and make informed decisions with ease. We will keep suggesting areas you can improve.
+              Empower your trading with a platform designed to help you analyze, track, and improve your performance. Our actionable insights guide you towards smarter decisions, making your growth our priority.
             </p>
           </div>
         </div>
