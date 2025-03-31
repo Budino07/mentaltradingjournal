@@ -284,6 +284,7 @@ const Landing = () => {
           title="Discover"
           titleHighlight="top features loved by our Traders"
           description="Voted by our community, these tools are game-changers, you don't want to miss this."
+          useDashboardCards={true}
         />
 
         {/* Analytics Section */}

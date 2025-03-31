@@ -1,19 +1,22 @@
 
 import React from "react";
-import { Users, DollarSign, BarChart3, Zap, MessageSquare } from "lucide-react";
+import { Users, DollarSign, BarChart3, Zap, MessageSquare, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export interface WhyChooseUsSectionProps {
   badge?: string;
   title?: string;
   titleHighlight?: string;
   description?: string;
+  useDashboardCards?: boolean;
 }
 
 export const WhyChooseUsSection = ({
   badge = "Why Traders Choose Us",
   title = "Empower Your",
   titleHighlight = "Trading Journey",
-  description = "Empower your trading with a platform designed to help you analyze, track, and improve your performance. Our actionable insights guide you towards smarter decisions, making your growth our priority."
+  description = "Empower your trading with a platform designed to help you analyze, track, and improve your performance. Our actionable insights guide you towards smarter decisions, making your growth our priority.",
+  useDashboardCards = false
 }: WhyChooseUsSectionProps) => {
   const features = [
     {
@@ -46,6 +49,27 @@ export const WhyChooseUsSection = ({
     }
   ];
 
+  const dashboardFeatures = [
+    {
+      title: "Dive deeper into your strategy",
+      description: "Over 50+ reports to help you visualize your trading performance and understand your edge.",
+      color: "from-primary/80 to-primary",
+      image: "/lovable-uploads/c6cd3584-964a-48af-bbbb-ef7f945fbda6.png"
+    },
+    {
+      title: "Understand your trading behaviors",
+      description: "Gain key insights into your emotional states and how they affect your decision-making process.",
+      color: "from-accent/80 to-accent",
+      image: "/lovable-uploads/c6cd3584-964a-48af-bbbb-ef7f945fbda6.png"
+    },
+    {
+      title: "Get a summary of what's working for you",
+      description: "Curated summaries that highlight your strengths and areas for improvement as a trader.",
+      color: "from-secondary/80 to-secondary",
+      image: "/lovable-uploads/c6cd3584-964a-48af-bbbb-ef7f945fbda6.png"
+    }
+  ];
+
   return (
     <section className="py-24">
       {/* Remove background elements to blend seamlessly with previous section */}
@@ -69,45 +93,82 @@ export const WhyChooseUsSection = ({
           </div>
         </div>
 
-        {/* Main Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
-          {features.map((feature, index) => (
-            <div 
-              key={index}
-              className="relative p-6 rounded-lg border border-white/10 bg-[#1A1F2C]/60 backdrop-blur-md overflow-hidden group hover:border-primary/20 transition-all duration-300"
-            >
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="relative">
-                <div className="w-14 h-14 rounded-xl bg-[#1A1F2C]/80 flex items-center justify-center mb-5 border border-white/5 group-hover:border-primary/20 transition-colors duration-300">
-                  <feature.icon className="w-7 h-7 text-primary-light" />
+        {useDashboardCards ? (
+          // Dashboard-style preview cards
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
+            {dashboardFeatures.map((feature, index) => (
+              <div 
+                key={index}
+                className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${feature.color} hover:shadow-lg hover:scale-[1.01] transition-all duration-300`}
+              >
+                <div className="p-8 flex flex-col h-[450px]">
+                  <div className="flex-none">
+                    <h3 className="text-2xl font-bold text-white mb-3">{feature.title}</h3>
+                    <p className="text-white/90 mb-6">{feature.description}</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="bg-white/10 backdrop-blur text-white border-white/20 hover:bg-white/20 hover:text-white"
+                    >
+                      Explore <ArrowRight className="ml-1 h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="flex-grow flex items-end mt-auto">
+                    <div className="rounded-lg overflow-hidden w-full h-60 bg-black/20 backdrop-blur-sm shadow-lg border border-white/10">
+                      <img 
+                        src={feature.image} 
+                        alt={feature.title} 
+                        className="w-full h-full object-cover object-center"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                <p className="text-gray-300 leading-relaxed">{feature.description}</p>
               </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Main Features Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
+              {features.map((feature, index) => (
+                <div 
+                  key={index}
+                  className="relative p-6 rounded-lg border border-white/10 bg-[#1A1F2C]/60 backdrop-blur-md overflow-hidden group hover:border-primary/20 transition-all duration-300"
+                >
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="relative">
+                    <div className="w-14 h-14 rounded-xl bg-[#1A1F2C]/80 flex items-center justify-center mb-5 border border-white/5 group-hover:border-primary/20 transition-colors duration-300">
+                      <feature.icon className="w-7 h-7 text-primary-light" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+                    <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* Additional Features - Fixed alignment issue */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
-          {additionalFeatures.map((feature, index) => (
-            <div 
-              key={index}
-              className="relative p-6 rounded-lg border border-white/10 bg-[#1A1F2C]/60 backdrop-blur-md overflow-hidden group hover:border-primary/20 transition-all duration-300"
-            >
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="relative flex items-start">
-                <div className="w-14 h-14 flex-shrink-0 rounded-xl bg-[#1A1F2C]/80 flex items-center justify-center mr-5 border border-white/5 group-hover:border-primary/20 transition-colors duration-300">
-                  <feature.icon className="w-7 h-7 text-primary-light" />
+            {/* Additional Features - Fixed alignment issue */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+              {additionalFeatures.map((feature, index) => (
+                <div 
+                  key={index}
+                  className="relative p-6 rounded-lg border border-white/10 bg-[#1A1F2C]/60 backdrop-blur-md overflow-hidden group hover:border-primary/20 transition-all duration-300"
+                >
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="relative flex items-start">
+                    <div className="w-14 h-14 flex-shrink-0 rounded-xl bg-[#1A1F2C]/80 flex items-center justify-center mr-5 border border-white/5 group-hover:border-primary/20 transition-colors duration-300">
+                      <feature.icon className="w-7 h-7 text-primary-light" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+                      <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                  <p className="text-gray-300 leading-relaxed">{feature.description}</p>
-                </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        )}
       </div>
     </section>
   );
