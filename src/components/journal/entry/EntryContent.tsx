@@ -5,15 +5,17 @@ import { Button } from "@/components/ui/button";
 import { TradesList } from "./TradesList";
 import { TradingRules } from "./TradingRules";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp, ListChecks, NotebookPen, LineChart, ExternalLink, Pencil, Target } from "lucide-react";
+import { ChevronDown, ChevronUp, ListChecks, NotebookPen, LineChart, ExternalLink, Pencil, Target, AlertTriangle } from "lucide-react";
 import { Trade } from "@/types/trade";
 import { NoteEditDialog } from "./NoteEditDialog";
+import { TradingMistakes } from "./TradingMistakes";
 
 interface EntryContentProps {
   id: string;
   marketConditions?: string;
   notes: string;
   followedRules?: string[];
+  mistakes?: string[];
   trades?: Trade[];
   postSubmissionNotes?: string;
   preTradingActivities?: string[];
@@ -33,6 +35,7 @@ export const EntryContent = ({
   marketConditions,
   notes,
   followedRules,
+  mistakes,
   trades,
   postSubmissionNotes,
   preTradingActivities,
@@ -48,6 +51,7 @@ export const EntryContent = ({
 }: EntryContentProps) => {
   const [showNotes, setShowNotes] = useState(true);
   const [showRules, setShowRules] = useState(true);
+  const [showMistakes, setShowMistakes] = useState(true);
   const [localNotes, setLocalNotes] = useState(notes);
   const [localPostNotes, setLocalPostNotes] = useState(postSubmissionNotes);
   
@@ -254,6 +258,25 @@ export const EntryContent = ({
           </div>
           <CollapsibleContent>
             <TradingRules rules={followedRules} />
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+
+      {mistakes && mistakes.length > 0 && (
+        <Collapsible open={showMistakes} onOpenChange={setShowMistakes} className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-destructive" />
+              <h4 className="text-sm font-medium">Trading Mistakes</h4>
+            </div>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
+                {showMistakes ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent>
+            <TradingMistakes mistakes={mistakes} />
           </CollapsibleContent>
         </Collapsible>
       )}

@@ -22,6 +22,7 @@ interface JournalEntry {
   market_conditions?: string;
   trades?: Trade[];
   followed_rules?: string[];
+  mistakes?: string[];
   post_submission_notes?: string;
   pre_trading_activities?: string[];
   daily_goals?: string[];
@@ -111,6 +112,7 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
           marketConditions={entry.market_conditions}
           notes={entry.notes}
           followedRules={entry.followed_rules}
+          mistakes={entry.mistakes}
           trades={entry.trades}
           postSubmissionNotes={entry.post_submission_notes}
           preTradingActivities={entry.pre_trading_activities}

@@ -98,6 +98,17 @@ export const useJournalFormSubmission = ({
         });
         return;
       }
+      
+      // For loss outcome with negative emotion, validate mistakes are selected
+      if (selectedOutcome === "loss" && 
+          selectedEmotion.toLowerCase().includes("negative") && 
+          (!selectedMistakes || selectedMistakes.length === 0)) {
+        toast.error("Missing Information", {
+          description: "Please select which trading mistakes were made.",
+          duration: 5000,
+        });
+        return;
+      }
     }
 
     try {
@@ -158,6 +169,15 @@ export const useJournalFormSubmission = ({
           title: "Rule adherence is on point! 🎯",
           message: "Following your trading rules consistently is a strong indicator of professional trading behavior.",
           type: "success"
+        });
+      }
+      
+      // Add notification for loss with mistakes identified
+      if (sessionType === "post" && selectedOutcome === "loss" && selectedMistakes && selectedMistakes.length > 0) {
+        addNotification({
+          title: "Learning from mistakes 📝",
+          message: "Identifying your trading mistakes is crucial for growth. Review them carefully before your next session.",
+          type: "info"
         });
       }
       
