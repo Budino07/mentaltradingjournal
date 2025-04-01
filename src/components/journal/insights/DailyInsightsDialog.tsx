@@ -220,7 +220,7 @@ export const DailyInsightsDialog = ({
             {insights.map((insight, index) => (
               <div 
                 key={index} 
-                className="bg-gray-800 rounded-md p-3 flex gap-3 items-start"
+                className="bg-gray-800/80 rounded-md p-3 flex gap-3 items-start"
               >
                 <AlertCircle className="h-5 w-5 text-indigo-400 shrink-0 mt-0.5" />
                 <div>
