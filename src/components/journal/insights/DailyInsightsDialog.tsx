@@ -1,12 +1,12 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { AlertCircle, X, Sparkles } from "lucide-react";
+import { AlertCircle, Sparkles } from "lucide-react";
 import { formatCurrency } from "@/utils/analyticsUtils";
 import { format } from "date-fns";
 import { useMemo } from "react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { X } from "lucide-react";
 
 export type InsightMessage = {
   title: string;
@@ -180,7 +180,7 @@ export const DailyInsightsDialog = ({
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12 ring-2 ring-indigo-400 ring-offset-2 ring-offset-black/80">
                 <AvatarImage
-                  src="/lovable-uploads/509f1caf-5606-42ad-b81e-41a50d085eb2.png"
+                  src="/lovable-uploads/3de77a29-8ca1-4638-8f34-18f3ecc1a113.png"
                   alt="Logo"
                   className="object-cover"
                 />
