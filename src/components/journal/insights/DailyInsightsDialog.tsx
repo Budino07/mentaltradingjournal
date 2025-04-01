@@ -185,19 +185,14 @@ export const DailyInsightsDialog = ({
                   className="object-cover"
                 />
               </Avatar>
-              <div>
-                <DialogTitle className="text-xl font-bold bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent">
-                  Your Mental Insights
-                </DialogTitle>
-                <p className="text-xs text-gray-400">AI-powered analysis</p>
-              </div>
+              <DialogTitle className="text-xl font-bold bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent">
+                Your Mental Insights
+              </DialogTitle>
             </div>
-            <DialogClose asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-white/10 rounded-full">
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </Button>
-            </DialogClose>
+            <Button variant="ghost" className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-white/10 rounded-full" onClick={() => onOpenChange(false)}>
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </Button>
           </div>
           
           <div className="flex justify-between items-center text-sm mt-2 bg-gray-800/40 rounded-lg p-2">
