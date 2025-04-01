@@ -1,9 +1,8 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useAuth } from "./AuthContext";
-import { startOfDay, isSameDay, differenceInHours, format, differenceInDays, isWithinInterval, subDays } from "date-fns";
+import { startOfDay, isSameDay, differenceInHours, format, differenceInDays, isWithinInterval, subDays, endOfDay } from "date-fns";
 import { JournalEntryType } from "@/types/journal";
 
 export type Notification = {
@@ -304,6 +303,22 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
           title: reminderTitle,
           message: "Small habits lead to big wins. Don't forget to log your trade insights today! ✅",
           type: "info"
+        });
+      }
+    }
+
+    // Post-session reminder - Check if user has pre-session but no post-session today as evening approaches
+    const todayPreSessions = todayEntries.filter(entry => entry.session_type === 'pre');
+    const todayPostSessions = todayEntries.filter(entry => entry.session_type === 'post');
+    
+    // If we have a pre-session but no post-session, and it's after 7 PM but before midnight
+    if (todayPreSessions.length > 0 && todayPostSessions.length === 0 && currentHour >= 19 && currentHour < 24) {
+      const postSessionReminderTitle = "Complete your trading day with a post-session";
+      if (!hasSentTodayWithTitle(postSessionReminderTitle)) {
+        addNotification({
+          title: postSessionReminderTitle,
+          message: "You logged your pre-session today, don't forget to complete your post-session analysis before the day ends! 📝",
+          type: "warning"
         });
       }
     }
