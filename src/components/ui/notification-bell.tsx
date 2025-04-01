@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
+  const [hasOpened, setHasOpened] = useState(false);
   const { toast } = useToast();
   const { 
     notifications, 
@@ -29,6 +30,18 @@ export function NotificationBell() {
     markAllAsRead,
     clearAllNotifications
   } = useNotifications();
+
+  // Mark all notifications as read when popover is opened
+  useEffect(() => {
+    if (open && unreadCount > 0 && !hasOpened) {
+      markAllAsRead();
+      setHasOpened(true);
+    }
+    
+    if (!open) {
+      setHasOpened(false);
+    }
+  }, [open, unreadCount, markAllAsRead, hasOpened]);
 
   const handleNotificationClick = (notification: Notification) => {
     markAsRead(notification.id);
@@ -98,16 +111,6 @@ export function NotificationBell() {
         <div className="flex items-center justify-between p-3 border-b">
           <h3 className="font-medium">Notifications</h3>
           <div className="flex gap-2">
-            {unreadCount > 0 && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleMarkAllAsRead}
-                className="text-xs h-7"
-              >
-                Mark all as read
-              </Button>
-            )}
             {notifications.length > 0 && (
               <Button 
                 variant="ghost" 
