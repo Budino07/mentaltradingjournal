@@ -388,7 +388,11 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       const tradesByHour = allTrades.reduce((acc, trade) => {
         if (!trade.entryDate) return acc;
         
-        const hour = new Date(trade.entryDate).getHours();
+        // Convert the trade entry time to the user's timezone for accurate time analysis
+        const entryDate = new Date(trade.entryDate);
+        const userLocalTradeTime = new Date(entryDate.toLocaleString('en-US', { timeZone: userTimezone }));
+        const hour = userLocalTradeTime.getHours();
+        
         const hourRange = Math.floor(hour / 4) * 4; // Group in 4-hour blocks
         const hourRangeKey = `${hourRange}-${hourRange + 4}`;
         
@@ -422,10 +426,18 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       if (bestTime.time && bestTime.avgPnl > 0) {
         const timeInsightTitle = "Your best trading hours";
         if (!hasSentWithinDaysWithTitle(timeInsightTitle, 14)) {
-          // Format hours in 12-hour format for better readability
+          // Format hours in 12-hour format for better readability in the user's timezone
           const [startHour, endHour] = bestTime.time.split('-').map(Number);
-          const formattedStartTime = format(new Date().setHours(startHour, 0, 0, 0), 'h:00 a');
-          const formattedEndTime = format(new Date().setHours(endHour, 0, 0, 0), 'h:00 a');
+          
+          // Create a Date object in the user's timezone for formatting
+          const userLocalStartTime = new Date();
+          userLocalStartTime.setHours(startHour, 0, 0, 0);
+          
+          const userLocalEndTime = new Date();
+          userLocalEndTime.setHours(endHour, 0, 0, 0);
+          
+          const formattedStartTime = format(userLocalStartTime, 'h:00 a');
+          const formattedEndTime = format(userLocalEndTime, 'h:00 a');
           
           addNotification({
             title: timeInsightTitle,
