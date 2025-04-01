@@ -38,6 +38,7 @@ export const DailyInsightsDialog = ({
     commissions,
     profitFactor,
     insights,
+    emotionInsight,
   } = useMemo(() => {
     // If no trades, return default values
     if (!trades || trades.length === 0) {
@@ -52,6 +53,7 @@ export const DailyInsightsDialog = ({
         commissions: 0,
         profitFactor: 0,
         insights: [],
+        emotionInsight: null,
       };
     }
 
@@ -131,6 +133,30 @@ export const DailyInsightsDialog = ({
       });
     }
     
+    // Generate emotion insight based on performance
+    let emotionInsight: InsightMessage | null = null;
+    
+    // Determine emotional insight based on win rate and PnL
+    if (winners > losers && netPnL > 0) {
+      emotionInsight = {
+        title: "Positive emotional momentum",
+        message: `Your winning trades today (${winners} wins, ${winRate}% win rate) suggest you were trading with emotional clarity. This correlates with better decision making.`,
+        type: "success"
+      };
+    } else if (losers > winners) {
+      emotionInsight = {
+        title: "Emotional resilience needed",
+        message: `With ${losers} losing trades today, consider how emotions might have affected your decisions. Traders who maintain emotional balance recover faster from losses.`,
+        type: "warning"
+      };
+    } else if (netPnL < 0 && trades.length > 2) {
+      emotionInsight = {
+        title: "Potential emotional trading",
+        message: `Multiple trades with negative P&L ${formatCurrency(netPnL)} may indicate reactive trading. Historical data shows better results when trading with a calm mindset.`,
+        type: "warning"
+      };
+    }
+    
     return {
       totalTrades,
       winRate,
@@ -142,6 +168,7 @@ export const DailyInsightsDialog = ({
       commissions,
       profitFactor,
       insights,
+      emotionInsight,
     };
   }, [trades]);
 
@@ -153,7 +180,7 @@ export const DailyInsightsDialog = ({
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12 ring-2 ring-indigo-400 ring-offset-2 ring-offset-black/80">
                 <AvatarImage
-                  src="/lovable-uploads/3de77a29-8ca1-4638-8f34-18f3ecc1a113.png"
+                  src="/lovable-uploads/509f1caf-5606-42ad-b81e-41a50d085eb2.png"
                   alt="Logo"
                   className="object-cover"
                 />
@@ -250,12 +277,13 @@ export const DailyInsightsDialog = ({
           </div>
         </div>
         
-        {insights.length > 0 && (
+        {(insights.length > 0 || emotionInsight) && (
           <div className="space-y-3 mt-3">
             <div className="flex items-center gap-2 mb-1">
               <Sparkles className="h-4 w-4 text-indigo-300" />
               <h3 className="text-sm font-semibold text-indigo-300">Key Insights</h3>
             </div>
+            
             {insights.map((insight, index) => (
               <div 
                 key={index} 
@@ -268,19 +296,23 @@ export const DailyInsightsDialog = ({
                 </div>
               </div>
             ))}
+            
+            {emotionInsight && (
+              <div 
+                className="bg-gray-800/80 backdrop-blur-sm rounded-md p-3 flex gap-3 items-start border border-indigo-500/20 shadow-sm shadow-indigo-500/10"
+              >
+                <AlertCircle className="h-5 w-5 text-indigo-400 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-white">{emotionInsight.title}</h4>
+                  <p className="text-gray-300 text-sm mt-1">{emotionInsight.message}</p>
+                </div>
+              </div>
+            )}
           </div>
         )}
         
         <div className="text-xs text-gray-400 mt-2 italic px-2">
           You can see only daily aggregated insights here. To view detailed insights, go to the corresponding trade.
-        </div>
-        
-        <div className="flex justify-end mt-3">
-          <DialogClose asChild>
-            <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-none shadow-md shadow-indigo-500/20">
-              Close
-            </Button>
-          </DialogClose>
         </div>
       </DialogContent>
     </Dialog>
