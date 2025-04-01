@@ -7,6 +7,13 @@ import { calculateEmotionRecovery, calculateEmotionTrend } from "./analytics/emo
 import { calculateMistakeFrequencies } from "./analytics/mistakeAnalysis";
 import { analyzeTradeDurations } from "./analytics/tradeDurationAnalysis";
 
+export const formatCurrency = (amount: number): string => {
+  // Format with dollar sign and 2 decimal places
+  return amount >= 0 
+    ? `$${amount.toFixed(2)}`
+    : `-$${Math.abs(amount).toFixed(2)}`;
+};
+
 export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
   console.log('Fetching journal entries...');
 

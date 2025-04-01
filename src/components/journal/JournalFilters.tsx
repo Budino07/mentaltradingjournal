@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, LineChart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { TradeFormDialog } from "@/components/analytics/trade-form/TradeFormDialog";
@@ -8,10 +8,13 @@ import { Trade } from "@/types/trade";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { DailyInsightsDialog } from "./insights/DailyInsightsDialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const JournalFilters = () => {
   const navigate = useNavigate();
   const [isTradeFormOpen, setIsTradeFormOpen] = useState(false);
+  const [isInsightsOpen, setIsInsightsOpen] = useState(false);
   const { user } = useAuth();
 
   const handleTradeSubmit = async (tradeData: Trade, isEdit: boolean) => {
@@ -75,6 +78,27 @@ export const JournalFilters = () => {
         Post-Session
       </Button>
 
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsInsightsOpen(true)}
+              className="p-2 h-10 w-10"
+            >
+              <img
+                src="/lovable-uploads/6821d9c7-5948-4435-bdae-6e4fa72856ca.png"
+                alt="Zella Logo"
+                className="h-full w-full rounded-full"
+              />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Insights</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
       <TradeFormDialog
         open={isTradeFormOpen}
         onOpenChange={setIsTradeFormOpen}
@@ -82,6 +106,13 @@ export const JournalFilters = () => {
       >
         <></>
       </TradeFormDialog>
+
+      <DailyInsightsDialog
+        open={isInsightsOpen}
+        onOpenChange={setIsInsightsOpen}
+        date={new Date()}
+        trades={[]}
+      />
     </div>
   );
 };

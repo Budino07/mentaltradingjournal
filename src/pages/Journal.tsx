@@ -16,6 +16,7 @@ import { useLocation } from "react-router-dom";
 import { SubscriptionGuard } from "@/components/subscription/SubscriptionGuard";
 import { JournalTradesList } from "@/components/journal/TradesList";
 import { CalendarModeProvider } from "@/contexts/CalendarModeContext";
+import { DailyInsightsDialog } from "@/components/journal/insights/DailyInsightsDialog";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
@@ -23,6 +24,7 @@ const Journal = () => {
   const location = useLocation();
   const locationState = location.state as { selectedDate?: Date } | undefined;
   const [searchQuery, setSearchQuery] = useState("");
+  const [isInsightsOpen, setIsInsightsOpen] = useState(false);
   
   const {
     selectedDate,
@@ -52,12 +54,18 @@ const Journal = () => {
       }, 100);
     };
 
+    const handleInsightsOpen = (event: CustomEvent) => {
+      setIsInsightsOpen(true);
+    };
+
     window.addEventListener('journal-search', handleSearch as EventListener);
     window.addEventListener('journal-date-select', handleDateSelect as EventListener);
+    window.addEventListener('journal-insights-open', handleInsightsOpen as EventListener);
     
     return () => {
       window.removeEventListener('journal-search', handleSearch as EventListener);
       window.removeEventListener('journal-date-select', handleDateSelect as EventListener);
+      window.removeEventListener('journal-insights-open', handleInsightsOpen as EventListener);
     };
   }, [setSelectedDate]);
 
@@ -191,12 +199,26 @@ const Journal = () => {
     displayedEntries = searchFilteredEntries(displayedEntries);
   }
 
+  // Collect all trades for the selected date
+  const selectedDateTrades = selectedDate
+    ? entries
+        .filter(entry => {
+          const entryDate = new Date(entry.created_at);
+          return entryDate >= startOfDay(selectedDate) && 
+                entryDate <= endOfDay(selectedDate);
+        })
+        .flatMap(entry => entry.trades || [])
+    : [];
+
   const calendarEntries = entries.map(entry => ({
     date: new Date(entry.created_at),
     emotion: entry.emotion,
     trades: entry.trades || [],
     session_type: entry.session_type
   }));
+
+  // Ensure the searchFilteredEntries function exists
+  
 
   return (
     <AppLayout>
@@ -220,45 +242,52 @@ const Journal = () => {
               />
 
               <Card id="journal-entries" className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-                  {searchQuery 
-                    ? `Search Results for "${searchQuery}"`
-                    : selectedDate 
-                      ? `Journal Entries for ${selectedDate.toLocaleDateString('en-US', { 
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}`
-                      : 'Journal Entries'
-                  }
-                </h2>
-                <JournalFilters />
-              </div>
-              
-              <ScrollArea className="h-[600px] pr-4">
-                {displayedEntries.length > 0 ? (
-                  <div className="space-y-4">
-                    {displayedEntries.map((entry) => (
-                      <JournalEntry key={entry.id} entry={entry} />
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground text-center py-8">
-                    {searchQuery
-                      ? `No entries found for "${searchQuery}"`
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
+                    {searchQuery 
+                      ? `Search Results for "${searchQuery}"`
                       : selectedDate 
-                        ? `No entries found for ${selectedDate.toLocaleDateString()}`
-                        : 'No entries found for the selected filters'
+                        ? `Journal Entries for ${selectedDate.toLocaleDateString('en-US', { 
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}`
+                        : 'Journal Entries'
+                    }
+                  </h2>
+                  <JournalFilters />
+                </div>
+                
+                <ScrollArea className="h-[600px] pr-4">
+                  {displayedEntries.length > 0 ? (
+                    <div className="space-y-4">
+                      {displayedEntries.map((entry) => (
+                        <JournalEntry key={entry.id} entry={entry} />
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground text-center py-8">
+                      {searchQuery
+                        ? `No entries found for "${searchQuery}"`
+                        : selectedDate 
+                          ? `No entries found for ${selectedDate.toLocaleDateString()}`
+                          : 'No entries found for the selected filters'
                     }
                   </p>
-                )}
-              </ScrollArea>
-            </Card>
-              
+                  )}
+                </ScrollArea>
+              </Card>
+                
               <JournalTradesList />
             </div>
+
+            <DailyInsightsDialog
+              open={isInsightsOpen}
+              onOpenChange={setIsInsightsOpen}
+              date={selectedDate || new Date()}
+              trades={selectedDateTrades}
+            />
           </CalendarModeProvider>
         </TimeFilterProvider>
       </SubscriptionGuard>
