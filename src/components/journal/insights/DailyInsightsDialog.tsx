@@ -33,7 +33,7 @@ export const DailyInsightsDialog = ({
     losers,
     netPnL,
     grossPnL,
-    volume,
+    lots,
     commissions,
     profitFactor,
     insights,
@@ -47,7 +47,7 @@ export const DailyInsightsDialog = ({
         losers: 0,
         netPnL: 0,
         grossPnL: 0,
-        volume: 0,
+        lots: 0,
         commissions: 0,
         profitFactor: 0,
         insights: [],
@@ -67,6 +67,11 @@ export const DailyInsightsDialog = ({
     // Calculate PnL values
     const grossPnL = trades.reduce((sum, trade) => {
       return sum + Number(trade.pnl || 0);
+    }, 0);
+    
+    // Calculate total lots (quantity)
+    const lots = trades.reduce((sum, trade) => {
+      return sum + Number(trade.quantity || 0);
     }, 0);
     
     // Estimate commissions as 0.1% of volume or use actual fees if available
@@ -99,11 +104,11 @@ export const DailyInsightsDialog = ({
     const insights: InsightMessage[] = [];
     
     // Check for unusual number of trades
-    const avgDailyTrades = 3; // This would ideally come from historical data
+    const avgDailyTrades = 1; // This would ideally come from historical data
     if (totalTrades > avgDailyTrades * 1.5) {
       insights.push({
         title: "Unusual number of trades",
-        message: `We noticed you had ${totalTrades} trades today and you usually average have ${Math.round(avgDailyTrades)} trades when you trade.`,
+        message: `We noticed you had ${totalTrades} trades today and you usually average have ${Math.round(avgDailyTrades)} trades when you have a Green Day.`,
         type: "warning",
       });
     }
@@ -117,7 +122,7 @@ export const DailyInsightsDialog = ({
       return runningPnL > max ? runningPnL : max;
     }, 0);
     
-    if (maxPnL > 0 && netPnL < 0 && maxPnL - netPnL > 10) {
+    if (maxPnL > 0 && netPnL < maxPnL && maxPnL - netPnL > 10) {
       insights.push({
         title: "Giving away profits",
         message: `You aren't maximizing your profits for the day. At one point you were up ${formatCurrency(maxPnL)} however closed at ${formatCurrency(netPnL)}, giving away profits.`,
@@ -132,7 +137,7 @@ export const DailyInsightsDialog = ({
       losers,
       netPnL,
       grossPnL,
-      volume,
+      lots,
       commissions,
       profitFactor,
       insights,
@@ -151,7 +156,7 @@ export const DailyInsightsDialog = ({
                 className="w-12 h-12 rounded-full"
               />
               <DialogTitle className="text-xl font-semibold text-white">
-                Your daily Zella Insights
+                Your Mental Insights
               </DialogTitle>
             </div>
             <DialogClose asChild>
@@ -187,8 +192,8 @@ export const DailyInsightsDialog = ({
             <span className="font-medium">{winRate}%</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">Volume</span>
-            <span className="font-medium">{Math.round(volume)}</span>
+            <span className="text-gray-400">Lots</span>
+            <span className="font-medium">{Math.round(lots)}</span>
           </div>
           
           <div className="flex justify-between">
