@@ -96,8 +96,8 @@ export const JournalFilters = () => {
             >
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <img
-                src="/lovable-uploads/6821d9c7-5948-4435-bdae-6e4fa72856ca.png"
-                alt="Zella Logo"
+                src="/lovable-uploads/3de77a29-8ca1-4638-8f34-18f3ecc1a113.png"
+                alt="Brain Logo"
                 className="h-full w-full rounded-full object-cover"
               />
             </Button>

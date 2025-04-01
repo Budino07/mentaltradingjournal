@@ -153,7 +153,7 @@ export const DailyInsightsDialog = ({
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12 ring-2 ring-indigo-400 ring-offset-2 ring-offset-black/80">
                 <AvatarImage
-                  src="/lovable-uploads/6821d9c7-5948-4435-bdae-6e4fa72856ca.png"
+                  src="/lovable-uploads/3de77a29-8ca1-4638-8f34-18f3ecc1a113.png"
                   alt="Logo"
                   className="object-cover"
                 />
