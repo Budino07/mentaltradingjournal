@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -266,7 +265,7 @@ export const EntryContent = ({
         <Collapsible open={showMistakes} onOpenChange={setShowMistakes} className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-destructive" />
+              <AlertTriangle className="w-4 h-4 text-red-500" />
               <h4 className="text-sm font-medium">Trading Mistakes</h4>
             </div>
             <CollapsibleTrigger asChild>
