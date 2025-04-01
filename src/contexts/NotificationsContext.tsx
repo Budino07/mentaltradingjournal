@@ -414,9 +414,14 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       if (bestTime.time && bestTime.avgPnl > 0) {
         const timeInsightTitle = "Your best trading hours";
         if (!hasSentWithinDaysWithTitle(timeInsightTitle, 14)) {
+          // Format hours in 12-hour format for better readability
+          const [startHour, endHour] = bestTime.time.split('-').map(Number);
+          const formattedStartTime = format(new Date().setHours(startHour, 0, 0, 0), 'h:00 a');
+          const formattedEndTime = format(new Date().setHours(endHour, 0, 0, 0), 'h:00 a');
+          
           addNotification({
             title: timeInsightTitle,
-            message: `Your win rate improves when you trade between ${bestTime.time}h. Keep an eye on your best hours. ⏳`,
+            message: `Your win rate improves when you trade between ${formattedStartTime} and ${formattedEndTime}. Keep an eye on your best hours. ⏳`,
             type: "info"
           });
         }
