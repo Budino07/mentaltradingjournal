@@ -1,3 +1,4 @@
+
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,6 +11,8 @@ import { Trade } from "@/types/trade";
 import { WeeklyPerformance } from "./WeeklyPerformance";
 import { CalendarModeToggle } from "./calendar/CalendarModeToggle";
 import { CalendarModeProvider } from "@/contexts/CalendarModeContext";
+import { useTimeFilter } from "@/contexts/TimeFilterContext";
+import { startOfMonth, endOfMonth, format } from "date-fns";
 
 interface JournalCalendarProps {
   date: Date | undefined;
@@ -25,10 +28,32 @@ interface JournalCalendarProps {
 export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendarProps) => {
   const queryClient = useQueryClient();
   const [currentMonth, setCurrentMonth] = useState<Date>(date || new Date());
+  const { setTimeFilter } = useTimeFilter();
 
   // Update current month when calendar month changes
   const handleMonthChange = (month: Date) => {
     setCurrentMonth(month);
+    
+    // Create a custom month filter based on the selected month
+    const monthKey = format(month, 'yyyy-MM');
+    const isCurrentMonth = format(new Date(), 'yyyy-MM') === monthKey;
+    
+    // If it's the current month, use "this-month", otherwise create a custom filter
+    if (isCurrentMonth) {
+      setTimeFilter("this-month");
+    } else {
+      // Dispatch a custom event to update the time filter with the selected month's range
+      const customTimeFilterEvent = new CustomEvent('custom-time-filter', {
+        detail: {
+          start: startOfMonth(month),
+          end: endOfMonth(month),
+          label: format(month, 'MMMM yyyy')
+        }
+      });
+      window.dispatchEvent(customTimeFilterEvent);
+    }
+    
+    console.log(`Month changed to: ${format(month, 'MMMM yyyy')}`);
   };
 
   // Subscribe to real-time updates

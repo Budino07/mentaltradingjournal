@@ -76,7 +76,7 @@ export const StatsHeader = () => {
   });
 
   const { stats } = useProgressTracking();
-  const { timeFilter, setTimeFilter } = useTimeFilter();
+  const { timeFilter, setTimeFilter, customDateRange } = useTimeFilter();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -140,6 +140,13 @@ export const StatsHeader = () => {
   };
 
   const getTimeInterval = () => {
+    if (timeFilter === 'custom' && customDateRange) {
+      return {
+        start: customDateRange.start || new Date(),
+        end: customDateRange.end || new Date()
+      };
+    }
+    
     const now = new Date();
     if (!timeFilter) {
       // If no filter is selected, default to current month
@@ -411,6 +418,16 @@ export const StatsHeader = () => {
         >
           Eternal
         </Button>
+        
+        {timeFilter === 'custom' && customDateRange && (
+          <Button 
+            variant="default"
+            className="bg-primary/90"
+            disabled={!hasEntries}
+          >
+            {customDateRange.label}
+          </Button>
+        )}
         
         <div className="relative ml-2">
           {isSearching ? (
