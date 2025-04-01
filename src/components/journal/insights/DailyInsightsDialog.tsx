@@ -1,4 +1,5 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { AlertCircle, Sparkles } from "lucide-react";
@@ -174,7 +175,7 @@ export const DailyInsightsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-gradient-to-br from-black/95 to-gray-900/95 border border-indigo-500/30 text-white shadow-xl shadow-indigo-500/20 rounded-xl">
+      <DialogContent className="sm:max-w-md bg-gradient-to-br from-black/95 to-gray-900/95 border border-indigo-500/30 text-white shadow-xl shadow-indigo-500/20 rounded-xl" hideCloseButton>
         <DialogHeader className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
