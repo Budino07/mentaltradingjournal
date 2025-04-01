@@ -2,10 +2,11 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { AlertCircle, X } from "lucide-react";
+import { AlertCircle, X, Sparkles } from "lucide-react";
 import { formatCurrency } from "@/utils/analyticsUtils";
 import { format } from "date-fns";
 import { useMemo } from "react";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 
 export type InsightMessage = {
   title: string;
@@ -146,81 +147,119 @@ export const DailyInsightsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-black/95 border-gray-800 text-white">
+      <DialogContent className="sm:max-w-md bg-gradient-to-br from-black/95 to-gray-900/95 border border-indigo-500/30 text-white shadow-xl shadow-indigo-500/20 rounded-xl">
         <DialogHeader className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img
-                src="/lovable-uploads/6821d9c7-5948-4435-bdae-6e4fa72856ca.png"
-                alt="Logo"
-                className="w-12 h-12 rounded-full"
-              />
-              <DialogTitle className="text-xl font-semibold text-white">
-                Your Mental Insights
-              </DialogTitle>
+              <Avatar className="h-12 w-12 ring-2 ring-indigo-400 ring-offset-2 ring-offset-black/80">
+                <AvatarImage
+                  src="/lovable-uploads/6821d9c7-5948-4435-bdae-6e4fa72856ca.png"
+                  alt="Logo"
+                  className="object-cover"
+                />
+              </Avatar>
+              <div>
+                <DialogTitle className="text-xl font-bold bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent">
+                  Your Mental Insights
+                </DialogTitle>
+                <p className="text-xs text-gray-400">AI-powered analysis</p>
+              </div>
             </div>
             <DialogClose asChild>
-              <Button variant="ghost" className="h-6 w-6 p-0 text-gray-400 hover:text-white">
+              <Button variant="ghost" className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-white/10 rounded-full">
                 <X className="h-4 w-4" />
                 <span className="sr-only">Close</span>
               </Button>
             </DialogClose>
           </div>
           
-          <div className="flex justify-between text-sm">
-            <div className="text-gray-300">{format(date, 'EEE, MMM d, yyyy')}</div>
-            <div className={netPnL >= 0 ? "text-green-500" : "text-red-500"}>
+          <div className="flex justify-between items-center text-sm mt-2 bg-gray-800/40 rounded-lg p-2">
+            <div className="text-gray-300 flex items-center">
+              <span className="inline-block bg-indigo-500/20 p-1 rounded mr-2">
+                {format(date, 'EEE')}
+              </span>
+              {format(date, 'MMM d, yyyy')}
+            </div>
+            <div className={`${netPnL >= 0 ? "text-green-400" : "text-red-400"} font-semibold`}>
               Net P&L {formatCurrency(netPnL)}
             </div>
           </div>
         </DialogHeader>
         
-        <div className="grid grid-cols-2 gap-y-2 gap-x-8 text-sm py-2">
-          <div className="flex justify-between">
-            <span className="text-gray-400">Total Trades</span>
-            <span className="font-medium">{totalTrades}</span>
+        <div className="grid grid-cols-2 gap-y-3 gap-x-8 text-sm py-3 px-1 bg-gray-800/20 rounded-lg mt-2">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400 flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-indigo-400"></span>
+              Total Trades
+            </span>
+            <span className="font-medium bg-gray-800 px-2 py-0.5 rounded">{totalTrades}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-400">Gross P&L</span>
-            <span className={grossPnL >= 0 ? "text-green-500" : "text-red-500"}>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400 flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-indigo-400"></span>
+              Gross P&L
+            </span>
+            <span className={`font-medium ${grossPnL >= 0 ? "text-green-400" : "text-red-400"} bg-gray-800 px-2 py-0.5 rounded`}>
               {formatCurrency(grossPnL)}
             </span>
           </div>
           
-          <div className="flex justify-between">
-            <span className="text-gray-400">Winrate</span>
-            <span className="font-medium">{winRate}%</span>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400 flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-indigo-400"></span>
+              Winrate
+            </span>
+            <span className="font-medium bg-gray-800 px-2 py-0.5 rounded">{winRate}%</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-400">Lots</span>
-            <span className="font-medium">{Math.round(lots)}</span>
-          </div>
-          
-          <div className="flex justify-between">
-            <span className="text-gray-400">Winners</span>
-            <span className="font-medium">{winners}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-400">Commissions</span>
-            <span className="font-medium">${commissions.toFixed(2)}</span>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400 flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-indigo-400"></span>
+              Lots
+            </span>
+            <span className="font-medium bg-gray-800 px-2 py-0.5 rounded">{Math.round(lots)}</span>
           </div>
           
-          <div className="flex justify-between">
-            <span className="text-gray-400">Losers</span>
-            <span className="font-medium">{losers}</span>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400 flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-indigo-400"></span>
+              Winners
+            </span>
+            <span className="font-medium bg-gray-800 px-2 py-0.5 rounded">{winners}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-400">Profit Factor</span>
-            <span className="font-medium">{profitFactor}</span>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400 flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-indigo-400"></span>
+              Commissions
+            </span>
+            <span className="font-medium bg-gray-800 px-2 py-0.5 rounded">${commissions.toFixed(2)}</span>
+          </div>
+          
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400 flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-indigo-400"></span>
+              Losers
+            </span>
+            <span className="font-medium bg-gray-800 px-2 py-0.5 rounded">{losers}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400 flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-indigo-400"></span>
+              Profit Factor
+            </span>
+            <span className="font-medium bg-gray-800 px-2 py-0.5 rounded">{profitFactor}</span>
           </div>
         </div>
         
         {insights.length > 0 && (
-          <div className="space-y-3 mt-2">
+          <div className="space-y-3 mt-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Sparkles className="h-4 w-4 text-indigo-300" />
+              <h3 className="text-sm font-semibold text-indigo-300">Key Insights</h3>
+            </div>
             {insights.map((insight, index) => (
               <div 
                 key={index} 
-                className="bg-gray-800/80 rounded-md p-3 flex gap-3 items-start"
+                className="bg-gray-800/80 backdrop-blur-sm rounded-md p-3 flex gap-3 items-start border border-indigo-500/20 shadow-sm shadow-indigo-500/10"
               >
                 <AlertCircle className="h-5 w-5 text-indigo-400 shrink-0 mt-0.5" />
                 <div>
@@ -232,13 +271,13 @@ export const DailyInsightsDialog = ({
           </div>
         )}
         
-        <div className="text-xs text-gray-500 mt-3">
+        <div className="text-xs text-gray-400 mt-2 italic px-2">
           You can see only daily aggregated insights here. To view detailed insights, go to the corresponding trade.
         </div>
         
-        <div className="flex justify-end mt-4">
+        <div className="flex justify-end mt-3">
           <DialogClose asChild>
-            <Button className="bg-indigo-600 hover:bg-indigo-700 text-white">
+            <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-none shadow-md shadow-indigo-500/20">
               Close
             </Button>
           </DialogClose>

@@ -92,17 +92,18 @@ export const JournalFilters = () => {
             <Button 
               variant="outline" 
               onClick={handleOpenInsights}
-              className="p-2 h-10 w-10"
+              className="p-1.5 h-10 w-10 relative group overflow-hidden"
             >
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <img
                 src="/lovable-uploads/6821d9c7-5948-4435-bdae-6e4fa72856ca.png"
                 alt="Zella Logo"
-                className="h-full w-full rounded-full"
+                className="h-full w-full rounded-full object-cover"
               />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>
-            <p>Insights</p>
+          <TooltipContent className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-none">
+            <p>Mental Insights</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
