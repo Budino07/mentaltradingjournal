@@ -2,7 +2,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { AlertCircle, X, Sparkles } from "lucide-react";
+import { AlertCircle, X, Sparkles, BarChart } from "lucide-react";
 import { formatCurrency } from "@/utils/analyticsUtils";
 import { format } from "date-fns";
 import { useMemo } from "react";
@@ -38,6 +38,7 @@ export const DailyInsightsDialog = ({
     commissions,
     profitFactor,
     insights,
+    emotionCorrelation
   } = useMemo(() => {
     // If no trades, return default values
     if (!trades || trades.length === 0) {
@@ -52,6 +53,7 @@ export const DailyInsightsDialog = ({
         commissions: 0,
         profitFactor: 0,
         insights: [],
+        emotionCorrelation: null
       };
     }
 
@@ -131,6 +133,50 @@ export const DailyInsightsDialog = ({
       });
     }
     
+    // Add emotional correlation analysis
+    let emotionCorrelation = null;
+    
+    // Check if we have emotion data for the trades
+    if (trades.some(trade => trade.emotion)) {
+      const emotionPerformance = {
+        positive: { count: 0, pnl: 0 },
+        neutral: { count: 0, pnl: 0 },
+        negative: { count: 0, pnl: 0 }
+      };
+      
+      trades.forEach(trade => {
+        if (trade.emotion && trade.pnl) {
+          const pnl = Number(trade.pnl || 0);
+          emotionPerformance[trade.emotion].count++;
+          emotionPerformance[trade.emotion].pnl += pnl;
+        }
+      });
+      
+      // Find best performing emotion
+      const emotions = Object.entries(emotionPerformance)
+        .filter(([_, stats]) => stats.count > 0)
+        .sort(([_, statsA], [__, statsB]) => (statsB.pnl / statsB.count) - (statsA.pnl / statsA.count));
+      
+      if (emotions.length > 0) {
+        const [bestEmotion, bestStats] = emotions[0];
+        const avgPnl = bestStats.pnl / bestStats.count;
+        
+        if (bestStats.count >= 2) {  // Only include if we have enough data
+          emotionCorrelation = {
+            emotion: bestEmotion,
+            avgPnl: avgPnl,
+            count: bestStats.count
+          };
+          
+          insights.push({
+            title: "Emotional trading pattern detected",
+            message: `You perform best when trading in a ${bestEmotion} emotional state, averaging ${formatCurrency(avgPnl)} per trade.`,
+            type: "info",
+          });
+        }
+      }
+    }
+    
     return {
       totalTrades,
       winRate,
@@ -142,6 +188,7 @@ export const DailyInsightsDialog = ({
       commissions,
       profitFactor,
       insights,
+      emotionCorrelation
     };
   }, [trades]);
 
@@ -250,12 +297,26 @@ export const DailyInsightsDialog = ({
           </div>
         </div>
         
-        {insights.length > 0 && (
+        {(insights.length > 0 || emotionCorrelation) && (
           <div className="space-y-3 mt-3">
             <div className="flex items-center gap-2 mb-1">
               <Sparkles className="h-4 w-4 text-indigo-300" />
               <h3 className="text-sm font-semibold text-indigo-300">Key Insights</h3>
             </div>
+            {emotionCorrelation && (
+              <div 
+                className="bg-gray-800/80 backdrop-blur-sm rounded-md p-3 flex gap-3 items-start border border-indigo-500/20 shadow-sm shadow-indigo-500/10"
+              >
+                <BarChart className="h-5 w-5 text-indigo-400 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-white">Emotion-Performance Correlation</h4>
+                  <p className="text-gray-300 text-sm mt-1">
+                    Your {emotionCorrelation.emotion} emotional state correlates with better trading outcomes 
+                    (avg. {formatCurrency(emotionCorrelation.avgPnl)} per trade).
+                  </p>
+                </div>
+              </div>
+            )}
             {insights.map((insight, index) => (
               <div 
                 key={index} 
@@ -274,15 +335,8 @@ export const DailyInsightsDialog = ({
         <div className="text-xs text-gray-400 mt-2 italic px-2">
           You can see only daily aggregated insights here. To view detailed insights, go to the corresponding trade.
         </div>
-        
-        <div className="flex justify-end mt-3">
-          <DialogClose asChild>
-            <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-none shadow-md shadow-indigo-500/20">
-              Close
-            </Button>
-          </DialogClose>
-        </div>
       </DialogContent>
     </Dialog>
   );
 };
+
