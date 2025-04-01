@@ -17,9 +17,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useToast } from "@/hooks/use-toast";
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
+  const { toast } = useToast();
   const { 
     notifications, 
     unreadCount, 
@@ -28,8 +30,15 @@ export function NotificationBell() {
     clearAllNotifications
   } = useNotifications();
 
-  const handleNotificationClick = (id: string) => {
-    markAsRead(id);
+  const handleNotificationClick = (notification: Notification) => {
+    markAsRead(notification.id);
+    
+    // Display a toast with the notification content for better visibility
+    toast({
+      title: notification.title,
+      description: notification.message,
+      variant: notification.type === "error" ? "destructive" : "default",
+    });
   };
   
   const handleMarkAllAsRead = () => {
@@ -129,7 +138,7 @@ export function NotificationBell() {
                     "py-2 px-3 hover:bg-muted/50 cursor-pointer transition-colors",
                     !notification.read && "bg-muted/20"
                   )}
-                  onClick={() => handleNotificationClick(notification.id)}
+                  onClick={() => handleNotificationClick(notification)}
                 >
                   <div className="flex items-start gap-2">
                     <div className="mt-1">{getNotificationIcon(notification.type)}</div>

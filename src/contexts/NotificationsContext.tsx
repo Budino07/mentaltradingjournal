@@ -3,6 +3,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useAuth } from "./AuthContext";
+import { startOfDay, isSameDay, differenceInHours, format, differenceInDays, isWithinInterval, subDays } from "date-fns";
+import { JournalEntryType } from "@/types/journal";
 
 export type Notification = {
   id: string;
@@ -78,6 +80,24 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     setNotifications([]);
   };
 
+  // Helper function to check if a notification was sent today with the given title
+  const hasSentTodayWithTitle = (title: string) => {
+    const today = startOfDay(new Date());
+    return notifications.some(notification => 
+      notification.title === title && 
+      isSameDay(new Date(notification.createdAt), today)
+    );
+  };
+
+  // Helper function to check if a notification was sent within the specified days with the given title
+  const hasSentWithinDaysWithTitle = (title: string, days: number) => {
+    const cutoffDate = subDays(new Date(), days);
+    return notifications.some(notification => 
+      notification.title === title && 
+      new Date(notification.createdAt) >= cutoffDate
+    );
+  };
+
   // Load notifications from localStorage on mount
   useEffect(() => {
     if (!user) return;
@@ -113,6 +133,8 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       (entry.trades || []).map(trade => ({
         ...trade,
         entryDate: trade.entryDate || '',
+        pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : (trade.pnl || 0),
+        entry: entry,
       }))
     );
 
@@ -137,13 +159,10 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     
     const avgTradesPerDay = days > 0 ? Math.round(totalTrades / days) : 0;
     
-    // Check if today's trades exceed average
+    // Check if today's trades exceed average (Overtrading notification)
     if (todayTrades.length > avgTradesPerDay && avgTradesPerDay > 0) {
       // Check if we've already notified about this today
-      const alreadyNotified = notifications.some(notification => 
-        notification.title === "Trading Frequency Alert" && 
-        new Date(notification.createdAt).toISOString().split('T')[0] === today
-      );
+      const alreadyNotified = hasSentTodayWithTitle("Trading Frequency Alert");
 
       if (!alreadyNotified) {
         addNotification({
@@ -153,6 +172,242 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
         });
       }
     }
+
+    // 🔥 Performance-Based Notifications - Winning streak (sent once per streak)
+    if (allTrades.length >= 3) {
+      const sortedTrades = [...allTrades].sort((a, b) => {
+        const dateA = a.entryDate ? new Date(a.entryDate).getTime() : 0;
+        const dateB = b.entryDate ? new Date(b.entryDate).getTime() : 0;
+        return dateB - dateA; // Sort by date descending (newest first)
+      });
+
+      // Check for 3+ consecutive profitable trades
+      const lastThreeTrades = sortedTrades.slice(0, 3);
+      const allProfitable = lastThreeTrades.every(trade => trade.pnl > 0);
+      
+      if (allProfitable && lastThreeTrades.length === 3) {
+        const streakTitle = "You're on fire! 🔥";
+        // Only send once per streak
+        const alreadyNotified = hasSentWithinDaysWithTitle(streakTitle, 1);
+        
+        if (!alreadyNotified) {
+          addNotification({
+            title: streakTitle,
+            message: `You've had ${lastThreeTrades.length} profitable trades in a row! Keep up the great work.`,
+            type: "success"
+          });
+        }
+      }
+    }
+
+    // Journal entries with emotions
+    const entriesWithEmotions = analyticsData.journalEntries.filter(entry => 
+      entry.emotion && (entry.session_type === 'pre' || entry.session_type === 'post')
+    );
+
+    // Check for consistent emotions and successful trades
+    if (entriesWithEmotions.length > 5) {
+      const recentEntries = entriesWithEmotions
+        .slice(0, 5)
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      
+      const consistentPositiveEmotions = recentEntries.filter(entry => 
+        entry.emotion?.toLowerCase().includes('positive')
+      ).length >= 3;
+      
+      const hasSuccessfulTrades = allTrades
+        .filter(trade => trade.pnl > 0 && trade.entryDate && 
+          new Date(trade.entryDate) >= subDays(new Date(), 7)
+        ).length >= 2;
+      
+      if (consistentPositiveEmotions && hasSuccessfulTrades) {
+        const emotionTitle = "You're in the zone! 🚀";
+        if (!hasSentWithinDaysWithTitle(emotionTitle, 3)) {
+          addNotification({
+            title: emotionTitle,
+            message: "Keep that mindset strong. Your positive emotions are correlated with successful trades!",
+            type: "success"
+          });
+        }
+      }
+    }
+
+    // Check for well-executed trades (based on followed rules)
+    const wellExecutedEntries = analyticsData.journalEntries
+      .filter(entry => entry.session_type === 'post' && entry.followed_rules && entry.followed_rules.length > 2)
+      .slice(0, 5);
+    
+    if (wellExecutedEntries.length >= 3) {
+      const momentumTitle = "Momentum is on your side!";
+      if (!hasSentWithinDaysWithTitle(momentumTitle, 5)) {
+        addNotification({
+          title: momentumTitle,
+          message: "Trust your system! You've been consistently following your trading rules.",
+          type: "success"
+        });
+      }
+    }
+
+    // Milestone notification for journaling streak
+    if (analyticsData?.dataRequirements?.journalStreak >= 10) {
+      const milestoneTitle = "You've reached a new milestone! 🎉";
+      if (!hasSentWithinDaysWithTitle(milestoneTitle, 10)) {
+        addNotification({
+          title: milestoneTitle,
+          message: `You've maintained a ${analyticsData.dataRequirements.journalStreak}-day journaling streak! Your consistency is impressive.`,
+          type: "success"
+        });
+      }
+    }
+
+    // 🧠 Mindset-Based Notifications - Check morning entries
+    const todayEntries = analyticsData.journalEntries.filter(entry => 
+      isSameDay(new Date(entry.created_at), new Date())
+    );
+    
+    const morningEntry = todayEntries.find(entry => 
+      entry.session_type === 'pre' && new Date(entry.created_at).getHours() < 12
+    );
+    
+    if (morningEntry && morningEntry.emotion) {
+      const mindsetTitle = `Your morning check-in: ${morningEntry.emotion}`;
+      
+      if (morningEntry.emotion.toLowerCase().includes('positive') && !hasSentTodayWithTitle(mindsetTitle)) {
+        addNotification({
+          title: mindsetTitle,
+          message: "You're in a great headspace. Ready for some homerun trades! ⚡",
+          type: "info"
+        });
+      } else if (morningEntry.emotion.toLowerCase().includes('neutral') && !hasSentTodayWithTitle(mindsetTitle)) {
+        addNotification({
+          title: mindsetTitle,
+          message: "You're feeling neutral today. Stay disciplined and trust the process. 📈",
+          type: "info"
+        });
+      } else if (morningEntry.emotion.toLowerCase().includes('negative') && !hasSentTodayWithTitle(mindsetTitle)) {
+        addNotification({
+          title: mindsetTitle,
+          message: "A strong trader knows when to step back. Reset and refocus before jumping in. 🧘",
+          type: "warning"
+        });
+      }
+    }
+
+    // ⏳ Reminders & Habit Tracking - Check if user hasn't journaled today (only after 5PM)
+    const now = new Date();
+    const currentHour = now.getHours();
+    
+    if (currentHour >= 17 && todayEntries.length === 0) {
+      const reminderTitle = "Don't forget to journal today!";
+      if (!hasSentTodayWithTitle(reminderTitle)) {
+        addNotification({
+          title: reminderTitle,
+          message: "Small habits lead to big wins. Don't forget to log your trade insights today! ✅",
+          type: "info"
+        });
+      }
+    }
+
+    // Journal streak notification
+    if (analyticsData?.dataRequirements?.journalStreak === 7) {
+      const streakTitle = "7-day streak in journaling! 📖";
+      if (!hasSentWithinDaysWithTitle(streakTitle, 7)) {
+        addNotification({
+          title: streakTitle,
+          message: "Your future self will thank you for this data. Keep it up!",
+          type: "success"
+        });
+      }
+    }
+
+    // 📊 Data-Driven Insights - Best emotion for trading
+    if (analyticsData?.emotionTrend && analyticsData.emotionTrend.length > 10) {
+      // Find the emotion with the best average PnL
+      const emotionPerformance = analyticsData.emotionTrend.reduce((acc, day) => {
+        if (!day.emotion) return acc;
+        
+        if (!acc[day.emotion]) {
+          acc[day.emotion] = { total: 0, count: 0 };
+        }
+        
+        acc[day.emotion].total += day.pnl || 0;
+        acc[day.emotion].count += 1;
+        
+        return acc;
+      }, {} as Record<string, { total: number; count: number }>);
+      
+      // Calculate average PnL for each emotion
+      const emotionAverages = Object.entries(emotionPerformance).map(([emotion, stats]) => ({
+        emotion,
+        avgPnl: stats.count > 0 ? stats.total / stats.count : 0
+      }));
+      
+      // Find best performing emotion
+      const bestEmotion = emotionAverages.reduce((best, current) => 
+        current.avgPnl > best.avgPnl ? current : best, 
+        { emotion: '', avgPnl: -Infinity }
+      );
+      
+      if (bestEmotion.emotion && bestEmotion.avgPnl > 0) {
+        const insightTitle = "Your best setups come when you feel...";
+        if (!hasSentWithinDaysWithTitle(insightTitle, 14)) {
+          addNotification({
+            title: insightTitle,
+            message: `Your best trades happen when you feel ${bestEmotion.emotion}. Keep that mental edge! 🏆`,
+            type: "info"
+          });
+        }
+      }
+    }
+
+    // Best time to trade insights - Group trades by hour and find the most profitable time period
+    if (allTrades.length > 10) {
+      const tradesByHour = allTrades.reduce((acc, trade) => {
+        if (!trade.entryDate) return acc;
+        
+        const hour = new Date(trade.entryDate).getHours();
+        const hourRange = Math.floor(hour / 4) * 4; // Group in 4-hour blocks
+        const hourRangeKey = `${hourRange}-${hourRange + 4}`;
+        
+        if (!acc[hourRangeKey]) {
+          acc[hourRangeKey] = { total: 0, profitable: 0, count: 0 };
+        }
+        
+        acc[hourRangeKey].total += trade.pnl;
+        if (trade.pnl > 0) acc[hourRangeKey].profitable += 1;
+        acc[hourRangeKey].count += 1;
+        
+        return acc;
+      }, {} as Record<string, { total: number; profitable: number; count: number }>);
+      
+      // Calculate win rate and average PnL for each time period
+      const timePerformance = Object.entries(tradesByHour).map(([time, stats]) => ({
+        time,
+        winRate: stats.count > 0 ? stats.profitable / stats.count : 0,
+        avgPnl: stats.count > 0 ? stats.total / stats.count : 0,
+        count: stats.count
+      }));
+      
+      // Find the best performing time period with at least 5 trades
+      const bestTime = timePerformance
+        .filter(period => period.count >= 5)
+        .reduce((best, current) => 
+          current.avgPnl > best.avgPnl ? current : best, 
+          { time: '', winRate: 0, avgPnl: -Infinity, count: 0 }
+        );
+      
+      if (bestTime.time && bestTime.avgPnl > 0) {
+        const timeInsightTitle = "Your best trading hours";
+        if (!hasSentWithinDaysWithTitle(timeInsightTitle, 14)) {
+          addNotification({
+            title: timeInsightTitle,
+            message: `Your win rate improves when you trade between ${bestTime.time}h. Keep an eye on your best hours. ⏳`,
+            type: "info"
+          });
+        }
+      }
+    }
+
   }, [analyticsData]);
 
   return (

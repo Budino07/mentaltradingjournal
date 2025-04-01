@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Trade } from "@/types/trade";
+import { useNotifications } from "@/contexts/NotificationsContext";
 
 interface JournalFormSubmissionProps {
   sessionType: "pre" | "post";
@@ -54,6 +55,7 @@ export const useJournalFormSubmission = ({
   const { showSuccessToast } = useJournalToast();
   const { updateProgress } = useProgressTracking();
   const { user } = useAuth();
+  const { addNotification } = useNotifications();
 
   const handleSubmit = async () => {
     if (!user) {
@@ -131,6 +133,34 @@ export const useJournalFormSubmission = ({
 
       await updateProgress(sessionType as any);
       console.log(`Progress updated for ${sessionType} session`);
+      
+      // Add positivity notification if emotion is positive
+      if (sessionType === "pre" && selectedEmotion.toLowerCase().includes("positive")) {
+        addNotification({
+          title: "Ready for the trading day! 📈",
+          message: "Starting with a positive mindset is the foundation of successful trading. Trust your system!",
+          type: "success"
+        });
+      }
+      
+      // Add self-awareness notification if emotion is negative but they're journaling
+      if (sessionType === "pre" && selectedEmotion.toLowerCase().includes("negative")) {
+        addNotification({
+          title: "Self-awareness is key 🧘",
+          message: "Recognizing your negative emotions is the first step to mastering them. Consider if today is the right day to trade.",
+          type: "info"
+        });
+      }
+      
+      // Add milestone notification for post-session
+      if (sessionType === "post" && followedRules && followedRules.length > 3) {
+        addNotification({
+          title: "Rule adherence is on point! 🎯",
+          message: "Following your trading rules consistently is a strong indicator of professional trading behavior.",
+          type: "success"
+        });
+      }
+      
       showSuccessToast(sessionType);
       resetForm();
       onSubmitSuccess?.();
