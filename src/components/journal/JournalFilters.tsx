@@ -54,6 +54,14 @@ export const JournalFilters = () => {
     }
   };
 
+  // Function to open insights dialog and dispatch an event
+  const handleOpenInsights = () => {
+    setIsInsightsOpen(true);
+    // Dispatch an event that Journal.tsx can listen for
+    const insightsEvent = new CustomEvent('journal-insights-open');
+    window.dispatchEvent(insightsEvent);
+  };
+
   return (
     <div className="flex gap-2 justify-start">
       <Button 
@@ -83,7 +91,7 @@ export const JournalFilters = () => {
           <TooltipTrigger asChild>
             <Button 
               variant="outline" 
-              onClick={() => setIsInsightsOpen(true)}
+              onClick={handleOpenInsights}
               className="p-2 h-10 w-10"
             >
               <img
@@ -107,12 +115,7 @@ export const JournalFilters = () => {
         <></>
       </TradeFormDialog>
 
-      <DailyInsightsDialog
-        open={isInsightsOpen}
-        onOpenChange={setIsInsightsOpen}
-        date={new Date()}
-        trades={[]}
-      />
+      {/* The DailyInsightsDialog is handled by Journal.tsx */}
     </div>
   );
 };
