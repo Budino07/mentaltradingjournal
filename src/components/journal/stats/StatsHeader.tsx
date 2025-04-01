@@ -419,7 +419,7 @@ export const StatsHeader = () => {
           Eternal
         </Button>
         
-        {timeFilter === 'custom' && customDateRange && (
+        {timeFilter === 'custom' && customDateRange && customDateRange.label && (
           <Button 
             variant="default"
             className="bg-primary/90"
