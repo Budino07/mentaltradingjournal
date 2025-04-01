@@ -1,4 +1,3 @@
-
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -28,13 +27,13 @@ interface JournalCalendarProps {
 export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendarProps) => {
   const queryClient = useQueryClient();
   const [currentMonth, setCurrentMonth] = useState<Date>(date || new Date());
-  const { setTimeFilter } = useTimeFilter();
+  const { setTimeFilter, setCustomDateRange } = useTimeFilter();
 
   // Update current month when calendar month changes
   const handleMonthChange = (month: Date) => {
     setCurrentMonth(month);
     
-    // Create a custom month filter based on the selected month
+    // Create a custom date range based on the selected month but don't set a custom filter label
     const monthKey = format(month, 'yyyy-MM');
     const isCurrentMonth = format(new Date(), 'yyyy-MM') === monthKey;
     
@@ -42,15 +41,13 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
     if (isCurrentMonth) {
       setTimeFilter("this-month");
     } else {
-      // Dispatch a custom event to update the time filter with the selected month's range
-      const customTimeFilterEvent = new CustomEvent('custom-time-filter', {
-        detail: {
-          start: startOfMonth(month),
-          end: endOfMonth(month),
-          label: format(month, 'MMMM yyyy')
-        }
+      // Set custom date range without a visible label
+      setCustomDateRange({
+        start: startOfMonth(month),
+        end: endOfMonth(month),
+        label: '' // Empty label to avoid displaying the month name
       });
-      window.dispatchEvent(customTimeFilterEvent);
+      setTimeFilter('custom');
     }
     
     console.log(`Month changed to: ${format(month, 'MMMM yyyy')}`);
