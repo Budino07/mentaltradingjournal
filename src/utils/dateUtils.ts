@@ -88,3 +88,14 @@ export const parseISODate = (dateString: string): Date => {
     return new Date();
   }
 };
+
+// Get user's timezone
+export const getUserTimezone = (): string => {
+  try {
+    // Get user's timezone using Intl API
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  } catch (error) {
+    console.error("Error getting user timezone:", error);
+    return 'UTC'; // Fallback to UTC
+  }
+};

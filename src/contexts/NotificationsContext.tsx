@@ -1,9 +1,11 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useAuth } from "./AuthContext";
 import { startOfDay, isSameDay, differenceInHours, format, differenceInDays, isWithinInterval, subDays, endOfDay } from "date-fns";
 import { JournalEntryType } from "@/types/journal";
+import { getUserTimezone } from "@/utils/dateUtils";
 
 export type Notification = {
   id: string;
@@ -126,6 +128,14 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
   // Check for overtrading and create notifications if needed
   useEffect(() => {
     if (!analyticsData || !user) return;
+
+    // Get the user's timezone
+    const userTimezone = getUserTimezone();
+
+    // Get current time in user's timezone
+    const now = new Date();
+    const userLocalTime = new Date(now.toLocaleString('en-US', { timeZone: userTimezone }));
+    const currentHour = userLocalTime.getHours();
 
     // Get all trades from journal entries
     const allTrades = analyticsData.journalEntries.flatMap(entry => 
@@ -293,9 +303,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     // ⏳ Reminders & Habit Tracking - Check if user hasn't journaled today (only after 5PM)
-    const now = new Date();
-    const currentHour = now.getHours();
-    
+    // Using user's local time
     if (currentHour >= 17 && todayEntries.length === 0) {
       const reminderTitle = "Don't forget to journal today!";
       if (!hasSentTodayWithTitle(reminderTitle)) {
@@ -311,7 +319,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     const todayPreSessions = todayEntries.filter(entry => entry.session_type === 'pre');
     const todayPostSessions = todayEntries.filter(entry => entry.session_type === 'post');
     
-    // If we have a pre-session but no post-session, and it's after 7 PM but before midnight
+    // If we have a pre-session but no post-session, and it's after 7 PM but before midnight in user's timezone
     if (todayPreSessions.length > 0 && todayPostSessions.length === 0 && currentHour >= 19 && currentHour < 24) {
       const postSessionReminderTitle = "Complete your trading day with a post-session";
       if (!hasSentTodayWithTitle(postSessionReminderTitle)) {
