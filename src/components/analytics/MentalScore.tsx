@@ -16,6 +16,7 @@ import {
   PolarRadiusAxis,
   Radar,
   ResponsiveContainer,
+  Dot,
 } from "recharts";
 import { Trade } from "@/types/trade";
 import { JournalEntryType } from "@/types/journal";
@@ -191,6 +192,34 @@ const calculateMaxDrawdown = (trades: Trade[]) => {
   return maxDrawdown;
 };
 
+// Custom dot component for radar chart endpoints
+const CustomDot = (props: any) => {
+  const { cx, cy, value } = props;
+  
+  return (
+    <g>
+      <circle 
+        cx={cx} 
+        cy={cy} 
+        r={4} 
+        fill="#6366F1" 
+        stroke="#fff" 
+        strokeWidth={2} 
+      />
+      <text 
+        x={cx} 
+        y={cy - 10} 
+        textAnchor="middle" 
+        fill="currentColor" 
+        fontSize="10"
+        fontWeight="500"
+      >
+        {value}%
+      </text>
+    </g>
+  );
+};
+
 // Mental Score Component
 export const MentalScore = () => {
   const { data: analytics, isLoading } = useQuery({
@@ -321,6 +350,7 @@ export const MentalScore = () => {
                 stroke="#6366F1"
                 fill="#6366F1"
                 fillOpacity={0.6}
+                dot={<CustomDot />}
               />
             </RadarChart>
           </ResponsiveContainer>

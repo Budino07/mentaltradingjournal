@@ -109,7 +109,11 @@ export const checkEmotionNotifications = (
       
       const currentEmotion = acc[day.emotion];
       if (currentEmotion) {
-        currentEmotion.total += day.pnl || 0;
+        // Ensure pnl is a number
+        const pnl = typeof day.pnl === 'number' ? day.pnl : 
+                    typeof day.pnl === 'string' ? parseFloat(day.pnl) : 0;
+                    
+        currentEmotion.total += pnl;
         currentEmotion.count += 1;
       }
       
