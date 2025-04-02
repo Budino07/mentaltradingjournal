@@ -11,7 +11,7 @@ export const checkPerformanceNotifications = (
   notifications: Notification[],
   addNotification: (notification: Omit<Notification, "id" | "createdAt" | "read">) => void
 ): void => {
-  if (!analyticsData) return;
+  if (!analyticsData || !analyticsData.journalEntries) return;
 
   // Get all trades from journal entries
   const allTrades = analyticsData.journalEntries.flatMap((entry: JournalEntryType) =>

@@ -32,10 +32,11 @@ export const WinLossRatio = () => {
   // Process trades to calculate win/loss ratio
   const allTrades = analytics.journalEntries.flatMap(entry => entry.trades || []);
   const winningTrades = allTrades.filter(trade => Number(trade.pnl) > 0).length;
-  const totalTrades = allTrades.length;
+  const losingTrades = allTrades.filter(trade => Number(trade.pnl) < 0).length;
+  const totalTrades = winningTrades + losingTrades;
   
   const winRate = totalTrades ? (winningTrades / totalTrades) * 100 : 0;
-  const lossRate = totalTrades ? ((totalTrades - winningTrades) / totalTrades) * 100 : 0;
+  const lossRate = totalTrades ? (losingTrades / totalTrades) * 100 : 0;
 
   const data = [
     { name: "Winning Trades", value: winRate },

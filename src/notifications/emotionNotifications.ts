@@ -9,7 +9,7 @@ export const checkEmotionNotifications = (
   notifications: Notification[],
   addNotification: (notification: Omit<Notification, "id" | "createdAt" | "read">) => void
 ): void => {
-  if (!analyticsData) return;
+  if (!analyticsData || !analyticsData.journalEntries) return;
 
   // Get today's entries
   const entriesForToday = analyticsData.journalEntries.filter((entry: JournalEntryType) => 

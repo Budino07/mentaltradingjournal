@@ -171,7 +171,7 @@ const calculateMentalMetrics = (journalEntries: JournalEntryType[]) => {
 
   const insights = {
     strength: highestMetric.name === "Avg Win/Loss" 
-      ? `Your trade management skills are excellent, with an average win (${avgWin.toFixed(2)}) ${avgWinLossRatio.toFixed(1)}x larger than your average loss (${avgLoss.toFixed(2)}).`
+      ? `Your trade management skills are excellent, with an average win (+$${avgWin.toFixed(2)}) ${avgWinLossRatio.toFixed(1)}x larger than your average loss (-$${avgLoss.toFixed(2)}).`
       : `Your ${highestMetric.name} (${highestMetric.originalValue}) is your strongest mental metric, showing solid psychological resilience in this area.`,
     weakness: lowestMetric.name === "Consistency" 
       ? `Focus on improving your trading consistency (${consistency}% profitable days). ${topSetup ? `Your "${topSetup}" setup has been your most reliable - consider focusing more on this pattern.` : "Try to identify and stick with your most reliable setups."}`
@@ -229,10 +229,10 @@ const CustomizedDot = (props: any) => {
           <circle 
             cx={cx} 
             cy={cy} 
-            r={5} 
+            r={3} 
             fill="#6366F1" 
             stroke="#fff" 
-            strokeWidth={2} 
+            strokeWidth={1.5} 
             style={{ cursor: 'pointer' }}
           />
         </TooltipTrigger>
