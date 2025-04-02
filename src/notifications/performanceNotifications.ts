@@ -89,10 +89,8 @@ export const checkPerformanceNotifications = (
   if (allTrades.length > 10) {
     const userTimezone = getUserTimezone();
     
-    const tradesByHour: Record<string, { total: number; profitable: number; count: number }> = {};
-    
-    allTrades.forEach(trade => {
-      if (!trade.entryDate) return;
+    const tradesByHour = allTrades.reduce((acc: Record<string, { total: number; profitable: number; count: number }>, trade) => {
+      if (!trade.entryDate) return acc;
       
       // Convert the trade entry time to the user's timezone for accurate time analysis
       const entryDate = new Date(trade.entryDate);
@@ -102,12 +100,12 @@ export const checkPerformanceNotifications = (
       const hourRange = Math.floor(hour / 4) * 4; // Group in 4-hour blocks
       const hourRangeKey = `${hourRange}-${hourRange + 4}`;
       
-      if (!tradesByHour[hourRangeKey]) {
-        tradesByHour[hourRangeKey] = { total: 0, profitable: 0, count: 0 };
+      if (!acc[hourRangeKey]) {
+        acc[hourRangeKey] = { total: 0, profitable: 0, count: 0 };
       }
       
       // Get the hour data object
-      const hourData = tradesByHour[hourRangeKey];
+      const hourData = acc[hourRangeKey];
       
       // Ensure pnl is a number
       const pnlValue = typeof trade.pnl === 'number' ? trade.pnl : 
@@ -117,8 +115,8 @@ export const checkPerformanceNotifications = (
       if (pnlValue > 0) hourData.profitable += 1;
       hourData.count += 1;
       
-      return;
-    });
+      return acc;
+    }, {} as Record<string, { total: number; profitable: number; count: number }>);
     
     // Calculate win rate and average PnL for each time period
     const timePerformance = Object.entries(tradesByHour).map(([time, stats]) => {
