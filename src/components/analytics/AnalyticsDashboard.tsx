@@ -21,6 +21,7 @@ import { EquityCurve } from "./EquityCurve";
 import { EmotionFrequency } from "./EmotionFrequency";
 import { SetupPerformance } from "./SetupPerformance";
 import { OvertradingHeatMap } from "./OvertradingHeatMap";
+import { MentalScore } from "./MentalScore";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -32,9 +33,10 @@ export const AnalyticsDashboard = () => {
     EmotionTrend,
     EmotionFrequency,
     MistakeAnalysis,
+    PersonalityPatterns,
+    MentalScore,
     EmotionRecovery,
     PreTradingEvents,
-    PersonalityPatterns,
     OvertradingHeatMap,
   ];
 
@@ -68,9 +70,13 @@ export const AnalyticsDashboard = () => {
           EmotionTrend, 
           EmotionFrequency,
           MistakeAnalysis,
+          
+          // Place PersonalityPatterns and MentalScore side by side in the grid
+          PersonalityPatterns,
+          MentalScore,
+          
           EmotionRecovery,
           PreTradingEvents,
-          PersonalityPatterns,
           OvertradingHeatMap,
           
           // Trading components

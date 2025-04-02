@@ -4,7 +4,6 @@ import { hasSentTodayWithTitle, hasSentWithinDaysWithTitle } from "@/utils/notif
 import { Notification } from "@/types/notifications";
 import { getUserTimezone } from "@/utils/dateUtils";
 import { JournalEntryType } from "@/types/journal";
-import { Trade } from "@/types/trade";
 
 export const checkPerformanceNotifications = (
   analyticsData: any,
@@ -15,7 +14,7 @@ export const checkPerformanceNotifications = (
 
   // Get all trades from journal entries
   const allTrades = analyticsData.journalEntries.flatMap((entry: JournalEntryType) =>
-    (entry.trades || []).map((trade: Trade) => ({
+    (entry.trades || []).map((trade) => ({
       ...trade,
       entryDate: trade.entryDate || '',
       pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : (trade.pnl || 0),
@@ -89,7 +88,7 @@ export const checkPerformanceNotifications = (
   if (allTrades.length > 10) {
     const userTimezone = getUserTimezone();
     
-    const tradesByHour = allTrades.reduce((acc: Record<string, { total: number; profitable: number; count: number }>, trade) => {
+    const tradesByHour: Record<string, { total: number; profitable: number; count: number }> = allTrades.reduce((acc, trade) => {
       if (!trade.entryDate) return acc;
       
       // Convert the trade entry time to the user's timezone for accurate time analysis

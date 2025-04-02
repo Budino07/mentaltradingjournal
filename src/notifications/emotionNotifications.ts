@@ -107,7 +107,7 @@ export const checkEmotionNotifications = (
         acc[day.emotion] = { total: 0, count: 0 };
       }
       
-      if (acc[day.emotion]) {
+      if (typeof day.pnl === 'number') {
         acc[day.emotion].total += day.pnl || 0;
         acc[day.emotion].count += 1;
       }

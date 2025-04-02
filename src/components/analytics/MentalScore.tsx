@@ -1,169 +1,18 @@
 
 import { Card } from "@/components/ui/card";
+import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
-import { Info } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
-  ResponsiveContainer,
-} from "recharts";
-import { Trade } from "@/types/trade";
-import { JournalEntry } from "@/types/journal";
+import { Progress } from "@/components/ui/progress";
+import { InfoIcon } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-// Calculate the mental score metrics from journal entries and trades
-const calculateMentalMetrics = (journalEntries: JournalEntry[]) => {
-  if (!journalEntries.length) {
-    return {
-      score: 0,
-      metrics: [],
-      insights: { strength: "", weakness: "" }
-    };
-  }
-
-  // Extract all trades
-  const allTrades = journalEntries.flatMap(entry => 
-    (entry.trades || []).map(trade => ({
-      ...trade,
-      pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : (trade.pnl || 0),
-    }))
-  );
-
-  // Calculate win percentage
-  const winningTrades = allTrades.filter(trade => trade.pnl > 0);
-  const winPercentage = allTrades.length > 0 
-    ? Math.round((winningTrades.length / allTrades.length) * 100) 
-    : 0;
-
-  // Calculate profit factor
-  const grossProfit = winningTrades.reduce((sum, trade) => sum + trade.pnl, 0);
-  const losingTrades = allTrades.filter(trade => trade.pnl < 0);
-  const grossLoss = Math.abs(losingTrades.reduce((sum, trade) => sum + trade.pnl, 0));
-  const profitFactor = grossLoss > 0 ? Math.round((grossProfit / grossLoss) * 10) / 10 : 0;
-
-  // Calculate average win/loss ratio
-  const avgWin = winningTrades.length > 0 
-    ? winningTrades.reduce((sum, trade) => sum + trade.pnl, 0) / winningTrades.length 
-    : 0;
-  const avgLoss = losingTrades.length > 0 
-    ? Math.abs(losingTrades.reduce((sum, trade) => sum + trade.pnl, 0)) / losingTrades.length 
-    : 0;
-  const winLossRatio = avgLoss > 0 ? Math.round((avgWin / avgLoss) * 10) / 10 : 0;
-
-  // Calculate recovery factor
-  const maxDrawdown = calculateMaxDrawdown(allTrades);
-  const netProfit = allTrades.reduce((sum, trade) => sum + trade.pnl, 0);
-  const recoveryFactor = maxDrawdown > 0 ? Math.round((netProfit / maxDrawdown) * 10) / 10 : 0;
-
-  // Calculate consistency
-  const dailyResults = journalEntries.reduce((acc: Record<string, number>, entry) => {
-    const date = new Date(entry.created_at).toISOString().split('T')[0];
-    const dailyPnl = (entry.trades || []).reduce(
-      (sum, trade) => sum + (typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : (trade.pnl || 0)), 
-      0
-    );
-    
-    if (!acc[date]) acc[date] = 0;
-    acc[date] += dailyPnl;
-    return acc;
-  }, {});
-  
-  const profitableDays = Object.values(dailyResults).filter(pnl => pnl > 0).length;
-  const totalDays = Object.keys(dailyResults).length;
-  const consistency = totalDays > 0 ? Math.round((profitableDays / totalDays) * 100) : 0;
-
-  // Create normalized scores (0-100)
-  const normalizeScore = (value: number, max: number) => Math.min(Math.round((value / max) * 100), 100);
-
-  const metrics = [
-    { name: "Win %", value: winPercentage, fullMark: 100, description: "Percentage of profitable trades" },
-    { name: "Profit Factor", value: normalizeScore(profitFactor, 3), fullMark: 100, description: "Ratio of gross profit to gross loss" },
-    { name: "Win/Loss Ratio", value: normalizeScore(winLossRatio, 3), fullMark: 100, description: "Average win divided by average loss" },
-    { name: "Recovery Factor", value: normalizeScore(recoveryFactor, 3), fullMark: 100, description: "Net profit divided by max drawdown" },
-    { name: "Max Drawdown", value: 100 - normalizeScore(maxDrawdown, 5000), fullMark: 100, description: "Largest peak-to-trough decline" },
-    { name: "Consistency", value: consistency, fullMark: 100, description: "Percentage of profitable days" },
-  ];
-
-  // Calculate overall mental score (weighted average)
-  const weights = {
-    "Win %": 0.15,
-    "Profit Factor": 0.2,
-    "Win/Loss Ratio": 0.2,
-    "Recovery Factor": 0.15,
-    "Max Drawdown": 0.1,
-    "Consistency": 0.2,
-  };
-
-  const weightedSum = metrics.reduce((sum, metric) => 
-    sum + metric.value * weights[metric.name as keyof typeof weights], 0
-  );
-  const totalWeight = Object.values(weights).reduce((sum, weight) => sum + weight, 0);
-  const overallScore = Math.round(weightedSum / totalWeight);
-
-  // Generate insights
-  const sortedMetrics = [...metrics].sort((a, b) => b.value - a.value);
-  const highestMetric = sortedMetrics[0];
-  const lowestMetric = sortedMetrics[sortedMetrics.length - 1];
-
-  const insights = {
-    strength: `Your ${highestMetric.name} (${highestMetric.value}%) is your strongest mental metric, showing solid psychological resilience.`,
-    weakness: `Focus on improving your ${lowestMetric.name} (${lowestMetric.value}%), as this may be limiting your overall trading performance.`
-  };
-
-  return {
-    score: overallScore,
-    metrics,
-    insights
-  };
-};
-
-// Calculate maximum drawdown from a series of trades
-const calculateMaxDrawdown = (trades: Trade[]) => {
-  if (!trades.length) return 0;
-  
-  let peak = 0;
-  let maxDrawdown = 0;
-  let runningTotal = 0;
-  
-  // Sort trades by date
-  const sortedTrades = [...trades].sort((a, b) => {
-    const dateA = a.entryDate ? new Date(a.entryDate).getTime() : 0;
-    const dateB = b.entryDate ? new Date(b.entryDate).getTime() : 0;
-    return dateA - dateB;
-  });
-  
-  sortedTrades.forEach(trade => {
-    runningTotal += trade.pnl;
-    
-    if (runningTotal > peak) {
-      peak = runningTotal;
-    }
-    
-    const currentDrawdown = peak - runningTotal;
-    if (currentDrawdown > maxDrawdown) {
-      maxDrawdown = currentDrawdown;
-    }
-  });
-  
-  return maxDrawdown;
-};
-
-// Mental Score Component
 export const MentalScore = () => {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
   });
-
+  
   if (isLoading || !analytics) {
     return (
       <Card className="p-4 md:p-6 space-y-4">
@@ -175,136 +24,186 @@ export const MentalScore = () => {
     );
   }
 
-  const mentalData = calculateMentalMetrics(analytics.journalEntries);
+  // Process trades to calculate metrics
+  const allTrades = analytics.journalEntries.flatMap(entry => entry.trades || []);
+  const validTrades = allTrades.filter(trade => typeof trade.pnl === 'number' || 
+    (typeof trade.pnl === 'string' && !isNaN(parseFloat(trade.pnl))));
   
-  // If no entries, show empty state
-  if (analytics.journalEntries.length === 0) {
+  if (validTrades.length === 0) {
     return (
-      <Card className="p-4 md:p-6 space-y-4 bg-gradient-to-br from-background/95 to-background/80">
+      <Card className="p-4 md:p-6 space-y-4">
         <div className="space-y-2">
           <h3 className="text-xl md:text-2xl font-bold">Mental Score</h3>
           <p className="text-sm text-muted-foreground">
-            Start journaling to see your mental trading metrics
+            No trade data available yet
           </p>
-        </div>
-        <div className="flex flex-col items-center justify-center h-[250px] text-muted-foreground">
-          <p>No journal entries found</p>
-          <p className="text-sm">Add journal entries to see your mental score analysis</p>
         </div>
       </Card>
     );
   }
 
-  // Rating based on score
-  const getRating = (score: number) => {
-    if (score >= 90) return "Elite";
-    if (score >= 80) return "Advanced";
-    if (score >= 70) return "Proficient";
-    if (score >= 60) return "Intermediate";
-    if (score >= 50) return "Developing";
-    return "Novice";
-  };
+  // Calculate key metrics for mental score
+  const winningTrades = validTrades.filter(trade => {
+    const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : trade.pnl;
+    return pnl > 0;
+  });
+  
+  // Win percentage
+  const winPercentage = (winningTrades.length / validTrades.length) * 100;
+  
+  // Profit factor (total gains / total losses)
+  const gains = validTrades.reduce((sum, trade) => {
+    const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : trade.pnl;
+    return sum + (pnl > 0 ? pnl : 0);
+  }, 0);
+  
+  const losses = validTrades.reduce((sum, trade) => {
+    const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : trade.pnl;
+    return sum + (pnl < 0 ? Math.abs(pnl) : 0);
+  }, 0);
+  
+  const profitFactor = losses > 0 ? gains / losses : gains > 0 ? 2 : 0;
+  
+  // Average win/loss ratio
+  const avgWin = winningTrades.length > 0 ? 
+    winningTrades.reduce((sum, trade) => {
+      const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : trade.pnl;
+      return sum + pnl;
+    }, 0) / winningTrades.length : 0;
+  
+  const losingTrades = validTrades.filter(trade => {
+    const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : trade.pnl;
+    return pnl < 0;
+  });
+  
+  const avgLoss = losingTrades.length > 0 ? 
+    losingTrades.reduce((sum, trade) => {
+      const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : trade.pnl;
+      return sum + Math.abs(pnl);
+    }, 0) / losingTrades.length : 0;
+  
+  const winLossRatio = avgLoss > 0 ? avgWin / avgLoss : avgWin > 0 ? 2 : 0;
+  
+  // Estimated recovery factor (net profit / max drawdown)
+  const totalPnL = validTrades.reduce((sum, trade) => {
+    const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : trade.pnl;
+    return sum + pnl;
+  }, 0);
+  
+  // Simple estimation of max drawdown
+  const maxDrawdown = Math.max(
+    losses,
+    losingTrades.length > 2 ? losingTrades.length * avgLoss * 0.5 : avgLoss * 2
+  );
+  
+  const recoveryFactor = maxDrawdown > 0 ? Math.abs(totalPnL) / maxDrawdown : 1;
+  
+  // Consistency (standard deviation of returns)
+  const returns = validTrades.map(trade => {
+    const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : trade.pnl;
+    return pnl;
+  });
+  
+  const avgReturn = returns.reduce((sum, ret) => sum + ret, 0) / returns.length;
+  const squaredDiffs = returns.map(ret => Math.pow(ret - avgReturn, 2));
+  const variance = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / returns.length;
+  const stdDev = Math.sqrt(variance);
+  
+  // Normalize stdDev to a 0-100 scale where lower is better (more consistent)
+  const consistencyScore = Math.max(0, Math.min(100, 100 - (stdDev / (avgReturn || 1) * 20)));
+  
+  // Calculate overall mental score (0-100)
+  const mentalScore = Math.min(100, Math.max(0, Math.round(
+    (winPercentage * 0.25) + 
+    (Math.min(profitFactor, 2) * 25) + 
+    (Math.min(winLossRatio, 2) * 10) + 
+    (Math.min(recoveryFactor, 1) * 15) + 
+    (consistencyScore * 0.25)
+  )));
+  
+  // Radar chart data
+  const radarData = [
+    { trait: "Win %", value: Math.min(100, Math.max(0, winPercentage)), fullMark: 100 },
+    { trait: "Profit Factor", value: Math.min(100, Math.max(0, profitFactor * 50)), fullMark: 100 },
+    { trait: "Win/Loss", value: Math.min(100, Math.max(0, winLossRatio * 50)), fullMark: 100 },
+    { trait: "Recovery", value: Math.min(100, Math.max(0, recoveryFactor * 100)), fullMark: 100 },
+    { trait: "Max DD", value: Math.min(100, Math.max(0, 100 - (maxDrawdown / (totalPnL || 1) * 20))), fullMark: 100 },
+    { trait: "Consistency", value: consistencyScore, fullMark: 100 },
+  ];
 
-  // Color based on score
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "#10B981"; // Green
-    if (score >= 60) return "#3B82F6"; // Blue
-    if (score >= 40) return "#F59E0B"; // Amber
-    return "#EF4444"; // Red
+  // Interpret the mental score
+  const getScoreDescription = (score: number) => {
+    if (score >= 90) return "Elite Mental Game";
+    if (score >= 80) return "Strong Mental Game";
+    if (score >= 70) return "Good Mental Game";
+    if (score >= 60) return "Developing Mental Game";
+    if (score >= 50) return "Average Mental Game";
+    if (score >= 40) return "Needs Improvement";
+    return "Early Development Stage";
   };
 
   return (
-    <Card className="p-4 md:p-6 space-y-4 bg-gradient-to-br from-background/95 to-background/80 backdrop-blur-sm border border-border/50 shadow-lg">
-      <div className="flex justify-between items-start">
-        <div className="space-y-2">
+    <Card className="p-4 md:p-6 space-y-4">
+      <div className="flex justify-between items-center">
+        <div className="space-y-1">
           <h3 className="text-xl md:text-2xl font-bold">Mental Score</h3>
-          <p className="text-sm text-muted-foreground">
-            Psychological trading metrics
+          <p className="text-sm text-muted-foreground flex items-center gap-1">
+            Trading psychology assessment
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <InfoIcon className="h-3.5 w-3.5 ml-1 text-muted-foreground/70" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-[300px]">
+                  <p className="text-xs">Mental Score measures your trading psychology strength based on win percentage, profit factor, win/loss ratio, recovery factor, drawdown management, and consistency.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </p>
         </div>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button className="text-muted-foreground hover:text-foreground transition-colors">
-                <Info size={18} />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent className="max-w-[300px]">
-              <p className="text-sm">
-                Your Mental Score measures the psychological aspects of your trading.
-                It combines metrics like win rate, consistency, and recovery ability
-                to give an overall score of your trading psychology.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Score Display */}
-        <div className="flex flex-col items-center justify-center space-y-2 bg-accent/10 rounded-lg p-4">
-          <div className="text-5xl font-bold" style={{ color: getScoreColor(mentalData.score) }}>
-            {mentalData.score}
-          </div>
-          <div className="text-sm font-medium">
-            {getRating(mentalData.score)}
-          </div>
-          <div className="w-full bg-background rounded-full h-2.5 mt-2">
-            <div 
-              className="h-2.5 rounded-full" 
-              style={{ 
-                width: `${mentalData.score}%`, 
-                backgroundColor: getScoreColor(mentalData.score) 
-              }}
-            ></div>
-          </div>
-          <p className="text-xs text-center text-muted-foreground mt-1">
-            Your Mental Trading Score
-          </p>
-        </div>
-
-        {/* Radar Chart */}
-        <div className="md:col-span-2 h-[200px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={mentalData.metrics}>
-              <PolarGrid className="text-muted-foreground/15" stroke="#444455" />
-              <PolarAngleAxis 
-                dataKey="name"
-                tick={{ fill: 'currentColor', fontSize: 11, fontWeight: 500 }}
-                stroke="transparent"
-              />
-              <PolarRadiusAxis 
-                angle={30} 
-                domain={[0, 100]}
-                tick={{ fill: 'currentColor', fontSize: 10 }}
-                axisLine={false}
-                tickCount={4}
-                stroke="#444455"
-              />
-              <Radar
-                name="Mental Metrics"
-                dataKey="value"
-                stroke="#6366F1"
-                fill="#6366F1"
-                fillOpacity={0.6}
-              />
-            </RadarChart>
-          </ResponsiveContainer>
+        <div className="text-right">
+          <div className="text-3xl font-bold">{mentalScore}</div>
+          <div className="text-sm text-muted-foreground">{getScoreDescription(mentalScore)}</div>
         </div>
       </div>
 
-      <div className="space-y-3">
-        <h4 className="font-semibold text-sm md:text-base">Insights</h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="bg-accent/10 p-3 rounded-lg">
-            <h5 className="text-sm font-medium">Strength</h5>
-            <p className="text-xs md:text-sm text-muted-foreground mt-1">{mentalData.insights.strength}</p>
-          </div>
-          <div className="bg-accent/10 p-3 rounded-lg">
-            <h5 className="text-sm font-medium">Area for Improvement</h5>
-            <p className="text-xs md:text-sm text-muted-foreground mt-1">{mentalData.insights.weakness}</p>
-          </div>
+      <div className="space-y-2">
+        <Progress value={mentalScore} className="h-2" />
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>Developing</span>
+          <span>Strong</span>
+          <span>Elite</span>
         </div>
+      </div>
+
+      <div className="h-[200px] md:h-[250px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <RadarChart outerRadius="65%" data={radarData}>
+            <PolarGrid />
+            <PolarAngleAxis dataKey="trait" tick={{ fontSize: 12, fill: 'currentColor' }} />
+            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+            <Radar 
+              name="Mental Traits" 
+              dataKey="value" 
+              stroke="#7C3AED" 
+              fill="#7C3AED" 
+              fillOpacity={0.4} 
+            />
+          </RadarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
+        <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
+        <p className="text-xs md:text-sm text-muted-foreground">
+          {mentalScore >= 75 ? (
+            "Your strong mental game is a significant trading edge. Continue leveraging your discipline and emotional control for consistent results."
+          ) : mentalScore >= 60 ? (
+            "You're developing a resilient trading mindset. Focus on improving consistency and drawdown management to strengthen your mental game."
+          ) : (
+            "Building your mental game is your biggest opportunity for improvement. Focus on maintaining discipline and developing a structured approach to handle emotions."
+          )}
+        </p>
       </div>
     </Card>
   );
