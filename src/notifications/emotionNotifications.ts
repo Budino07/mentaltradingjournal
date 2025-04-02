@@ -1,140 +1,127 @@
 
-import { format, isSameDay, subDays } from "date-fns";
-import { hasSentTodayWithTitle, hasSentWithinDaysWithTitle, getDaysSinceEmotion } from "@/utils/notificationUtils";
+import { format, differenceInDays } from "date-fns";
+import { hasSentWithinDaysWithTitle } from "@/utils/notificationUtils";
 import { Notification } from "@/types/notifications";
 import { JournalEntryType } from "@/types/journal";
 
+// Type definition for emotion pattern analysis
+interface EmotionPattern {
+  emotion: string;
+  count: number;
+  total: number;
+  avgPnl: number;
+}
+
 export const checkEmotionNotifications = (
-  analyticsData: any,
+  journalEntries: JournalEntryType[],
   notifications: Notification[],
   addNotification: (notification: Omit<Notification, "id" | "createdAt" | "read">) => void
 ): void => {
-  if (!analyticsData) return;
+  if (!journalEntries || journalEntries.length === 0) return;
 
-  // Get today's entries
-  const entriesForToday = analyticsData.journalEntries.filter((entry: JournalEntryType) => 
-    isSameDay(new Date(entry.created_at), new Date())
-  );
+  // Get entries from the last 14 days
+  const twoWeeksAgo = new Date();
+  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
   
-  // Check if any of today's entries have each emotion
-  const todayEmotions = entriesForToday.map(entry => entry.emotion);
-  const hasPositiveToday = todayEmotions.includes('positive');
-  const hasNeutralToday = todayEmotions.includes('neutral');
-  const hasNegativeToday = todayEmotions.includes('negative');
+  const recentEntries = journalEntries.filter(entry => {
+    const entryDate = new Date(entry.created_at);
+    return entryDate >= twoWeeksAgo;
+  });
+
+  if (recentEntries.length < 5) return; // Not enough data for patterns
+
+  // Analyze emotion patterns and their correlation with trading performance
+  const emotionPatterns: Record<string, EmotionPattern> = {};
   
-  // Calculate days since each emotion was last logged
-  const daysSincePositive = getDaysSinceEmotion('positive', analyticsData.journalEntries);
-  const daysSinceNeutral = getDaysSinceEmotion('neutral', analyticsData.journalEntries);
-  const daysSinceNegative = getDaysSinceEmotion('negative', analyticsData.journalEntries);
-  
-  // Positive emotion return notification
-  if (hasPositiveToday && daysSincePositive >= 3) {
-    const positiveReturnTitle = "Welcome back to positivity! 🎉";
-    if (!hasSentTodayWithTitle(notifications, positiveReturnTitle)) {
-      addNotification({
-        title: positiveReturnTitle,
-        message: `It's been ${daysSincePositive} days since you last felt positive. Great to see you back in a good headspace! Reflect on what changed to maintain this momentum.`,
-        type: "success"
-      });
+  recentEntries.forEach(entry => {
+    const { emotion, trades } = entry;
+    
+    if (!emotion || !trades || trades.length === 0) return;
+    
+    if (!emotionPatterns[emotion]) {
+      emotionPatterns[emotion] = { emotion, count: 0, total: 0, avgPnl: 0 };
     }
-  }
+    
+    const totalPnl = trades.reduce((sum, trade) => {
+      const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+                 (typeof trade.pnl === 'number' ? trade.pnl : 0);
+      return sum + pnl;
+    }, 0);
+    
+    emotionPatterns[emotion].count += 1;
+    emotionPatterns[emotion].total += totalPnl;
+  });
   
-  // Neutral emotion return notification
-  if (hasNeutralToday && daysSinceNeutral >= 4) {
-    const neutralReturnTitle = "Back to balance ⚖️";
-    if (!hasSentTodayWithTitle(notifications, neutralReturnTitle)) {
+  // Calculate average PnL for each emotion
+  Object.values(emotionPatterns).forEach(pattern => {
+    pattern.avgPnl = pattern.count > 0 ? pattern.total / pattern.count : 0;
+  });
+  
+  // Find the emotion with the highest average PnL (minimum 3 occurrences)
+  const bestEmotion = Object.values(emotionPatterns)
+    .filter(pattern => pattern.count >= 3)
+    .sort((a, b) => b.avgPnl - a.avgPnl)[0];
+  
+  // Find the emotion with the lowest average PnL (minimum 3 occurrences)
+  const worstEmotion = Object.values(emotionPatterns)
+    .filter(pattern => pattern.count >= 3)
+    .sort((a, b) => a.avgPnl - b.avgPnl)[0];
+  
+  // Emotion-Performance Insight (sent once every 14 days)
+  if (bestEmotion && worstEmotion && bestEmotion.emotion !== worstEmotion.emotion) {
+    const insightTitle = "Emotion-Performance Connection";
+    
+    // Only send this notification once every 14 days
+    if (!hasSentWithinDaysWithTitle(notifications, insightTitle, 14)) {
+      const formattedBestAvg = bestEmotion.avgPnl.toFixed(2);
+      const formattedWorstAvg = worstEmotion.avgPnl.toFixed(2);
+      
       addNotification({
-        title: neutralReturnTitle,
-        message: `After ${daysSinceNeutral} days, you're back to a neutral emotional state. This balanced mindset can be great for objective decision making.`,
+        title: insightTitle,
+        message: `Trading while feeling "${bestEmotion.emotion}" yields better results ($${formattedBestAvg} avg) compared to trading while feeling "${worstEmotion.emotion}" ($${formattedWorstAvg} avg). Consider your emotional state before trading.`,
         type: "info"
       });
     }
   }
   
-  // Negative emotion return notification
-  if (hasNegativeToday && daysSinceNegative >= 5) {
-    const negativeReturnTitle = "Emotional awareness check 🧠";
-    if (!hasSentTodayWithTitle(notifications, negativeReturnTitle)) {
-      addNotification({
-        title: negativeReturnTitle,
-        message: `You haven't recorded negative emotions in ${daysSinceNegative} days until today. Remember that acknowledging emotions is the first step to managing them. What triggered this change?`,
-        type: "warning"
-      });
-    }
-  }
-
-  // 🧠 Mindset-Based Notifications - Check morning entries
-  const morningEntry = entriesForToday.find(entry => 
-    entry.session_type === 'pre' && new Date(entry.created_at).getHours() < 12
-  );
+  // Negative Emotion Trading Warning (if applicable and not already sent)
+  const negativeEmotionEntries = recentEntries.filter(entry => entry.emotion === 'negative');
   
-  if (morningEntry && morningEntry.emotion) {
-    const mindsetTitle = `Your morning check-in: ${morningEntry.emotion}`;
+  if (negativeEmotionEntries.length >= 3) {
+    // Calculate success rate when trading with negative emotions
+    const negativeEmotionResults = {
+      successful: 0,
+      total: 0,
+      totalPnl: 0
+    };
     
-    if (morningEntry.emotion.toLowerCase().includes('positive') && !hasSentTodayWithTitle(notifications, mindsetTitle)) {
-      addNotification({
-        title: mindsetTitle,
-        message: "You're in a great headspace. Ready for some homerun trades! ⚡",
-        type: "info"
-      });
-    } else if (morningEntry.emotion.toLowerCase().includes('neutral') && !hasSentTodayWithTitle(notifications, mindsetTitle)) {
-      addNotification({
-        title: mindsetTitle,
-        message: "You're feeling neutral today. Stay disciplined and trust the process. 📈",
-        type: "info"
-      });
-    } else if (morningEntry.emotion.toLowerCase().includes('negative') && !hasSentTodayWithTitle(notifications, mindsetTitle)) {
-      addNotification({
-        title: mindsetTitle,
-        message: "A strong trader knows when to step back. Reset and refocus before jumping in. 🧘",
-        type: "warning"
-      });
-    }
-  }
-
-  // Journal entries with emotions
-  const entriesWithEmotions = analyticsData.journalEntries.filter((entry: JournalEntryType) => 
-    entry.emotion && (entry.session_type === 'pre' || entry.session_type === 'post')
-  );
-
-  // 📊 Data-Driven Insights - Best emotion for trading
-  if (analyticsData?.emotionTrend && analyticsData.emotionTrend.length > 10) {
-    // Find the emotion with the best average PnL
-    const emotionPerformance = analyticsData.emotionTrend.reduce((acc: Record<string, { total: number; count: number }>, day: any) => {
-      if (!day.emotion) return acc;
+    negativeEmotionEntries.forEach(entry => {
+      if (!entry.trades) return;
       
-      if (!acc[day.emotion]) {
-        acc[day.emotion] = { total: 0, count: 0 };
-      }
+      entry.trades.forEach(trade => {
+        const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+                   (typeof trade.pnl === 'number' ? trade.pnl : 0);
+        
+        negativeEmotionResults.total += 1;
+        if (pnl > 0) negativeEmotionResults.successful += 1;
+        negativeEmotionResults.totalPnl += pnl;
+      });
+    });
+    
+    const successRate = negativeEmotionResults.total > 0 
+      ? (negativeEmotionResults.successful / negativeEmotionResults.total) * 100 
+      : 0;
+    
+    // If success rate is low, send warning
+    if (successRate < 40 && negativeEmotionResults.total >= 5) {
+      const warningTitle = "Trading Mindset Alert";
       
-      const currentEmotion = acc[day.emotion];
-      if (currentEmotion) {
-        currentEmotion.total += day.pnl || 0;
-        currentEmotion.count += 1;
-      }
-      
-      return acc;
-    }, {} as Record<string, { total: number; count: number }>);
-    
-    // Calculate average PnL for each emotion
-    const emotionAverages = Object.entries(emotionPerformance).map(([emotion, stats]) => ({
-      emotion,
-      avgPnl: stats.count > 0 ? stats.total / stats.count : 0
-    }));
-    
-    // Find best performing emotion
-    const bestEmotion = emotionAverages.reduce((best, current) => 
-      current.avgPnl > best.avgPnl ? current : best, 
-      { emotion: '', avgPnl: -Infinity }
-    );
-    
-    if (bestEmotion.emotion && bestEmotion.avgPnl > 0) {
-      const insightTitle = "Your best setups come when you feel...";
-      if (!hasSentWithinDaysWithTitle(notifications, insightTitle, 14)) {
+      // Only send once a week
+      if (!hasSentWithinDaysWithTitle(notifications, warningTitle, 7)) {
         addNotification({
-          title: insightTitle,
-          message: `Your best trades happen when you feel ${bestEmotion.emotion}. Keep that mental edge! 🏆`,
-          type: "info"
+          title: warningTitle,
+          message: `Your success rate is only ${successRate.toFixed(1)}% when trading in a negative emotional state. Consider taking a break when not feeling at your best.`,
+          type: "warning"
         });
       }
     }
