@@ -88,7 +88,7 @@ export const checkPerformanceNotifications = (
   if (allTrades.length > 10) {
     const userTimezone = getUserTimezone();
     
-    const tradesByHour = allTrades.reduce((acc: Record<string, { total: number; profitable: number; count: number }>, trade) => {
+    const tradesByHour: Record<string, { total: number; profitable: number; count: number }> = allTrades.reduce((acc, trade) => {
       if (!trade.entryDate) return acc;
       
       // Convert the trade entry time to the user's timezone for accurate time analysis
@@ -151,4 +151,3 @@ export const checkPerformanceNotifications = (
     }
   }
 };
-
