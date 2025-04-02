@@ -12,7 +12,15 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
+import { 
+  Tooltip as UITooltip, 
+  TooltipContent, 
+  TooltipProvider, 
+  TooltipTrigger 
+} from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 
+// Custom tooltip component for the radar chart
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     return (
@@ -25,6 +33,9 @@ const CustomTooltip = ({ active, payload }: any) => {
           <p className="text-xs text-muted-foreground">
             Previous: {payload[0].payload.previous}%
           </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            {payload[0].payload.description}
+          </p>
         </div>
       </div>
     );
@@ -32,6 +43,7 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
+// Component that displays trader personality trait analysis
 export const PersonalityPatterns = () => {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
@@ -49,18 +61,38 @@ export const PersonalityPatterns = () => {
     );
   }
 
-  // Calculate real personality traits from journal entries
+  // Get journal entries for analysis
   const entries = analytics.journalEntries;
   const totalEntries = entries.length;
   
-  // Calculate discipline based on rule adherence
+  // If no entries, show empty state
+  if (totalEntries === 0) {
+    return (
+      <Card className="p-4 md:p-6 space-y-4 bg-gradient-to-br from-background/95 to-background/80">
+        <div className="space-y-2">
+          <h3 className="text-xl md:text-2xl font-bold">Personality Patterns</h3>
+          <p className="text-sm text-muted-foreground">
+            Start journaling to see your trading personality traits
+          </p>
+        </div>
+        <div className="flex flex-col items-center justify-center h-[250px] text-muted-foreground">
+          <p>No journal entries found</p>
+          <p className="text-sm">Add journal entries to see your personality analysis</p>
+        </div>
+      </Card>
+    );
+  }
+  
+  // TRAIT #1: DISCIPLINE
+  // Measured by how often rules are followed and documented
   const disciplineScore = entries.reduce((acc, entry) => {
     const followedRulesCount = entry.followed_rules?.length || 0;
     return acc + (followedRulesCount > 0 ? 1 : 0);
   }, 0);
 
-  // Calculate risk tolerance based on individual trades using stop loss
-  const riskToleranceScore = entries.reduce((acc, entry) => {
+  // TRAIT #2: RISK MANAGEMENT
+  // Measured by use of stop loss and position sizing in trades
+  const riskManagementScore = entries.reduce((acc, entry) => {
     const trades = entry.trades || [];
     const tradesWithRiskManagement = trades.filter(trade => 
       trade.stopLoss && trade.quantity
@@ -68,7 +100,8 @@ export const PersonalityPatterns = () => {
     return acc + (tradesWithRiskManagement.length > 0 ? 1 : 0);
   }, 0);
 
-  // Calculate emotional resilience based on recovery after losses
+  // TRAIT #3: EMOTIONAL RESILIENCE
+  // Measured by recovery after losses - positive emotion after a loss
   const emotionalResilienceScore = entries.reduce((acc, entry, index) => {
     if (index === 0) return acc;
     const prevEntry = entries[index - 1];
@@ -77,7 +110,8 @@ export const PersonalityPatterns = () => {
     return acc + (recoveredFromLoss ? 1 : 0);
   }, 0);
 
-  // Calculate patience based on trade duration and pre-session preparation
+  // TRAIT #4: PATIENCE
+  // Measured by trade duration and pre-session preparation
   const patienceScore = entries.reduce((acc, entry) => {
     const hasPreSession = entry.session_type === 'pre';
     const trades = entry.trades || [];
@@ -88,7 +122,8 @@ export const PersonalityPatterns = () => {
     return acc + (hasPreSession || hasLongTrades ? 1 : 0);
   }, 0);
 
-  // Calculate adaptability based on profitable trades across different sessions and conditions
+  // TRAIT #5: ADAPTABILITY
+  // Measured by profitable trades across different market conditions
   const adaptabilityScore = entries.reduce((acc, entry) => {
     const trades = entry.trades || [];
     
@@ -103,11 +138,11 @@ export const PersonalityPatterns = () => {
       hasProfitableTrades && 
       entry.followed_rules?.length;
     
-    // Award points for demonstrating adaptability through any of these conditions
     return acc + ((successfulUnderEmotion || hasSuccessfulPrePost) ? 1 : 0);
   }, 0);
 
-  // Calculate focus based on mistake avoidance and note-taking behavior
+  // TRAIT #6: FOCUS
+  // Measured by detailed note-taking and avoiding mistakes
   const focusScore = entries.reduce((acc, entry) => {
     // Check if detailed notes are present
     const hasDetailedNotes = entry.notes && entry.notes.length > 100;
@@ -118,39 +153,46 @@ export const PersonalityPatterns = () => {
     return acc + ((hasDetailedNotes || fewMistakes) ? 1 : 0);
   }, 0);
 
-  // Convert scores to percentages
+  // Convert raw scores to percentages based on total entries
   const normalizeScore = (score: number) => Math.round((score / totalEntries) * 100);
 
+  // Create data array for the radar chart
   const data = [
     { 
       trait: "Discipline", 
       current: normalizeScore(disciplineScore),
-      previous: normalizeScore(disciplineScore - 5)
+      previous: normalizeScore(disciplineScore - 5),
+      description: "Measures how consistently you follow your trading rules and document them."
     },
     { 
-      trait: "Risk Tolerance", 
-      current: normalizeScore(riskToleranceScore),
-      previous: normalizeScore(riskToleranceScore - 3)
+      trait: "Risk Management", 
+      current: normalizeScore(riskManagementScore),
+      previous: normalizeScore(riskManagementScore - 3),
+      description: "Shows how effectively you use stop losses and position sizing in your trades."
     },
     { 
       trait: "Emotional Resilience", 
       current: normalizeScore(emotionalResilienceScore),
-      previous: normalizeScore(emotionalResilienceScore - 4)
+      previous: normalizeScore(emotionalResilienceScore - 4),
+      description: "Reflects your ability to maintain a positive mindset after losses."
     },
     { 
       trait: "Patience", 
       current: normalizeScore(patienceScore),
-      previous: normalizeScore(patienceScore - 2)
+      previous: normalizeScore(patienceScore - 2),
+      description: "Indicates your ability to wait for high-quality setups and hold trades for optimal results."
     },
     { 
       trait: "Adaptability", 
       current: normalizeScore(adaptabilityScore),
-      previous: normalizeScore(adaptabilityScore - 3)
+      previous: normalizeScore(adaptabilityScore - 3),
+      description: "Shows how well you adjust to different market conditions and emotional states."
     },
     { 
       trait: "Focus", 
       current: normalizeScore(focusScore),
-      previous: normalizeScore(focusScore - 3)
+      previous: normalizeScore(focusScore - 3),
+      description: "Measures your attention to detail through note-taking and mistake avoidance."
     },
   ];
 
@@ -169,11 +211,29 @@ export const PersonalityPatterns = () => {
 
   return (
     <Card className="p-4 md:p-6 space-y-4 bg-gradient-to-br from-background/95 to-background/80 backdrop-blur-sm border border-border/50 shadow-lg">
-      <div className="space-y-2">
-        <h3 className="text-xl md:text-2xl font-bold">Personality Patterns</h3>
-        <p className="text-sm text-muted-foreground">
-          Track changes in trading personality traits over time
-        </p>
+      <div className="flex justify-between items-start">
+        <div className="space-y-2">
+          <h3 className="text-xl md:text-2xl font-bold">Trading Personality Profile</h3>
+          <p className="text-sm text-muted-foreground">
+            Key personality traits based on your trading journal
+          </p>
+        </div>
+        <TooltipProvider>
+          <UITooltip>
+            <TooltipTrigger asChild>
+              <button className="text-muted-foreground hover:text-foreground transition-colors">
+                <Info size={18} />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-[300px]">
+              <p className="text-sm">
+                This chart analyzes your journal entries to identify your key trading personality traits.
+                Higher percentages indicate stronger traits.
+                Hover over each trait for more details.
+              </p>
+            </TooltipContent>
+          </UITooltip>
+        </TooltipProvider>
       </div>
 
       <div className="h-[300px] md:h-[350px] w-full">
@@ -219,13 +279,20 @@ export const PersonalityPatterns = () => {
         </ResponsiveContainer>
       </div>
 
-      <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
-        <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
-        <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
-          <p>{insights.strength}</p>
-          <p>{insights.improvement}</p>
+      <div className="space-y-3">
+        <h4 className="font-semibold text-sm md:text-base">What This Means For Your Trading</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="bg-accent/10 p-3 rounded-lg">
+            <h5 className="text-sm font-medium">Strength</h5>
+            <p className="text-xs md:text-sm text-muted-foreground mt-1">{insights.strength}</p>
+          </div>
+          <div className="bg-accent/10 p-3 rounded-lg">
+            <h5 className="text-sm font-medium">Area for Improvement</h5>
+            <p className="text-xs md:text-sm text-muted-foreground mt-1">{insights.improvement}</p>
+          </div>
         </div>
       </div>
     </Card>
   );
 };
+
