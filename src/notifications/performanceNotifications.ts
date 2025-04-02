@@ -104,20 +104,25 @@ export const checkPerformanceNotifications = (
         acc[hourRangeKey] = { total: 0, profitable: 0, count: 0 };
       }
       
-      acc[hourRangeKey].total += trade.pnl;
-      if (trade.pnl > 0) acc[hourRangeKey].profitable += 1;
-      acc[hourRangeKey].count += 1;
+      const hourData = acc[hourRangeKey];
+      hourData.total += typeof trade.pnl === 'number' ? trade.pnl : 0;
+      if (typeof trade.pnl === 'number' && trade.pnl > 0) hourData.profitable += 1;
+      hourData.count += 1;
       
       return acc;
     }, {} as Record<string, { total: number; profitable: number; count: number }>);
     
     // Calculate win rate and average PnL for each time period
-    const timePerformance = Object.entries(tradesByHour).map(([time, stats]) => ({
-      time,
-      winRate: stats.count > 0 ? stats.profitable / stats.count : 0,
-      avgPnl: stats.count > 0 ? stats.total / stats.count : 0,
-      count: stats.count
-    }));
+    const timePerformance = Object.entries(tradesByHour).map(([time, stats]) => {
+      // Ensure proper typing
+      const typedStats = stats as { total: number; profitable: number; count: number };
+      return {
+        time,
+        winRate: typedStats.count > 0 ? typedStats.profitable / typedStats.count : 0,
+        avgPnl: typedStats.count > 0 ? typedStats.total / typedStats.count : 0,
+        count: typedStats.count
+      };
+    });
     
     // Find the best performing time period with at least 5 trades
     const bestTime = timePerformance

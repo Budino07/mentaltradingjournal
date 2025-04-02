@@ -107,19 +107,24 @@ export const checkEmotionNotifications = (
         acc[day.emotion] = { total: 0, count: 0 };
       }
       
-      if (acc[day.emotion]) {
-        acc[day.emotion].total += day.pnl || 0;
-        acc[day.emotion].count += 1;
+      const currentEmotion = acc[day.emotion];
+      if (currentEmotion && typeof currentEmotion === 'object' && 'total' in currentEmotion && 'count' in currentEmotion) {
+        currentEmotion.total += day.pnl || 0;
+        currentEmotion.count += 1;
       }
       
       return acc;
     }, {} as Record<string, { total: number; count: number }>);
     
     // Calculate average PnL for each emotion
-    const emotionAverages = Object.entries(emotionPerformance).map(([emotion, stats]) => ({
-      emotion,
-      avgPnl: stats.count > 0 ? stats.total / stats.count : 0
-    }));
+    const emotionAverages = Object.entries(emotionPerformance).map(([emotion, stats]) => {
+      // Ensure stats is properly typed
+      const typedStats = stats as { total: number; count: number };
+      return {
+        emotion,
+        avgPnl: typedStats.count > 0 ? typedStats.total / typedStats.count : 0
+      };
+    });
     
     // Find best performing emotion
     const bestEmotion = emotionAverages.reduce((best, current) => 
