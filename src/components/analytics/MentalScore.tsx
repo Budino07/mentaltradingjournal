@@ -16,6 +16,7 @@ import {
   PolarRadiusAxis,
   Radar,
   ResponsiveContainer,
+  Dot,
 } from "recharts";
 import { Trade } from "@/types/trade";
 import { JournalEntryType } from "@/types/journal";
@@ -34,7 +35,8 @@ const calculateMentalMetrics = (journalEntries: JournalEntryType[]) => {
   const allTrades = journalEntries.flatMap(entry => 
     (entry.trades || []).map(trade => ({
       ...trade,
-      pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : (trade.pnl || 0),
+      pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+           (typeof trade.pnl === 'number' ? trade.pnl : 0),
     }))
   );
 
@@ -81,7 +83,7 @@ const calculateMentalMetrics = (journalEntries: JournalEntryType[]) => {
       }, 0)) / losingTrades.length 
     : 0;
     
-  const winLossRatio = avgLoss > 0 ? Math.round((avgWin / avgLoss) * 10) / 10 : 0;
+  const avgWinLossRatio = avgLoss > 0 ? Math.round((avgWin / avgLoss) * 10) / 10 : 0;
 
   // Calculate recovery factor
   const maxDrawdown = calculateMaxDrawdown(allTrades);
@@ -117,19 +119,19 @@ const calculateMentalMetrics = (journalEntries: JournalEntryType[]) => {
   const normalizeScore = (value: number, max: number) => Math.min(Math.round((value / max) * 100), 100);
 
   const metrics = [
-    { name: "Win %", value: winPercentage, fullMark: 100, description: "Percentage of profitable trades" },
-    { name: "Profit Factor", value: normalizeScore(profitFactor, 3), fullMark: 100, description: "Ratio of gross profit to gross loss" },
-    { name: "Win/Loss Ratio", value: normalizeScore(winLossRatio, 3), fullMark: 100, description: "Average win divided by average loss" },
-    { name: "Recovery Factor", value: normalizeScore(recoveryFactor, 3), fullMark: 100, description: "Net profit divided by max drawdown" },
-    { name: "Max Drawdown", value: 100 - normalizeScore(maxDrawdown, 5000), fullMark: 100, description: "Largest peak-to-trough decline" },
-    { name: "Consistency", value: consistency, fullMark: 100, description: "Percentage of profitable days" },
+    { name: "Win %", value: winPercentage, fullMark: 100, description: "Percentage of profitable trades", originalValue: `${winPercentage}%` },
+    { name: "Profit Factor", value: normalizeScore(profitFactor, 3), fullMark: 100, description: "Ratio of gross profit to gross loss", originalValue: profitFactor.toFixed(1) },
+    { name: "Avg Win/Loss", value: normalizeScore(avgWinLossRatio, 3), fullMark: 100, description: "Average win amount divided by average loss amount", originalValue: avgWinLossRatio.toFixed(1) },
+    { name: "Recovery Factor", value: normalizeScore(recoveryFactor, 3), fullMark: 100, description: "Net profit divided by max drawdown", originalValue: recoveryFactor.toFixed(1) },
+    { name: "Max Drawdown", value: 100 - normalizeScore(maxDrawdown, 5000), fullMark: 100, description: "Largest peak-to-trough decline", originalValue: `$${maxDrawdown.toFixed(0)}` },
+    { name: "Consistency", value: consistency, fullMark: 100, description: "Percentage of profitable days", originalValue: `${consistency}%` },
   ];
 
   // Calculate overall mental score (weighted average)
   const weights = {
     "Win %": 0.15,
     "Profit Factor": 0.2,
-    "Win/Loss Ratio": 0.2,
+    "Avg Win/Loss": 0.2,
     "Recovery Factor": 0.15,
     "Max Drawdown": 0.1,
     "Consistency": 0.2,
@@ -146,9 +148,34 @@ const calculateMentalMetrics = (journalEntries: JournalEntryType[]) => {
   const highestMetric = sortedMetrics[0];
   const lowestMetric = sortedMetrics[sortedMetrics.length - 1];
 
+  // Find the specific setup type with the best performance
+  const setupPerformance: Record<string, { count: number, pnl: number }> = {};
+  
+  // Process all trades to find the most consistent setup
+  allTrades.forEach(trade => {
+    if (trade.setup) {
+      if (!setupPerformance[trade.setup]) {
+        setupPerformance[trade.setup] = { count: 0, pnl: 0 };
+      }
+      setupPerformance[trade.setup].count += 1;
+      setupPerformance[trade.setup].pnl += typeof trade.pnl === 'number' ? trade.pnl : 0;
+    }
+  });
+  
+  // Find the most frequent setup with positive PnL
+  const consistentSetups = Object.entries(setupPerformance)
+    .filter(([_, stats]) => stats.count >= 3 && stats.pnl > 0)
+    .sort((a, b) => b[1].count - a[1].count);
+  
+  const topSetup = consistentSetups.length > 0 ? consistentSetups[0][0] : null;
+
   const insights = {
-    strength: `Your ${highestMetric.name} (${highestMetric.value}%) is your strongest mental metric, showing solid psychological resilience.`,
-    weakness: `Focus on improving your ${lowestMetric.name} (${lowestMetric.value}%), as this may be limiting your overall trading performance.`
+    strength: highestMetric.name === "Avg Win/Loss" 
+      ? `Your trade management skills are excellent, with an average win (${avgWin.toFixed(2)}) ${avgWinLossRatio.toFixed(1)}x larger than your average loss (${avgLoss.toFixed(2)}).`
+      : `Your ${highestMetric.name} (${highestMetric.originalValue}) is your strongest mental metric, showing solid psychological resilience in this area.`,
+    weakness: lowestMetric.name === "Consistency" 
+      ? `Focus on improving your trading consistency (${consistency}% profitable days). ${topSetup ? `Your "${topSetup}" setup has been your most reliable - consider focusing more on this pattern.` : "Try to identify and stick with your most reliable setups."}`
+      : `Work on improving your ${lowestMetric.name.toLowerCase()} (${lowestMetric.originalValue}), as this may be limiting your overall trading performance.`
   };
 
   return {
@@ -189,6 +216,33 @@ const calculateMaxDrawdown = (trades: Trade[]) => {
   });
   
   return maxDrawdown;
+};
+
+// Custom radar dot with tooltips
+const CustomizedDot = (props: any) => {
+  const { cx, cy, value, payload, index } = props;
+  
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <circle 
+            cx={cx} 
+            cy={cy} 
+            r={5} 
+            fill="#6366F1" 
+            stroke="#fff" 
+            strokeWidth={2} 
+            style={{ cursor: 'pointer' }}
+          />
+        </TooltipTrigger>
+        <TooltipContent className="flex flex-col gap-1 p-2 max-w-[220px]">
+          <p className="font-semibold text-sm">{payload.name}: {payload.originalValue}</p>
+          <p className="text-xs text-muted-foreground">{payload.description}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 };
 
 // Mental Score Component
@@ -321,6 +375,7 @@ export const MentalScore = () => {
                 stroke="#6366F1"
                 fill="#6366F1"
                 fillOpacity={0.6}
+                dot={<CustomizedDot />}
               />
             </RadarChart>
           </ResponsiveContainer>

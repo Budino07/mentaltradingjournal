@@ -18,7 +18,7 @@ export const checkPerformanceNotifications = (
     (entry.trades || []).map((trade: Trade) => ({
       ...trade,
       entryDate: trade.entryDate || '',
-      pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : (trade.pnl || 0),
+      pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : (typeof trade.pnl === 'number' ? trade.pnl : 0),
       entry: entry,
     }))
   );
@@ -104,7 +104,7 @@ export const checkPerformanceNotifications = (
         acc[hourRangeKey] = { total: 0, profitable: 0, count: 0 };
       }
       
-      // Explicitly type and extract the hourData to ensure type safety
+      // Get the hour data object
       const hourData = acc[hourRangeKey];
       
       // Ensure pnl is a number
