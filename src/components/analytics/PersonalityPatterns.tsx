@@ -8,6 +8,7 @@ import {
   Radar,
   ResponsiveContainer,
   Tooltip,
+  Legend,
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
@@ -106,6 +107,17 @@ export const PersonalityPatterns = () => {
     return acc + ((successfulUnderEmotion || hasSuccessfulPrePost) ? 1 : 0);
   }, 0);
 
+  // Calculate focus based on mistake avoidance and note-taking behavior
+  const focusScore = entries.reduce((acc, entry) => {
+    // Check if detailed notes are present
+    const hasDetailedNotes = entry.notes && entry.notes.length > 100;
+    
+    // Check if few or no mistakes were made
+    const fewMistakes = !entry.mistakes || entry.mistakes.length <= 1;
+    
+    return acc + ((hasDetailedNotes || fewMistakes) ? 1 : 0);
+  }, 0);
+
   // Convert scores to percentages
   const normalizeScore = (score: number) => Math.round((score / totalEntries) * 100);
 
@@ -135,6 +147,11 @@ export const PersonalityPatterns = () => {
       current: normalizeScore(adaptabilityScore),
       previous: normalizeScore(adaptabilityScore - 3)
     },
+    { 
+      trait: "Focus", 
+      current: normalizeScore(focusScore),
+      previous: normalizeScore(focusScore - 3)
+    },
   ];
 
   // Generate insights based on the scores
@@ -151,7 +168,7 @@ export const PersonalityPatterns = () => {
   const insights = generateInsights();
 
   return (
-    <Card className="p-4 md:p-6 space-y-4">
+    <Card className="p-4 md:p-6 space-y-4 bg-gradient-to-br from-background/95 to-background/80 backdrop-blur-sm border border-border/50 shadow-lg">
       <div className="space-y-2">
         <h3 className="text-xl md:text-2xl font-bold">Personality Patterns</h3>
         <p className="text-sm text-muted-foreground">
@@ -159,18 +176,22 @@ export const PersonalityPatterns = () => {
         </p>
       </div>
 
-      <div className="h-[250px] md:h-[300px] w-full">
+      <div className="h-[300px] md:h-[350px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
-            <PolarGrid className="text-muted-foreground/25" />
+            <PolarGrid className="text-muted-foreground/15" stroke="#444455" />
             <PolarAngleAxis 
               dataKey="trait"
-              tick={{ fill: 'currentColor', fontSize: 12 }}
+              tick={{ fill: 'currentColor', fontSize: 13, fontWeight: 500 }}
+              stroke="transparent"
             />
             <PolarRadiusAxis 
               angle={30} 
               domain={[0, 100]}
-              tick={{ fill: 'currentColor', fontSize: 12 }}
+              tick={{ fill: 'currentColor', fontSize: 10 }}
+              axisLine={false}
+              tickCount={5}
+              stroke="#444455"
             />
             <Tooltip content={<CustomTooltip />} />
             <Radar
@@ -178,14 +199,21 @@ export const PersonalityPatterns = () => {
               dataKey="current"
               stroke="#6E59A5"
               fill="#6E59A5"
-              fillOpacity={0.6}
+              fillOpacity={0.7}
             />
             <Radar
-              name="Previous Month"
+              name="Previous"
               dataKey="previous"
               stroke="#0EA5E9"
               fill="#0EA5E9"
-              fillOpacity={0.6}
+              fillOpacity={0.35}
+            />
+            <Legend 
+              iconType="circle" 
+              wrapperStyle={{ 
+                paddingTop: 20,
+                fontSize: '12px'
+              }}
             />
           </RadarChart>
         </ResponsiveContainer>
