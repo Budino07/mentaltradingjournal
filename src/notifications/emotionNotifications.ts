@@ -107,8 +107,10 @@ export const checkEmotionNotifications = (
         acc[day.emotion] = { total: 0, count: 0 };
       }
       
-      acc[day.emotion].total += day.pnl || 0;
-      acc[day.emotion].count += 1;
+      if (acc[day.emotion]) {
+        acc[day.emotion].total += day.pnl || 0;
+        acc[day.emotion].count += 1;
+      }
       
       return acc;
     }, {} as Record<string, { total: number; count: number }>);
@@ -137,4 +139,3 @@ export const checkEmotionNotifications = (
     }
   }
 };
-
