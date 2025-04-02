@@ -39,29 +39,57 @@ const calculateMentalMetrics = (journalEntries: JournalEntryType[]) => {
   );
 
   // Calculate win percentage
-  const winningTrades = allTrades.filter(trade => (typeof trade.pnl === 'number' && trade.pnl > 0));
+  const winningTrades = allTrades.filter(trade => {
+    const pnl = typeof trade.pnl === 'number' ? trade.pnl : 0;
+    return pnl > 0;
+  });
+  
   const winPercentage = allTrades.length > 0 
     ? Math.round((winningTrades.length / allTrades.length) * 100) 
     : 0;
 
   // Calculate profit factor
-  const grossProfit = winningTrades.reduce((sum, trade) => sum + (typeof trade.pnl === 'number' ? trade.pnl : 0), 0);
-  const losingTrades = allTrades.filter(trade => (typeof trade.pnl === 'number' && trade.pnl < 0));
-  const grossLoss = Math.abs(losingTrades.reduce((sum, trade) => sum + (typeof trade.pnl === 'number' ? trade.pnl : 0), 0));
+  const grossProfit = winningTrades.reduce((sum, trade) => {
+    const pnl = typeof trade.pnl === 'number' ? trade.pnl : 0;
+    return sum + pnl;
+  }, 0);
+  
+  const losingTrades = allTrades.filter(trade => {
+    const pnl = typeof trade.pnl === 'number' ? trade.pnl : 0;
+    return pnl < 0;
+  });
+  
+  const grossLoss = Math.abs(losingTrades.reduce((sum, trade) => {
+    const pnl = typeof trade.pnl === 'number' ? trade.pnl : 0;
+    return sum + pnl;
+  }, 0));
+  
   const profitFactor = grossLoss > 0 ? Math.round((grossProfit / grossLoss) * 10) / 10 : 0;
 
   // Calculate average win/loss ratio
   const avgWin = winningTrades.length > 0 
-    ? winningTrades.reduce((sum, trade) => sum + (typeof trade.pnl === 'number' ? trade.pnl : 0), 0) / winningTrades.length 
+    ? winningTrades.reduce((sum, trade) => {
+        const pnl = typeof trade.pnl === 'number' ? trade.pnl : 0;
+        return sum + pnl;
+      }, 0) / winningTrades.length 
     : 0;
+    
   const avgLoss = losingTrades.length > 0 
-    ? Math.abs(losingTrades.reduce((sum, trade) => sum + (typeof trade.pnl === 'number' ? trade.pnl : 0), 0)) / losingTrades.length 
+    ? Math.abs(losingTrades.reduce((sum, trade) => {
+        const pnl = typeof trade.pnl === 'number' ? trade.pnl : 0;
+        return sum + pnl;
+      }, 0)) / losingTrades.length 
     : 0;
+    
   const winLossRatio = avgLoss > 0 ? Math.round((avgWin / avgLoss) * 10) / 10 : 0;
 
   // Calculate recovery factor
   const maxDrawdown = calculateMaxDrawdown(allTrades);
-  const netProfit = allTrades.reduce((sum, trade) => sum + (typeof trade.pnl === 'number' ? trade.pnl : 0), 0);
+  const netProfit = allTrades.reduce((sum, trade) => {
+    const pnl = typeof trade.pnl === 'number' ? trade.pnl : 0;
+    return sum + pnl;
+  }, 0);
+  
   const recoveryFactor = maxDrawdown > 0 ? Math.round((netProfit / maxDrawdown) * 10) / 10 : 0;
 
   // Calculate consistency
@@ -69,7 +97,8 @@ const calculateMentalMetrics = (journalEntries: JournalEntryType[]) => {
     const date = new Date(entry.created_at).toISOString().split('T')[0];
     const dailyPnl = (entry.trades || []).reduce(
       (sum, trade) => {
-        const tradePnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : (typeof trade.pnl === 'number' ? trade.pnl : 0);
+        const tradePnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+                        (typeof trade.pnl === 'number' ? trade.pnl : 0);
         return sum + tradePnl;
       }, 
       0
@@ -78,7 +107,7 @@ const calculateMentalMetrics = (journalEntries: JournalEntryType[]) => {
     if (!acc[date]) acc[date] = 0;
     acc[date] += dailyPnl;
     return acc;
-  }, {});
+  }, {} as Record<string, number>);
   
   const profitableDays = Object.values(dailyResults).filter(pnl => pnl > 0).length;
   const totalDays = Object.keys(dailyResults).length;
@@ -145,7 +174,8 @@ const calculateMaxDrawdown = (trades: Trade[]) => {
   });
   
   sortedTrades.forEach(trade => {
-    const pnlValue = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : (typeof trade.pnl === 'number' ? trade.pnl : 0);
+    const pnlValue = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+                     (typeof trade.pnl === 'number' ? trade.pnl : 0);
     runningTotal += pnlValue;
     
     if (runningTotal > peak) {

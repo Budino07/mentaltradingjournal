@@ -104,9 +104,15 @@ export const checkPerformanceNotifications = (
         acc[hourRangeKey] = { total: 0, profitable: 0, count: 0 };
       }
       
+      // Explicitly type and extract the hourData to ensure type safety
       const hourData = acc[hourRangeKey];
-      hourData.total += typeof trade.pnl === 'number' ? trade.pnl : 0;
-      if (typeof trade.pnl === 'number' && trade.pnl > 0) hourData.profitable += 1;
+      
+      // Ensure pnl is a number
+      const pnlValue = typeof trade.pnl === 'number' ? trade.pnl : 
+                      typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 0;
+      
+      hourData.total += pnlValue;
+      if (pnlValue > 0) hourData.profitable += 1;
       hourData.count += 1;
       
       return acc;
@@ -114,13 +120,11 @@ export const checkPerformanceNotifications = (
     
     // Calculate win rate and average PnL for each time period
     const timePerformance = Object.entries(tradesByHour).map(([time, stats]) => {
-      // Ensure proper typing
-      const typedStats = stats as { total: number; profitable: number; count: number };
       return {
         time,
-        winRate: typedStats.count > 0 ? typedStats.profitable / typedStats.count : 0,
-        avgPnl: typedStats.count > 0 ? typedStats.total / typedStats.count : 0,
-        count: typedStats.count
+        winRate: stats.count > 0 ? stats.profitable / stats.count : 0,
+        avgPnl: stats.count > 0 ? stats.total / stats.count : 0,
+        count: stats.count
       };
     });
     

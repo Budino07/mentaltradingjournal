@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { EmotionTrend } from "./EmotionTrend";
@@ -21,6 +20,7 @@ import { EquityCurve } from "./EquityCurve";
 import { EmotionFrequency } from "./EmotionFrequency";
 import { SetupPerformance } from "./SetupPerformance";
 import { OvertradingHeatMap } from "./OvertradingHeatMap";
+import { MentalScore } from "./MentalScore"; // Import the new MentalScore component
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -35,6 +35,7 @@ export const AnalyticsDashboard = () => {
     EmotionRecovery,
     PreTradingEvents,
     PersonalityPatterns,
+    MentalScore, // Add MentalScore to psychological components
     OvertradingHeatMap,
   ];
 
@@ -62,15 +63,20 @@ export const AnalyticsDashboard = () => {
         return tradingComponents;
       default:
         // Reordered components for the "all" view
-        // First psychological components, then trading components
+        // We'll put PersonalityPatterns and MentalScore side by side
         return [
           // Psychological components starting with EmotionTrend
           EmotionTrend, 
           EmotionFrequency,
+          
+          // Put PersonalityPatterns and MentalScore side by side
+          PersonalityPatterns,
+          MentalScore,
+          
+          // Other psychological components
           MistakeAnalysis,
           EmotionRecovery,
           PreTradingEvents,
-          PersonalityPatterns,
           OvertradingHeatMap,
           
           // Trading components
