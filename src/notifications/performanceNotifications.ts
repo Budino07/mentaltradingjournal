@@ -104,12 +104,12 @@ export const checkPerformanceNotifications = (
         acc[hourRangeKey] = { total: 0, profitable: 0, count: 0 };
       }
       
+      // Explicitly type and extract the hourData to ensure type safety
+      const hourData = acc[hourRangeKey];
+      
       // Ensure pnl is a number
       const pnlValue = typeof trade.pnl === 'number' ? trade.pnl : 
                       typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 0;
-      
-      // Get the hourData object
-      const hourData = acc[hourRangeKey];
       
       hourData.total += pnlValue;
       if (pnlValue > 0) hourData.profitable += 1;

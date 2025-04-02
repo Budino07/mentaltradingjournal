@@ -68,7 +68,7 @@ export const WinLossRatio = () => {
   const totalTrades = allTrades.length;
   
   const winRate = totalTrades ? (winningTrades / totalTrades) * 100 : 0;
-  const lossRate = totalTrades ? 100 - winRate : 0; // Calculate loss rate as complement to win rate
+  const lossRate = totalTrades ? ((totalTrades - winningTrades) / totalTrades) * 100 : 0;
 
   const data = [
     { name: "Winning Trades", value: winRate },
