@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -205,12 +206,12 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Emotional return notifications - check when a user returns to an emotional state
     // Get today's entries
-    const todayEntries = analyticsData.journalEntries.filter(entry => 
+    const entriesForToday = analyticsData.journalEntries.filter(entry => 
       isSameDay(new Date(entry.created_at), new Date())
     );
     
     // Check if any of today's entries have each emotion
-    const todayEmotions = todayEntries.map(entry => entry.emotion);
+    const todayEmotions = entriesForToday.map(entry => entry.emotion);
     const hasPositiveToday = todayEmotions.includes('positive');
     const hasNeutralToday = todayEmotions.includes('neutral');
     const hasNegativeToday = todayEmotions.includes('negative');
@@ -344,11 +345,9 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     // 🧠 Mindset-Based Notifications - Check morning entries
-    const todayEntries = analyticsData.journalEntries.filter(entry => 
-      isSameDay(new Date(entry.created_at), new Date())
-    );
+    const todayEntriesForMindset = entriesForToday;
     
-    const morningEntry = todayEntries.find(entry => 
+    const morningEntry = todayEntriesForMindset.find(entry => 
       entry.session_type === 'pre' && new Date(entry.created_at).getHours() < 12
     );
     
@@ -378,7 +377,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // ⏳ Reminders & Habit Tracking - Check if user hasn't journaled today (only after 5PM)
     // Using user's local time
-    if (currentHour >= 17 && todayEntries.length === 0) {
+    if (currentHour >= 17 && entriesForToday.length === 0) {
       const reminderTitle = "Don't forget to journal today!";
       if (!hasSentTodayWithTitle(reminderTitle)) {
         addNotification({
@@ -390,8 +389,8 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     // Post-session reminder - Check if user has pre-session but no post-session today as evening approaches
-    const todayPreSessions = todayEntries.filter(entry => entry.session_type === 'pre');
-    const todayPostSessions = todayEntries.filter(entry => entry.session_type === 'post');
+    const todayPreSessions = entriesForToday.filter(entry => entry.session_type === 'pre');
+    const todayPostSessions = entriesForToday.filter(entry => entry.session_type === 'post');
     
     // If we have a pre-session but no post-session, and it's after 7 PM but before midnight in user's timezone
     if (todayPreSessions.length > 0 && todayPostSessions.length === 0 && currentHour >= 19 && currentHour < 24) {
