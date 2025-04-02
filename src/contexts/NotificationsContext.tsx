@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -99,6 +98,28 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   };
 
+  // Helper function to find when an emotion was last logged
+  const getDaysSinceEmotion = (emotion: string, entries: JournalEntryType[]): number => {
+    // Sort entries from newest to oldest
+    const sortedEntries = [...entries].sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+    
+    // Find most recent entry with this emotion (excluding today)
+    const today = startOfDay(new Date());
+    const mostRecentWithEmotion = sortedEntries.find(entry => 
+      entry.emotion === emotion && 
+      !isSameDay(new Date(entry.created_at), today)
+    );
+    
+    if (!mostRecentWithEmotion) {
+      return 30; // Default to 30 days if never logged before
+    }
+    
+    // Calculate days since that entry
+    return differenceInDays(today, new Date(mostRecentWithEmotion.created_at));
+  };
+
   // Load notifications from localStorage on mount
   useEffect(() => {
     if (!user) return;
@@ -177,6 +198,59 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
         addNotification({
           title: "Trading Frequency Alert",
           message: `You've made ${todayTrades.length} trades today, which exceeds your average of ${avgTradesPerDay} trades per day. Are you sticking to your trading plan?`,
+          type: "warning"
+        });
+      }
+    }
+
+    // Emotional return notifications - check when a user returns to an emotional state
+    // Get today's entries
+    const todayEntries = analyticsData.journalEntries.filter(entry => 
+      isSameDay(new Date(entry.created_at), new Date())
+    );
+    
+    // Check if any of today's entries have each emotion
+    const todayEmotions = todayEntries.map(entry => entry.emotion);
+    const hasPositiveToday = todayEmotions.includes('positive');
+    const hasNeutralToday = todayEmotions.includes('neutral');
+    const hasNegativeToday = todayEmotions.includes('negative');
+    
+    // Calculate days since each emotion was last logged
+    const daysSincePositive = getDaysSinceEmotion('positive', analyticsData.journalEntries);
+    const daysSinceNeutral = getDaysSinceEmotion('neutral', analyticsData.journalEntries);
+    const daysSinceNegative = getDaysSinceEmotion('negative', analyticsData.journalEntries);
+    
+    // Positive emotion return notification
+    if (hasPositiveToday && daysSincePositive >= 3) {
+      const positiveReturnTitle = "Welcome back to positivity! 🎉";
+      if (!hasSentTodayWithTitle(positiveReturnTitle)) {
+        addNotification({
+          title: positiveReturnTitle,
+          message: `It's been ${daysSincePositive} days since you last felt positive. Great to see you back in a good headspace! Reflect on what changed to maintain this momentum.`,
+          type: "success"
+        });
+      }
+    }
+    
+    // Neutral emotion return notification
+    if (hasNeutralToday && daysSinceNeutral >= 4) {
+      const neutralReturnTitle = "Back to balance ⚖️";
+      if (!hasSentTodayWithTitle(neutralReturnTitle)) {
+        addNotification({
+          title: neutralReturnTitle,
+          message: `After ${daysSinceNeutral} days, you're back to a neutral emotional state. This balanced mindset can be great for objective decision making.`,
+          type: "info"
+        });
+      }
+    }
+    
+    // Negative emotion return notification
+    if (hasNegativeToday && daysSinceNegative >= 5) {
+      const negativeReturnTitle = "Emotional awareness check 🧠";
+      if (!hasSentTodayWithTitle(negativeReturnTitle)) {
+        addNotification({
+          title: negativeReturnTitle,
+          message: `You haven't recorded negative emotions in ${daysSinceNegative} days until today. Remember that acknowledging emotions is the first step to managing them. What triggered this change?`,
           type: "warning"
         });
       }
