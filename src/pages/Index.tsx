@@ -4,6 +4,7 @@ import { EmotionLogger } from "@/components/journal/EmotionLogger";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { CalendarModeProvider } from "@/contexts/CalendarModeContext";
+import { MorningRecap } from "@/components/notifications/MorningRecap";
 
 const Index = () => {
   const isMobile = useIsMobile();
@@ -14,6 +15,7 @@ const Index = () => {
         <AppLayout>
           <div className={`container mx-auto py-0 ${isMobile ? 'px-3' : 'px-2'}`}>
             <EmotionLogger />
+            <MorningRecap />
           </div>
         </AppLayout>
       </CalendarModeProvider>

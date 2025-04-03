@@ -1,3 +1,4 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -17,6 +18,7 @@ import { SubscriptionGuard } from "@/components/subscription/SubscriptionGuard";
 import { JournalTradesList } from "@/components/journal/TradesList";
 import { CalendarModeProvider } from "@/contexts/CalendarModeContext";
 import { DailyInsightsDialog } from "@/components/journal/insights/DailyInsightsDialog";
+import { MorningRecap } from "@/components/notifications/MorningRecap";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
@@ -288,6 +290,8 @@ const Journal = () => {
               date={selectedDate || new Date()}
               trades={selectedDateTrades}
             />
+            
+            <MorningRecap />
           </CalendarModeProvider>
         </TimeFilterProvider>
       </SubscriptionGuard>
