@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info, Settings } from "lucide-react";
@@ -27,6 +26,7 @@ type TimeOfDayTrade = {
   instrument?: string;
   direction?: string;
   entryId?: string; // Journal entry ID
+  entryDate?: string; // Add entry date for navigation
 };
 
 export const TradeTimePerformance = () => {
@@ -63,7 +63,8 @@ export const TradeTimePerformance = () => {
           pnl,
           instrument: trade.instrument,
           direction: trade.direction,
-          entryId: entry.id // Add the journal entry ID
+          entryId: entry.id, // Add the journal entry ID
+          entryDate: entry.created_at // Add the entry created date for navigation
         });
       });
     });
@@ -73,9 +74,15 @@ export const TradeTimePerformance = () => {
 
   // Handle click on a data point
   const handlePointClick = (data: TimeOfDayTrade) => {
-    if (data.entryId) {
-      // Correct redirect to the dashboard route with the entry parameter
-      navigate(`/dashboard?entry=${data.entryId}`);
+    if (data.entryDate) {
+      // Navigate to the journal page with the date of the entry
+      // This will show entries for that specific date
+      const entryDate = new Date(data.entryDate);
+      navigate('/dashboard', { 
+        state: { 
+          selectedDate: entryDate
+        }
+      });
     }
   };
 
@@ -236,7 +243,7 @@ export const TradeTimePerformance = () => {
                         <p>{`P&L: ${formatCurrency(data.pnl)}`}</p>
                         {data.instrument && <p>{`Instrument: ${data.instrument}`}</p>}
                         {data.direction && <p>{`Direction: ${data.direction}`}</p>}
-                        <p className="text-xs text-primary mt-1">Click to view details</p>
+                        <p className="text-xs text-primary mt-1">Click to view journal entries for this date</p>
                       </div>
                     );
                   }
