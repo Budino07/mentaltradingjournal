@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { X, AlertCircle } from "lucide-react";
 import {
@@ -189,7 +188,7 @@ export const MorningRecap = () => {
             <div className="flex items-center space-x-4">
               <div className={`h-16 w-16 rounded-full overflow-hidden flex items-center justify-center ${isDark ? "bg-indigo-900/30 border border-indigo-500/20" : "bg-slate-100 border border-slate-200"}`}>
                 <img 
-                  src="/lovable-uploads/2865dd7c-9897-4e9e-814b-1742b3af6bc4.png" 
+                  src="/lovable-uploads/c44d50b3-9f41-4f60-aca9-e9330a156b6e.png" 
                   alt="Brain Memoji" 
                   className="h-16 w-16 object-cover"
                 />
