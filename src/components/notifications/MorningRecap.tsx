@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogHeader,
 } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { formatDisplayDate } from "@/utils/dateUtils";
@@ -153,12 +152,6 @@ export const MorningRecap = () => {
 
   if (!analyticsData) return null;
 
-  // Get user initials for avatar fallback
-  const getUserInitials = () => {
-    const username = user?.user_metadata?.username || user?.email?.split('@')[0] || '';
-    return username.substring(0, 2).toUpperCase();
-  };
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent 
@@ -194,14 +187,13 @@ export const MorningRecap = () => {
 
           <div className="flex items-center justify-between mt-6">
             <div className="flex items-center space-x-4">
-              <Avatar className={`h-14 w-14 ${isDark ? "border border-indigo-500/20" : "border border-slate-200"}`}>
-                <AvatarImage src={user?.user_metadata?.avatar_url} />
-                <AvatarFallback className={`text-lg font-medium ${
-                  isDark ? "bg-indigo-900/30 text-indigo-200" : "bg-slate-100 text-slate-700"
-                }`}>
-                  {getUserInitials()}
-                </AvatarFallback>
-              </Avatar>
+              <div className={`h-16 w-16 rounded-full overflow-hidden flex items-center justify-center ${isDark ? "bg-indigo-900/30 border border-indigo-500/20" : "bg-slate-100 border border-slate-200"}`}>
+                <img 
+                  src="/lovable-uploads/2865dd7c-9897-4e9e-814b-1742b3af6bc4.png" 
+                  alt="Brain Memoji" 
+                  className="h-16 w-16 object-cover"
+                />
+              </div>
             </div>
             
             <div className="flex justify-between space-x-6 w-4/5">
