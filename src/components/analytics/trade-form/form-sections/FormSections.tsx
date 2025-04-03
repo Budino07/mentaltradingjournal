@@ -3,6 +3,7 @@ import { Trade } from "@/types/trade";
 import { GeneralSection } from "../GeneralSection";
 import { TradeEntrySection } from "../TradeEntrySection";
 import { TradeExitSection } from "../TradeExitSection";
+import { NotesSection } from "../NotesSection";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FormSectionsProps {
@@ -22,6 +23,9 @@ export const FormSections = ({
   
   return (
     <div className={`${isMobile ? 'p-3 pt-0' : 'p-2 md:p-6 pt-2'} grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-6`}>
+      <div className="md:col-span-3">
+        <NotesSection formValues={formValues} />
+      </div>
       <GeneralSection 
         direction={direction} 
         setDirection={setDirection}

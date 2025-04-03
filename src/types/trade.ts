@@ -1,3 +1,4 @@
+
 export interface Trade {
   [key: string]: any;
   id?: string;
@@ -17,4 +18,5 @@ export interface Trade {
   forecastScreenshot?: string;
   resultScreenshot?: string;
   htfBias?: string;
+  notes?: string; // Add notes field to Trade type
 }

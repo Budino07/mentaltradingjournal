@@ -36,7 +36,8 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         forecastScreenshot: formData.get("forecastScreenshot") as string,
         resultUrl: formData.get("resultUrl") as string,
         highestPrice: parseFloat(formData.get("highestPrice") as string),
-        lowestPrice: parseFloat(formData.get("lowestPrice") as string)
+        lowestPrice: parseFloat(formData.get("lowestPrice") as string),
+        notes: formData.get("notes") as string, // Add notes field to trade data
       };
 
       console.log("Trade data to submit:", tradeData);
@@ -84,7 +85,7 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
           .from('journal_entries')
           .insert({
             user_id: user?.id,
-            notes: `Write anything that stands out for ${tradeData.instrument}`,
+            notes: tradeData.notes || `Write anything that stands out for ${tradeData.instrument}`, // Use trade notes if provided
             trades: [tradeObject],
             session_type: 'trade',
             emotion: 'neutral',    
