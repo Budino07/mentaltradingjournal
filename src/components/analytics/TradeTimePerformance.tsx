@@ -74,7 +74,8 @@ export const TradeTimePerformance = () => {
   // Handle click on a data point
   const handlePointClick = (data: TimeOfDayTrade) => {
     if (data.entryId) {
-      navigate(`/journal?entry=${data.entryId}`);
+      // Correct redirect to the dashboard route with the entry parameter
+      navigate(`/dashboard?entry=${data.entryId}`);
     }
   };
 
