@@ -1,5 +1,5 @@
 
-import { format, isSameDay, subDays } from "date-fns";
+import { format, isSameDay, differenceInDays, startOfDay, subDays } from "date-fns";
 import { hasSentTodayWithTitle, hasSentWithinDaysWithTitle, getDaysSinceEmotion } from "@/utils/notificationUtils";
 import { Notification } from "@/types/notifications";
 import { JournalEntryType } from "@/types/journal";
@@ -9,134 +9,153 @@ export const checkEmotionNotifications = (
   notifications: Notification[],
   addNotification: (notification: Omit<Notification, "id" | "createdAt" | "read">) => void
 ): void => {
-  if (!analyticsData || !analyticsData.journalEntries) return;
+  if (!analyticsData?.journalEntries?.length) return;
 
-  // Get today's entries
-  const entriesForToday = analyticsData.journalEntries.filter((entry: JournalEntryType) => 
-    isSameDay(new Date(entry.created_at), new Date())
-  );
-  
-  // Check if any of today's entries have each emotion
-  const todayEmotions = entriesForToday.map(entry => entry.emotion);
-  const hasPositiveToday = todayEmotions.includes('positive');
-  const hasNeutralToday = todayEmotions.includes('neutral');
-  const hasNegativeToday = todayEmotions.includes('negative');
-  
-  // Calculate days since each emotion was last logged
-  const daysSincePositive = getDaysSinceEmotion('positive', analyticsData.journalEntries);
-  const daysSinceNeutral = getDaysSinceEmotion('neutral', analyticsData.journalEntries);
-  const daysSinceNegative = getDaysSinceEmotion('negative', analyticsData.journalEntries);
-  
-  // Positive emotion return notification
-  if (hasPositiveToday && daysSincePositive >= 3) {
-    const positiveReturnTitle = "Welcome back to positivity! 🎉";
-    if (!hasSentTodayWithTitle(notifications, positiveReturnTitle)) {
-      addNotification({
-        title: positiveReturnTitle,
-        message: `It's been ${daysSincePositive} days since you last felt positive. Great to see you back in a good headspace! Reflect on what changed to maintain this momentum.`,
-        type: "success"
-      });
-    }
-  }
-  
-  // Neutral emotion return notification
-  if (hasNeutralToday && daysSinceNeutral >= 4) {
-    const neutralReturnTitle = "Back to balance ⚖️";
-    if (!hasSentTodayWithTitle(notifications, neutralReturnTitle)) {
-      addNotification({
-        title: neutralReturnTitle,
-        message: `After ${daysSinceNeutral} days, you're back to a neutral emotional state. This balanced mindset can be great for objective decision making.`,
-        type: "info"
-      });
-    }
-  }
-  
-  // Negative emotion return notification
-  if (hasNegativeToday && daysSinceNegative >= 5) {
-    const negativeReturnTitle = "Emotional awareness check 🧠";
-    if (!hasSentTodayWithTitle(notifications, negativeReturnTitle)) {
-      addNotification({
-        title: negativeReturnTitle,
-        message: `You haven't recorded negative emotions in ${daysSinceNegative} days until today. Remember that acknowledging emotions is the first step to managing them. What triggered this change?`,
-        type: "warning"
-      });
-    }
-  }
-
-  // 🧠 Mindset-Based Notifications - Check morning entries
-  const morningEntry = entriesForToday.find(entry => 
-    entry.session_type === 'pre' && new Date(entry.created_at).getHours() < 12
-  );
-  
-  if (morningEntry && morningEntry.emotion) {
-    const mindsetTitle = `Your morning check-in: ${morningEntry.emotion}`;
-    
-    if (morningEntry.emotion.toLowerCase().includes('positive') && !hasSentTodayWithTitle(notifications, mindsetTitle)) {
-      addNotification({
-        title: mindsetTitle,
-        message: "You're in a great headspace. Ready for some homerun trades! ⚡",
-        type: "info"
-      });
-    } else if (morningEntry.emotion.toLowerCase().includes('neutral') && !hasSentTodayWithTitle(notifications, mindsetTitle)) {
-      addNotification({
-        title: mindsetTitle,
-        message: "You're feeling neutral today. Stay disciplined and trust the process. 📈",
-        type: "info"
-      });
-    } else if (morningEntry.emotion.toLowerCase().includes('negative') && !hasSentTodayWithTitle(notifications, mindsetTitle)) {
-      addNotification({
-        title: mindsetTitle,
-        message: "A strong trader knows when to step back. Reset and refocus before jumping in. 🧘",
-        type: "warning"
-      });
-    }
-  }
-
-  // Journal entries with emotions
-  const entriesWithEmotions = analyticsData.journalEntries.filter((entry: JournalEntryType) => 
-    entry.emotion && (entry.session_type === 'pre' || entry.session_type === 'post')
-  );
-
-  // 📊 Data-Driven Insights - Best emotion for trading
-  if (analyticsData?.emotionTrend && analyticsData.emotionTrend.length > 10) {
-    // Find the emotion with the best average PnL
-    const emotionPerformance = analyticsData.emotionTrend.reduce((acc: Record<string, { total: number; count: number }>, day: any) => {
-      if (!day.emotion) return acc;
-      
-      if (!acc[day.emotion]) {
-        acc[day.emotion] = { total: 0, count: 0 };
-      }
-      
-      const currentEmotion = acc[day.emotion];
-      if (currentEmotion) {
-        currentEmotion.total += day.pnl || 0;
-        currentEmotion.count += 1;
-      }
-      
-      return acc;
-    }, {} as Record<string, { total: number; count: number }>);
-    
-    // Calculate average PnL for each emotion
-    const emotionAverages = Object.entries(emotionPerformance).map(([emotion, stats]) => ({
-      emotion,
-      avgPnl: stats.count > 0 ? stats.total / stats.count : 0
+  // Get all emotions logged in journal entries
+  const journalEntries = analyticsData.journalEntries;
+  const emotions = journalEntries
+    .filter((entry: JournalEntryType) => entry.emotion)
+    .map((entry: JournalEntryType) => ({
+      emotion: entry.emotion,
+      date: new Date(entry.created_at),
     }));
+
+  // Track emotions and their frequency
+  const emotionCounts: Record<string, { count: number; lastLogged: Date }> = {};
+  emotions.forEach((item: { emotion: string; date: Date }) => {
+    if (!emotionCounts[item.emotion]) {
+      emotionCounts[item.emotion] = { count: 0, lastLogged: item.date };
+    }
+    emotionCounts[item.emotion].count++;
     
-    // Find best performing emotion
-    const bestEmotion = emotionAverages.reduce((best, current) => 
-      current.avgPnl > best.avgPnl ? current : best, 
-      { emotion: '', avgPnl: -Infinity }
-    );
+    // Update last logged date if this entry is more recent
+    if (item.date > emotionCounts[item.emotion].lastLogged) {
+      emotionCounts[item.emotion].lastLogged = item.date;
+    }
+  });
+
+  // Check for emotions that seem to be recurring patterns
+  const dominantEmotions = Object.entries(emotionCounts)
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, 3);
+  
+  if (dominantEmotions.length > 0 && dominantEmotions[0][1].count > 5) {
+    const dominantEmotion = dominantEmotions[0][0];
+    const emotionTitle = `Emotional pattern detected: ${dominantEmotion}`;
     
-    if (bestEmotion.emotion && bestEmotion.avgPnl > 0) {
-      const insightTitle = "Your best setups come when you feel...";
-      if (!hasSentWithinDaysWithTitle(notifications, insightTitle, 14)) {
+    // Only send once every 14 days
+    if (!hasSentWithinDaysWithTitle(notifications, emotionTitle, 14)) {
+      // Get possible matching trades to this emotion
+      const tradesWithEmotion = journalEntries
+        .filter((entry: JournalEntryType) => entry.emotion === dominantEmotion && entry.trades && entry.trades.length > 0)
+        .flatMap((entry: JournalEntryType) => entry.trades);
+      
+      // Calculate win rate for trades with this emotion
+      const winCount = tradesWithEmotion.filter((trade: any) => {
+        const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+                  typeof trade.pnl === 'number' ? trade.pnl : 0;
+        return pnl > 0;
+      }).length;
+      
+      const winRate = tradesWithEmotion.length > 0 ? 
+        Math.round((winCount / tradesWithEmotion.length) * 100) : 0;
+      
+      let message = `You've logged "${dominantEmotion}" ${dominantEmotions[0][1].count} times in your journal.`;
+      
+      // Add win rate context if we have enough trades
+      if (tradesWithEmotion.length >= 5) {
+        message += ` When trading with this emotion, your win rate is ${winRate}%.`;
+        if (winRate < 50) {
+          message += ` Consider strategies to manage this emotional state before trading.`;
+        } else {
+          message += ` This emotion appears to correlate with positive trading results.`;
+        }
+      }
+      
+      addNotification({
+        title: emotionTitle,
+        message,
+        type: "info"
+      });
+    }
+  }
+
+  // Check for unusual emotions that weren't logged before
+  const today = startOfDay(new Date());
+  const recentEntries = journalEntries.filter((entry: JournalEntryType) => 
+    isSameDay(new Date(entry.created_at), today)
+  );
+  
+  recentEntries.forEach((entry: JournalEntryType) => {
+    if (!entry.emotion) return;
+    
+    // Check if this emotion has been rarely logged before
+    const previousOccurrences = emotions.filter(e => 
+      e.emotion === entry.emotion && 
+      !isSameDay(e.date, today)
+    ).length;
+    
+    if (previousOccurrences <= 1 && emotions.length > 10) {
+      const unusualEmotionTitle = `Unusual emotion detected: ${entry.emotion}`;
+      
+      if (!hasSentTodayWithTitle(notifications, unusualEmotionTitle)) {
         addNotification({
-          title: insightTitle,
-          message: `Your best trades happen when you feel ${bestEmotion.emotion}. Keep that mental edge! 🏆`,
-          type: "info"
+          title: unusualEmotionTitle,
+          message: `You've rarely logged "${entry.emotion}" before. Pay attention to how this emotional state affects your trading decisions today.`,
+          type: "warning"
         });
       }
+    }
+  });
+  
+  // Emotion/Performance correlation insights
+  if (analyticsData.emotionPerformance) {
+    const emotionPerformance = analyticsData.emotionPerformance;
+    
+    // Find emotions with significant impact (positive or negative)
+    Object.entries(emotionPerformance).forEach(([emotion, stats]: [string, any]) => {
+      if (typeof stats === 'object' && stats !== null && stats.count >= 5) {
+        const avgPnl = stats.total / stats.count;
+        const significantPnl = Math.abs(avgPnl) > 100; // Threshold for "significant" impact
+        
+        if (significantPnl) {
+          const isProfitable = avgPnl > 0;
+          const emotionImpactTitle = `${emotion} affects your trading ${isProfitable ? 'positively' : 'negatively'}`;
+          
+          if (!hasSentWithinDaysWithTitle(notifications, emotionImpactTitle, 21)) {
+            const message = isProfitable
+              ? `When you log "${emotion}", your average P&L is +$${avgPnl.toFixed(2)}. This emotion appears to correlate with profitable trades.`
+              : `When you log "${emotion}", your average P&L is -$${Math.abs(avgPnl).toFixed(2)}. Consider pausing trading when you experience this emotion.`;
+            
+            addNotification({
+              title: emotionImpactTitle,
+              message,
+              type: isProfitable ? "success" : "warning"
+            });
+          }
+        }
+      }
+    });
+  }
+  
+  // Check for negative emotions happening in sequence
+  const negativeEmotions = ["frustrated", "angry", "sad", "fearful", "anxious", "stressed"];
+  const recentNegativeCount = journalEntries
+    .filter((entry: JournalEntryType) => {
+      const entryDate = new Date(entry.created_at);
+      const daysSinceEntry = differenceInDays(today, entryDate);
+      return daysSinceEntry <= 3 && negativeEmotions.includes(entry.emotion?.toLowerCase() || '');
+    })
+    .length;
+  
+  if (recentNegativeCount >= 2) {
+    const negativePatternTitle = "Take care of your mental health";
+    if (!hasSentWithinDaysWithTitle(notifications, negativePatternTitle, 3)) {
+      addNotification({
+        title: negativePatternTitle,
+        message: `You've logged multiple negative emotions recently. Remember to take breaks and practice self-care for better trading decisions.`,
+        type: "warning"
+      });
     }
   }
 };

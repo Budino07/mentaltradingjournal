@@ -5,6 +5,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -41,10 +42,13 @@ export const MorningRecap = () => {
         return;
       }
 
+      // Format today's date as YYYY-MM-DD for consistent storage
+      const today = startOfDay(new Date()).toISOString().split('T')[0];
+      
       // Check if we've already shown the recap today
       const lastShownDate = localStorage.getItem(`morning-recap-shown-${user.id}`);
       
-      if (lastShownDate && isSameDay(new Date(lastShownDate), now)) {
+      if (lastShownDate === today) {
         // Already shown today, don't show again
         return;
       }
@@ -52,8 +56,8 @@ export const MorningRecap = () => {
       // Show the recap if we have analytics data
       if (analyticsData) {
         setOpen(true);
-        // Save the current date to localStorage to remember we've shown it today
-        localStorage.setItem(`morning-recap-shown-${user.id}`, now.toISOString());
+        // Save today's date to localStorage to remember we've shown it today
+        localStorage.setItem(`morning-recap-shown-${user.id}`, today);
       }
     };
     
@@ -194,6 +198,7 @@ export const MorningRecap = () => {
           </button>
           
           <DialogHeader className="mb-2 space-y-2 text-left p-0">
+            <DialogTitle className="sr-only">Morning Recap</DialogTitle>
             <h3 className={`text-2xl font-medium ${
               isDark 
                 ? "text-white" 
