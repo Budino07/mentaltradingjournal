@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { X, AlertCircle } from "lucide-react";
 import {
@@ -7,8 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { generateAnalytics } from "@/utils/analyticsUtils";
-import { formatDisplayDate } from "@/utils/dateUtils";
-import { subDays, startOfDay, endOfDay } from "date-fns";
+import { formatDisplayDate, getUserTimezone } from "@/utils/dateUtils";
+import { subDays, startOfDay, endOfDay, isSameDay } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { useTheme } from "next-themes";
 
@@ -29,9 +30,30 @@ export const MorningRecap = () => {
     const checkAndShowRecap = () => {
       if (!user) return;
 
-      // Always show the recap when there's analytics data (for testing)
+      // Get user's local time
+      const userTimezone = getUserTimezone();
+      const now = new Date();
+      const userLocalTime = new Date(now.toLocaleString('en-US', { timeZone: userTimezone }));
+      const currentHour = userLocalTime.getHours();
+      
+      // Only show after 6AM local time
+      if (currentHour < 6) {
+        return;
+      }
+
+      // Check if we've already shown the recap today
+      const lastShownDate = localStorage.getItem(`morning-recap-shown-${user.id}`);
+      
+      if (lastShownDate && isSameDay(new Date(lastShownDate), now)) {
+        // Already shown today, don't show again
+        return;
+      }
+
+      // Show the recap if we have analytics data
       if (analyticsData) {
         setOpen(true);
+        // Save the current date to localStorage to remember we've shown it today
+        localStorage.setItem(`morning-recap-shown-${user.id}`, now.toISOString());
       }
     };
     
