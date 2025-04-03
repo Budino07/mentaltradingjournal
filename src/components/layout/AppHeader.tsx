@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NotificationBell } from "@/components/ui/notification-bell";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export function AppHeader() {
   const location = useLocation();
@@ -50,6 +51,11 @@ export function AppHeader() {
   ];
 
   const handleUpdateUsername = async () => {
+    if (!username.trim()) {
+      toast("Username cannot be empty");
+      return;
+    }
+    
     try {
       await updateUsername(username);
       setIsEditing(false);
@@ -65,6 +71,12 @@ export function AppHeader() {
 
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || 'User';
   const userEmail = user?.email;
+  
+  // Get initials for avatar
+  const getInitials = () => {
+    if (!displayName) return 'U';
+    return displayName.charAt(0).toUpperCase();
+  };
 
   // Close mobile sidebar when navigating to a new page
   const handleNavigation = () => {
@@ -106,23 +118,60 @@ export function AppHeader() {
           {user ? (
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="ghost" className="gap-2">
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline-block">{userEmail}</span>
-                  <span className="inline-block sm:hidden">{displayName}</span>
+                <Button variant="ghost" className="gap-2 px-2">
+                  <Avatar className="h-8 w-8 border border-primary/10">
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      {getInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col items-start">
+                    <span className="text-sm font-medium">{displayName}</span>
+                  </div>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">
                 <div className="space-y-4">
+                  <div className="pb-2 border-b border-border/50">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10 border border-primary/10">
+                        <AvatarFallback className="bg-primary/10 text-primary">
+                          {getInitials()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">{displayName}</span>
+                        <span className="text-xs text-muted-foreground">{userEmail}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <div className="space-y-2">
                     {isEditing ? (
-                      <div className="flex gap-2">
-                        <Input
-                          value={username}
-                          onChange={(e) => setUsername(e.target.value)}
-                          placeholder="Enter new username"
-                        />
-                        <Button onClick={handleUpdateUsername}>Save</Button>
+                      <div className="space-y-2">
+                        <label htmlFor="username" className="text-xs font-medium text-muted-foreground">
+                          Username
+                        </label>
+                        <div className="flex gap-2">
+                          <Input
+                            id="username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Enter new username"
+                          />
+                          <div className="flex gap-1">
+                            <Button 
+                              size="sm" 
+                              onClick={handleUpdateUsername}>
+                              Save
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              onClick={() => setIsEditing(false)}>
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     ) : (
                       <Button
@@ -175,7 +224,18 @@ export function AppHeader() {
           </SheetTrigger>
           <SheetContent side="right" className="w-[280px] sm:w-[320px]">
             {user && (
-              <div className="flex justify-end mt-2 mb-2">
+              <div className="flex justify-between items-center mt-2 mb-2">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8 border border-primary/10">
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      {getInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">{displayName}</span>
+                    <span className="text-xs text-muted-foreground">{userEmail}</span>
+                  </div>
+                </div>
                 <NotificationBell />
               </div>
             )}
@@ -223,14 +283,23 @@ export function AppHeader() {
                   <div className="space-y-2 mt-4">
                     {isEditing ? (
                       <div className="space-y-2">
+                        <label htmlFor="mobile-username" className="text-xs font-medium text-muted-foreground px-2">
+                          Username
+                        </label>
                         <Input
+                          id="mobile-username"
                           value={username}
                           onChange={(e) => setUsername(e.target.value)}
                           placeholder="Enter new username"
                         />
-                        <Button onClick={handleUpdateUsername} className="w-full">
-                          Save
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button onClick={handleUpdateUsername} className="flex-1">
+                            Save
+                          </Button>
+                          <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1">
+                            Cancel
+                          </Button>
+                        </div>
                       </div>
                     ) : (
                       <Button
