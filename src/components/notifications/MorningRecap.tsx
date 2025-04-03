@@ -14,7 +14,6 @@ import { useQuery } from "@tanstack/react-query";
 
 export const MorningRecap = () => {
   const [open, setOpen] = useState(false);
-  const [hasShownToday, setHasShownToday] = useState(false);
   const { user } = useAuth();
 
   // Get analytics data
@@ -26,36 +25,18 @@ export const MorningRecap = () => {
   useEffect(() => {
     // Check if we should show the recap
     const checkAndShowRecap = () => {
-      if (!user || hasShownToday) return;
+      if (!user) return;
 
-      // Get current time in user's timezone
-      const timezone = getUserTimezone();
-      const now = new Date();
-      const userLocalTime = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
-      
-      // Set the 7AM threshold time
-      const morningThreshold = set(new Date(userLocalTime), { hours: 7, minutes: 0, seconds: 0 });
-      
-      // Only show after 7AM
-      if (isAfter(userLocalTime, morningThreshold)) {
-        // Check if we've already shown the recap today
-        const storedDate = localStorage.getItem(`morning-recap-shown-${user.id}`);
-        const today = startOfDay(new Date()).toISOString();
-        
-        if (storedDate !== today) {
-          setOpen(true);
-          setHasShownToday(true);
-          localStorage.setItem(`morning-recap-shown-${user.id}`, today);
-        }
+      // Always show the recap when there's analytics data (for testing)
+      if (analyticsData) {
+        setOpen(true);
       }
     };
     
-    // Check immediately and then every minute
+    // Check immediately when analytics data is loaded
     checkAndShowRecap();
-    const interval = setInterval(checkAndShowRecap, 60000);
     
-    return () => clearInterval(interval);
-  }, [user, hasShownToday]);
+  }, [user, analyticsData]);
 
   // Calculate yesterday's metrics
   const getYesterdayMetrics = () => {
@@ -120,9 +101,10 @@ export const MorningRecap = () => {
   };
 
   const metrics = getYesterdayMetrics();
+  // Format PnL as dollar amount 
   const pnlFormatted = metrics.pnl >= 0 ? 
-    `+${metrics.pnl.toFixed(1)}%` : 
-    `${metrics.pnl.toFixed(1)}%`;
+    `+$${Math.abs(metrics.pnl).toFixed(2)}` : 
+    `-$${Math.abs(metrics.pnl).toFixed(2)}`;
 
   if (!analyticsData) return null;
 
