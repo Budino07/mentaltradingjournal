@@ -17,6 +17,7 @@ import { generateAnalytics } from "@/utils/analyticsUtils";
 import { Trade } from "@/types/trade";
 import { formatCurrency } from "@/utils/analyticsUtils";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { useNavigate } from "react-router-dom";
 
 type TimeOfDayTrade = {
   hour: number;
@@ -25,9 +26,11 @@ type TimeOfDayTrade = {
   pnl: number;
   instrument?: string;
   direction?: string;
+  entryId?: string; // Journal entry ID
 };
 
 export const TradeTimePerformance = () => {
+  const navigate = useNavigate();
   const { data: analyticsData, isLoading } = useQuery({
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
@@ -59,13 +62,21 @@ export const TradeTimePerformance = () => {
           time: `${hour}:${minute.toString().padStart(2, '0')}`,
           pnl,
           instrument: trade.instrument,
-          direction: trade.direction
+          direction: trade.direction,
+          entryId: entry.id // Add the journal entry ID
         });
       });
     });
     
     return allTrades;
   }, [analyticsData]);
+
+  // Handle click on a data point
+  const handlePointClick = (data: TimeOfDayTrade) => {
+    if (data.entryId) {
+      navigate(`/journal?entry=${data.entryId}`);
+    }
+  };
 
   // Calculate performance insights
   const performanceInsights = useMemo(() => {
@@ -224,6 +235,7 @@ export const TradeTimePerformance = () => {
                         <p>{`P&L: ${formatCurrency(data.pnl)}`}</p>
                         {data.instrument && <p>{`Instrument: ${data.instrument}`}</p>}
                         {data.direction && <p>{`Direction: ${data.direction}`}</p>}
+                        <p className="text-xs text-primary mt-1">Click to view details</p>
                       </div>
                     );
                   }
@@ -234,11 +246,15 @@ export const TradeTimePerformance = () => {
                 name="Profitable Trades" 
                 data={tradesByTime.filter(trade => trade.pnl >= 0)} 
                 fill="#4ade80" 
+                cursor="pointer"
+                onClick={(data) => handlePointClick(data)}
               />
               <Scatter 
                 name="Losing Trades" 
                 data={tradesByTime.filter(trade => trade.pnl < 0)} 
                 fill="#f87171" 
+                cursor="pointer"
+                onClick={(data) => handlePointClick(data)}
               />
             </ScatterChart>
           </ResponsiveContainer>
