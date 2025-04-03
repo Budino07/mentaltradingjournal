@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { EmotionTrend } from "./EmotionTrend";
@@ -20,7 +21,8 @@ import { EquityCurve } from "./EquityCurve";
 import { EmotionFrequency } from "./EmotionFrequency";
 import { SetupPerformance } from "./SetupPerformance";
 import { OvertradingHeatMap } from "./OvertradingHeatMap";
-import { MentalScore } from "./MentalScore"; // Import the new MentalScore component
+import { MentalScore } from "./MentalScore";
+import { TradeTimePerformance } from "./TradeTimePerformance"; // Import the new component
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -35,7 +37,7 @@ export const AnalyticsDashboard = () => {
     EmotionRecovery,
     PreTradingEvents,
     PersonalityPatterns,
-    MentalScore, // Add MentalScore to psychological components
+    MentalScore,
     OvertradingHeatMap,
   ];
 
@@ -53,6 +55,7 @@ export const AnalyticsDashboard = () => {
     TradeFrequencyByMonth,
     RiskRewardAnalysis,
     WinLossRatio,
+    TradeTimePerformance, // Add the new component to the trading components list
   ];
 
   const getFilteredComponents = () => {
@@ -93,6 +96,7 @@ export const AnalyticsDashboard = () => {
           TradeFrequencyByMonth,
           RiskRewardAnalysis,
           WinLossRatio,
+          TradeTimePerformance, // Add the new component to the "all" view as well
         ];
     }
   };
