@@ -6,6 +6,12 @@ import { getUserTimezone } from "@/utils/dateUtils";
 import { JournalEntryType } from "@/types/journal";
 import { Trade } from "@/types/trade";
 
+interface HourlyTradeStats {
+  total: number;
+  profitable: number;
+  count: number;
+}
+
 export const checkPerformanceNotifications = (
   analyticsData: any,
   notifications: Notification[],
@@ -89,7 +95,7 @@ export const checkPerformanceNotifications = (
   if (allTrades.length > 10) {
     const userTimezone = getUserTimezone();
     
-    const tradesByHour = allTrades.reduce((acc: Record<string, { total: number; profitable: number; count: number }>, trade) => {
+    const tradesByHour: Record<string, HourlyTradeStats> = allTrades.reduce((acc: Record<string, HourlyTradeStats>, trade) => {
       if (!trade.entryDate) return acc;
       
       // Convert the trade entry time to the user's timezone for accurate time analysis
@@ -116,7 +122,7 @@ export const checkPerformanceNotifications = (
       hourData.count += 1;
       
       return acc;
-    }, {} as Record<string, { total: number; profitable: number; count: number }>);
+    }, {});
     
     // Calculate win rate and average PnL for each time period
     const timePerformance = Object.entries(tradesByHour).map(([time, stats]) => {

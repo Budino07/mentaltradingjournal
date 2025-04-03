@@ -25,6 +25,7 @@ import { formatDate } from "@/utils/dateUtils";
 import { JournalEntryType } from "@/types/journal";
 import { LineChart, Line, ResponsiveContainer, AreaChart, Area } from "recharts";
 import { Progress } from "@/components/ui/progress";
+import { TradingStruggleInsight } from "./TradingStruggleInsight";
 
 export const StatsHeader = () => {
   const queryClient = useQueryClient();
@@ -644,6 +645,9 @@ export const StatsHeader = () => {
             </div>
           </div>
         </Card>
+
+        {/* Add the new Trading Struggle Insight component */}
+        <TradingStruggleInsight />
       </div>
     </div>
   );
