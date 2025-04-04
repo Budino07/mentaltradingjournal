@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format, subDays } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +20,7 @@ export const EmotionalJourneyChart = () => {
     queryFn: generateAnalytics,
   });
 
+  
   const getDaysForTimeframe = () => {
     const today = new Date();
     const days = [];
@@ -35,7 +35,6 @@ export const EmotionalJourneyChart = () => {
   
   const days = getDaysForTimeframe();
 
-  // Process emotional data from journal entries
   const emotionalData = React.useMemo(() => {
     if (!analyticsData?.journalEntries?.length) return [];
     
