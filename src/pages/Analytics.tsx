@@ -31,7 +31,7 @@ export default function Analytics() {
   return (
     <AppLayout>
       <SubscriptionGuard>
-        <div className={`container mx-auto ${isMobile ? 'px-3' : 'px-4 sm:px-6'}`}>
+        <div className="w-full max-w-none">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <div className="flex justify-center mb-4">
               <TabsList className="bg-background/50 backdrop-blur-sm">
@@ -40,11 +40,11 @@ export default function Analytics() {
               </TabsList>
             </div>
             
-            <TabsContent value="dashboard" className="space-y-6">
+            <TabsContent value="dashboard" className="space-y-6 container mx-auto">
               <AnalyticsDashboard />
             </TabsContent>
             
-            <TabsContent value="psychology" className="space-y-6">
+            <TabsContent value="psychology" className="space-y-6 container mx-auto">
               <EmotionalJourneyChart />
             </TabsContent>
           </Tabs>
