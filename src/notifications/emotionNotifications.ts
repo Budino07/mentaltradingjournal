@@ -3,6 +3,14 @@ import { format, isSameDay, differenceInDays, startOfDay, subDays } from "date-f
 import { hasSentTodayWithTitle, hasSentWithinDaysWithTitle, getDaysSinceEmotion } from "@/utils/notificationUtils";
 import { Notification } from "@/types/notifications";
 import { JournalEntryType } from "@/types/journal";
+import { Trade } from "@/types/trade";
+
+interface EmotionPerformance {
+  [emotion: string]: {
+    count: number;
+    total: number;
+  }
+}
 
 export const checkEmotionNotifications = (
   analyticsData: any,
@@ -48,10 +56,10 @@ export const checkEmotionNotifications = (
       // Get possible matching trades to this emotion
       const tradesWithEmotion = journalEntries
         .filter((entry: JournalEntryType) => entry.emotion === dominantEmotion && entry.trades && entry.trades.length > 0)
-        .flatMap((entry: JournalEntryType) => entry.trades);
+        .flatMap((entry: JournalEntryType) => entry.trades as Trade[]);
       
       // Calculate win rate for trades with this emotion
-      const winCount = tradesWithEmotion.filter((trade: any) => {
+      const winCount = tradesWithEmotion.filter((trade: Trade) => {
         const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
                   typeof trade.pnl === 'number' ? trade.pnl : 0;
         return pnl > 0;
@@ -110,10 +118,10 @@ export const checkEmotionNotifications = (
   
   // Emotion/Performance correlation insights
   if (analyticsData.emotionPerformance) {
-    const emotionPerformance = analyticsData.emotionPerformance;
+    const emotionPerformance: EmotionPerformance = analyticsData.emotionPerformance;
     
     // Find emotions with significant impact (positive or negative)
-    Object.entries(emotionPerformance).forEach(([emotion, stats]: [string, any]) => {
+    Object.entries(emotionPerformance).forEach(([emotion, stats]) => {
       if (typeof stats === 'object' && stats !== null && stats.count >= 5) {
         const avgPnl = stats.total / stats.count;
         const significantPnl = Math.abs(avgPnl) > 100; // Threshold for "significant" impact

@@ -62,7 +62,9 @@ export const MorningRecap = () => {
     };
     
     // Check immediately when analytics data is loaded
-    checkAndShowRecap();
+    if (analyticsData) {
+      checkAndShowRecap();
+    }
     
   }, [user, analyticsData]);
 

@@ -6,6 +6,25 @@ import { getUserTimezone } from "@/utils/dateUtils";
 import { JournalEntryType } from "@/types/journal";
 import { Trade } from "@/types/trade";
 
+interface TradeWithEntry extends Trade {
+  entryDate: string;
+  pnl: number;
+  entry?: JournalEntryType;
+}
+
+interface HourData {
+  total: number;
+  profitable: number;
+  count: number;
+}
+
+interface TimePerformance {
+  time: string;
+  winRate: number;
+  avgPnl: number;
+  count: number;
+}
+
 export const checkPerformanceNotifications = (
   analyticsData: any,
   notifications: Notification[],
@@ -21,7 +40,7 @@ export const checkPerformanceNotifications = (
       pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : (typeof trade.pnl === 'number' ? trade.pnl : 0),
       entry: entry,
     }))
-  );
+  ) as TradeWithEntry[];
 
   // Calculate average trades per day
   const dayTradeMap = allTrades.reduce((acc: Record<string, number>, trade) => {
@@ -89,7 +108,7 @@ export const checkPerformanceNotifications = (
   if (allTrades.length > 10) {
     const userTimezone = getUserTimezone();
     
-    const tradesByHour = allTrades.reduce((acc: Record<string, { total: number; profitable: number; count: number }>, trade) => {
+    const tradesByHour = allTrades.reduce((acc: Record<string, HourData>, trade) => {
       if (!trade.entryDate) return acc;
       
       // Convert the trade entry time to the user's timezone for accurate time analysis
@@ -108,15 +127,14 @@ export const checkPerformanceNotifications = (
       const hourData = acc[hourRangeKey];
       
       // Ensure pnl is a number
-      const pnlValue = typeof trade.pnl === 'number' ? trade.pnl : 
-                      typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 0;
+      const pnlValue = trade.pnl;
       
       hourData.total += pnlValue;
       if (pnlValue > 0) hourData.profitable += 1;
       hourData.count += 1;
       
       return acc;
-    }, {} as Record<string, { total: number; profitable: number; count: number }>);
+    }, {} as Record<string, HourData>);
     
     // Calculate win rate and average PnL for each time period
     const timePerformance = Object.entries(tradesByHour).map(([time, stats]) => {
@@ -131,7 +149,7 @@ export const checkPerformanceNotifications = (
     // Find the best performing time period with at least 5 trades
     const bestTime = timePerformance
       .filter(period => period.count >= 5)
-      .reduce((best, current) => 
+      .reduce((best: TimePerformance, current: TimePerformance) => 
         current.avgPnl > best.avgPnl ? current : best, 
         { time: '', winRate: 0, avgPnl: -Infinity, count: 0 }
       );
