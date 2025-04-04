@@ -80,6 +80,13 @@ export const CoreNeedsMatrix = ({ emotionalData }: CoreNeedsMatrixProps) => {
     return null;
   };
 
+  // Fix: Calculate percentages safely with type checking
+  const calculatePercentage = (value: number): number => {
+    // Return 0 if there's no emotional data to prevent division by zero
+    if (!emotionalData.length) return 0;
+    return Math.round((value / emotionalData.length) * 100);
+  };
+
   return (
     <Card className="border border-primary/10 bg-card/30 backdrop-blur-md overflow-hidden">
       <CardHeader className="pb-2">
@@ -132,7 +139,7 @@ export const CoreNeedsMatrix = ({ emotionalData }: CoreNeedsMatrixProps) => {
                     </div>
                     <h3 className="font-medium capitalize">{need.name}</h3>
                     <Badge variant="outline" className="ml-auto text-xs">
-                      {Math.round((need.value / emotionalData.length) * 100)}%
+                      {calculatePercentage(need.value)}%
                     </Badge>
                   </div>
                   
