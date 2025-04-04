@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { format, subDays } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +20,6 @@ export const EmotionalJourneyChart = () => {
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
   });
-
   
   const getDaysForTimeframe = () => {
     const today = new Date();
@@ -143,7 +143,7 @@ export const EmotionalJourneyChart = () => {
   }
 
   return (
-    <Card className="w-full overflow-hidden border border-primary/10 bg-card/30 backdrop-blur-md">
+    <Card className="w-full max-w-[100%] overflow-hidden border border-primary/10 bg-card/30 backdrop-blur-md">
       <CardHeader className="pb-3">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <CardTitle className="text-xl text-gradient-primary">
@@ -162,7 +162,7 @@ export const EmotionalJourneyChart = () => {
           </Tabs>
         </div>
       </CardHeader>
-      <CardContent className="pb-6 pt-2">
+      <CardContent className="pb-6 pt-2 w-full">
         <div className="relative h-[400px] w-full">
           <EmotionalWaveform 
             emotionalData={emotionalData}

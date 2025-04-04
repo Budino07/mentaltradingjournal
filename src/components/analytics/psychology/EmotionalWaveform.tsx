@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -223,7 +222,7 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
         }}
       />
       
-      <ChartContainer config={chartConfig} className="h-full">
+      <ChartContainer config={chartConfig} className="h-full w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={emotionalData}
