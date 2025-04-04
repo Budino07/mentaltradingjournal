@@ -8,6 +8,11 @@ interface CoreNeedsMatrixProps {
   emotionalData: any[];
 }
 
+interface NeedDataItem {
+  name: string;
+  value: number;
+}
+
 export const CoreNeedsMatrix = ({ emotionalData }: CoreNeedsMatrixProps) => {
   const [selectedNeed, setSelectedNeed] = useState<string | null>(null);
   
@@ -123,7 +128,7 @@ export const CoreNeedsMatrix = ({ emotionalData }: CoreNeedsMatrixProps) => {
           
           <div>
             <div className="space-y-3">
-              {needsData.map((need) => (
+              {needsData.map((need: NeedDataItem) => (
                 <div 
                   key={need.name}
                   className={`p-2 rounded-md transition-all cursor-pointer
