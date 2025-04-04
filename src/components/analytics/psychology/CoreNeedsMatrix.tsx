@@ -46,7 +46,7 @@ export const CoreNeedsMatrix = ({ emotionalData }: CoreNeedsMatrixProps) => {
     safety: 'Prioritizing security and risk management. May result in exiting trades too early out of fear.',
     connection: 'Seeking belonging in trading communities. May lead to following others\' strategies without proper analysis.',
     growth: 'Focus on learning and improvement. May result in overthinking or analysis paralysis.',
-    unknown: 'Psychological needs that haven\'t been clearly identified yet.'
+    unknown: 'Psychological needs that haven\'t been clearly identified yet in your journal entries.'
   };
   
   const needRecommendations = {
@@ -85,7 +85,7 @@ export const CoreNeedsMatrix = ({ emotionalData }: CoreNeedsMatrixProps) => {
     return null;
   };
 
-  // Fix: Calculate percentages safely with type checking
+  // Calculate percentages safely with type checking
   const calculatePercentage = (value: number): number => {
     // Return 0 if there's no emotional data to prevent division by zero
     if (!emotionalData.length) return 0;
@@ -106,13 +106,13 @@ export const CoreNeedsMatrix = ({ emotionalData }: CoreNeedsMatrixProps) => {
                   data={needsData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={40}
-                  outerRadius={80}
-                  paddingAngle={2}
+                  innerRadius={30}
+                  outerRadius={90}
+                  paddingAngle={1}
                   dataKey="value"
                   onClick={(data) => handleNeedClick(data.name)}
                 >
-                  {needsData.map((entry, index) => (
+                  {needsData.map((entry: NeedDataItem, index) => (
                     <Cell 
                       key={`cell-${index}`} 
                       fill={colors[entry.name as keyof typeof colors] || '#6b7280'} 

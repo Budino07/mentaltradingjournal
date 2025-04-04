@@ -68,7 +68,7 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
       <g>
         {payload.preScore !== null && (
           <>
-            {/* Core need aura */}
+            {/* Core need aura - reduced size */}
             <defs>
               <radialGradient id={`auraGradient${payload.formattedDate}`}>
                 <stop offset="0%" stopColor={startColor} stopOpacity={0.8} />
@@ -78,7 +78,7 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
             <circle 
               cx={cx} 
               cy={cy} 
-              r={25} 
+              r={15} 
               fill={`url(#auraGradient${payload.formattedDate})`} 
               opacity={0.7}
             />
@@ -87,28 +87,28 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
             <circle 
               cx={cx} 
               cy={cy} 
-              r={5}
+              r={4}
               fill={payload.preScore > 0 ? '#9333ea' : '#dc2626'}
               stroke="#ffffff"
-              strokeWidth={1.5}
+              strokeWidth={1}
             />
             
-            {/* Warning indicator for harmful patterns */}
+            {/* Warning indicator for harmful patterns - simplified */}
             {hasPattern && (
               <g>
                 <path 
-                  d={`M${cx - 12},${cy - 12} L${cx + 12},${cy + 12} M${cx + 12},${cy - 12} L${cx - 12},${cy + 12}`} 
+                  d={`M${cx - 8},${cy - 8} L${cx + 8},${cy + 8} M${cx + 8},${cy - 8} L${cx - 8},${cy + 8}`} 
                   stroke="#ff0000" 
-                  strokeWidth={2} 
+                  strokeWidth={1.5} 
                 />
                 <circle 
                   cx={cx} 
                   cy={cy} 
-                  r={15} 
+                  r={10} 
                   fill="none" 
                   stroke="#ff0000" 
-                  strokeWidth={2} 
-                  strokeDasharray="4,2"
+                  strokeWidth={1.5} 
+                  strokeDasharray="3,2"
                 />
               </g>
             )}
@@ -142,9 +142,9 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
         <circle
           cx={cx}
           cy={cy}
-          r={8}
+          r={6}
           stroke="#ffffff"
-          strokeWidth={2}
+          strokeWidth={1.5}
           fill={data.preScore > 0 ? '#9333ea' : '#dc2626'}
           opacity={0.9}
         />
