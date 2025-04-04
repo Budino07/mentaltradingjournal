@@ -44,7 +44,7 @@ export default function Analytics() {
               <AnalyticsDashboard />
             </TabsContent>
             
-            <TabsContent value="psychology" className="w-full space-y-6 px-0">
+            <TabsContent value="psychology" className="w-full space-y-6 px-0 mx-0">
               <EmotionalJourneyChart />
             </TabsContent>
           </Tabs>

@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -226,7 +227,7 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={emotionalData}
-            margin={{ top: 10, right: 10, left: 10, bottom: 30 }}
+            margin={{ top: 10, right: 0, left: 0, bottom: 30 }}
           >
             <defs>
               <linearGradient id="preGradient" x1="0" y1="0" x2="0" y2="1">

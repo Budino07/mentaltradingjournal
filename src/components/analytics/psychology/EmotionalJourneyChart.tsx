@@ -143,7 +143,7 @@ export const EmotionalJourneyChart = () => {
   }
 
   return (
-    <Card className="w-full max-w-[100%] overflow-hidden border border-primary/10 bg-card/30 backdrop-blur-md">
+    <Card className="w-full max-w-[100vw] overflow-hidden border border-primary/10 bg-card/30 backdrop-blur-md">
       <CardHeader className="pb-3">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <CardTitle className="text-xl text-gradient-primary">
