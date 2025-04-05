@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format, subDays } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +10,7 @@ import { EmotionalWaveform } from './EmotionalWaveform';
 import { ReflectionEntries } from './ReflectionEntries';
 import { PersonalityInsights } from './PersonalityInsights';
 import { EmotionalPatternGuardrails } from './EmotionalPatternGuardrails';
+import { BehavioralPatterns } from './BehavioralPatterns';
 
 export const EmotionalJourneyChart = () => {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'quarter'>('week');
@@ -191,6 +191,12 @@ export const EmotionalJourneyChart = () => {
         <div className="mt-8">
           <EmotionalPatternGuardrails 
             emotionalData={emotionalData}
+          />
+        </div>
+        
+        <div className="mt-8">
+          <BehavioralPatterns 
+            journalEntries={analyticsData?.journalEntries || []}
           />
         </div>
       </CardContent>

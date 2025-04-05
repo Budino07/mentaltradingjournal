@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PatternAnalyzer } from './PatternAnalyzer';
 
 interface ReflectionEntriesProps {
   emotionalData: any;
@@ -129,6 +130,9 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                             </Badge>
                           )}
                         </div>
+                        
+                        {/* Add Pattern Analyzer here */}
+                        <PatternAnalyzer reflection={emotionalData.reflection} />
                       </div>
                     )}
                   </div>
