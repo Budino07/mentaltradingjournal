@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RefreshCw, AlertTriangle, Clock } from "lucide-react";
+import { RefreshCw, AlertTriangle, Clock, TrendingDown, DollarSign, ThumbsDown } from "lucide-react";
 
 interface BehavioralPatternsProps {
   journalEntries: any[];
@@ -23,10 +23,35 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
       return rushKeywords.some(keyword => text.includes(keyword));
     });
     
-    // Calculate average P&L for rushed entries
-    let avgPnL = 0;
-    if (rushedEntries.length > 0) {
-      const totalPnL = rushedEntries.reduce((sum, entry) => {
+    // Pattern detection for "Giving Back Profits"
+    const givingBackEntries = journalEntries.filter(entry => {
+      const text = entry.notes?.toLowerCase() || '';
+      
+      const keywords = ['gave back', 'giving back', 'lost profit', 'slippage', 'profit gone', 'erased gains', 'reversed'];
+      return keywords.some(keyword => text.includes(keyword));
+    });
+    
+    // Pattern detection for "Greed"
+    const greedEntries = journalEntries.filter(entry => {
+      const text = entry.notes?.toLowerCase() || '';
+      
+      const keywords = ['greed', 'greedy', 'more profit', 'bigger win', 'too much', 'excessive'];
+      return keywords.some(keyword => text.includes(keyword));
+    });
+    
+    // Pattern detection for "Frustration/Regret"
+    const frustrationEntries = journalEntries.filter(entry => {
+      const text = entry.notes?.toLowerCase() || '';
+      
+      const keywords = ['frustrat', 'regret', 'disappoint', 'angry', 'upset', 'tilt', 'tilted'];
+      return keywords.some(keyword => text.includes(keyword));
+    });
+    
+    // Calculate average P&L for each pattern
+    const calculateAvgPnL = (entries: any[]) => {
+      if (entries.length === 0) return 0;
+      
+      const totalPnL = entries.reduce((sum, entry) => {
         const entryPnL = entry.trades?.reduce((tradeSum: number, trade: any) => {
           const tradePnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
                          typeof trade.pnl === 'number' ? trade.pnl : 0;
@@ -36,45 +61,52 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
         return sum + entryPnL;
       }, 0);
       
-      avgPnL = totalPnL / rushedEntries.length;
-    }
+      return totalPnL / entries.length;
+    };
     
-    // Extract typical phrases from rushed entries
-    const phrases: string[] = [];
-    rushedEntries.forEach(entry => {
-      const text = entry.notes || '';
-      const sentences = text.split(/[.!?]+/).filter((s: string) => s.trim().length > 0);
+    // Extract typical phrases from entries with specific pattern
+    const extractPhrases = (entries: any[], patternKeywords: string[]) => {
+      const phrases: string[] = [];
       
-      sentences.forEach((sentence: string) => {
-        const lowercaseSentence = sentence.toLowerCase().trim();
+      entries.forEach(entry => {
+        const text = entry.notes || '';
+        const sentences = text.split(/[.!?]+/).filter((s: string) => s.trim().length > 0);
         
-        // Check for rush keywords
-        if (['rush', 'hurry', 'quick', 'fast', 'wanted to be done', 'forced'].some(
-          keyword => lowercaseSentence.includes(keyword)
-        )) {
-          // Add shortened version of sentence to phrases
-          let phrase = sentence.trim();
-          if (phrase.length > 40) {
-            phrase = phrase.substring(0, 37) + '...';
-          }
+        sentences.forEach((sentence: string) => {
+          const lowercaseSentence = sentence.toLowerCase().trim();
           
-          if (!phrases.includes(phrase) && phrases.length < 3) {
-            phrases.push(phrase);
+          // Check for pattern keywords
+          if (patternKeywords.some(keyword => lowercaseSentence.includes(keyword))) {
+            // Add shortened version of sentence to phrases
+            let phrase = sentence.trim();
+            if (phrase.length > 40) {
+              phrase = phrase.substring(0, 37) + '...';
+            }
+            
+            if (!phrases.includes(phrase) && phrases.length < 3) {
+              phrases.push(phrase);
+            }
           }
-        }
+        });
       });
-    });
+      
+      return phrases;
+    };
     
     // Create patterns array
     const patterns = [];
     
+    // Add Rushed to Finish pattern if detected
     if (rushedEntries.length > 0) {
+      const rushKeywords = ['rush', 'hurry', 'quick', 'fast', 'wanted to be done', 'done with'];
+      const phrases = extractPhrases(rushedEntries, rushKeywords);
+      
       patterns.push({
         id: 'rushed-to-finish',
         name: 'Rushed to Finish',
         icon: RefreshCw,
         count: rushedEntries.length,
-        avgPnL: avgPnL,
+        avgPnL: calculateAvgPnL(rushedEntries),
         typicalPhrases: phrases.length > 0 ? phrases : [
           'Wanted to be done',
           'Forced a quick trade',
@@ -84,7 +116,65 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
       });
     }
     
-    // Add more patterns here as needed
+    // Add Giving Back Profits pattern if detected
+    if (givingBackEntries.length > 0) {
+      const givingBackKeywords = ['gave back', 'giving back', 'lost profit', 'slippage', 'profit gone'];
+      const phrases = extractPhrases(givingBackEntries, givingBackKeywords);
+      
+      patterns.push({
+        id: 'giving-back-profits',
+        name: 'Giving Back Profits',
+        icon: TrendingDown,
+        count: givingBackEntries.length,
+        avgPnL: calculateAvgPnL(givingBackEntries),
+        typicalPhrases: phrases.length > 0 ? phrases : [
+          'Gave too much back to the market',
+          'Watched profits disappear',
+          'Let winners turn to losers'
+        ],
+        description: 'Consider implementing trailing stops or taking partial profits to protect gains'
+      });
+    }
+    
+    // Add Greed pattern if detected
+    if (greedEntries.length > 0) {
+      const greedKeywords = ['greed', 'greedy', 'more profit', 'bigger win'];
+      const phrases = extractPhrases(greedEntries, greedKeywords);
+      
+      patterns.push({
+        id: 'greed',
+        name: 'Greed',
+        icon: DollarSign,
+        count: greedEntries.length,
+        avgPnL: calculateAvgPnL(greedEntries),
+        typicalPhrases: phrases.length > 0 ? phrases : [
+          'Became too greedy',
+          'Wanted more profit',
+          'Tried to maximize the gain'
+        ],
+        description: 'Greed often leads to poor risk management. Stick to your original plan and position sizing'
+      });
+    }
+    
+    // Add Frustration/Regret pattern if detected
+    if (frustrationEntries.length > 0) {
+      const frustrationKeywords = ['frustrat', 'regret', 'upset', 'tilt', 'tilted'];
+      const phrases = extractPhrases(frustrationEntries, frustrationKeywords);
+      
+      patterns.push({
+        id: 'frustration-regret',
+        name: 'Frustration/Regret',
+        icon: ThumbsDown,
+        count: frustrationEntries.length,
+        avgPnL: calculateAvgPnL(frustrationEntries),
+        typicalPhrases: phrases.length > 0 ? phrases : [
+          'It tilted me',
+          'So frustrated with myself',
+          'Regret taking that trade'
+        ],
+        description: 'These emotions often lead to revenge trading. Take a break when you notice these feelings'
+      });
+    }
     
     return { patterns };
   };
