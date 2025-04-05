@@ -26,18 +26,25 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
     }
   };
   
-  const getEmotionBadgeColor = (score: number | null) => {
-    if (score === null) return 'bg-slate-200 text-slate-700';
-    if (score > 5) return 'bg-green-100 text-green-800 border-green-300';
-    if (score > 0) return 'bg-blue-100 text-blue-800 border-blue-300';
-    if (score > -5) return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-    return 'bg-red-100 text-red-800 border-red-300';
+  const getEmotionBadgeColor = (emotion: string | null, score: number | null) => {
+    if (!emotion) return 'bg-slate-200 text-slate-700';
+    
+    const lowerEmotion = emotion.toLowerCase();
+    
+    if (['happy', 'confident', 'calm', 'focused', 'optimistic', 'positive'].includes(lowerEmotion)) {
+      return 'variant-success'; // Green for positive emotions
+    } else if (['neutral', 'content', 'reflective'].includes(lowerEmotion)) {
+      return 'variant-neutral'; // Blue for neutral emotions
+    } else if (['anxious', 'scared', 'frustrated', 'angry', 'sad', 'negative'].includes(lowerEmotion)) {
+      return 'variant-warning'; // Purple/red for negative emotions
+    }
+    
+    return 'variant-outline'; // Default fallback
   };
   
-  const getEmotionLabel = (emotion: string | null, score: number | null) => {
+  const capitalizeEmotion = (emotion: string | null) => {
     if (!emotion) return 'No data';
-    
-    return `${emotion} (${score && score > 0 ? '+' : ''}${score})`;
+    return emotion.charAt(0).toUpperCase() + emotion.slice(1);
   };
 
   return (
@@ -61,15 +68,15 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
             <div className="space-y-3 mb-4">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Pre-Trading Emotional State</p>
-                <Badge variant="outline" className={`${getEmotionBadgeColor(emotionalData.preScore)} px-2 py-1`}>
-                  {getEmotionLabel(emotionalData.preEmotion, emotionalData.preScore)}
+                <Badge variant={getEmotionBadgeColor(emotionalData.preEmotion, emotionalData.preScore)}>
+                  {capitalizeEmotion(emotionalData.preEmotion)}
                 </Badge>
               </div>
               
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Post-Trading Emotional State</p>
-                <Badge variant="outline" className={`${getEmotionBadgeColor(emotionalData.postScore)} px-2 py-1`}>
-                  {getEmotionLabel(emotionalData.postEmotion, emotionalData.postScore)}
+                <Badge variant={getEmotionBadgeColor(emotionalData.postEmotion, emotionalData.postScore)}>
+                  {capitalizeEmotion(emotionalData.postEmotion)}
                 </Badge>
               </div>
             </div>
