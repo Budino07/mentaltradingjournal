@@ -23,7 +23,7 @@ const badgeVariants = cva(
         neutral:
           "border-transparent bg-primary text-white hover:bg-primary/80",
         // New variants for emotional states
-        "variant-success": "border-transparent bg-accent text-accent-foreground hover:bg-accent/80", // Positive (peach)
+        "variant-success": "border-transparent bg-accent text-accent-foreground hover:bg-accent/80 font-bold", // Positive (peach) - made bolder and brighter
         "variant-neutral": "border-transparent bg-blue-100 text-blue-800 border-blue-300", // Neutral (blue)
         "variant-warning": "border-transparent bg-primary-light text-white hover:bg-primary-light/80", // Negative (purple)
       },

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,7 +26,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
   };
   
   const getEmotionBadgeColor = (emotion: string | null, score: number | null) => {
-    if (!emotion) return 'bg-slate-200 text-slate-700';
+    if (!emotion) return 'outline';
     
     const lowerEmotion = emotion.toLowerCase();
     
@@ -39,7 +38,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
       return 'variant-warning'; // Purple/red for negative emotions
     }
     
-    return 'variant-outline'; // Default fallback
+    return 'outline'; // Default fallback
   };
   
   const capitalizeEmotion = (emotion: string | null) => {

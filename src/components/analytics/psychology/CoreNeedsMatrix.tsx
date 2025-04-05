@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -60,7 +59,7 @@ export const CoreNeedsMatrix = ({ emotionalData }: CoreNeedsMatrixProps) => {
   
   const getCoreNeedIcon = (need: string) => {
     switch (need) {
-      case 'control': return '🎮';
+      case 'control': return '🧠';
       case 'validation': return '👍';
       case 'safety': return '🛡️';
       case 'connection': return '👥';
