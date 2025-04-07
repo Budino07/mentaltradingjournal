@@ -1,16 +1,20 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, forwardRef } from "react";
 
 interface NoteContentProps {
   content: string;
   onContentChange: (newContent: string) => void;
+  editorRef?: React.RefObject<HTMLDivElement>;
 }
 
-export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
-  const editorRef = useRef<HTMLDivElement>(null);
+export const NoteContent = ({ content, onContentChange, editorRef }: NoteContentProps) => {
+  const localEditorRef = useRef<HTMLDivElement>(null);
+  
+  // Use provided ref or local ref
+  const finalEditorRef = editorRef || localEditorRef;
 
   const makeLinksClickable = () => {
-    const editor = editorRef.current;
+    const editor = finalEditorRef.current;
     if (!editor) return;
 
     // Find all links and ensure they have the correct attributes
@@ -75,7 +79,7 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
   };
 
   useEffect(() => {
-    const editor = editorRef.current;
+    const editor = finalEditorRef.current;
     if (!editor) return;
 
     // Only set the innerHTML if the content has changed and the editor isn't focused
@@ -84,10 +88,10 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
       makeLinksClickable();
       applyLinkStyling(editor);
     }
-  }, [content]);
+  }, [content, finalEditorRef]);
 
   useEffect(() => {
-    const editor = editorRef.current;
+    const editor = finalEditorRef.current;
     if (!editor) return;
 
     const handleInput = () => {
@@ -97,7 +101,7 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
 
     editor.addEventListener('input', handleInput);
     return () => editor.removeEventListener('input', handleInput);
-  }, [onContentChange]);
+  }, [onContentChange, finalEditorRef]);
 
   // Handle paste to ensure links are clickable immediately
   const handlePaste = (e: React.ClipboardEvent) => {
@@ -118,7 +122,7 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
 
   return (
     <div
-      ref={editorRef}
+      ref={finalEditorRef}
       contentEditable
       className="min-h-[calc(100vh-300px)] max-h-[calc(100vh-300px)] overflow-y-auto focus:outline-none focus-visible:outline-none text-lg leading-relaxed transition-colors duration-200 prose prose-sm max-w-none dark:prose-invert"
       role="textbox"

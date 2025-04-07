@@ -17,12 +17,14 @@ export const LinkDialog = ({ isOpen, onClose, onSubmit, selectionText }: LinkDia
 
   // Reset states and update text when dialog opens or selection changes
   useEffect(() => {
-    if (isOpen && selectionText) {
-      setText(selectionText);
-    } else if (isOpen) {
-      setText("");
+    if (isOpen) {
+      if (selectionText) {
+        setText(selectionText);
+      } else {
+        setText("");
+      }
+      setUrl("");
     }
-    setUrl("");
   }, [isOpen, selectionText]);
 
   const handleSubmit = () => {
@@ -55,6 +57,13 @@ export const LinkDialog = ({ isOpen, onClose, onSubmit, selectionText }: LinkDia
             }}
             autoFocus
           />
+          {!selectionText && (
+            <Input
+              placeholder="Link text (optional)..."
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+            />
+          )}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancel</Button>

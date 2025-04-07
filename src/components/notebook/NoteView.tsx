@@ -25,6 +25,8 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   const [selectedText, setSelectedText] = useState("");
   
+  const editorRef = useRef<HTMLDivElement | null>(null);
+  
   const {
     isLoading,
     title,
@@ -63,9 +65,16 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
   };
 
   const handleLink = () => {
+    // Save the current selection before opening dialog
     const selection = window.getSelection();
-    const selectedText = selection?.toString() || "";
-    setSelectedText(selectedText);
+    if (selection) {
+      setSelectedText(selection.toString());
+      
+      // Store the selection range for later use
+      if (editorRef.current) {
+        editorRef.current.focus();
+      }
+    }
     setIsLinkDialogOpen(true);
   };
 
@@ -76,19 +85,19 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
       finalUrl = `https://${finalUrl}`;
     }
     
-    const editor = document.querySelector('[contenteditable="true"]');
+    const editor = document.querySelector('[contenteditable="true"]') as HTMLElement;
     if (!editor) return;
     
-    // Focus the editor to ensure the selection is maintained
+    // Focus the editor to ensure we're working with it
     editor.focus();
     
     const selection = window.getSelection();
     
     if (selection && !selection.isCollapsed) {
-      // When text is selected, use execCommand to create a link
+      // When text is selected, create a link with the selection
       document.execCommand('createLink', false, finalUrl);
       
-      // Now find all links and style them
+      // Apply styling to the newly created link
       const links = editor.querySelectorAll('a');
       links.forEach(link => {
         link.setAttribute('target', '_blank');
@@ -105,10 +114,8 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
       document.execCommand('insertHTML', false, linkHtml);
     }
     
-    // Trigger content update manually
-    if (editor) {
-      handleContentChange(editor.innerHTML);
-    }
+    // Trigger content update manually to save the changes
+    handleContentChange(editor.innerHTML);
   };
 
   if (!noteId) {
@@ -155,6 +162,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
             <NoteContent 
               content={content} 
               onContentChange={handleContentChange} 
+              editorRef={editorRef}
             />
           </div>
           <ColorPickerDialog
