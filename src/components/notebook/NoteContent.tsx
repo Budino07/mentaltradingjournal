@@ -64,6 +64,16 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
     });
   };
 
+  // Apply custom link styling to ensure visual consistency
+  const applyLinkStyling = (editor: HTMLElement) => {
+    const links = editor.querySelectorAll('a');
+    links.forEach(link => {
+      link.classList.add('text-primary', 'hover:text-primary-dark', 'underline');
+      link.setAttribute('target', '_blank');
+      link.setAttribute('rel', 'noopener noreferrer');
+    });
+  };
+
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -72,6 +82,7 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
     if (!editor.isEqualNode(document.activeElement)) {
       editor.innerHTML = content;
       makeLinksClickable();
+      applyLinkStyling(editor);
     }
   }, [content]);
 

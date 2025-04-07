@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { NoteViewSkeleton } from "./NoteViewSkeleton";
 import { EmptyNoteState } from "./EmptyNoteState";
 import { useNote } from "@/hooks/useNote";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ColorPickerDialog } from "./ColorPickerDialog";
 import { LinkDialog } from "./LinkDialog";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,8 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
   const { user } = useAuth();
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+  const [selectedText, setSelectedText] = useState("");
+  
   const {
     isLoading,
     title,
@@ -61,33 +63,40 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
   };
 
   const handleLink = () => {
+    const selection = window.getSelection();
+    const selectedText = selection?.toString() || "";
+    setSelectedText(selectedText);
     setIsLinkDialogOpen(true);
   };
 
   const handleLinkSubmit = (url: string) => {
-    const selection = window.getSelection();
-    const range = selection?.getRangeAt(0);
+    // Ensure URL has protocol prefix
+    let finalUrl = url;
+    if (!/^https?:\/\//i.test(finalUrl)) {
+      finalUrl = `https://${finalUrl}`;
+    }
     
-    if (range && !range.collapsed) {
+    const selection = window.getSelection();
+    if (selection && !selection.isCollapsed) {
       // If text is selected, wrap it in a link
+      const range = selection.getRangeAt(0);
       const selectedText = range.toString();
-      const link = `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${selectedText}</a>`;
-      document.execCommand('insertHTML', false, link);
+      
+      // Create link element
+      const linkHtml = `<a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${selectedText}</a>`;
+      
+      // Insert the HTML
+      document.execCommand('insertHTML', false, linkHtml);
     } else {
       // If no text is selected, insert the URL as a link
-      const link = `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${url}</a>`;
-      document.execCommand('insertHTML', false, link);
+      const linkHtml = `<a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${finalUrl}</a>`;
+      document.execCommand('insertHTML', false, linkHtml);
     }
 
-    // Re-apply the makeLinksClickable function to ensure proper styling
+    // Trigger content update manually since we modified the DOM directly
     const editor = document.querySelector('[contenteditable="true"]');
     if (editor) {
-      const links = editor.getElementsByTagName('a');
-      Array.from(links).forEach(link => {
-        link.setAttribute('target', '_blank');
-        link.setAttribute('rel', 'noopener noreferrer');
-        link.classList.add('text-primary', 'hover:text-primary-dark', 'underline');
-      });
+      handleContentChange(editor.innerHTML);
     }
   };
 
@@ -148,6 +157,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
             isOpen={isLinkDialogOpen}
             onClose={() => setIsLinkDialogOpen(false)}
             onSubmit={handleLinkSubmit}
+            selectionText={selectedText}
           />
         </div>
       </div>

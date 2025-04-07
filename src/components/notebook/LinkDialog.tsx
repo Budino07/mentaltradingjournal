@@ -1,5 +1,5 @@
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -8,9 +8,10 @@ interface LinkDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (url: string) => void;
+  selectionText?: string;
 }
 
-export const LinkDialog = ({ isOpen, onClose, onSubmit }: LinkDialogProps) => {
+export const LinkDialog = ({ isOpen, onClose, onSubmit, selectionText }: LinkDialogProps) => {
   const [url, setUrl] = useState("");
 
   const handleSubmit = () => {
@@ -26,6 +27,9 @@ export const LinkDialog = ({ isOpen, onClose, onSubmit }: LinkDialogProps) => {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Insert Link</DialogTitle>
+          <DialogDescription>
+            {selectionText ? `Link text: "${selectionText}"` : "Enter URL to insert a link"}
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <Input
@@ -37,6 +41,7 @@ export const LinkDialog = ({ isOpen, onClose, onSubmit }: LinkDialogProps) => {
                 handleSubmit();
               }
             }}
+            autoFocus
           />
         </div>
         <DialogFooter>
