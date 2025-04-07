@@ -124,12 +124,12 @@ export function NotificationBell() {
           </div>
         </div>
         
-        <ScrollArea className="max-h-[300px]">
-          {notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-[100px] py-6 text-center">
-              <p className="text-muted-foreground">No notifications</p>
-            </div>
-          ) : (
+        {notifications.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-[100px] py-6 text-center">
+            <p className="text-muted-foreground">No notifications</p>
+          </div>
+        ) : (
+          <ScrollArea className="h-[300px]">
             <div className="py-1">
               {notifications.map((notification) => (
                 <div
@@ -165,8 +165,8 @@ export function NotificationBell() {
                 </div>
               ))}
             </div>
-          )}
-        </ScrollArea>
+          </ScrollArea>
+        )}
       </PopoverContent>
     </Popover>
   );
