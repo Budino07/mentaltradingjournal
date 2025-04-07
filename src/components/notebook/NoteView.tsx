@@ -69,41 +69,45 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
     setIsLinkDialogOpen(true);
   };
 
-  const handleLinkSubmit = (url: string) => {
+  const handleLinkSubmit = (url: string, text?: string) => {
     // Ensure URL has protocol prefix
     let finalUrl = url;
     if (!/^https?:\/\//i.test(finalUrl)) {
       finalUrl = `https://${finalUrl}`;
     }
     
+    const editor = document.querySelector('[contenteditable="true"]');
+    if (!editor) return;
+    
+    // Focus the editor to ensure the selection is maintained
+    editor.focus();
+    
     const selection = window.getSelection();
+    
     if (selection && !selection.isCollapsed) {
-      // If text is selected, wrap it in a link
+      // When text is selected, use execCommand to create a link
       document.execCommand('createLink', false, finalUrl);
       
-      // Apply styling to all links
-      const editor = document.querySelector('[contenteditable="true"]');
-      if (editor) {
-        const links = editor.querySelectorAll('a');
-        links.forEach(link => {
-          link.setAttribute('target', '_blank');
-          link.setAttribute('rel', 'noopener noreferrer');
-          link.classList.add('text-primary', 'hover:text-primary-dark', 'underline');
-        });
-        
-        // Trigger content update manually
-        handleContentChange(editor.innerHTML);
-      }
+      // Now find all links and style them
+      const links = editor.querySelectorAll('a');
+      links.forEach(link => {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+        link.classList.add('text-primary', 'hover:text-primary-dark', 'underline');
+      });
+    } else if (text) {
+      // If we have text from the dialog but no selection, insert it as a link
+      const linkHtml = `<a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${text}</a>`;
+      document.execCommand('insertHTML', false, linkHtml);
     } else {
-      // If no text is selected, insert the URL as a link
+      // If no text is selected or provided, insert the URL as a link
       const linkHtml = `<a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${finalUrl}</a>`;
       document.execCommand('insertHTML', false, linkHtml);
-      
-      // Trigger content update manually
-      const editor = document.querySelector('[contenteditable="true"]');
-      if (editor) {
-        handleContentChange(editor.innerHTML);
-      }
+    }
+    
+    // Trigger content update manually
+    if (editor) {
+      handleContentChange(editor.innerHTML);
     }
   };
 
