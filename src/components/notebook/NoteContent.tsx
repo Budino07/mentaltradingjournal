@@ -18,8 +18,8 @@ export const NoteContent = ({ content, onContentChange, editorRef }: NoteContent
     if (!editor) return;
 
     // Find all links and ensure they have the correct attributes
-    const links = editor.getElementsByTagName('a');
-    Array.from(links).forEach(link => {
+    const links = editor.querySelectorAll('a');
+    links.forEach(link => {
       link.setAttribute('target', '_blank');
       link.setAttribute('rel', 'noopener noreferrer');
       link.classList.add('text-primary', 'hover:text-primary-dark', 'underline');
@@ -50,7 +50,9 @@ export const NoteContent = ({ content, onContentChange, editorRef }: NoteContent
 
     // Replace text nodes with linked versions
     nodesToReplace.forEach(({ node, urls }) => {
-      let html = node.textContent || "";
+      if (!node.textContent) return;
+      
+      let html = node.textContent;
       urls.forEach(url => {
         html = html.replace(
           url,
@@ -102,6 +104,21 @@ export const NoteContent = ({ content, onContentChange, editorRef }: NoteContent
     editor.addEventListener('input', handleInput);
     return () => editor.removeEventListener('input', handleInput);
   }, [onContentChange, finalEditorRef]);
+
+  // Apply link styling when contentEditable changes
+  useEffect(() => {
+    const editor = finalEditorRef.current;
+    if (!editor) return;
+
+    const handleContentChange = () => {
+      applyLinkStyling(editor);
+    };
+
+    const observer = new MutationObserver(handleContentChange);
+    observer.observe(editor, { subtree: true, childList: true });
+
+    return () => observer.disconnect();
+  }, [finalEditorRef]);
 
   // Handle paste to ensure links are clickable immediately
   const handlePaste = (e: React.ClipboardEvent) => {

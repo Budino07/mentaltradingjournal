@@ -24,6 +24,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   const [selectedText, setSelectedText] = useState("");
+  const [savedSelection, setSavedSelection] = useState<Range | null>(null);
   
   const editorRef = useRef<HTMLDivElement | null>(null);
   
@@ -64,20 +65,24 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
     setIsColorPickerOpen(true);
   };
 
+  // Save the current selection and open link dialog
   const handleLink = () => {
-    // Save the current selection before opening dialog
     const selection = window.getSelection();
-    if (selection) {
-      setSelectedText(selection.toString());
-      
-      // Store the selection range for later use
-      if (editorRef.current) {
-        editorRef.current.focus();
-      }
+    if (!selection || selection.rangeCount === 0) {
+      setSelectedText("");
+      setSavedSelection(null);
+      setIsLinkDialogOpen(true);
+      return;
     }
+
+    // Store the current selection range
+    const range = selection.getRangeAt(0);
+    setSavedSelection(range.cloneRange());
+    setSelectedText(selection.toString());
     setIsLinkDialogOpen(true);
   };
 
+  // Handle link submission with proper selection restoration
   const handleLinkSubmit = (url: string, text?: string) => {
     // Ensure URL has protocol prefix
     let finalUrl = url;
@@ -85,37 +90,48 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
       finalUrl = `https://${finalUrl}`;
     }
     
-    const editor = document.querySelector('[contenteditable="true"]') as HTMLElement;
-    if (!editor) return;
-    
-    // Focus the editor to ensure we're working with it
-    editor.focus();
+    if (!editorRef.current) return;
+
+    // Focus the editor
+    editorRef.current.focus();
     
     const selection = window.getSelection();
     
-    if (selection && !selection.isCollapsed) {
-      // When text is selected, create a link with the selection
+    // If we have a saved selection, restore it
+    if (savedSelection) {
+      selection?.removeAllRanges();
+      selection?.addRange(savedSelection);
+      
+      // Create the link from selection
       document.execCommand('createLink', false, finalUrl);
       
+      // Get all links in the editor
+      const links = editorRef.current.querySelectorAll('a');
+      
       // Apply styling to the newly created link
-      const links = editor.querySelectorAll('a');
       links.forEach(link => {
         link.setAttribute('target', '_blank');
         link.setAttribute('rel', 'noopener noreferrer');
         link.classList.add('text-primary', 'hover:text-primary-dark', 'underline');
       });
     } else if (text) {
-      // If we have text from the dialog but no selection, insert it as a link
+      // If no selection but we have text from dialog, insert as new link
       const linkHtml = `<a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${text}</a>`;
       document.execCommand('insertHTML', false, linkHtml);
     } else {
-      // If no text is selected or provided, insert the URL as a link
+      // If no text provided, insert the URL itself as link
       const linkHtml = `<a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${finalUrl}</a>`;
       document.execCommand('insertHTML', false, linkHtml);
     }
     
-    // Trigger content update manually to save the changes
-    handleContentChange(editor.innerHTML);
+    // Reset selection and saved range
+    setSavedSelection(null);
+    setSelectedText("");
+    
+    // Trigger content update to save changes
+    if (editorRef.current) {
+      handleContentChange(editorRef.current.innerHTML);
+    }
   };
 
   if (!noteId) {
