@@ -79,24 +79,31 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
     const selection = window.getSelection();
     if (selection && !selection.isCollapsed) {
       // If text is selected, wrap it in a link
-      const range = selection.getRangeAt(0);
-      const selectedText = range.toString();
+      document.execCommand('createLink', false, finalUrl);
       
-      // Create link element
-      const linkHtml = `<a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${selectedText}</a>`;
-      
-      // Insert the HTML
-      document.execCommand('insertHTML', false, linkHtml);
+      // Apply styling to all links
+      const editor = document.querySelector('[contenteditable="true"]');
+      if (editor) {
+        const links = editor.querySelectorAll('a');
+        links.forEach(link => {
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
+          link.classList.add('text-primary', 'hover:text-primary-dark', 'underline');
+        });
+        
+        // Trigger content update manually
+        handleContentChange(editor.innerHTML);
+      }
     } else {
       // If no text is selected, insert the URL as a link
       const linkHtml = `<a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark underline">${finalUrl}</a>`;
       document.execCommand('insertHTML', false, linkHtml);
-    }
-
-    // Trigger content update manually since we modified the DOM directly
-    const editor = document.querySelector('[contenteditable="true"]');
-    if (editor) {
-      handleContentChange(editor.innerHTML);
+      
+      // Trigger content update manually
+      const editor = document.querySelector('[contenteditable="true"]');
+      if (editor) {
+        handleContentChange(editor.innerHTML);
+      }
     }
   };
 

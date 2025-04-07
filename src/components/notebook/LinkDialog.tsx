@@ -2,22 +2,34 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface LinkDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (url: string) => void;
+  onSubmit: (url: string, text?: string) => void;
   selectionText?: string;
 }
 
 export const LinkDialog = ({ isOpen, onClose, onSubmit, selectionText }: LinkDialogProps) => {
   const [url, setUrl] = useState("");
+  const [text, setText] = useState("");
+
+  // Reset states and update text when dialog opens or selection changes
+  useEffect(() => {
+    if (isOpen && selectionText) {
+      setText(selectionText);
+    } else if (isOpen) {
+      setText("");
+    }
+    setUrl("");
+  }, [isOpen, selectionText]);
 
   const handleSubmit = () => {
     if (url.trim()) {
-      onSubmit(url.trim());
+      onSubmit(url.trim(), text || undefined);
       setUrl("");
+      setText("");
       onClose();
     }
   };
