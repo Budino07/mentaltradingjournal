@@ -11,6 +11,7 @@ import { ReflectionEntries } from './ReflectionEntries';
 import { PersonalityInsights } from './PersonalityInsights';
 import { EmotionalPatternGuardrails } from './EmotionalPatternGuardrails';
 import { BehavioralPatterns } from './BehavioralPatterns';
+import { generateEmotionalData } from '@/utils/psychology/coreNeedsAnalysis';
 
 export const EmotionalJourneyChart = () => {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'quarter'>('week');
@@ -35,95 +36,12 @@ export const EmotionalJourneyChart = () => {
   
   const days = getDaysForTimeframe();
 
+  // Use our utility for emotional data generation
   const emotionalData = React.useMemo(() => {
     if (!analyticsData?.journalEntries?.length) return [];
     
-    return days.map(day => {
-      const dayEntries = analyticsData.journalEntries.filter(entry => 
-        new Date(entry.created_at).toDateString() === day.toDateString()
-      );
-      
-      const preSession = dayEntries.find(entry => entry.session_type === 'pre');
-      const postSession = dayEntries.find(entry => entry.session_type === 'post');
-      
-      // Calculate emotional intensity score (-10 to +10)
-      const calculateEmotionalScore = (entry: any) => {
-        if (!entry) return null;
-        
-        const emotion = entry.emotion?.toLowerCase() || '';
-        
-        if (['happy', 'confident', 'calm', 'focused', 'optimistic'].includes(emotion)) {
-          return 5 + Math.random() * 5; // Positive emotions (5 to 10)
-        } else if (['neutral', 'content', 'reflective'].includes(emotion)) {
-          return -2 + Math.random() * 4; // Neutral emotions (-2 to 2)
-        } else if (['anxious', 'scared', 'frustrated', 'angry', 'sad'].includes(emotion)) {
-          return -10 + Math.random() * 5; // Negative emotions (-10 to -5)
-        }
-        
-        return 0; // Default
-      };
-      
-      // Extract trades performance for this day
-      const dayTrades = dayEntries
-        .filter(entry => entry.trades && entry.trades.length > 0)
-        .flatMap(entry => entry.trades || []);
-      
-      const tradePnL = dayTrades.reduce((sum, trade) => {
-        const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
-                 typeof trade.pnl === 'number' ? trade.pnl : 0;
-        return sum + pnl;
-      }, 0);
-      
-      // Calculate emotional change intensity
-      const preScore = calculateEmotionalScore(preSession);
-      const postScore = calculateEmotionalScore(postSession);
-      const emotionalChange = preScore !== null && postScore !== null 
-        ? postScore - preScore 
-        : null;
-      
-      // Determine core needs based on journal content
-      const notes = [preSession?.notes, postSession?.notes].filter(Boolean).join(' ').toLowerCase();
-      
-      let coreNeed = 'unknown';
-      if (notes.includes('control') || notes.includes('manage') || notes.includes('discipline')) {
-        coreNeed = 'control';
-      } else if (notes.includes('validation') || notes.includes('acknowledge') || notes.includes('recognition')) {
-        coreNeed = 'validation';
-      } else if (notes.includes('safe') || notes.includes('security') || notes.includes('protect')) {
-        coreNeed = 'safety';
-      } else if (notes.includes('connect') || notes.includes('belong') || notes.includes('relationship')) {
-        coreNeed = 'connection';
-      } else if (notes.includes('grow') || notes.includes('improve') || notes.includes('learn')) {
-        coreNeed = 'growth';
-      }
-      
-      // Generate reflection summary
-      const reflection = postSession?.notes || '';
-      
-      // Identify potential harmful patterns
-      const hasHarmfulPattern = postSession ? 
-        (postSession.emotion === 'angry' && tradePnL < 0) || 
-        ((postSession.emotion === 'confident' || postSession.emotion === 'excited') && tradePnL > 100) : 
-        false;
-      
-      return {
-        date: day,
-        formattedDate: format(day, 'MMM dd'),
-        preScore,
-        postScore,
-        emotionalChange,
-        preEmotion: preSession?.emotion || null,
-        postEmotion: postSession?.emotion || null,
-        tradePnL,
-        reflection,
-        coreNeed,
-        hasHarmfulPattern,
-        patternType: hasHarmfulPattern ? 
-          (tradePnL < 0 ? 'revenge trading' : 'overconfidence') : 
-          null
-      };
-    }).filter(item => item.preScore !== null || item.postScore !== null);
-  }, [analyticsData, days]);
+    return generateEmotionalData(analyticsData.journalEntries);
+  }, [analyticsData?.journalEntries]);
 
   const handleDayClick = (day: Date) => {
     setFocusDay(day);

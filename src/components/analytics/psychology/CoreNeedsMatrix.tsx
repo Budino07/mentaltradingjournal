@@ -2,9 +2,16 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { useQuery } from '@tanstack/react-query';
+import { generateAnalytics } from '@/utils/analyticsUtils';
+import { 
+  CoreNeed, 
+  generateEmotionalData, 
+  analyzeJournalEntriesForCoreNeeds 
+} from '@/utils/psychology/coreNeedsAnalysis';
 
 interface CoreNeedsMatrixProps {
-  emotionalData: any[];
+  emotionalData?: any[];
 }
 
 interface NeedDataItem {
@@ -12,23 +19,42 @@ interface NeedDataItem {
   value: number;
 }
 
-export const CoreNeedsMatrix = ({ emotionalData }: CoreNeedsMatrixProps) => {
+export const CoreNeedsMatrix = ({ emotionalData: providedData }: CoreNeedsMatrixProps) => {
   const [selectedNeed, setSelectedNeed] = useState<string | null>(null);
   
+  const { data: analyticsData } = useQuery({
+    queryKey: ['analytics'],
+    queryFn: generateAnalytics,
+  });
+  
   const needsData = React.useMemo(() => {
-    const coreNeeds = emotionalData.reduce((acc: Record<string, number>, item) => {
-      if (!acc[item.coreNeed]) {
-        acc[item.coreNeed] = 0;
-      }
-      acc[item.coreNeed]++;
-      return acc;
-    }, {});
+    if (providedData && providedData.length > 0) {
+      // If data is provided externally, use it
+      const coreNeeds = providedData.reduce((acc: Record<string, number>, item) => {
+        const needName = item.coreNeed || 'unknown';
+        if (!acc[needName]) {
+          acc[needName] = 0;
+        }
+        acc[needName]++;
+        return acc;
+      }, {});
+      
+      return Object.entries(coreNeeds).map(([name, value]) => ({
+        name,
+        value,
+      }));
+    } else if (analyticsData?.journalEntries) {
+      // Otherwise analyze journal entries using our utility
+      const analyzedNeeds = analyzeJournalEntriesForCoreNeeds(analyticsData.journalEntries);
+      
+      return analyzedNeeds.map(({ coreNeed, count }) => ({
+        name: coreNeed,
+        value: count,
+      }));
+    }
     
-    return Object.entries(coreNeeds).map(([name, value]) => ({
-      name,
-      value,
-    }));
-  }, [emotionalData]);
+    return [];
+  }, [providedData, analyticsData]);
   
   const colors = {
     control: '#9333ea',
@@ -86,10 +112,32 @@ export const CoreNeedsMatrix = ({ emotionalData }: CoreNeedsMatrixProps) => {
 
   // Calculate percentages safely with type checking
   const calculatePercentage = (value: number): number => {
-    // Return 0 if there's no emotional data to prevent division by zero
-    if (!emotionalData.length) return 0;
-    return Math.round((value / emotionalData.length) * 100);
+    // Get total value
+    const total = needsData.reduce((sum, item) => sum + item.value, 0);
+    // Return 0 if there's no data to prevent division by zero
+    if (!total) return 0;
+    return Math.round((value / total) * 100);
   };
+
+  // If there's no data, show a placeholder
+  if (!needsData.length) {
+    return (
+      <Card className="border border-primary/10 bg-card/30 backdrop-blur-md overflow-hidden">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-gradient-primary">Core Needs Matrix</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-2">
+          <div className="flex flex-col items-center justify-center h-[200px] text-center">
+            <div className="text-4xl mb-4">🧠</div>
+            <h3 className="text-lg font-medium mb-2">No data available yet</h3>
+            <p className="text-sm text-muted-foreground">
+              Start journaling about your trading emotions to see your psychological needs analysis
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border border-primary/10 bg-card/30 backdrop-blur-md overflow-hidden">
