@@ -1,4 +1,3 @@
-
 import { Trade } from "@/types/trade";
 
 export const calculateMaeRelativeToSl = (
@@ -47,15 +46,6 @@ export const calculateMfeRelativeToTp = (
     ? ((highestPrice - entryPrice) / (takeProfit - entryPrice)) * 100
     : ((entryPrice - lowestPrice) / (entryPrice - takeProfit)) * 100;
 
-  console.log('MFE Calculation:', {
-    entryPrice,
-    takeProfit,
-    highestPrice,
-    lowestPrice,
-    isLongForTp,
-    result: mfeValue
-  });
-
   return mfeValue;
 };
 
@@ -98,77 +88,98 @@ export const calculateRMultiple = (
 };
 
 export const processTrade = (trade: Trade) => {
-  if (
-    !trade.highestPrice ||
-    !trade.lowestPrice ||
-    !trade.entryPrice ||
-    !trade.takeProfit ||
-    !trade.stopLoss ||
-    !trade.exitPrice ||
-    !trade.id
-  ) {
+  try {
+    // Ensure all required fields exist and are numeric
+    if (
+      !trade.id || 
+      trade.highestPrice === undefined || trade.highestPrice === null ||
+      trade.lowestPrice === undefined || trade.lowestPrice === null ||
+      trade.entryPrice === undefined || trade.entryPrice === null ||
+      trade.takeProfit === undefined || trade.takeProfit === null ||
+      trade.stopLoss === undefined || trade.stopLoss === null ||
+      trade.exitPrice === undefined || trade.exitPrice === null
+    ) {
+      console.log('Skipping trade due to missing required fields:', trade.id);
+      return null;
+    }
+
+    // Convert all values to numbers to ensure calculation accuracy
+    const entryPrice = Number(trade.entryPrice);
+    const exitPrice = Number(trade.exitPrice);
+    const highestPrice = Number(trade.highestPrice);
+    const lowestPrice = Number(trade.lowestPrice);
+    const takeProfit = Number(trade.takeProfit);
+    const stopLoss = Number(trade.stopLoss);
+    
+    // Validate that the numbers are valid
+    if (
+      isNaN(entryPrice) || isNaN(exitPrice) || 
+      isNaN(highestPrice) || isNaN(lowestPrice) || 
+      isNaN(takeProfit) || isNaN(stopLoss)
+    ) {
+      console.log('Skipping trade due to invalid numeric values:', trade.id);
+      return null;
+    }
+    
+    // Check if prices make logical sense
+    if (highestPrice < lowestPrice || stopLoss === entryPrice || takeProfit === entryPrice) {
+      console.log('Skipping trade due to illogical price values:', trade.id);
+      return null;
+    }
+    
+    // Determine trade direction
+    const isLong = stopLoss < entryPrice;
+    const isLongForTp = takeProfit > entryPrice;
+    
+    console.log('Processing trade:', {
+      id: trade.id,
+      instrument: trade.instrument,
+      entryPrice,
+      exitPrice,
+      highestPrice,
+      lowestPrice,
+      takeProfit,
+      stopLoss,
+      isLong,
+      isLongForTp
+    });
+
+    const maeRelativeToSl = calculateMaeRelativeToSl(
+      entryPrice,
+      stopLoss,
+      highestPrice,
+      lowestPrice,
+      isLong
+    );
+
+    const mfeRelativeToTp = calculateMfeRelativeToTp(
+      entryPrice,
+      takeProfit,
+      highestPrice,
+      lowestPrice,
+      isLongForTp
+    );
+
+    const capturedMove = calculateCapturedMove(
+      entryPrice,
+      exitPrice,
+      highestPrice,
+      lowestPrice,
+      isLong
+    );
+
+    const rMultiple = calculateRMultiple(entryPrice, takeProfit, stopLoss);
+
+    return {
+      id: trade.id,
+      mfeRelativeToTp,
+      maeRelativeToSl,
+      instrument: trade.instrument,
+      rMultiple,
+      capturedMove
+    };
+  } catch (error) {
+    console.error('Error processing trade:', error, trade);
     return null;
   }
-
-  const entryPrice = Number(trade.entryPrice);
-  const exitPrice = Number(trade.exitPrice);
-  const highestPrice = Number(trade.highestPrice);
-  const lowestPrice = Number(trade.lowestPrice);
-  const takeProfit = Number(trade.takeProfit);
-  const stopLoss = Number(trade.stopLoss);
-  
-  console.log('Processing trade:', {
-    id: trade.id,
-    instrument: trade.instrument,
-    entryPrice,
-    exitPrice,
-    highestPrice,
-    lowestPrice,
-    takeProfit,
-    stopLoss
-  });
-  
-  const isLong = stopLoss < entryPrice;
-  const isLongForTp = takeProfit > entryPrice;
-
-  console.log('Trade direction:', {
-    isLong,
-    isLongForTp,
-    instrument: trade.instrument
-  });
-
-  const maeRelativeToSl = calculateMaeRelativeToSl(
-    entryPrice,
-    stopLoss,
-    highestPrice,
-    lowestPrice,
-    isLong
-  );
-
-  const mfeRelativeToTp = calculateMfeRelativeToTp(
-    entryPrice,
-    takeProfit,
-    highestPrice,
-    lowestPrice,
-    isLongForTp
-  );
-
-  const capturedMove = calculateCapturedMove(
-    entryPrice,
-    exitPrice,
-    highestPrice,
-    lowestPrice,
-    isLong
-  );
-
-  const rMultiple = calculateRMultiple(entryPrice, takeProfit, stopLoss);
-
-  return {
-    id: trade.id,
-    mfeRelativeToTp,
-    maeRelativeToSl,
-    instrument: trade.instrument,
-    rMultiple,
-    capturedMove
-  };
 };
