@@ -21,7 +21,6 @@ interface EmotionalDataPoint {
   emotion: string;
   hasHarmfulPattern: boolean;
   patternType: string | null;
-  patternSource?: string; // New field to track the source of pattern detection
 }
 
 interface EmotionalWaveformProps {
@@ -98,51 +97,13 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
               strokeWidth={1}
             />
             
-            {/* Warning indicator for harmful patterns - improved visibility */}
+            {/* Warning indicator for harmful patterns - simplified */}
             {hasPattern && (
               <g>
                 <path 
                   d={`M${cx - 8},${cy - 8} L${cx + 8},${cy + 8} M${cx + 8},${cy - 8} L${cx - 8},${cy + 8}`} 
                   stroke="#ff0000" 
                   strokeWidth={1.5} 
-                  strokeLinecap="round"
-                />
-                <circle 
-                  cx={cx} 
-                  cy={cy} 
-                  r={10} 
-                  fill="none" 
-                  stroke="#ff0000" 
-                  strokeWidth={1.5} 
-                  strokeDasharray="3,2"
-                />
-              </g>
-            )}
-          </>
-        )}
-        
-        {/* Handle points with PNL data but no emotional data */}
-        {payload.preScore === null && payload.tradePnL !== 0 && (
-          <>
-            {/* Neutral marker for PNL-only data points */}
-            <circle 
-              cx={cx} 
-              cy={cy} 
-              r={4}
-              fill={payload.tradePnL > 0 ? '#16a34a' : '#dc2626'}
-              stroke="#ffffff"
-              strokeWidth={1}
-              opacity={0.6}
-            />
-            
-            {/* Show pattern indicator even for PNL-only data points */}
-            {hasPattern && (
-              <g>
-                <path 
-                  d={`M${cx - 8},${cy - 8} L${cx + 8},${cy + 8} M${cx + 8},${cy - 8} L${cx - 8},${cy + 8}`} 
-                  stroke="#ff0000" 
-                  strokeWidth={1.5} 
-                  strokeLinecap="round"
                 />
                 <circle 
                   cx={cx} 
@@ -188,10 +149,7 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
           r={6}
           stroke="#ffffff"
           strokeWidth={1.5}
-          fill={data.preScore > 0 ? '#9333ea' : 
-                data.preScore < 0 ? '#dc2626' : 
-                data.tradePnL > 0 ? '#16a34a' : 
-                data.tradePnL < 0 ? '#dc2626' : '#6b7280'}
+          fill={data.preScore > 0 ? '#9333ea' : '#dc2626'}
           opacity={0.9}
         />
       </motion.g>
@@ -330,8 +288,8 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
         </ResponsiveContainer>
       </ChartContainer>
       
-      {/* Legend with enhanced information */}
-      <div className="absolute bottom-0 left-0 right-0 flex flex-wrap justify-center gap-4 text-xs py-2 px-3">
+      {/* Legend */}
+      <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-6 text-xs py-2">
         <div className="flex items-center">
           <div className="w-3 h-3 rounded-full bg-purple-600 mr-2"></div>
           <span>Pre-Trading State</span>
@@ -339,15 +297,6 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
         <div className="flex items-center">
           <div className="w-3 h-3 rounded-full bg-pink-600 mr-2"></div>
           <span>Post-Trading State</span>
-        </div>
-        <div className="flex items-center">
-          <div className="flex items-center justify-center w-5 h-5">
-            <svg width="16" height="16" viewBox="0 0 16 16" className="opacity-80">
-              <path d="M2 2L14 14M14 2L2 14" stroke="red" strokeWidth="2" strokeLinecap="round"/>
-              <circle cx="8" cy="8" r="7" stroke="red" strokeWidth="1" strokeDasharray="3,2" fill="none"/>
-            </svg>
-          </div>
-          <span>Harmful Pattern</span>
         </div>
       </div>
     </div>

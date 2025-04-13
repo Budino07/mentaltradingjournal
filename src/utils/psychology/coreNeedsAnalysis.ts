@@ -343,100 +343,14 @@ export function getEntriesByCoreSeed(entries: JournalEntry[]): {
   }));
 }
 
-// List of harmful patterns to detect in trading reflections
-const harmfulPatterns = [
-  {
-    type: 'revenge trading',
-    keywords: ['revenge', 'get back', 'make up for', 'recover loss'],
-    description: 'Taking trades to recover losses rather than based on strategy'
-  },
-  {
-    type: 'overtrading',
-    keywords: ['overtrade', 'too many trades', 'trading too much', 'excessive', 'volume'],
-    description: 'Taking too many trades in a short period'
-  },
-  {
-    type: 'panic trading',
-    keywords: ['panic', 'fear', 'anxiety', 'stress', 'nervous', 'worried'],
-    description: 'Trading based on emotional fear rather than strategy'
-  },
-  {
-    type: 'emotional decision making',
-    keywords: ['emotion', 'feel', 'gut', 'impulsive', 'urge', 'temptation'],
-    description: 'Making decisions based on emotions rather than analysis'
-  },
-  {
-    type: 'ignoring stop loss',
-    keywords: ['moved stop', 'ignored stop', 'no stop loss', 'without stop', 'bypassed stop'],
-    description: 'Moving, ignoring, or trading without stop losses'
-  },
-  {
-    type: 'profit chasing',
-    keywords: ['fomo', 'missing out', 'chase', 'chasing', 'greedy', 'greed'],
-    description: 'Entering trades out of fear of missing out or greed'
-  },
-  {
-    type: 'risk management issues',
-    keywords: ['too large', 'oversized', 'big position', 'excessive risk', 'high leverage'],
-    description: 'Taking positions that are too large for account size'
-  }
-];
-
-// Detect harmful patterns in a reflection or trading notes
-export function detectHarmfulPatterns(text: string): { detected: boolean; patternType: string | null; source: string } {
-  if (!text) return { detected: false, patternType: null, source: 'no data' };
-  
-  const lowercaseText = text.toLowerCase();
-  
-  // Check against each defined pattern
-  for (const pattern of harmfulPatterns) {
-    if (pattern.keywords.some(keyword => lowercaseText.includes(keyword.toLowerCase()))) {
-      return { 
-        detected: true, 
-        patternType: pattern.type,
-        source: `keyword: "${pattern.keywords.find(k => lowercaseText.includes(k.toLowerCase()))}"` 
-      };
-    }
-  }
-  
-  // Check for P&L-based pattern indicators
-  if (
-    (lowercaseText.includes('loss') && 
-      (lowercaseText.includes('frustrat') || lowercaseText.includes('angry') || lowercaseText.includes('upset'))) ||
-    (lowercaseText.includes('profit') && lowercaseText.includes('gave back')) ||
-    (lowercaseText.includes('gave up') && lowercaseText.includes('gain'))
-  ) {
-    return { 
-      detected: true, 
-      patternType: 'emotional reaction to P&L',
-      source: 'emotional P&L reaction'
-    };
-  }
-  
-  // Check for behavioral indicators without explicit keywords
-  if (
-    (lowercaseText.includes('should have waited') || lowercaseText.includes('too early')) ||
-    (lowercaseText.includes('didn\'t follow') && lowercaseText.includes('plan')) ||
-    (lowercaseText.includes('broke') && lowercaseText.includes('rule'))
-  ) {
-    return { 
-      detected: true, 
-      patternType: 'discipline issues',
-      source: 'behavioral indicators'
-    };
-  }
-  
-  return { detected: false, patternType: null, source: 'no pattern detected' };
-}
-
 // Create an interface for the emotional data to match what EmotionalWaveform expects
 export interface EnhancedEmotionalDataPoint {
   coreNeed: CoreNeed;
   emotion: string;
   date: Date;
   formattedDate: string;
-  preScore: number | null;
-  postScore: number | null;
+  preScore: number | null;  // Changed from optional to required but nullable
+  postScore: number | null; // Changed from optional to required but nullable
   emotionalChange: number | null;
   preEmotion: string | null;
   postEmotion: string | null;
@@ -444,7 +358,6 @@ export interface EnhancedEmotionalDataPoint {
   reflection: string;
   hasHarmfulPattern: boolean;
   patternType: string | null;
-  patternSource?: string; // New field to track how pattern was detected
   intensity: number;
 }
 
@@ -517,10 +430,18 @@ export function generateEmotionalData(entries: JournalEntry[]): EnhancedEmotiona
     // Format date for display
     const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     
-    // Enhanced pattern detection using the new function
-    const { detected: hasHarmfulPattern, patternType, source: patternSource } = detectHarmfulPatterns(
-      [entry.notes, entry.emotion_detail, entry.post_submission_notes].filter(Boolean).join(' ')
-    );
+    // Determine if this shows a harmful pattern
+    const hasHarmfulPattern = textContent.includes('revenge') || 
+                             textContent.includes('overtrade') || 
+                             textContent.includes('panic');
+
+    // Determine pattern type if any
+    let patternType = null;
+    if (hasHarmfulPattern) {
+      if (textContent.includes('revenge')) patternType = 'revenge trading';
+      else if (textContent.includes('overtrade')) patternType = 'overtrading';
+      else if (textContent.includes('panic')) patternType = 'panic trading';
+    }
 
     // Extract PNL if available from trades
     let tradePnL = 0;
@@ -534,18 +455,6 @@ export function generateEmotionalData(entries: JournalEntry[]): EnhancedEmotiona
           }
         }
       });
-    }
-    
-    // Additional pattern detection based on P&L data when emotional data is limited
-    let finalPatternType = patternType;
-    let finalHasHarmfulPattern = hasHarmfulPattern;
-    let finalPatternSource = patternSource;
-    
-    // Look for large losses with minimal reflection as potential harmful patterns
-    if (!hasHarmfulPattern && tradePnL < -100 && (!entry.notes || entry.notes.length < 20)) {
-      finalHasHarmfulPattern = true;
-      finalPatternType = 'significant loss with minimal reflection';
-      finalPatternSource = 'P&L data with limited reflection';
     }
 
     // Return enhanced emotional data point with all required fields
@@ -561,9 +470,8 @@ export function generateEmotionalData(entries: JournalEntry[]): EnhancedEmotiona
       postEmotion: entry.session_type === 'post' ? emotion : null,
       tradePnL,
       reflection: entry.notes || '',
-      hasHarmfulPattern: finalHasHarmfulPattern,
-      patternType: finalPatternType,
-      patternSource: finalPatternSource,
+      hasHarmfulPattern,
+      patternType,
       intensity
     };
   });
