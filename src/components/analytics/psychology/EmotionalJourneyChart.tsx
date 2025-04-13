@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { format, subDays } from 'date-fns';
+import React, { useState, useMemo } from 'react';
+import { format, subDays, subMonths, isAfter } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -23,26 +23,34 @@ export const EmotionalJourneyChart = () => {
     queryFn: generateAnalytics,
   });
   
-  const getDaysForTimeframe = () => {
-    const today = new Date();
-    const days = [];
-    const daysToShow = timeframe === 'week' ? 7 : timeframe === 'month' ? 30 : 90;
-    
-    for (let i = daysToShow - 1; i >= 0; i--) {
-      days.push(subDays(today, i));
-    }
-    
-    return days;
-  };
-  
-  const days = getDaysForTimeframe();
-
-  // Use our utility for emotional data generation - using as-is since the types are now aligned
-  const emotionalData = React.useMemo(() => {
+  // Filter data based on timeframe
+  const filteredEmotionalData = useMemo(() => {
     if (!analyticsData?.journalEntries?.length) return [];
     
-    return generateEmotionalData(analyticsData.journalEntries);
-  }, [analyticsData?.journalEntries]);
+    // Generate the full dataset
+    const fullData = generateEmotionalData(analyticsData.journalEntries);
+    
+    // Apply timeframe filtering
+    const today = new Date();
+    let cutoffDate: Date;
+    
+    switch (timeframe) {
+      case 'week':
+        cutoffDate = subDays(today, 7);
+        break;
+      case 'month':
+        cutoffDate = subDays(today, 30);
+        break;
+      case 'quarter':
+        cutoffDate = subMonths(today, 3);
+        break;
+      default:
+        cutoffDate = subDays(today, 7);
+    }
+    
+    // Filter the data to only include dates after the cutoff
+    return fullData.filter(item => isAfter(item.date, cutoffDate));
+  }, [analyticsData?.journalEntries, timeframe]);
 
   const handleDayClick = (day: Date) => {
     setFocusDay(day);
@@ -56,6 +64,38 @@ export const EmotionalJourneyChart = () => {
         </CardHeader>
         <CardContent className="flex justify-center items-center h-[400px]">
           <div className="h-4 w-24 bg-muted rounded"></div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Empty state message when no data is available for the selected timeframe
+  if (filteredEmotionalData.length === 0) {
+    return (
+      <Card className="w-full max-w-[100vw] overflow-hidden border border-primary/10 bg-card/30 backdrop-blur-md">
+        <CardHeader className="pb-3">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <CardTitle className="text-xl text-gradient-primary">
+              Emotional Trading Journey
+            </CardTitle>
+            <Tabs 
+              value={timeframe} 
+              onValueChange={(value) => setTimeframe(value as 'week' | 'month' | 'quarter')}
+              className="self-start"
+            >
+              <TabsList className="bg-background/50 backdrop-blur-sm">
+                <TabsTrigger value="week">Week</TabsTrigger>
+                <TabsTrigger value="month">Month</TabsTrigger>
+                <TabsTrigger value="quarter">Quarter</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        </CardHeader>
+        <CardContent className="pb-6 pt-2 w-full">
+          <div className="relative h-[400px] w-full flex items-center justify-center flex-col gap-4">
+            <p className="text-lg text-muted-foreground">No emotional data available for the selected timeframe</p>
+            <p className="text-sm text-muted-foreground">Try selecting a different time period or add journal entries</p>
+          </div>
         </CardContent>
       </Card>
     );
@@ -84,7 +124,7 @@ export const EmotionalJourneyChart = () => {
       <CardContent className="pb-6 pt-2 w-full">
         <div className="relative h-[400px] w-full">
           <EmotionalWaveform 
-            emotionalData={emotionalData}
+            emotionalData={filteredEmotionalData}
             onDayClick={handleDayClick}
           />
         </div>
@@ -92,7 +132,7 @@ export const EmotionalJourneyChart = () => {
         <div className="mt-6">
           {focusDay && (
             <ReflectionEntries 
-              emotionalData={emotionalData.find(item => 
+              emotionalData={filteredEmotionalData.find(item => 
                 item.date.toDateString() === focusDay.toDateString()
               )}
               onClose={() => setFocusDay(null)}
@@ -102,14 +142,14 @@ export const EmotionalJourneyChart = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
           <CoreNeedsMatrix 
-            emotionalData={emotionalData}
+            emotionalData={filteredEmotionalData}
           />
           <PersonalityInsights />
         </div>
         
         <div className="mt-8">
           <EmotionalPatternGuardrails 
-            emotionalData={emotionalData}
+            emotionalData={filteredEmotionalData}
           />
         </div>
         
