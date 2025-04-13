@@ -97,7 +97,7 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
               strokeWidth={1}
             />
             
-            {/* Warning indicator for harmful patterns - simplified */}
+            {/* Warning indicator for harmful patterns - improved to be more visible */}
             {hasPattern && (
               <g>
                 <path 

@@ -285,6 +285,54 @@ function analyzeEntryForCoreNeeds(entry: JournalEntry): CoreNeed {
   return 'unknown';
 }
 
+// New function to detect harmful patterns more accurately
+function detectHarmfulPatterns(entry: JournalEntry | null, textContent: string, tradePnL: number): {
+  hasHarmfulPattern: boolean;
+  patternType: string | null;
+} {
+  // No entry means no pattern
+  if (!entry) {
+    return { hasHarmfulPattern: false, patternType: null };
+  }
+  
+  // Check for keyword indicators in text content
+  const keywordPatterns = {
+    'revenge trading': ['revenge', 'get back', 'make up for'],
+    'overtrading': ['overtrade', 'too many trades', 'excessive'],
+    'panic trading': ['panic', 'fear driven', 'scared'],
+    'fomo': ['fomo', 'fear of missing out', 'jumped in', 'couldn\'t miss'],
+    'analysis paralysis': ['overthinking', 'can\'t decide', 'frozen', 'paralyzed'],
+    'greed': ['greedy', 'too much', 'more and more', 'never enough']
+  };
+  
+  // Check for each pattern
+  for (const [pattern, keywords] of Object.entries(keywordPatterns)) {
+    if (keywords.some(keyword => textContent.includes(keyword.toLowerCase()))) {
+      return { hasHarmfulPattern: true, patternType: pattern };
+    }
+  }
+  
+  // P&L-based pattern detection
+  if (tradePnL < -200) {
+    // Major loss might indicate a harmful pattern
+    return { hasHarmfulPattern: true, patternType: 'Significant Loss' };
+  }
+  
+  // Additional checks from entry data if available
+  if (entry.emotion === 'negative' && tradePnL < 0) {
+    // Negative emotion combined with loss could indicate pattern issues
+    return { hasHarmfulPattern: true, patternType: 'Emotional Trading' };
+  }
+  
+  // Check for common mistake patterns if available
+  if (Array.isArray(entry.mistakes) && entry.mistakes.length > 2) {
+    return { hasHarmfulPattern: true, patternType: 'Multiple Mistakes' };
+  }
+  
+  // No harmful pattern detected
+  return { hasHarmfulPattern: false, patternType: null };
+}
+
 // Process all journal entries and categorize them by core need
 export function analyzeJournalEntriesForCoreNeeds(entries: JournalEntry[]): { 
   coreNeed: CoreNeed; 
@@ -430,19 +478,6 @@ export function generateEmotionalData(entries: JournalEntry[]): EnhancedEmotiona
     // Format date for display
     const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     
-    // Determine if this shows a harmful pattern
-    const hasHarmfulPattern = textContent.includes('revenge') || 
-                             textContent.includes('overtrade') || 
-                             textContent.includes('panic');
-
-    // Determine pattern type if any
-    let patternType = null;
-    if (hasHarmfulPattern) {
-      if (textContent.includes('revenge')) patternType = 'revenge trading';
-      else if (textContent.includes('overtrade')) patternType = 'overtrading';
-      else if (textContent.includes('panic')) patternType = 'panic trading';
-    }
-
     // Extract PNL if available from trades
     let tradePnL = 0;
     if (entry.trades && entry.trades.length > 0) {
@@ -456,6 +491,9 @@ export function generateEmotionalData(entries: JournalEntry[]): EnhancedEmotiona
         }
       });
     }
+    
+    // Use the improved pattern detection
+    const { hasHarmfulPattern, patternType } = detectHarmfulPatterns(entry, textContent, tradePnL);
 
     // Return enhanced emotional data point with all required fields
     return {
