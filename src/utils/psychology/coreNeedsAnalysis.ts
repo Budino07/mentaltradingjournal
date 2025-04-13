@@ -1,4 +1,3 @@
-
 import { JournalEntry } from "@/types/analytics";
 
 // Define the core need types
@@ -350,15 +349,15 @@ export interface EnhancedEmotionalDataPoint {
   emotion: string;
   date: Date;
   formattedDate: string;
-  preScore?: number | null;
-  postScore?: number | null;
-  emotionalChange?: number | null;
-  preEmotion?: string | null;
-  postEmotion?: string | null;
-  tradePnL?: number;
-  reflection?: string;
-  hasHarmfulPattern?: boolean;
-  patternType?: string | null;
+  preScore: number | null;  // Changed from optional to required but nullable
+  postScore: number | null; // Changed from optional to required but nullable
+  emotionalChange: number | null;
+  preEmotion: string | null;
+  postEmotion: string | null;
+  tradePnL: number;
+  reflection: string;
+  hasHarmfulPattern: boolean;
+  patternType: string | null;
   intensity: number;
 }
 
@@ -369,8 +368,8 @@ export function generateEmotionalData(entries: JournalEntry[]): EnhancedEmotiona
     const emotion = entry.emotion || 'neutral';
     
     // Calculate emotional scores for the waveform
-    let preScore = null;
-    let postScore = null;
+    let preScore: number | null = null;
+    let postScore: number | null = null;
     
     // Convert emotion to score
     const getScoreFromEmotion = (emotion: string): number => {
@@ -458,7 +457,7 @@ export function generateEmotionalData(entries: JournalEntry[]): EnhancedEmotiona
       });
     }
 
-    // Return enhanced emotional data point
+    // Return enhanced emotional data point with all required fields
     return {
       coreNeed,
       emotion,

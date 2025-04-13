@@ -3,8 +3,10 @@ import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Area, XAxis, YAxis, ReferenceLine, ResponsiveContainer, ComposedChart } from 'recharts';
+import { EnhancedEmotionalDataPoint } from '@/utils/psychology/coreNeedsAnalysis';
 
-interface EmotionalDataPoint {
+// Updated interface to match the EnhancedEmotionalDataPoint
+interface EmotionalDataPoint extends Omit<EnhancedEmotionalDataPoint, 'intensity'> {
   date: Date;
   formattedDate: string;
   preScore: number | null;

@@ -37,7 +37,7 @@ export const EmotionalJourneyChart = () => {
   
   const days = getDaysForTimeframe();
 
-  // Use our utility for emotional data generation
+  // Use our utility for emotional data generation - using as-is since the types are now aligned
   const emotionalData = React.useMemo(() => {
     if (!analyticsData?.journalEntries?.length) return [];
     
