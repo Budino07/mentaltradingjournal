@@ -3,10 +3,11 @@ import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Area, XAxis, YAxis, ReferenceLine, ResponsiveContainer, ComposedChart } from 'recharts';
-import { EnhancedEmotionalDataPoint } from '@/utils/psychology/coreNeedsAnalysis';
+import { EnhancedEmotionalDataPoint, CoreNeed } from '@/utils/psychology/coreNeedsAnalysis';
 
-// Updated interface to match the EnhancedEmotionalDataPoint
-interface EmotionalDataPoint extends Omit<EnhancedEmotionalDataPoint, 'intensity'> {
+// Define the interface based on what's needed for the component
+// Instead of extending, we'll define it directly to avoid type conflicts
+interface EmotionalDataPoint {
   date: Date;
   formattedDate: string;
   preScore: number | null;
@@ -16,7 +17,8 @@ interface EmotionalDataPoint extends Omit<EnhancedEmotionalDataPoint, 'intensity
   postEmotion: string | null;
   tradePnL: number;
   reflection: string;
-  coreNeed: string;
+  coreNeed: CoreNeed;  // Now correctly using the CoreNeed type
+  emotion: string;
   hasHarmfulPattern: boolean;
   patternType: string | null;
 }
@@ -48,7 +50,7 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
   };
   
   // Function to get color gradient for core need overlay
-  const getCoreNeedGradient = (coreNeed: string) => {
+  const getCoreNeedGradient = (coreNeed: CoreNeed) => {
     switch (coreNeed) {
       case 'control': return ['#e9d5ff', '#9333ea'];
       case 'validation': return ['#fecaca', '#dc2626'];
