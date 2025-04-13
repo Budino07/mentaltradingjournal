@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { format, subDays } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +12,7 @@ import { ReflectionEntries } from './ReflectionEntries';
 import { PersonalityInsights } from './PersonalityInsights';
 import { EmotionalPatternGuardrails } from './EmotionalPatternGuardrails';
 import { BehavioralPatterns } from './BehavioralPatterns';
-import { generateEmotionalData } from '@/utils/psychology/coreNeedsAnalysis';
+import { generateEmotionalData, EnhancedEmotionalDataPoint } from '@/utils/psychology/coreNeedsAnalysis';
 
 export const EmotionalJourneyChart = () => {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'quarter'>('week');

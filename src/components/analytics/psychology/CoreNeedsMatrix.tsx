@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -113,7 +114,7 @@ export const CoreNeedsMatrix = ({ emotionalData: providedData }: CoreNeedsMatrix
   // Calculate percentages safely with type checking
   const calculatePercentage = (value: number): number => {
     // Get total value
-    const total = needsData.reduce((sum, item) => sum + item.value, 0);
+    const total = needsData.reduce((sum, item) => sum + (item.value as number), 0);
     // Return 0 if there's no data to prevent division by zero
     if (!total) return 0;
     return Math.round((value / total) * 100);

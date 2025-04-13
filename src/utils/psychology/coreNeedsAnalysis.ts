@@ -1,3 +1,4 @@
+
 import { JournalEntry } from "@/types/analytics";
 
 // Define the core need types
@@ -107,7 +108,7 @@ const tradingBehaviorToCoreNeedMap: Record<string, CoreNeed[]> = {
   'take profit early': ['validation', 'safety'],
   'let winners run': ['validation'],
   'prove right': ['validation'],
-  'revenge trade': ['validation', 'control'],
+  // 'revenge trade': ['validation', 'control'], - Removed duplicate entry
   'boast': ['validation'],
   'share results': ['validation', 'connection'],
   
@@ -343,17 +344,57 @@ export function getEntriesByCoreSeed(entries: JournalEntry[]): {
   }));
 }
 
-// Generate emotional data for Core Needs Matrix
-export function generateEmotionalData(entries: JournalEntry[]): {
+// Create an interface for the emotional data to match what EmotionalWaveform expects
+export interface EnhancedEmotionalDataPoint {
   coreNeed: CoreNeed;
   emotion: string;
-  date: string;
+  date: Date;
+  formattedDate: string;
+  preScore?: number | null;
+  postScore?: number | null;
+  emotionalChange?: number | null;
+  preEmotion?: string | null;
+  postEmotion?: string | null;
+  tradePnL?: number;
+  reflection?: string;
+  hasHarmfulPattern?: boolean;
+  patternType?: string | null;
   intensity: number;
-}[] {
+}
+
+// Generate emotional data for Core Needs Matrix
+export function generateEmotionalData(entries: JournalEntry[]): EnhancedEmotionalDataPoint[] {
   return entries.map(entry => {
     const coreNeed = analyzeEntryForCoreNeeds(entry);
     const emotion = entry.emotion || 'neutral';
-    const date = entry.created_at;
+    
+    // Calculate emotional scores for the waveform
+    let preScore = null;
+    let postScore = null;
+    
+    // Convert emotion to score
+    const getScoreFromEmotion = (emotion: string): number => {
+      switch(emotion.toLowerCase()) {
+        case 'positive': return 5;
+        case 'negative': return -5;
+        case 'neutral': return 0;
+        default: return 0;
+      }
+    };
+    
+    // Set pre and post scores based on session type
+    if (entry.session_type === 'pre') {
+      preScore = getScoreFromEmotion(emotion);
+    } else if (entry.session_type === 'post') {
+      postScore = getScoreFromEmotion(emotion);
+    } else if (entry.session_type === 'trade') {
+      // For trade entries, use emotion for both pre and post as an approximation
+      preScore = getScoreFromEmotion(emotion);
+      postScore = getScoreFromEmotion(emotion);
+    }
+    
+    // Parse date
+    const date = new Date(entry.created_at);
     
     // Calculate intensity based on emotion and content
     let intensity = 5; // Default medium intensity
@@ -387,10 +428,51 @@ export function generateEmotionalData(entries: JournalEntry[]): {
     // Keep intensity within 1-10 range
     intensity = Math.max(1, Math.min(10, intensity));
     
+    // Format date for display
+    const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    
+    // Determine if this shows a harmful pattern
+    const hasHarmfulPattern = textContent.includes('revenge') || 
+                             textContent.includes('overtrade') || 
+                             textContent.includes('panic');
+
+    // Determine pattern type if any
+    let patternType = null;
+    if (hasHarmfulPattern) {
+      if (textContent.includes('revenge')) patternType = 'revenge trading';
+      else if (textContent.includes('overtrade')) patternType = 'overtrading';
+      else if (textContent.includes('panic')) patternType = 'panic trading';
+    }
+
+    // Extract PNL if available from trades
+    let tradePnL = 0;
+    if (entry.trades && entry.trades.length > 0) {
+      entry.trades.forEach(trade => {
+        const pnl = trade.pnl || trade.profit_loss;
+        if (pnl !== undefined) {
+          const pnlValue = typeof pnl === 'string' ? parseFloat(pnl) : pnl;
+          if (!isNaN(pnlValue)) {
+            tradePnL += pnlValue;
+          }
+        }
+      });
+    }
+
+    // Return enhanced emotional data point
     return {
       coreNeed,
       emotion,
       date,
+      formattedDate,
+      preScore,
+      postScore,
+      emotionalChange: postScore !== null && preScore !== null ? postScore - preScore : null,
+      preEmotion: entry.session_type === 'pre' ? emotion : null,
+      postEmotion: entry.session_type === 'post' ? emotion : null,
+      tradePnL,
+      reflection: entry.notes || '',
+      hasHarmfulPattern,
+      patternType,
       intensity
     };
   });
