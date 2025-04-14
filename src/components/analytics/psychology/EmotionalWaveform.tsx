@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -6,7 +5,6 @@ import { Area, XAxis, YAxis, ReferenceLine, ResponsiveContainer, ComposedChart }
 import { EnhancedEmotionalDataPoint, CoreNeed } from '@/utils/psychology/coreNeedsAnalysis';
 
 // Define the interface based on what's needed for the component
-// Instead of extending, we'll define it directly to avoid type conflicts
 interface EmotionalDataPoint {
   date: Date;
   formattedDate: string;
@@ -17,7 +15,7 @@ interface EmotionalDataPoint {
   postEmotion: string | null;
   tradePnL: number;
   reflection: string;
-  coreNeed: CoreNeed;  // Now correctly using the CoreNeed type
+  coreNeed: CoreNeed;
   emotion: string;
   hasHarmfulPattern: boolean;
   patternType: string | null;
@@ -60,6 +58,53 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
       default: return ['#d1d5db', '#6b7280'];
     }
   };
+
+  // Aggregate emotional data by date to prevent duplicates
+  const aggregatedData = emotionalData.reduce<Record<string, EmotionalDataPoint>>((acc, entry) => {
+    const dateKey = entry.date.toDateString();
+    
+    if (!acc[dateKey]) {
+      // First entry for this date
+      acc[dateKey] = {...entry};
+    } else {
+      // Already have an entry for this date, merge data
+      const existing = acc[dateKey];
+      
+      // Keep the pre/post scores if they exist
+      if (entry.preScore !== null && existing.preScore === null) {
+        existing.preScore = entry.preScore;
+        existing.preEmotion = entry.preEmotion;
+      }
+      
+      if (entry.postScore !== null && existing.postScore === null) {
+        existing.postScore = entry.postScore;
+        existing.postEmotion = entry.postEmotion;
+      }
+      
+      // Accumulate PnL
+      existing.tradePnL += entry.tradePnL;
+      
+      // Combine reflections if they exist
+      if (entry.reflection && entry.reflection.trim() !== '') {
+        existing.reflection = existing.reflection 
+          ? `${existing.reflection}\n\n${entry.reflection}`
+          : entry.reflection;
+      }
+      
+      // Take the most severe pattern
+      if (entry.hasHarmfulPattern && (!existing.hasHarmfulPattern || !existing.patternType)) {
+        existing.hasHarmfulPattern = true;
+        existing.patternType = entry.patternType;
+      }
+    }
+    
+    return acc;
+  }, {});
+  
+  // Convert aggregated data back to array
+  const chartData = Object.values(aggregatedData).sort(
+    (a, b) => a.date.getTime() - b.date.getTime()
+  );
 
   const renderCustomizedDot = ({ cx, cy, payload }: any) => {
     if (!payload) return null;
@@ -230,7 +275,7 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
       <ChartContainer config={chartConfig} className="h-full w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
-            data={emotionalData}
+            data={chartData}
             margin={{ top: 10, right: 0, left: 0, bottom: 30 }}
           >
             <defs>
@@ -297,6 +342,10 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
         <div className="flex items-center">
           <div className="w-3 h-3 rounded-full bg-pink-600 mr-2"></div>
           <span>Post-Trading State</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-3 h-3 rounded-full bg-red-600 mr-2"></div>
+          <span>Pattern Warning</span>
         </div>
       </div>
     </div>
