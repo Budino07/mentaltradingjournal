@@ -1,3 +1,4 @@
+
 import { Trade } from "@/types/trade";
 
 export const calculateDayStats = (entries: Array<{ trades?: Trade[], emotion?: string, session_type?: string }>) => {
@@ -103,7 +104,18 @@ export const getEmotionColor = (emotion: string | null, mode: 'emotion' | 'perfo
 };
 
 export const getBorderColor = (amount: number | null, mode: 'emotion' | 'performance' = 'emotion', emotionColors: { border: string } | null = null) => {
-  // Always return a neutral border
+  // Only use neutral border for emotion mode
+  if (mode === 'emotion') {
+    return 'border-gray-200 dark:border-gray-700';
+  }
+  
+  // In performance mode, use P&L-based colored borders
+  if (!amount) return 'border-gray-200 dark:border-gray-700';
+  
+  // More vibrant border colors for performance mode
+  if (amount > 0) return 'border-emerald-500 dark:border-emerald-500';
+  if (amount < 0) return 'border-red-500 dark:border-red-500';
+  
   return 'border-gray-200 dark:border-gray-700';
 };
 
