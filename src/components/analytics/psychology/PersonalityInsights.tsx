@@ -3,16 +3,140 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Info } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { generateAnalytics } from "@/utils/analyticsUtils";
 
 export const PersonalityInsights = () => {
-  // This would ideally come from a real personality assessment
-  // For now, we're using placeholder data
+  const { data: analytics, isLoading } = useQuery({
+    queryKey: ['analytics'],
+    queryFn: generateAnalytics,
+  });
+
+  // Calculate risk tolerance based on language in journal entries
+  const calculateRiskTolerance = () => {
+    if (!analytics || !analytics.journalEntries || analytics.journalEntries.length === 0) {
+      return 50; // Default value if no data
+    }
+    
+    const entries = analytics.journalEntries;
+    let riskScore = 0;
+    let totalEntries = 0;
+    
+    // Risk-related keywords and phrases
+    const riskKeywords = [
+      'high risk', 'higher risk', 'risky', 'aggressive', 'big position', 
+      'large position', 'heavy position', 'bigger size', 'larger size',
+      'increased size', 'risk more', 'risking more', 'double down',
+      'went all in', 'max risk'
+    ];
+    
+    // Conservative-related keywords and phrases
+    const conservativeKeywords = [
+      'low risk', 'lower risk', 'conservative', 'cautious', 'small position',
+      'smaller size', 'reduced size', 'minimal risk', 'risk less',
+      'scaled back', 'scaled down', 'risk averse', 'careful'
+    ];
+    
+    entries.forEach(entry => {
+      const notes = entry.notes ? entry.notes.toLowerCase() : '';
+      
+      // Check for risk keywords
+      const hasRiskKeywords = riskKeywords.some(keyword => 
+        notes.includes(keyword.toLowerCase())
+      );
+      
+      // Check for conservative keywords
+      const hasConservativeKeywords = conservativeKeywords.some(keyword => 
+        notes.includes(keyword.toLowerCase())
+      );
+      
+      if (hasRiskKeywords) {
+        riskScore += 1;
+      }
+      
+      if (hasConservativeKeywords) {
+        riskScore -= 1; // Reduce score for conservative language
+      }
+      
+      totalEntries += 1;
+    });
+    
+    // Calculate percentage (50% is neutral, higher is more risk-tolerant)
+    const baseScore = 50; // Neutral base
+    const maxAdjustment = 40; // Maximum adjustment range
+    const adjustmentFactor = totalEntries > 0 ? (riskScore / totalEntries) * maxAdjustment : 0;
+    
+    return Math.min(100, Math.max(10, Math.round(baseScore + adjustmentFactor)));
+  };
+  
+  // Placeholder calculations for other traits (would be replaced with real calculations)
+  const calculatePatience = () => {
+    return 45; // Placeholder value
+  };
+  
+  const calculateDiscipline = () => {
+    return 78; // Placeholder value
+  };
+  
+  const calculateAdaptability = () => {
+    return 58; // Placeholder value
+  };
+  
+  const calculateEmotionalReactivity = () => {
+    return 72; // Placeholder value
+  };
+  
+  if (isLoading) {
+    return (
+      <Card className="border border-primary/10 bg-card/30 backdrop-blur-md overflow-hidden">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-gradient-primary">
+            Personality Matrix
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-2">
+          <div className="h-64 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  // Calculate or use placeholder values
+  const riskTolerance = calculateRiskTolerance();
+  const patience = calculatePatience();
+  const discipline = calculateDiscipline();
+  const adaptability = calculateAdaptability();
+  const emotionalReactivity = calculateEmotionalReactivity();
+  
+  // Define personality traits with dynamic values
   const personalityTraits = [
-    { name: 'Risk Tolerance', level: 65, description: 'Moderate to high comfort with risk taking in trades' },
-    { name: 'Patience', level: 45, description: 'Some tendency toward impatience when waiting for trade setups' },
-    { name: 'Discipline', level: 78, description: 'Strong ability to follow trading rules and systems' },
-    { name: 'Adaptability', level: 58, description: 'Moderately flexible in responding to changing market conditions' },
-    { name: 'Emotional Reactivity', level: 72, description: 'Higher than average emotional response to market events' },
+    { 
+      name: 'Risk Tolerance', 
+      level: riskTolerance, 
+      description: 'Level of comfort with risk taking based on language used in journal entries' 
+    },
+    { 
+      name: 'Patience', 
+      level: patience, 
+      description: 'Some tendency toward impatience when waiting for trade setups' 
+    },
+    { 
+      name: 'Discipline', 
+      level: discipline, 
+      description: 'Strong ability to follow trading rules and systems' 
+    },
+    { 
+      name: 'Adaptability', 
+      level: adaptability, 
+      description: 'Moderately flexible in responding to changing market conditions' 
+    },
+    { 
+      name: 'Emotional Reactivity', 
+      level: emotionalReactivity, 
+      description: 'Higher than average emotional response to market events' 
+    },
   ];
   
   const getTraitLevel = (level: number) => {
@@ -61,7 +185,7 @@ export const PersonalityInsights = () => {
             <Info className="h-5 w-5 shrink-0 mt-0.5" />
             <div className="text-xs">
               <p className="font-medium mb-1">How Your Personality Affects Trading</p>
-              <p>Your high emotional reactivity combined with moderate patience may cause premature exits. Focus on building patience with smaller position sizes.</p>
+              <p>Your {getTraitLevel(riskTolerance).label.toLowerCase()} risk tolerance combined with {getTraitLevel(patience).label.toLowerCase()} patience may {riskTolerance > patience ? 'cause you to enter trades too aggressively' : 'help you wait for better setups'}. Focus on building consistency with your approach.</p>
             </div>
           </div>
         </div>
