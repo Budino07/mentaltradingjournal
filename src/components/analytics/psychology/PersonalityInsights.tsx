@@ -169,7 +169,7 @@ export const PersonalityInsights = () => {
     return Math.min(100, Math.max(10, Math.round(baseScore + adjustmentFactor)));
   };
   
-  // Calculate emotional reactivity based on pre/post session emotional changes and response to losses
+  // Calculate emotional reactivity based on emotion changes and response to losses
   const calculateEmotionalReactivity = () => {
     if (!analytics || !analytics.journalEntries || analytics.journalEntries.length === 0) {
       return 50; // Default value if no data
@@ -241,7 +241,7 @@ export const PersonalityInsights = () => {
       totalFactors += 1;
     });
     
-    // 3. Check for quick trading after losses (within 10 minutes)
+    // 3. Check for quick trading after losses (less than 10 minutes)
     for (let i = 0; i < sortedEntries.length - 1; i++) {
       const currentEntry = sortedEntries[i];
       const nextEntry = sortedEntries[i + 1];
@@ -275,11 +275,9 @@ export const PersonalityInsights = () => {
           // If trader entered new trade within 10 minutes after a loss
           if (timeDiffMinutes < 10) {
             reactivityScore += 1;
-            totalFactors += 1;
-          } else {
-            // If trader waited more than 10 minutes, this is a sign of low reactivity
-            totalFactors += 1;
           }
+          
+          totalFactors += 1;
         }
       }
     }
@@ -341,7 +339,7 @@ export const PersonalityInsights = () => {
     return { label: 'Very Low', color: 'text-red-600 bg-red-100' };
   };
 
-  // Generate personalized insight based on discipline, risk tolerance, and emotional reactivity
+  // Generate personalized insight based on discipline and risk tolerance
   const generatePersonalizedInsight = () => {
     if (riskTolerance > 70 && discipline < 50) {
       return "Your high risk tolerance combined with lower discipline suggests you may take risks without adequate safeguards. Focus on developing stronger discipline and rules.";
@@ -355,10 +353,6 @@ export const PersonalityInsights = () => {
       return "Your higher emotional reactivity may be affecting trading decisions. Consider implementing cool-down periods after losses.";
     } else if (emotionalReactivity < 30 && discipline > 60) {
       return "Your emotional stability and discipline are strengths. This combination typically leads to more consistent trading results.";
-    } else if (riskTolerance > 60 && emotionalReactivity > 60) {
-      return "Your combination of high risk tolerance and emotional reactivity suggests potential for impulsive decisions. Try implementing a structured decision-making process.";
-    } else if (riskTolerance < 40 && emotionalReactivity > 60) {
-      return "While cautious with risk, your emotional reactivity might lead to premature exits. Consider using mechanical exit rules to maintain consistency.";
     } else {
       return "Your balanced profile shows moderate risk management and discipline. Focus on building consistency with your approach.";
     }
@@ -412,3 +406,4 @@ export const PersonalityInsights = () => {
     </Card>
   );
 };
+

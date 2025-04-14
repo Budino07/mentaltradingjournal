@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { format, subDays, subMonths, isAfter } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,13 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useQuery } from '@tanstack/react-query';
 import { generateAnalytics } from '@/utils/analyticsUtils';
-import { CoreTraitsMatrix } from './CoreTraitsMatrix';
+import { CoreNeedsMatrix } from './CoreNeedsMatrix';
 import { EmotionalWaveform } from './EmotionalWaveform';
 import { ReflectionEntries } from './ReflectionEntries';
 import { PersonalityInsights } from './PersonalityInsights';
 import { EmotionalPatternGuardrails } from './EmotionalPatternGuardrails';
 import { BehavioralPatterns } from './BehavioralPatterns';
-import { generateEmotionalData, EnhancedEmotionalDataPoint } from '@/utils/psychology/coreTraitsAnalysis';
+import { generateEmotionalData, EnhancedEmotionalDataPoint } from '@/utils/psychology/coreNeedsAnalysis';
 
 export const EmotionalJourneyChart = () => {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'quarter'>('week');
@@ -76,8 +75,8 @@ export const EmotionalJourneyChart = () => {
           }
         }
         
-        // Update core trait if available
-        if (item.coreTrait) existing.coreTrait = item.coreTrait;
+        // Update core need if available
+        if (item.coreNeed) existing.coreNeed = item.coreNeed;
         
         // Accumulate trading P&L
         existing.tradePnL += item.tradePnL;
@@ -189,7 +188,7 @@ export const EmotionalJourneyChart = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-          <CoreTraitsMatrix 
+          <CoreNeedsMatrix 
             emotionalData={filteredEmotionalData}
           />
           <PersonalityInsights />
