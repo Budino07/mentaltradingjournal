@@ -565,6 +565,14 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
     };
   };
 
+  // Helper function to capitalize each word
+  const capitalizeWords = (text: string) => {
+    return text
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
   // Run all pattern analyses
   const rushedResult = analyzeRushedToFinish(reflection);
   const givingBackResult = analyzeGivingBackProfits(reflection);
@@ -629,7 +637,7 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
                     'bg-blue-100 text-blue-800 border-blue-300'
                 }`}
               >
-                {pattern.name}
+                {capitalizeWords(pattern.name)}
               </Badge>
               <span className="text-xs text-muted-foreground">
                 Confidence: <span className={`font-medium ${
