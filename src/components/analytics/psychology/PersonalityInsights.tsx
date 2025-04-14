@@ -69,21 +69,127 @@ export const PersonalityInsights = () => {
     return Math.min(100, Math.max(10, Math.round(baseScore + adjustmentFactor)));
   };
   
-  // Placeholder calculations for other traits (would be replaced with real calculations)
-  const calculatePatience = () => {
-    return 45; // Placeholder value
-  };
-  
+  // Calculate discipline based on rule following and avoiding risky trades
   const calculateDiscipline = () => {
-    return 78; // Placeholder value
+    if (!analytics || !analytics.journalEntries || analytics.journalEntries.length === 0) {
+      return 50; // Default value if no data
+    }
+    
+    const entries = analytics.journalEntries;
+    let disciplineScore = 0;
+    let totalEntries = 0;
+    
+    // Risk avoidance keywords and phrases that indicate discipline
+    const riskAvoidanceKeywords = [
+      'didn\'t take', 'didn\'t enter', 'avoided', 'skipped', 'passed on', 
+      'stayed out', 'not worth', 'too risky', 'risk too high', 
+      'didn\'t want to force', 'better to wait', 'patience',
+      'walked away', 'looked risky', 'discipline', 'stuck to plan',
+      'followed rules', 'no fomo', 'avoided fomo'
+    ];
+    
+    // Contextual phrases that indicate avoiding trades due to risk (high discipline)
+    const disciplineContextPhrases = [
+      'didn\'t take this trade because',
+      'skipped this one',
+      'avoided because',
+      'passing on this setup',
+      'didn\'t want to force',
+      'staying disciplined',
+      'sticking to my rules',
+      'not worth the risk',
+      'better to miss',
+      'no trade was better',
+      'exercised restraint',
+      'showing discipline',
+      'waited for better',
+      'resisted temptation',
+      'avoided overtrading',
+      'not rushing into',
+      'let it go by'
+    ];
+    
+    entries.forEach(entry => {
+      const notes = entry.notes ? entry.notes.toLowerCase() : '';
+      
+      // Check for rule following
+      const hasFollowedRules = entry.followed_rules && entry.followed_rules.length > 0;
+      
+      // Check for risk avoidance keywords
+      let hasRiskAvoidance = false;
+      
+      // First check for contextual phrases that indicate discipline
+      const hasDisciplineContext = disciplineContextPhrases.some(phrase => 
+        notes.includes(phrase.toLowerCase())
+      );
+      
+      // Then check for risk avoidance keywords nearby risk-related words
+      if (!hasDisciplineContext) {
+        const sentences = notes.split(/[.!?]+/).filter(s => s.trim().length > 0);
+        
+        for (const sentence of sentences) {
+          const lowerSentence = sentence.toLowerCase().trim();
+          
+          // Check if sentence contains risk avoidance keywords
+          const containsAvoidance = riskAvoidanceKeywords.some(keyword => 
+            lowerSentence.includes(keyword.toLowerCase())
+          );
+          
+          // Check if sentence also mentions risk or similar concepts
+          const riskMentioned = lowerSentence.includes('risk') || 
+                               lowerSentence.includes('volatil') || 
+                               lowerSentence.includes('aggressive') ||
+                               lowerSentence.includes('uncertain');
+          
+          if (containsAvoidance && riskMentioned) {
+            hasRiskAvoidance = true;
+            break;
+          }
+        }
+      }
+      
+      // Award points for discipline indicators
+      if (hasFollowedRules) {
+        disciplineScore += 1;
+      }
+      
+      if (hasDisciplineContext || hasRiskAvoidance) {
+        disciplineScore += 1;
+      }
+      
+      totalEntries += 1;
+    });
+    
+    // Calculate percentage with a base value
+    const baseScore = 40; // Base discipline score
+    const maxAdjustment = 60; // Maximum adjustment range
+    // A trader could show discipline in multiple ways per entry, so normalize by total entries
+    const adjustmentFactor = totalEntries > 0 ? (disciplineScore / totalEntries) * maxAdjustment : 0;
+    
+    return Math.min(100, Math.max(10, Math.round(baseScore + adjustmentFactor)));
   };
   
+  // Calculate adaptability based on performance in different conditions
   const calculateAdaptability = () => {
-    return 58; // Placeholder value
+    if (!analytics || !analytics.journalEntries || analytics.journalEntries.length === 0) {
+      return 58; // Default value if no data
+    }
+    
+    // For now, this is a placeholder - would need more complex analysis of how a trader
+    // performs across different market conditions, time frames, etc.
+    // Could be enhanced with real trading data analysis
+    return 58;
   };
   
+  // Calculate emotional reactivity based on language in journal entries
   const calculateEmotionalReactivity = () => {
-    return 72; // Placeholder value
+    if (!analytics || !analytics.journalEntries || analytics.journalEntries.length === 0) {
+      return 72; // Default value if no data
+    }
+    
+    // For now, this is a placeholder - would analyze emotional language in journal entries
+    // Could be enhanced with sentiment analysis of journal content
+    return 72;
   };
   
   if (isLoading) {
@@ -105,7 +211,6 @@ export const PersonalityInsights = () => {
   
   // Calculate or use placeholder values
   const riskTolerance = calculateRiskTolerance();
-  const patience = calculatePatience();
   const discipline = calculateDiscipline();
   const adaptability = calculateAdaptability();
   const emotionalReactivity = calculateEmotionalReactivity();
@@ -118,14 +223,9 @@ export const PersonalityInsights = () => {
       description: 'Level of comfort with risk taking based on language used in journal entries' 
     },
     { 
-      name: 'Patience', 
-      level: patience, 
-      description: 'Some tendency toward impatience when waiting for trade setups' 
-    },
-    { 
       name: 'Discipline', 
       level: discipline, 
-      description: 'Strong ability to follow trading rules and systems' 
+      description: 'Ability to follow trading rules and avoid high-risk situations when appropriate' 
     },
     { 
       name: 'Adaptability', 
@@ -146,6 +246,23 @@ export const PersonalityInsights = () => {
     if (level >= 20) return { label: 'Low', color: 'text-orange-600 bg-orange-100' };
     return { label: 'Very Low', color: 'text-red-600 bg-red-100' };
   };
+
+  // Generate personalized insight based on discipline and risk tolerance
+  const generatePersonalizedInsight = () => {
+    if (riskTolerance > 70 && discipline < 50) {
+      return "Your high risk tolerance combined with lower discipline suggests you may take risks without adequate safeguards. Focus on developing stronger discipline and rules.";
+    } else if (riskTolerance > 70 && discipline > 70) {
+      return "You balance a high risk appetite with strong discipline, allowing for calculated risk-taking while maintaining control.";
+    } else if (riskTolerance < 30 && discipline > 70) {
+      return "Your cautious approach and high discipline may lead to conservative but consistent results. Consider if slightly higher risk could improve returns.";
+    } else if (riskTolerance < 30 && discipline < 50) {
+      return "While you're risk-averse, your lower discipline scores suggest inconsistent execution. Work on developing stronger trading routines.";
+    } else {
+      return "Your balanced profile shows moderate risk management and discipline. Focus on building consistency with your approach.";
+    }
+  };
+
+  const personalizedInsight = generatePersonalizedInsight();
 
   return (
     <Card className="border border-primary/10 bg-card/30 backdrop-blur-md overflow-hidden">
@@ -185,7 +302,7 @@ export const PersonalityInsights = () => {
             <Info className="h-5 w-5 shrink-0 mt-0.5" />
             <div className="text-xs">
               <p className="font-medium mb-1">How Your Personality Affects Trading</p>
-              <p>Your {getTraitLevel(riskTolerance).label.toLowerCase()} risk tolerance combined with {getTraitLevel(patience).label.toLowerCase()} patience may {riskTolerance > patience ? 'cause you to enter trades too aggressively' : 'help you wait for better setups'}. Focus on building consistency with your approach.</p>
+              <p>{personalizedInsight}</p>
             </div>
           </div>
         </div>
