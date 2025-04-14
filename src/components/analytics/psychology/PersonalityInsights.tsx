@@ -1,32 +1,14 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Info } from "lucide-react";
-import { analyzeRiskTolerance } from '@/utils/analytics/positionSizingAnalysis';
-import { useQuery } from '@tanstack/react-query';
-import { generateAnalytics } from '@/utils/analyticsUtils';
 
 export const PersonalityInsights = () => {
-  const { data: analytics } = useQuery({
-    queryKey: ['analytics'],
-    queryFn: generateAnalytics,
-  });
-
-  const trades = analytics?.journalEntries.flatMap(entry => entry.trades || []) || [];
-  
-  // Calculate risk tolerance based on actual trading data
-  const riskToleranceLevel = analyzeRiskTolerance(trades);
-  
+  // This would ideally come from a real personality assessment
+  // For now, we're using placeholder data
   const personalityTraits = [
-    {
-      name: 'Risk Tolerance',
-      level: riskToleranceLevel,
-      description: `${riskToleranceLevel > 70 
-        ? 'High risk tolerance - consider reducing position sizes' 
-        : riskToleranceLevel > 40 
-        ? 'Moderate risk management - maintaining good position sizing' 
-        : 'Conservative risk approach - could potentially increase position sizes safely'}`
-    },
+    { name: 'Risk Tolerance', level: 65, description: 'Moderate to high comfort with risk taking in trades' },
     { name: 'Patience', level: 45, description: 'Some tendency toward impatience when waiting for trade setups' },
     { name: 'Discipline', level: 78, description: 'Strong ability to follow trading rules and systems' },
     { name: 'Adaptability', level: 58, description: 'Moderately flexible in responding to changing market conditions' },
