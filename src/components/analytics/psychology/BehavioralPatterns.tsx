@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, Clock, TrendingDown, DollarSign, ThumbsDown, BarChart2, Zap, Award, Repeat, Target, FileText } from "lucide-react";
+import { AlertTriangle, Clock, TrendingDown, DollarSign, ThumbsDown, BarChart2, Zap, Award, Repeat, Target, FileText, ExternalLink } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 interface BehavioralPatternsProps {
@@ -332,6 +331,12 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
     }
   };
 
+  const openImageInNewTab = (url?: string) => {
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <>
       <Card className="border border-primary/10 bg-card/30 backdrop-blur-md">
@@ -472,6 +477,43 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
                               </div>
                             )}
                           </div>
+                          {trade.forecastScreenshot && (
+                            <div className="mt-2 space-y-1">
+                              <p className="text-xs font-medium text-muted-foreground">Forecast Screenshot</p>
+                              <div 
+                                onClick={() => openImageInNewTab(trade.forecastScreenshot)} 
+                                className="cursor-pointer hover:opacity-90 transition-opacity relative group"
+                              >
+                                <img 
+                                  src={trade.forecastScreenshot} 
+                                  alt="Trade forecast" 
+                                  className="rounded-md border max-h-64 object-contain w-full" 
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                                  <ExternalLink className="w-6 h-6 text-white" />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {trade.resultUrl && (
+                            <div className="mt-2 space-y-1">
+                              <p className="text-xs font-medium text-muted-foreground">Result Screenshot</p>
+                              <div 
+                                onClick={() => openImageInNewTab(trade.resultUrl)} 
+                                className="cursor-pointer hover:opacity-90 transition-opacity relative group"
+                              >
+                                <img 
+                                  src={trade.resultUrl} 
+                                  alt="Trade result" 
+                                  className="rounded-md border max-h-64 object-contain w-full" 
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                                  <ExternalLink className="w-6 h-6 text-white" />
+                                </div>
+                              </div>
+                            </div>
+                          )}
                           {trade.notes && (
                             <div className="mt-1 text-muted-foreground">
                               <p className="whitespace-pre-line">{trade.notes}</p>
