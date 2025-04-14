@@ -66,6 +66,11 @@ export default {
           DEFAULT: "#9b37b0",
           50: "rgba(147,39,143,0.5)",
           100: "rgba(147,39,143,0.7)"
+        },
+        "soft-purple": {
+          DEFAULT: "#E5DEFF",
+          50: "rgba(229, 222, 255, 0.5)",
+          100: "rgba(229, 222, 255, 0.7)"
         }
       },
       borderRadius: {
@@ -104,7 +109,9 @@ export default {
       },
       boxShadow: {
         "neon-purple": "0 0 15px rgba(147,39,143,0.5)",
-        "neon-purple-hover": "0 0 25px rgba(147,39,143,0.7)"
+        "neon-purple-hover": "0 0 25px rgba(147,39,143,0.7)",
+        "soft-purple": "0 0 15px rgba(229, 222, 255, 0.5)",
+        "soft-purple-hover": "0 0 25px rgba(229, 222, 255, 0.7)"
       }
     },
   },

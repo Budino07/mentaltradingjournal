@@ -470,7 +470,7 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
             {patterns.map((pattern) => (
               <div 
                 key={pattern.id}
-                className="p-4 rounded-lg border-4 border-neon-purple/50 bg-background/40 backdrop-blur-md shadow-[0_0_15px_rgba(147,39,143,0.5)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(147,39,143,0.7)]"
+                className="p-4 rounded-lg border-4 border-soft-purple/50 bg-background/40 backdrop-blur-md shadow-soft-purple transition-all duration-300 hover:shadow-soft-purple-hover"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-start gap-3">
