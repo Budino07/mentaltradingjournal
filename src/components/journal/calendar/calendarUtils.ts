@@ -119,8 +119,13 @@ export const getBorderColor = (amount: number | null, mode: 'emotion' | 'perform
   return 'border-gray-200 dark:border-gray-700';
 };
 
-export const getPnLColor = (amount: number, mode: 'emotion' | 'performance' = 'emotion') => {
+export const getPnLColor = (amount: number, mode: 'emotion' | 'performance' = 'emotion', hasPreSessionEmotion: boolean = true) => {
   if (amount === 0) return 'text-gray-500 dark:text-gray-400';
+  
+  // Always use neutral colors in emotion mode if there's no pre-session emotion
+  if (mode === 'emotion' && !hasPreSessionEmotion) {
+    return 'text-gray-600 dark:text-gray-300';
+  }
   
   if (mode === 'performance') {
     // More vibrant colors for performance mode
@@ -128,7 +133,7 @@ export const getPnLColor = (amount: number, mode: 'emotion' | 'performance' = 'e
       ? 'text-emerald-600 dark:text-emerald-400' 
       : 'text-red-500 dark:text-red-400';
   } else {
-    // Subtle colors for emotion mode
+    // Subtle colors for emotion mode when pre-session emotion exists
     return amount > 0 
       ? 'text-emerald-600/80 dark:text-emerald-400/80' 
       : 'text-red-500/80 dark:text-red-400/80';
