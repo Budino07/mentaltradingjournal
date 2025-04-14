@@ -169,27 +169,125 @@ export const PersonalityInsights = () => {
     return Math.min(100, Math.max(10, Math.round(baseScore + adjustmentFactor)));
   };
   
-  // Calculate adaptability based on performance in different conditions
-  const calculateAdaptability = () => {
-    if (!analytics || !analytics.journalEntries || analytics.journalEntries.length === 0) {
-      return 58; // Default value if no data
-    }
-    
-    // For now, this is a placeholder - would need more complex analysis of how a trader
-    // performs across different market conditions, time frames, etc.
-    // Could be enhanced with real trading data analysis
-    return 58;
-  };
-  
-  // Calculate emotional reactivity based on language in journal entries
+  // Calculate emotional reactivity based on emotion changes and response to losses
   const calculateEmotionalReactivity = () => {
     if (!analytics || !analytics.journalEntries || analytics.journalEntries.length === 0) {
-      return 72; // Default value if no data
+      return 50; // Default value if no data
     }
     
-    // For now, this is a placeholder - would analyze emotional language in journal entries
-    // Could be enhanced with sentiment analysis of journal content
-    return 72;
+    const entries = analytics.journalEntries;
+    let reactivityScore = 0;
+    let totalFactors = 0;
+    
+    // Sort entries by date for temporal analysis
+    const sortedEntries = [...entries].sort((a, b) => 
+      new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
+    
+    // 1. Analyze emotional state changes between pre/post sessions
+    for (let i = 0; i < sortedEntries.length - 1; i++) {
+      const currentEntry = sortedEntries[i];
+      const nextEntry = sortedEntries[i + 1];
+      
+      // Check if we have a pre-session followed by post-session
+      if (currentEntry.session_type === 'pre' && nextEntry.session_type === 'post') {
+        // Check for negative emotional shift (indicates reactivity)
+        if (
+          (currentEntry.emotion === 'positive' && nextEntry.emotion === 'negative') ||
+          (currentEntry.emotion === 'neutral' && nextEntry.emotion === 'negative')
+        ) {
+          reactivityScore += 1;
+          totalFactors += 1;
+        }
+        
+        // Check for stable or improved emotional state (indicates lower reactivity)
+        if (
+          (currentEntry.emotion === currentEntry.emotion) ||
+          (currentEntry.emotion === 'negative' && nextEntry.emotion === 'neutral') ||
+          (currentEntry.emotion === 'negative' && nextEntry.emotion === 'positive') ||
+          (currentEntry.emotion === 'neutral' && nextEntry.emotion === 'positive')
+        ) {
+          totalFactors += 1;
+        }
+      }
+    }
+    
+    // 2. Check for negative language patterns in post-session entries after losses
+    const lossEntries = sortedEntries.filter(entry => 
+      entry.session_type === 'post' && entry.outcome === 'loss'
+    );
+    
+    // Emotional reactivity phrases to look for in post-loss entries
+    const reactivityPhrases = [
+      'frustrated', 'angry', 'annoyed', 'upset', 'mad',
+      'revenge trade', 'revenge trading', 'getting back', 'make it back',
+      'couldn\'t accept', 'couldn\'t handle', 'emotional decision',
+      'traded angry', 'traded emotionally', 'lost control',
+      'overreacted', 'need to recover', 'tilted', 'on tilt'
+    ];
+    
+    lossEntries.forEach(entry => {
+      if (!entry.notes) return;
+      
+      const notes = entry.notes.toLowerCase();
+      const hasReactivityPhrases = reactivityPhrases.some(phrase => 
+        notes.includes(phrase.toLowerCase())
+      );
+      
+      if (hasReactivityPhrases) {
+        reactivityScore += 1;
+      }
+      
+      totalFactors += 1;
+    });
+    
+    // 3. Check for quick trading after losses (less than 10 minutes)
+    for (let i = 0; i < sortedEntries.length - 1; i++) {
+      const currentEntry = sortedEntries[i];
+      const nextEntry = sortedEntries[i + 1];
+      
+      // Skip entries without trades
+      if (!currentEntry.trades || !nextEntry.trades) continue;
+      if (currentEntry.trades.length === 0 || nextEntry.trades.length === 0) continue;
+      
+      // Check if current entry has a losing trade
+      const hasLosingTrade = currentEntry.trades.some(trade => 
+        Number(trade.pnl) < 0 || (trade.profit_loss && Number(trade.profit_loss) < 0)
+      );
+      
+      if (hasLosingTrade) {
+        // Find last trade exit time from current entry
+        const lastTradeExit = currentEntry.trades
+          .filter(trade => trade.exitDate)
+          .map(trade => new Date(trade.exitDate as string).getTime())
+          .sort((a, b) => b - a)[0]; // Get most recent exit time
+        
+        // Find first trade entry time from next entry
+        const firstTradeEntry = nextEntry.trades
+          .filter(trade => trade.entryDate)
+          .map(trade => new Date(trade.entryDate as string).getTime())
+          .sort((a, b) => a - b)[0]; // Get earliest entry time
+        
+        if (lastTradeExit && firstTradeEntry) {
+          // Calculate time difference in minutes
+          const timeDiffMinutes = (firstTradeEntry - lastTradeExit) / (1000 * 60);
+          
+          // If trader entered new trade within 10 minutes after a loss
+          if (timeDiffMinutes < 10) {
+            reactivityScore += 1;
+          }
+          
+          totalFactors += 1;
+        }
+      }
+    }
+    
+    // Calculate score - higher score means more emotional reactivity
+    const baseScore = 50; // Neutral base
+    const maxAdjustment = 40;
+    const adjustmentFactor = totalFactors > 0 ? (reactivityScore / totalFactors) * maxAdjustment : 0;
+    
+    return Math.min(100, Math.max(10, Math.round(baseScore + adjustmentFactor)));
   };
   
   if (isLoading) {
@@ -209,10 +307,9 @@ export const PersonalityInsights = () => {
     );
   }
   
-  // Calculate or use placeholder values
+  // Calculate trait values
   const riskTolerance = calculateRiskTolerance();
   const discipline = calculateDiscipline();
-  const adaptability = calculateAdaptability();
   const emotionalReactivity = calculateEmotionalReactivity();
   
   // Define personality traits with dynamic values
@@ -228,14 +325,9 @@ export const PersonalityInsights = () => {
       description: 'Ability to follow trading rules and avoid high-risk situations when appropriate' 
     },
     { 
-      name: 'Adaptability', 
-      level: adaptability, 
-      description: 'Moderately flexible in responding to changing market conditions' 
-    },
-    { 
       name: 'Emotional Reactivity', 
       level: emotionalReactivity, 
-      description: 'Higher than average emotional response to market events' 
+      description: 'Response to market events, particularly losses, and emotional stability between sessions' 
     },
   ];
   
@@ -257,6 +349,10 @@ export const PersonalityInsights = () => {
       return "Your cautious approach and high discipline may lead to conservative but consistent results. Consider if slightly higher risk could improve returns.";
     } else if (riskTolerance < 30 && discipline < 50) {
       return "While you're risk-averse, your lower discipline scores suggest inconsistent execution. Work on developing stronger trading routines.";
+    } else if (emotionalReactivity > 70) {
+      return "Your higher emotional reactivity may be affecting trading decisions. Consider implementing cool-down periods after losses.";
+    } else if (emotionalReactivity < 30 && discipline > 60) {
+      return "Your emotional stability and discipline are strengths. This combination typically leads to more consistent trading results.";
     } else {
       return "Your balanced profile shows moderate risk management and discipline. Focus on building consistency with your approach.";
     }
@@ -310,3 +406,4 @@ export const PersonalityInsights = () => {
     </Card>
   );
 };
+
