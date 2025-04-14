@@ -7,6 +7,7 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PatternAnalyzer } from './PatternAnalyzer';
 import { AlertTriangle } from 'lucide-react';
+import { CoreTrait } from '@/utils/psychology/coreNeedsAnalysis';
 
 interface ReflectionEntriesProps {
   emotionalData: any;
@@ -23,13 +24,16 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
   // Consolidate all reflections into a single reflection with proper spacing
   const consolidatedReflection = multipleReflections.join('\n\n');
   
-  const getCoreNeedIcon = (need: string) => {
-    switch (need) {
-      case 'control': return '🎮';
+  const getCoreTraitIcon = (trait: CoreTrait) => {
+    switch (trait) {
+      case 'control': return '🧠';
       case 'validation': return '👍';
       case 'safety': return '🛡️';
       case 'connection': return '👥';
       case 'growth': return '🌱';
+      case 'conviction': return '🎯';
+      case 'focus': return '🔍';
+      case 'confidence': return '💪';
       default: return '❓';
     }
   };
@@ -114,11 +118,11 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
             
             <div className="flex items-center mt-4 gap-2">
               <div className="bg-primary/10 rounded-full p-2 h-10 w-10 flex items-center justify-center">
-                <span className="text-lg">{getCoreNeedIcon(emotionalData.coreNeed)}</span>
+                <span className="text-lg">{getCoreTraitIcon(emotionalData.coreTrait)}</span>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Core Need</p>
-                <p className="font-medium capitalize">{emotionalData.coreNeed}</p>
+                <p className="text-xs text-muted-foreground">Core Trait</p>
+                <p className="font-medium capitalize">{emotionalData.coreTrait}</p>
               </div>
             </div>
             
