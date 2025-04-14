@@ -192,6 +192,18 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                                   Giving Back Profits
                                 </Badge>
                               )}
+                              {(consolidatedReflection.includes('recover') || consolidatedReflection.includes('fresh start') || 
+                                 consolidatedReflection.includes('yesterday') || consolidatedReflection.includes('previous day')) && (
+                                <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-300">
+                                  Recency Bias
+                                </Badge>
+                              )}
+                              {(consolidatedReflection.includes('feel good') || consolidatedReflection.includes('happy') || 
+                                 consolidatedReflection.includes('positive') || consolidatedReflection.includes('optimistic')) && (
+                                <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                                  Positive Mindset
+                                </Badge>
+                              )}
                               {emotionalData.hasHarmfulPattern && emotionalData.patternType && (
                                 <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
                                   {emotionalData.patternType}

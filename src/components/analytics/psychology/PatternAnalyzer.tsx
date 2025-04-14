@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
 
@@ -386,12 +385,193 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
       summary
     };
   };
+  
+  // Analyze for "Recency Bias" pattern
+  const analyzeRecencyBias = (text: string): PatternAnalysisResult => {
+    if (!text || text.length < 10) {
+      return {
+        detected: false,
+        confidence: 'Low',
+        indicators: [],
+        summary: 'Insufficient text to analyze'
+      };
+    }
+    
+    const keywords = [
+      'yesterday', 'last trade', 'previous trade', 'recent', 'just', 'last time',
+      'fresh start', 'recover', 'recovered', 'back to', 'starting over', 'restart'
+    ];
+    
+    const phrases = [
+      'able to recover',
+      'starting fresh',
+      'feel good after',
+      'back on track',
+      'previous day',
+      'turned around',
+      'bounced back',
+      'recovered from',
+      'made up for',
+      'compensated for'
+    ];
+    
+    const lowercaseText = text.toLowerCase();
+    
+    const keywordHits = keywords.filter(keyword => 
+      lowercaseText.includes(keyword)
+    );
+    
+    const phraseHits = phrases.filter(phrase => 
+      lowercaseText.includes(phrase.toLowerCase())
+    );
+    
+    const extractedPhrases: string[] = [];
+    if (keywordHits.length > 0 || phraseHits.length > 0) {
+      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+      
+      sentences.forEach(sentence => {
+        const lowerSentence = sentence.toLowerCase().trim();
+        
+        const containsKeyword = keywords.some(keyword => 
+          lowerSentence.includes(keyword)
+        );
+        
+        const containsPhrase = phrases.some(phrase => 
+          lowerSentence.includes(phrase.toLowerCase())
+        );
+        
+        if (containsKeyword || containsPhrase) {
+          let extractedPhrase = sentence.trim();
+          if (extractedPhrase.length > 60) {
+            extractedPhrase = extractedPhrase.substring(0, 57) + '...';
+          }
+          extractedPhrases.push(extractedPhrase);
+        }
+      });
+    }
+    
+    let confidence: 'Low' | 'Medium' | 'High' = 'Low';
+    
+    if ((phraseHits.length >= 1 && keywordHits.length >= 2) || phraseHits.length >= 2) {
+      confidence = 'High';
+    } else if (phraseHits.length === 1 || keywordHits.length >= 2) {
+      confidence = 'Medium';
+    }
+    
+    const detected = confidence !== 'Low';
+    
+    let summary = '';
+    if (detected) {
+      summary = 'Trader shows recency bias, placing significant weight on recent trading outcomes';
+    } else {
+      summary = 'No indicators of recency bias were detected';
+    }
+    
+    return {
+      detected,
+      confidence,
+      indicators: extractedPhrases.length > 0 ? extractedPhrases : [],
+      summary
+    };
+  };
+
+  // Analyze for "Positive Mindset" pattern
+  const analyzePositiveMindset = (text: string): PatternAnalysisResult => {
+    if (!text || text.length < 10) {
+      return {
+        detected: false,
+        confidence: 'Low',
+        indicators: [],
+        summary: 'Insufficient text to analyze'
+      };
+    }
+    
+    const keywords = [
+      'feel good', 'happy', 'positive', 'excited', 'confident', 'optimistic',
+      'great', 'excellent', 'wonderful', 'terrific', 'fantastic', 'amazing',
+      'proud', 'pleased', 'satisfied', 'content', 'grateful', 'thankful'
+    ];
+    
+    const phrases = [
+      'in a good mood',
+      'feeling positive',
+      'staying optimistic',
+      'good mindset',
+      'focused and clear',
+      'grateful for',
+      'learning experience',
+      'growth mindset',
+      'positive outlook',
+      'enjoying the process'
+    ];
+    
+    const lowercaseText = text.toLowerCase();
+    
+    const keywordHits = keywords.filter(keyword => 
+      lowercaseText.includes(keyword)
+    );
+    
+    const phraseHits = phrases.filter(phrase => 
+      lowercaseText.includes(phrase.toLowerCase())
+    );
+    
+    const extractedPhrases: string[] = [];
+    if (keywordHits.length > 0 || phraseHits.length > 0) {
+      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+      
+      sentences.forEach(sentence => {
+        const lowerSentence = sentence.toLowerCase().trim();
+        
+        const containsKeyword = keywords.some(keyword => 
+          lowerSentence.includes(keyword)
+        );
+        
+        const containsPhrase = phrases.some(phrase => 
+          lowerSentence.includes(phrase.toLowerCase())
+        );
+        
+        if (containsKeyword || containsPhrase) {
+          let extractedPhrase = sentence.trim();
+          if (extractedPhrase.length > 60) {
+            extractedPhrase = extractedPhrase.substring(0, 57) + '...';
+          }
+          extractedPhrases.push(extractedPhrase);
+        }
+      });
+    }
+    
+    let confidence: 'Low' | 'Medium' | 'High' = 'Low';
+    
+    if ((phraseHits.length >= 1 && keywordHits.length >= 2) || keywordHits.length >= 3) {
+      confidence = 'High';
+    } else if (phraseHits.length === 1 || keywordHits.length >= 1) {
+      confidence = 'Medium';
+    }
+    
+    const detected = confidence !== 'Low';
+    
+    let summary = '';
+    if (detected) {
+      summary = 'Trader exhibits a positive mindset that can enhance decision-making and resilience';
+    } else {
+      summary = 'No indicators of a strong positive mindset were detected';
+    }
+    
+    return {
+      detected,
+      confidence,
+      indicators: extractedPhrases.length > 0 ? extractedPhrases : [],
+      summary
+    };
+  };
 
   // Run all pattern analyses
   const rushedResult = analyzeRushedToFinish(reflection);
   const givingBackResult = analyzeGivingBackProfits(reflection);
   const greedResult = analyzeGreed(reflection);
   const frustrationResult = analyzeFrustrationRegret(reflection);
+  const recencyBiasResult = analyzeRecencyBias(reflection);
+  const positiveMindsetResult = analyzePositiveMindset(reflection);
   
   // Collect all detected patterns
   const detectedPatterns = [
@@ -410,6 +590,14 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
     frustrationResult.detected && { 
       name: 'Frustration/Regret', 
       result: frustrationResult 
+    },
+    recencyBiasResult.detected && { 
+      name: 'Recency Bias', 
+      result: recencyBiasResult 
+    },
+    positiveMindsetResult.detected && { 
+      name: 'Positive Mindset', 
+      result: positiveMindsetResult 
     }
   ].filter(Boolean);
   
@@ -432,7 +620,13 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
                     'bg-yellow-100 text-yellow-800 border-yellow-300' : 
                   pattern.name === 'Giving Back Profits' ?
                     'bg-orange-100 text-orange-800 border-orange-300' : 
-                    'bg-red-100 text-red-800 border-red-300'
+                  pattern.name === 'Frustration/Regret' ?
+                    'bg-red-100 text-red-800 border-red-300' :
+                  pattern.name === 'Recency Bias' ?
+                    'bg-purple-100 text-purple-800 border-purple-300' :
+                  pattern.name === 'Positive Mindset' ?
+                    'bg-green-100 text-green-800 border-green-300' :
+                    'bg-blue-100 text-blue-800 border-blue-300'
                 }`}
               >
                 {pattern.name}
