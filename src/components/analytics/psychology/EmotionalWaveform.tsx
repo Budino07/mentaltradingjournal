@@ -3,7 +3,7 @@ import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Area, XAxis, YAxis, ReferenceLine, ResponsiveContainer, ComposedChart } from 'recharts';
-import { EnhancedEmotionalDataPoint, CoreNeed } from '@/utils/psychology/coreNeedsAnalysis';
+import { EnhancedEmotionalDataPoint, CoreTrait } from '@/utils/psychology/coreNeedsAnalysis';
 
 // Define the interface based on what's needed for the component
 // Instead of extending, we'll define it directly to avoid type conflicts
@@ -17,7 +17,7 @@ interface EmotionalDataPoint {
   postEmotion: string | null;
   tradePnL: number;
   reflection: string;
-  coreNeed: CoreNeed;  // Now correctly using the CoreNeed type
+  coreTrait: CoreTrait;  // Now correctly using the CoreTrait type
   emotion: string;
   hasHarmfulPattern: boolean;
   patternType: string | null;
@@ -49,14 +49,17 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
     },
   };
   
-  // Function to get color gradient for core need overlay
-  const getCoreNeedGradient = (coreNeed: CoreNeed) => {
-    switch (coreNeed) {
+  // Function to get color gradient for core trait overlay
+  const getCoreNeedGradient = (coreTrait: CoreTrait) => {
+    switch (coreTrait) {
       case 'control': return ['#e9d5ff', '#9333ea'];
       case 'validation': return ['#fecaca', '#dc2626'];
       case 'safety': return ['#bbf7d0', '#16a34a'];
       case 'connection': return ['#bae6fd', '#0284c7'];
       case 'growth': return ['#fef08a', '#ca8a04'];
+      case 'conviction': return ['#fee2e2', '#e11d48'];
+      case 'focus': return ['#cffafe', '#0891b2'];
+      case 'confidence': return ['#ddd6fe', '#7c3aed'];
       default: return ['#d1d5db', '#6b7280'];
     }
   };

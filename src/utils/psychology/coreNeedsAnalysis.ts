@@ -1,3 +1,5 @@
+
+// First part of the file with imports and type definitions
 import { JournalEntry } from "@/types/analytics";
 
 // Define the core trait types
@@ -120,7 +122,7 @@ const emotionToCoreTraitMap: Record<string, CoreTrait[]> = {
   // Confidence-related emotions
   'self-assured': ['confidence'],
   'insecure': ['confidence'],
-  'doubtful': ['confidence'],
+  // 'doubtful': ['confidence'], - Removed duplicate, it's already defined above
   'hesitant': ['confidence', 'conviction']
 };
 
@@ -433,7 +435,7 @@ export function analyzeJournalEntriesForCoreTraits(entries: JournalEntry[]): {
 }
 
 // Process all journal entries and return them grouped by core trait
-export function getEntriesByCoreSeed(entries: JournalEntry[]): { 
+export function getEntriesByCoreTrait(entries: JournalEntry[]): { 
   coreTrait: CoreTrait; 
   entries: JournalEntry[];
 }[] {
