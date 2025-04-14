@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
 
@@ -386,103 +387,29 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
     };
   };
 
-  // Enhanced Loss Processing Analysis
-  const analyzeLossProcessing = (text: string): PatternAnalysisResult => {
-    if (!text || text.length < 10) {
-      return {
-        detected: false,
-        confidence: 'Low',
-        indicators: [],
-        summary: 'Insufficient text to analyze'
-      };
-    }
-    
-    const lossProcessingPatterns = {
-      'recencyBias': [
-        'starting fresh', 
-        'just recovered', 
-        'recent success',
-        'forget past loss'
-      ],
-      'positiveReinforcement': [
-        'feel good', 
-        'solid workout', 
-        'good habits', 
-        'momentum'
-      ],
-      'stateDependent': [
-        'physical state', 
-        'environment', 
-        'mental clarity'
-      ],
-      'freshStartEffect': [
-        'fresh start', 
-        'reset', 
-        'new beginning', 
-        'turning point'
-      ]
-    };
-    
-    const textLower = text.toLowerCase();
-    
-    const detectedPatterns: string[] = [];
-    
-    Object.entries(lossProcessingPatterns).forEach(([pattern, keywords]) => {
-      if (keywords.some(keyword => textLower.includes(keyword))) {
-        detectedPatterns.push(pattern);
-      }
-    });
-    
-    return {
-      detected: detectedPatterns.length > 0,
-      confidence: detectedPatterns.length >= 2 ? 'High' : 'Medium',
-      indicators: detectedPatterns,
-      summary: detectedPatterns.length > 0 
-        ? 'Advanced loss processing with psychological insights' 
-        : 'Standard loss recovery observation'
-    };
-  };
-
-  // Modify the existing pattern detection to include this new method
+  // Run all pattern analyses
   const rushedResult = analyzeRushedToFinish(reflection);
   const givingBackResult = analyzeGivingBackProfits(reflection);
   const greedResult = analyzeGreed(reflection);
   const frustrationResult = analyzeFrustrationRegret(reflection);
-  const lossProcessingResult = analyzeLossProcessing(reflection);
   
+  // Collect all detected patterns
   const detectedPatterns = [
-    rushedResult.detected && { name: 'Rushed to Finish', result: rushedResult },
-    givingBackResult.detected && { name: 'Giving Back Profits', result: givingBackResult },
-    greedResult.detected && { name: 'Greed', result: greedResult },
-    frustrationResult.detected && { name: 'Frustration/Regret', result: frustrationResult },
-    lossProcessingResult.detected && { 
-      name: 'Loss Processing', 
-      result: lossProcessingResult,
-      renderMethod: () => (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-              Loss Processing Insights
-            </Badge>
-          </div>
-          {lossProcessingResult.indicators.map((insight, index) => (
-            <div key={index} className="text-sm text-muted-foreground">
-              {insight === 'recencyBias' && (
-                <p>🔍 Recency Bias: Emotional weight on recent success, important to stay disciplined.</p>
-              )}
-              {insight === 'positiveReinforcement' && (
-                <p>💪 Positive Reinforcement: Good habits and momentum building.</p>
-              )}
-              {insight === 'stateDependent' && (
-                <p>🌐 State-Dependent Performance: Environment and physical state influencing decisions.</p>
-              )}
-              {insight === 'freshStartEffect' && (
-                <p>🔄 Fresh Start Effect: Psychological reset and renewed motivation.</p>
-              )}
-            </div>
-          ))}
-        </div>
-      )
+    rushedResult.detected && { 
+      name: 'Rushed to Finish', 
+      result: rushedResult 
+    },
+    givingBackResult.detected && { 
+      name: 'Giving Back Profits', 
+      result: givingBackResult 
+    },
+    greedResult.detected && { 
+      name: 'Greed', 
+      result: greedResult 
+    },
+    frustrationResult.detected && { 
+      name: 'Frustration/Regret', 
+      result: frustrationResult 
     }
   ].filter(Boolean);
   
@@ -530,7 +457,6 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
             )}
             
             <p className="text-xs text-muted-foreground">{pattern.result.summary}</p>
-            {pattern.renderMethod && pattern.renderMethod()}
           </div>
         ))}
       </div>
