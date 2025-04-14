@@ -83,34 +83,28 @@ export const getEmotionStyle = (stats: { totalPL: number } | null) => {
 export const getEmotionColor = (emotion: string | null, mode: 'emotion' | 'performance' = 'emotion') => {
   if (!emotion) return null;
 
-  // Performance mode: only care about P&L colors
-  if (mode === 'performance') {
+  // Always return a neutral border in emotion mode
+  if (mode === 'emotion') {
     return {
       border: "border-gray-200 dark:border-gray-600",
-      text: "text-gray-600 dark:text-gray-300"
+      text: emotion.toLowerCase() === 'positive' 
+        ? "text-[#FEC6A1]" 
+        : emotion.toLowerCase() === 'negative' 
+          ? "text-[#9b87f5]" 
+          : "text-blue-600 dark:text-blue-300"
     };
   }
 
-  // Emotion mode: colors based on emotional state
-  switch (emotion.toLowerCase()) {
-    case 'positive':
-      return {
-        border: "border-[#FEC6A1] dark:border-[#FEC6A1]",
-        text: "text-[#FEC6A1] dark:text-[#FEC6A1]"
-      };
-    case 'negative':
-      return {
-        border: "border-[#9b87f5] dark:border-[#9b87f5]",
-        text: "text-[#9b87f5] dark:text-[#9b87f5]"
-      };
-    case 'neutral':
-      return {
-        border: "border-blue-400 dark:border-blue-500",
-        text: "text-blue-600 dark:text-blue-300"
-      };
-    default:
-      return null;
-  }
+  // Performance mode remains unchanged
+  return {
+    border: "border-gray-200 dark:border-gray-600",
+    text: "text-gray-600 dark:text-gray-300"
+  };
+};
+
+export const getBorderColor = (amount: number | null, mode: 'emotion' | 'performance' = 'emotion', emotionColors: { border: string } | null = null) => {
+  // Always return a neutral border
+  return 'border-gray-200 dark:border-gray-700';
 };
 
 export const getPnLColor = (amount: number, mode: 'emotion' | 'performance' = 'emotion') => {
@@ -127,26 +121,4 @@ export const getPnLColor = (amount: number, mode: 'emotion' | 'performance' = 'e
       ? 'text-emerald-600/80 dark:text-emerald-400/80' 
       : 'text-red-500/80 dark:text-red-400/80';
   }
-};
-
-export const getBorderColor = (amount: number | null, mode: 'emotion' | 'performance' = 'emotion', emotionColors: { border: string } | null = null) => {
-  // In emotion mode, if we have emotion colors, use those for the border
-  if (mode === 'emotion' && emotionColors) {
-    return emotionColors.border;
-  }
-  
-  // Otherwise, fall back to P&L based coloring
-  if (!amount) return 'border-gray-200 dark:border-gray-700';
-  
-  if (mode === 'performance') {
-    // More vibrant border colors for performance mode
-    if (amount > 0) return 'border-emerald-500 dark:border-emerald-500';
-    if (amount < 0) return 'border-red-500 dark:border-red-500';
-  } else {
-    // Subtle border colors for emotion mode
-    if (amount > 0) return 'border-emerald-500/70 dark:border-emerald-500/70';
-    if (amount < 0) return 'border-red-500/70 dark:border-red-500/70';
-  }
-  
-  return 'border-gray-200 dark:border-gray-700';
 };
