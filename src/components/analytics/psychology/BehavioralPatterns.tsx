@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, Clock, TrendingDown, DollarSign, ThumbsDown } from "lucide-react";
+import { AlertTriangle, Clock, TrendingDown, DollarSign, ThumbsDown, BarChart2, Zap, Award, Repeat, Target } from "lucide-react";
 
 interface BehavioralPatternsProps {
   journalEntries: any[];
@@ -35,6 +35,46 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
       const text = entry.notes?.toLowerCase() || '';
       
       const keywords = ['frustrat', 'regret', 'disappoint', 'angry', 'upset', 'tilt', 'tilted'];
+      return keywords.some(keyword => text.includes(keyword));
+    });
+    
+    // Pattern detection for "Overtrading"
+    const overtradingEntries = journalEntries.filter(entry => {
+      const text = entry.notes?.toLowerCase() || '';
+      
+      const keywords = ['overtrad', 'too many trades', 'kept entering', 'multiple entries', 'excessive', 'couldn\'t stop', 'another entry', 'second entry', 're-enter'];
+      return keywords.some(keyword => text.includes(keyword));
+    });
+    
+    // Pattern detection for "FOMO"
+    const fomoEntries = journalEntries.filter(entry => {
+      const text = entry.notes?.toLowerCase() || '';
+      
+      const keywords = ['fomo', 'fear of missing', 'missed out', 'didn\'t want to miss', 'everyone else', 'jumping in', 'getting left behind', 'had to get in'];
+      return keywords.some(keyword => text.includes(keyword));
+    });
+    
+    // Pattern detection for "Discipline"
+    const disciplineEntries = journalEntries.filter(entry => {
+      const text = entry.notes?.toLowerCase() || '';
+      
+      const keywords = ['discipline', 'followed plan', 'stuck to rules', 'patient', 'waited', 'followed system', 'according to plan', 'avoided', 'resisted', 'stayed out'];
+      return keywords.some(keyword => text.includes(keyword));
+    });
+    
+    // Pattern detection for "Revenge Trading"
+    const revengeEntries = journalEntries.filter(entry => {
+      const text = entry.notes?.toLowerCase() || '';
+      
+      const keywords = ['revenge', 'make it back', 'recover loss', 'get back', 'after that loss', 'angry trade', 'emotional trade', 'impulsive after loss'];
+      return keywords.some(keyword => text.includes(keyword));
+    });
+    
+    // Pattern detection for "Peak State / Flow"
+    const peakStateEntries = journalEntries.filter(entry => {
+      const text = entry.notes?.toLowerCase() || '';
+      
+      const keywords = ['flow', 'peak', 'zone', 'clarity', 'focused', 'aligned', 'calm', 'clear mind', 'everything clicked', 'effortless', 'in sync', 'perfect execution'];
       return keywords.some(keyword => text.includes(keyword));
     });
     
@@ -144,6 +184,106 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
           'Regret taking that trade'
         ],
         description: 'These emotions often lead to revenge trading. Take a break when you notice these feelings'
+      });
+    }
+    
+    // Add Overtrading pattern if detected
+    if (overtradingEntries.length > 0) {
+      const overtradingKeywords = ['overtrad', 'too many trades', 'multiple entries', 're-enter'];
+      const phrases = extractPhrases(overtradingEntries, overtradingKeywords);
+      
+      patterns.push({
+        id: 'overtrading',
+        name: 'Overtrading',
+        icon: BarChart2,
+        count: overtradingEntries.length,
+        avgPnL: calculateAvgPnL(overtradingEntries),
+        typicalPhrases: phrases.length > 0 ? phrases : [
+          'Kept entering over and over',
+          'Too many trades today',
+          'Couldn\'t stop myself from trading'
+        ],
+        description: 'Consider setting a daily trade limit and stopping after reaching it. Quality over quantity'
+      });
+    }
+    
+    // Add FOMO pattern if detected
+    if (fomoEntries.length > 0) {
+      const fomoKeywords = ['fomo', 'fear of missing', 'didn\'t want to miss'];
+      const phrases = extractPhrases(fomoEntries, fomoKeywords);
+      
+      patterns.push({
+        id: 'fomo',
+        name: 'FOMO',
+        icon: AlertTriangle,
+        count: fomoEntries.length,
+        avgPnL: calculateAvgPnL(fomoEntries),
+        typicalPhrases: phrases.length > 0 ? phrases : [
+          'Everyone was jumping in',
+          'Didn\'t want to miss the move',
+          'Fear of missing out on profits'
+        ],
+        description: 'Remember there will always be another opportunity. Wait for setups that meet your criteria'
+      });
+    }
+    
+    // Add Discipline pattern if detected
+    if (disciplineEntries.length > 0) {
+      const disciplineKeywords = ['discipline', 'followed plan', 'patient', 'waited'];
+      const phrases = extractPhrases(disciplineEntries, disciplineKeywords);
+      
+      patterns.push({
+        id: 'discipline',
+        name: 'Discipline',
+        icon: Award,
+        count: disciplineEntries.length,
+        avgPnL: calculateAvgPnL(disciplineEntries),
+        typicalPhrases: phrases.length > 0 ? phrases : [
+          'Followed my trading plan exactly',
+          'Stayed patient and waited',
+          'Resisted the urge to deviate'
+        ],
+        description: 'Excellent! Discipline is the foundation of consistent trading. Continue to reinforce this strength'
+      });
+    }
+    
+    // Add Revenge Trading pattern if detected
+    if (revengeEntries.length > 0) {
+      const revengeKeywords = ['revenge', 'make it back', 'recover loss', 'get back'];
+      const phrases = extractPhrases(revengeEntries, revengeKeywords);
+      
+      patterns.push({
+        id: 'revenge-trading',
+        name: 'Revenge Trading',
+        icon: Repeat,
+        count: revengeEntries.length,
+        avgPnL: calculateAvgPnL(revengeEntries),
+        typicalPhrases: phrases.length > 0 ? phrases : [
+          'Tried to make back my losses',
+          'Jumped back in right away',
+          'Wasn\'t thinking clearly after that loss'
+        ],
+        description: 'Consider implementing a "cooling off" period after losses. Step away for at least 30 minutes'
+      });
+    }
+    
+    // Add Peak State / Flow pattern if detected
+    if (peakStateEntries.length > 0) {
+      const peakStateKeywords = ['flow', 'peak', 'zone', 'clarity', 'focused'];
+      const phrases = extractPhrases(peakStateEntries, peakStateKeywords);
+      
+      patterns.push({
+        id: 'peak-state',
+        name: 'Peak State / Flow',
+        icon: Target,
+        count: peakStateEntries.length,
+        avgPnL: calculateAvgPnL(peakStateEntries),
+        typicalPhrases: phrases.length > 0 ? phrases : [
+          'Everything felt aligned today',
+          'I was in the zone',
+          'Trading felt effortless and clear'
+        ],
+        description: 'Excellent! Document what contributed to this state so you can recreate it in future sessions'
       });
     }
     
