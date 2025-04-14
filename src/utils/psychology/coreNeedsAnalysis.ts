@@ -1,4 +1,3 @@
-
 // First part of the file with imports and type definitions
 import { JournalEntry } from "@/types/analytics";
 
@@ -282,13 +281,31 @@ function analyzeEntryForCoreTraits(entry: JournalEntry): CoreTrait {
     Array.isArray(entry.mistakes) ? entry.mistakes.join(' ') : '',
   ].join(' ').toLowerCase();
   
-  // First check: Direct keyword matching
+  // Prioritize trait detection for conviction, focus, and confidence
+  // First, check for conviction trait
+  if (containsAnyKeyword(textToAnalyze, coreTraitKeywords.conviction)) {
+    return 'conviction';
+  }
+  
+  // Second, check for focus trait
+  if (containsAnyKeyword(textToAnalyze, coreTraitKeywords.focus)) {
+    return 'focus';
+  }
+  
+  // Third, check for confidence trait
+  if (containsAnyKeyword(textToAnalyze, coreTraitKeywords.confidence)) {
+    return 'confidence';
+  }
+  
+  // Next, check for other traits with keywords
   for (const [trait, keywords] of Object.entries(coreTraitKeywords)) {
-    if (trait !== 'unknown' && containsAnyKeyword(textToAnalyze, keywords)) {
+    if (trait !== 'unknown' && trait !== 'conviction' && trait !== 'focus' && trait !== 'confidence' && 
+        containsAnyKeyword(textToAnalyze, keywords)) {
       return trait as CoreTrait;
     }
   }
   
+  // Continue with remaining detection methods
   // Second check: Emotion-based indicators
   for (const [emotion, traits] of Object.entries(emotionToCoreTraitMap)) {
     if (textToAnalyze.includes(emotion.toLowerCase())) {
@@ -354,7 +371,8 @@ function analyzeEntryForCoreTraits(entry: JournalEntry): CoreTrait {
     }
   }
   
-  return 'unknown';
+  // Default to 'growth' instead of 'unknown' if no specific trait detected
+  return 'growth';
 }
 
 // New function to detect harmful patterns more accurately
@@ -405,7 +423,7 @@ function detectHarmfulPatterns(entry: JournalEntry | null, textContent: string, 
   return { hasHarmfulPattern: false, patternType: null };
 }
 
-// Process all journal entries and categorize them by core trait
+// Process all journal entries and categorize them by core trait 
 export function analyzeJournalEntriesForCoreTraits(entries: JournalEntry[]): { 
   coreTrait: CoreTrait; 
   count: number;
@@ -427,11 +445,13 @@ export function analyzeJournalEntriesForCoreTraits(entries: JournalEntry[]): {
     return acc;
   }, {} as Record<CoreTrait, number>);
   
-  // Convert to array format
-  return Object.entries(traitsCounts).map(([trait, count]) => ({
-    coreTrait: trait as CoreTrait,
-    count
-  }));
+  // Convert to array format, filtering out unknown trait
+  return Object.entries(traitsCounts)
+    .filter(([trait]) => trait !== 'unknown')
+    .map(([trait, count]) => ({
+      coreTrait: trait as CoreTrait,
+      count
+    }));
 }
 
 // Process all journal entries and return them grouped by core trait
@@ -569,7 +589,8 @@ export function generateEmotionalData(entries: JournalEntry[]): EnhancedEmotiona
 
     // Return enhanced emotional data point with all required fields
     return {
-      coreTrait,
+      // If the coreTrait is unknown, replace with 'growth' as a safe default
+      coreTrait: coreTrait === 'unknown' ? 'growth' : coreTrait,
       emotion,
       date,
       formattedDate,

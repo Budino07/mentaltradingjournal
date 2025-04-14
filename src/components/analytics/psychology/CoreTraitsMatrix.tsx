@@ -32,10 +32,13 @@ export const CoreTraitsMatrix = ({ emotionalData: providedData }: CoreTraitsMatr
       // If data is provided externally, use it
       const coreTraits = providedData.reduce((acc: Record<string, number>, item) => {
         const traitName = item.coreTrait || 'unknown';
-        if (!acc[traitName]) {
-          acc[traitName] = 0;
+        // Skip unknown traits
+        if (traitName !== 'unknown') {
+          if (!acc[traitName]) {
+            acc[traitName] = 0;
+          }
+          acc[traitName]++;
         }
-        acc[traitName]++;
         return acc;
       }, {});
       
@@ -47,10 +50,13 @@ export const CoreTraitsMatrix = ({ emotionalData: providedData }: CoreTraitsMatr
       // Otherwise analyze journal entries using our utility
       const analyzedTraits = analyzeJournalEntriesForCoreTraits(analyticsData.journalEntries);
       
-      return analyzedTraits.map(({ coreTrait, count }) => ({
-        name: coreTrait,
-        value: count,
-      }));
+      // Filter out the unknown trait
+      return analyzedTraits
+        .filter(({ coreTrait }) => coreTrait !== 'unknown')
+        .map(({ coreTrait, count }) => ({
+          name: coreTrait,
+          value: count,
+        }));
     }
     
     return [];
