@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,6 +14,9 @@ interface ReflectionEntriesProps {
 
 export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesProps) => {
   if (!emotionalData) return null;
+  
+  // Handle multiple reflections that might have been aggregated
+  const reflections = emotionalData.reflection ? emotionalData.reflection.split('\n\n') : [];
   
   const getCoreNeedIcon = (need: string) => {
     switch (need) {
@@ -82,6 +84,11 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
           <div className="md:w-1/3">
             <h3 className="text-lg font-medium mb-2">
               {format(emotionalData.date, 'EEEE, MMMM d')}
+              {reflections.length > 1 && (
+                <span className="text-sm text-muted-foreground ml-2">
+                  ({reflections.length} entries)
+                </span>
+              )}
             </h3>
             
             <div className="space-y-3 mb-4">
@@ -122,73 +129,78 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
           </div>
           
           <div className="md:w-2/3">
-            {emotionalData.reflection ? (
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium mb-2">Daily Reflection</h4>
-                  <div className="bg-primary/5 border border-primary/10 rounded-md p-4 relative">
-                    <div className="absolute -left-3 top-4 w-6 h-6 rotate-45 border-l border-b border-primary/10 bg-primary/5"></div>
-                    <p className="text-sm leading-relaxed">{emotionalData.reflection}</p>
-                    
-                    {/* Apply pattern analyzer to all reflections */}
-                    {emotionalData.reflection.length > 10 && (
-                      <>
-                        <PatternAnalyzer reflection={emotionalData.reflection} />
+            {reflections.length > 0 ? (
+              <div className="space-y-8">
+                {reflections.map((reflection, index) => (
+                  <div key={index} className="space-y-4">
+                    <div>
+                      <h4 className="font-medium mb-2">
+                        {reflections.length > 1 ? `Reflection ${index + 1}` : 'Daily Reflection'}
+                      </h4>
+                      <div className="bg-primary/5 border border-primary/10 rounded-md p-4 relative">
+                        <div className="absolute -left-3 top-4 w-6 h-6 rotate-45 border-l border-b border-primary/10 bg-primary/5"></div>
+                        <p className="text-sm leading-relaxed">{reflection}</p>
                         
-                        <div className="mt-4 pt-3 border-t border-dashed border-primary/10">
-                          <h5 className="text-sm font-medium mb-2 text-muted-foreground">Psychological Insights</h5>
-                          <div className="flex flex-wrap gap-2">
-                            {emotionalData.reflection.includes('fear') && (
-                              <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                                Fear Reaction
-                              </Badge>
-                            )}
-                            {emotionalData.reflection.includes('anxious') && (
-                              <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                                Anxiety Response
-                              </Badge>
-                            )}
-                            {emotionalData.reflection.includes('confident') && (
-                              <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                                Confidence State
-                              </Badge>
-                            )}
-                            {emotionalData.reflection.includes('loss') && (
-                              <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                                Loss Processing
-                              </Badge>
-                            )}
-                            {emotionalData.reflection.includes('learn') && (
-                              <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
-                                Learning Mindset
-                              </Badge>
-                            )}
-                            {(emotionalData.reflection.includes('greed') || emotionalData.reflection.includes('greedy')) && (
-                              <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
-                                Greed Response
-                              </Badge>
-                            )}
-                            {(emotionalData.reflection.includes('frustrat') || emotionalData.reflection.includes('regret')) && (
-                              <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                                Frustration/Regret
-                              </Badge>
-                            )}
-                            {(emotionalData.reflection.includes('slippage') || emotionalData.reflection.includes('gave back')) && (
-                              <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
-                                Giving Back Profits
-                              </Badge>
-                            )}
-                            {emotionalData.hasHarmfulPattern && emotionalData.patternType && (
-                              <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                                {emotionalData.patternType}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </>
-                    )}
+                        {reflection.length > 10 && (
+                          <>
+                            <PatternAnalyzer reflection={reflection} />
+                            
+                            <div className="mt-4 pt-3 border-t border-dashed border-primary/10">
+                              <h5 className="text-sm font-medium mb-2 text-muted-foreground">Psychological Insights</h5>
+                              <div className="flex flex-wrap gap-2">
+                                {reflection.includes('fear') && (
+                                  <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                                    Fear Reaction
+                                  </Badge>
+                                )}
+                                {reflection.includes('anxious') && (
+                                  <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                                    Anxiety Response
+                                  </Badge>
+                                )}
+                                {reflection.includes('confident') && (
+                                  <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                                    Confidence State
+                                  </Badge>
+                                )}
+                                {reflection.includes('loss') && (
+                                  <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
+                                    Loss Processing
+                                  </Badge>
+                                )}
+                                {reflection.includes('learn') && (
+                                  <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
+                                    Learning Mindset
+                                  </Badge>
+                                )}
+                                {(reflection.includes('greed') || reflection.includes('greedy')) && (
+                                  <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
+                                    Greed Response
+                                  </Badge>
+                                )}
+                                {(reflection.includes('frustrat') || reflection.includes('regret')) && (
+                                  <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
+                                    Frustration/Regret
+                                  </Badge>
+                                )}
+                                {(reflection.includes('slippage') || reflection.includes('gave back')) && (
+                                  <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
+                                    Giving Back Profits
+                                  </Badge>
+                                )}
+                                {emotionalData.hasHarmfulPattern && emotionalData.patternType && (
+                                  <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
+                                    {emotionalData.patternType}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
                 
                 {emotionalData.tradePnL !== 0 && (
                   <div className="flex items-center gap-2">

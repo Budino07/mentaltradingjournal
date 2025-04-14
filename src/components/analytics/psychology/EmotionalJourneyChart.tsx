@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { format, subDays, subMonths, isAfter } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +22,7 @@ export const EmotionalJourneyChart = () => {
     queryFn: generateAnalytics,
   });
   
-  // Filter data based on timeframe
+  // Filter and aggregate data based on timeframe
   const filteredEmotionalData = useMemo(() => {
     if (!analyticsData?.journalEntries?.length) return [];
     
@@ -49,7 +48,55 @@ export const EmotionalJourneyChart = () => {
     }
     
     // Filter the data to only include dates after the cutoff
-    return fullData.filter(item => isAfter(item.date, cutoffDate));
+    const filteredData = fullData.filter(item => isAfter(item.date, cutoffDate));
+    
+    // Aggregate data by date to remove duplicates
+    const aggregatedMap = new Map<string, EnhancedEmotionalDataPoint>();
+    
+    filteredData.forEach(item => {
+      const dateKey = format(item.date, 'yyyy-MM-dd');
+      
+      if (aggregatedMap.has(dateKey)) {
+        // Update existing entry with this day's data
+        const existing = aggregatedMap.get(dateKey)!;
+        
+        // Prioritize emotional states if present
+        if (item.preScore !== null) existing.preScore = item.preScore;
+        if (item.postScore !== null) existing.postScore = item.postScore;
+        if (item.preEmotion) existing.preEmotion = item.preEmotion;
+        if (item.postEmotion) existing.postEmotion = item.postEmotion;
+        
+        // Combine reflections
+        if (item.reflection && item.reflection.trim() !== '') {
+          if (existing.reflection && existing.reflection.trim() !== '') {
+            existing.reflection += '\n\n' + item.reflection;
+          } else {
+            existing.reflection = item.reflection;
+          }
+        }
+        
+        // Update core need if available
+        if (item.coreNeed) existing.coreNeed = item.coreNeed;
+        
+        // Accumulate trading P&L
+        existing.tradePnL += item.tradePnL;
+        
+        // Keep track of harmful patterns
+        if (item.hasHarmfulPattern) {
+          existing.hasHarmfulPattern = true;
+          if (item.patternType) {
+            existing.patternType = item.patternType;
+          }
+        }
+      } else {
+        // First entry for this date
+        aggregatedMap.set(dateKey, { ...item });
+      }
+    });
+    
+    // Convert map back to array and sort by date
+    return Array.from(aggregatedMap.values())
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
   }, [analyticsData?.journalEntries, timeframe]);
 
   const handleDayClick = (day: Date) => {
