@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RefreshCw, AlertTriangle, Clock, TrendingDown, DollarSign, ThumbsDown } from "lucide-react";
+import { AlertTriangle, Clock, TrendingDown, DollarSign, ThumbsDown } from "lucide-react";
 
 interface BehavioralPatternsProps {
   journalEntries: any[];
@@ -13,15 +13,6 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
     if (!journalEntries || journalEntries.length === 0) {
       return { patterns: [] };
     }
-    
-    // Pattern detection for "Rushed to Finish"
-    const rushedEntries = journalEntries.filter(entry => {
-      const text = entry.notes?.toLowerCase() || '';
-      
-      // Basic keyword matching
-      const rushKeywords = ['rush', 'hurry', 'quick', 'fast', 'speed', 'urgent', 'wanted to be done', 'done with'];
-      return rushKeywords.some(keyword => text.includes(keyword));
-    });
     
     // Pattern detection for "Giving Back Profits"
     const givingBackEntries = journalEntries.filter(entry => {
@@ -95,26 +86,6 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
     
     // Create patterns array
     const patterns = [];
-    
-    // Add Rushed to Finish pattern if detected
-    if (rushedEntries.length > 0) {
-      const rushKeywords = ['rush', 'hurry', 'quick', 'fast', 'wanted to be done', 'done with'];
-      const phrases = extractPhrases(rushedEntries, rushKeywords);
-      
-      patterns.push({
-        id: 'rushed-to-finish',
-        name: 'Rushed to Finish',
-        icon: RefreshCw,
-        count: rushedEntries.length,
-        avgPnL: calculateAvgPnL(rushedEntries),
-        typicalPhrases: phrases.length > 0 ? phrases : [
-          'Wanted to be done',
-          'Forced a quick trade',
-          'Didn\'t care about quality, just needed it over'
-        ],
-        description: 'This pattern usually leads to losses. You\'re better off stopping when this urge appears'
-      });
-    }
     
     // Add Giving Back Profits pattern if detected
     if (givingBackEntries.length > 0) {
