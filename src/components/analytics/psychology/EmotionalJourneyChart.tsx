@@ -54,13 +54,6 @@ export const EmotionalJourneyChart = () => {
 
   const handleDayClick = (day: Date) => {
     setFocusDay(day);
-    
-    // Find all entries for the selected date
-    const entriesForDay = filteredEmotionalData.filter(item => 
-      item.date.toDateString() === day.toDateString()
-    );
-    
-    console.log(`Found ${entriesForDay.length} entries for ${day.toDateString()}`);
   };
 
   if (isLoading) {
@@ -139,7 +132,7 @@ export const EmotionalJourneyChart = () => {
         <div className="mt-6">
           {focusDay && (
             <ReflectionEntries 
-              emotionalData={filteredEmotionalData.filter(item => 
+              emotionalData={filteredEmotionalData.find(item => 
                 item.date.toDateString() === focusDay.toDateString()
               )}
               onClose={() => setFocusDay(null)}
@@ -169,4 +162,3 @@ export const EmotionalJourneyChart = () => {
     </Card>
   );
 };
-
