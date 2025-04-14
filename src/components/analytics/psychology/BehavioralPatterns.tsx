@@ -426,6 +426,57 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
                               {typeof trade.pnl === 'number' ? trade.pnl.toFixed(2) : trade.pnl}
                             </span>
                           </div>
+                          <div className="mt-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+                            {trade.direction && (
+                              <div>
+                                <span className="text-muted-foreground">Direction:</span>{' '}
+                                <span className={trade.direction === 'buy' ? 'text-green-500' : 'text-red-500'}>
+                                  {trade.direction.toUpperCase()}
+                                </span>
+                              </div>
+                            )}
+                            {trade.entryPrice && (
+                              <div>
+                                <span className="text-muted-foreground">Entry:</span>{' '}
+                                {trade.entryPrice}
+                              </div>
+                            )}
+                            {trade.exitPrice && (
+                              <div>
+                                <span className="text-muted-foreground">Exit:</span>{' '}
+                                {trade.exitPrice}
+                              </div>
+                            )}
+                            {trade.quantity && (
+                              <div>
+                                <span className="text-muted-foreground">Size:</span>{' '}
+                                {trade.quantity}
+                              </div>
+                            )}
+                            {trade.setup && (
+                              <div>
+                                <span className="text-muted-foreground">Setup:</span>{' '}
+                                {trade.setup}
+                              </div>
+                            )}
+                            {trade.stopLoss && (
+                              <div>
+                                <span className="text-muted-foreground">SL:</span>{' '}
+                                {trade.stopLoss}
+                              </div>
+                            )}
+                            {trade.takeProfit && (
+                              <div>
+                                <span className="text-muted-foreground">TP:</span>{' '}
+                                {trade.takeProfit}
+                              </div>
+                            )}
+                          </div>
+                          {trade.notes && (
+                            <div className="mt-1 text-muted-foreground">
+                              <p className="whitespace-pre-line">{trade.notes}</p>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
