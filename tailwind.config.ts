@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -63,6 +62,11 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        "neon-purple": {
+          DEFAULT: "#9b37b0",
+          50: "rgba(147,39,143,0.5)",
+          100: "rgba(147,39,143,0.7)"
+        }
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -98,6 +102,10 @@ export default {
         "slide-in": "slide-in 0.3s ease-out",
         "pulse-slow": "pulse-slow 4s ease-in-out infinite",
       },
+      boxShadow: {
+        "neon-purple": "0 0 15px rgba(147,39,143,0.5)",
+        "neon-purple-hover": "0 0 25px rgba(147,39,143,0.7)"
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],

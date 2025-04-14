@@ -1,6 +1,20 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, Clock, TrendingDown, DollarSign, ThumbsDown, BarChart2, Zap, Award, Repeat, Target, FileText, ExternalLink } from "lucide-react";
+import { 
+  AlertTriangle, 
+  Clock, 
+  TrendingDown, 
+  DollarSign, 
+  ThumbsDown, 
+  BarChart2, 
+  Zap, 
+  Award, 
+  Repeat, 
+  Target, 
+  FileText, 
+  ExternalLink 
+} from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 interface BehavioralPatternsProps {
@@ -456,7 +470,7 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
             {patterns.map((pattern) => (
               <div 
                 key={pattern.id}
-                className="p-4 rounded-lg border border-primary/20 bg-background/40 backdrop-blur-md"
+                className="p-4 rounded-lg border-4 border-neon-purple/50 bg-background/40 backdrop-blur-md shadow-[0_0_15px_rgba(147,39,143,0.5)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(147,39,143,0.7)]"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-start gap-3">
