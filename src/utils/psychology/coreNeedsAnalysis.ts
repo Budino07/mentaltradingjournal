@@ -1,10 +1,10 @@
 import { JournalEntry } from "@/types/analytics";
 
-// Define the core need types
-export type CoreNeed = 'control' | 'validation' | 'safety' | 'connection' | 'growth' | 'unknown';
+// Define the core trait types
+export type CoreTrait = 'control' | 'validation' | 'safety' | 'connection' | 'growth' | 'conviction' | 'focus' | 'confidence' | 'unknown';
 
-// Extended keywords and phrases for each core need
-const coreNeedKeywords: Record<CoreNeed, string[]> = {
+// Extended keywords and phrases for each core trait
+const coreTraitKeywords: Record<CoreTrait, string[]> = {
   control: [
     'control', 'manage', 'discipline', 'plan', 'strategy', 'stick to', 'follow', 'consistent',
     'organized', 'system', 'rule', 'overrule', 'impulsive', 'spontaneous', 'urge', 
@@ -29,7 +29,7 @@ const coreNeedKeywords: Record<CoreNeed, string[]> = {
   connection: [
     'connect', 'belong', 'relationship', 'community', 'group', 'team', 'together',
     'united', 'aligned', 'consensus', 'agreement', 'disagreement', 'conflict',
-    'harmony', 'discord', 'isolation', 'alone', 'lonely', 'supported', 'abandoned',
+    'harmony', 'discord', 'isolation', 'alone', 'supported', 'abandoned',
     'included', 'excluded', 'accepted', 'rejected', 'follow others', 'crowd', 'herd',
     'trend', 'popular', 'unpopular', 'majority', 'minority'
   ],
@@ -39,11 +39,27 @@ const coreNeedKeywords: Record<CoreNeed, string[]> = {
     'experiment', 'try', 'test', 'explore', 'discover', 'understand', 'comprehend', 'grasp',
     'master', 'novice', 'expert', 'beginner', 'advanced', 'intermediate'
   ],
+  conviction: [
+    'knew this would work', 'high probability setup', 'everything lined up', 'held despite pullback', 
+    'stuck to the plan', 'didn\'t flinch', 'went full size', 'sized up', 'didn\'t pull the trigger', 
+    'hesitated', 'closed too early', 'didn\'t trust it', 'conviction', 'sure', 'certain', 'committed'
+  ],
+  focus: [
+    'fully present', 'in the zone', 'everything slowed down', 'stayed off my phone', 
+    'watched for 30 mins before entry', 'noticed a shift in momentum', 'noticed order flow',  
+    'got distracted', 'zoned out', 'didn\'t see the setup', 'wasn\'t paying attention', 
+    'focus', 'concentration', 'attentive', 'diligent', 'mindful', 'alert', 'aware'
+  ],
+  confidence: [
+    'I was ready', 'felt sharp', 'I can do this', 'I\'ve seen this before', 'my process is working', 
+    'took the loss, no regret', 'wasn\'t sure', 'afraid to lose', 'didn\'t believe in the setup', 
+    'felt off today', 'confidence', 'self-assured', 'decisive', 'bold', 'assertive'
+  ],
   unknown: [] // No keywords for unknown as it's the default case
 };
 
-// Emotion-based indicators for core needs
-const emotionToCoreNeedMap: Record<string, CoreNeed[]> = {
+// Emotion-based indicators for core traits
+const emotionToCoreTraitMap: Record<string, CoreTrait[]> = {
   // Control-related emotions
   'frustrated': ['control'],
   'overwhelmed': ['control'],
@@ -57,7 +73,7 @@ const emotionToCoreNeedMap: Record<string, CoreNeed[]> = {
   // Validation-related emotions
   'proud': ['validation'],
   'accomplished': ['validation'],
-  'confident': ['validation'],
+  'confident': ['validation', 'confidence'],
   'disappointed': ['validation'],
   'embarrassed': ['validation'],
   'ashamed': ['validation'],
@@ -73,7 +89,6 @@ const emotionToCoreNeedMap: Record<string, CoreNeed[]> = {
   'calm': ['safety', 'control'],
   
   // Connection-related emotions
-  'lonely': ['connection'],
   'isolated': ['connection'],
   'connected': ['connection'],
   'supported': ['connection'],
@@ -88,26 +103,42 @@ const emotionToCoreNeedMap: Record<string, CoreNeed[]> = {
   'challenged': ['growth'],
   'stimulated': ['growth'],
   'bored': ['growth'],
-  'stagnant': ['growth']
+  'stagnant': ['growth'],
+  
+  // Conviction-related emotions
+  'certain': ['conviction'],
+  'doubtful': ['conviction'],
+  'confused': ['conviction'],
+  'decisive': ['conviction', 'confidence'],
+  
+  // Focus-related emotions
+  'alert': ['focus'],
+  'distracted': ['focus'],
+  'present': ['focus'],
+  'scattered': ['focus'],
+  
+  // Confidence-related emotions
+  'self-assured': ['confidence'],
+  'insecure': ['confidence'],
+  'doubtful': ['confidence'],
+  'hesitant': ['confidence', 'conviction']
 };
 
-// Trading behavior indicators for core needs
-const tradingBehaviorToCoreNeedMap: Record<string, CoreNeed[]> = {
+// Trading behavior indicators for core traits
+const tradingBehaviorToCoreTraitMap: Record<string, CoreTrait[]> = {
   // Control-related behaviors
   'overtrade': ['control'],
   'revenge trade': ['control', 'validation'],
-  'stick to plan': ['control'],
+  'stick to plan': ['control', 'conviction'],
   'follow rules': ['control'],
   'break rules': ['control'],
   'change strategy': ['control', 'growth'],
   'adjust position': ['control'],
-  'hesitate': ['control', 'safety'],
+  'hesitate': ['control', 'safety', 'conviction'],
   
   // Validation-related behaviors
-  'take profit early': ['validation', 'safety'],
-  'let winners run': ['validation'],
+  'let winners run': ['validation', 'conviction'],
   'prove right': ['validation'],
-  // 'revenge trade': ['validation', 'control'], - Removed duplicate entry
   'boast': ['validation'],
   'share results': ['validation', 'connection'],
   
@@ -131,61 +162,100 @@ const tradingBehaviorToCoreNeedMap: Record<string, CoreNeed[]> = {
   // Growth-related behaviors
   'try new setup': ['growth'],
   'learn technique': ['growth'],
-  'study chart': ['growth'],
+  'study chart': ['growth', 'focus'],
   'analyze mistake': ['growth'],
   'journal': ['growth'],
   'test strategy': ['growth'],
-  'backtest': ['growth']
+  'backtest': ['growth'],
+  
+  // Conviction-related behaviors
+  'held position': ['conviction'],
+  'sized up': ['conviction', 'confidence'],
+  'full size': ['conviction', 'confidence'],
+  'closed early': ['conviction'],
+  
+  // Focus-related behaviors
+  'watched setup': ['focus'],
+  'monitored price action': ['focus'],
+  'noticed pattern': ['focus'],
+  'stayed focused': ['focus'],
+  'avoided distractions': ['focus'],
+  
+  // Confidence-related behaviors
+  'executed quickly': ['confidence'],
+  'no hesitation': ['confidence', 'conviction'],
+  'trusted analysis': ['confidence'],
+  'took loss well': ['confidence']
 };
 
-// Context-based analysis for core needs
-const contextToCoreNeedMap: Record<string, CoreNeed[]> = {
-  // Context indicating control needs
-  'missed opportunity': ['control'],
+// Context-based analysis for core traits
+const contextToCoreTraitMap: Record<string, CoreTrait[]> = {
+  // Context indicating control traits
   'should have waited': ['control'],
   'jumped the gun': ['control'],
   'too early': ['control'],
   'too late': ['control'],
   'impulsive decision': ['control'],
-  'stick to the plan': ['control'],
+  'stick to the plan': ['control', 'conviction'],
   
-  // Context indicating validation needs
+  // Context indicating validation traits
   'finally right': ['validation'],
-  'knew it would': ['validation'],
+  'knew it would': ['validation', 'conviction'],
   'told you so': ['validation'],
   'proved them wrong': ['validation'],
-  'should have trusted myself': ['validation'],
+  'should have trusted myself': ['validation', 'confidence'],
   
-  // Context indicating safety needs
+  // Context indicating safety traits
   'preserved capital': ['safety'],
   'avoided loss': ['safety'],
   'played it safe': ['safety'],
   'better safe than sorry': ['safety'],
   'too risky': ['safety'],
   
-  // Context indicating connection needs
+  // Context indicating connection traits
   'everyone else': ['connection'],
   'others were': ['connection'],
   'group consensus': ['connection'],
   'community thinks': ['connection'],
   
-  // Context indicating growth needs
+  // Context indicating growth traits
   'learned from': ['growth'],
   'next time I will': ['growth'],
   'improving my': ['growth'],
-  'getting better at': ['growth']
+  'getting better at': ['growth'],
+  
+  // Context indicating conviction traits
+  'everything lined up': ['conviction'],
+  'high probability': ['conviction'],
+  'strong setup': ['conviction'],
+  'perfect pattern': ['conviction'],
+  
+  // Context indicating focus traits
+  'paid close attention': ['focus'],
+  'stayed focused': ['focus'],
+  'lost focus': ['focus'],
+  'distracted by': ['focus'],
+  
+  // Context indicating confidence traits
+  'trusted myself': ['confidence'],
+  'believed in my analysis': ['confidence'],
+  'doubted myself': ['confidence'],
+  'second-guessed': ['confidence']
 };
 
-// Extract core needs from emotion details
-function extractNeedFromEmotionDetail(emotionDetail: string): CoreNeed | null {
+// Extract core traits from emotion details
+function extractTraitFromEmotionDetail(emotionDetail: string): CoreTrait | null {
   const lowercaseDetail = emotionDetail.toLowerCase();
   
   // Direct mapping based on emotion detail
   if (lowercaseDetail.includes('control') || lowercaseDetail.includes('discipline')) return 'control';
   if (lowercaseDetail.includes('confidence') || lowercaseDetail.includes('proud')) return 'validation';
   if (lowercaseDetail.includes('safe') || lowercaseDetail.includes('secure') || lowercaseDetail.includes('anxious')) return 'safety';
-  if (lowercaseDetail.includes('alone') || lowercaseDetail.includes('connect') || lowercaseDetail.includes('support')) return 'connection';
+  if (lowercaseDetail.includes('connect') || lowercaseDetail.includes('support')) return 'connection';
   if (lowercaseDetail.includes('grow') || lowercaseDetail.includes('learn') || lowercaseDetail.includes('improve')) return 'growth';
+  if (lowercaseDetail.includes('certain') || lowercaseDetail.includes('conviction')) return 'conviction';
+  if (lowercaseDetail.includes('focus') || lowercaseDetail.includes('attention')) return 'focus';
+  if (lowercaseDetail.includes('confident') || lowercaseDetail.includes('self-assured')) return 'confidence';
   
   return null;
 }
@@ -197,8 +267,8 @@ function containsAnyKeyword(text: string, keywords: string[]): boolean {
   return keywords.some(keyword => lowercaseText.includes(keyword.toLowerCase()));
 }
 
-// Analyze entry for core needs using multiple methods
-function analyzeEntryForCoreNeeds(entry: JournalEntry): CoreNeed {
+// Analyze entry for core traits using multiple methods
+function analyzeEntryForCoreTraits(entry: JournalEntry): CoreTrait {
   if (!entry) return 'unknown';
   
   const textToAnalyze = [
@@ -211,42 +281,42 @@ function analyzeEntryForCoreNeeds(entry: JournalEntry): CoreNeed {
   ].join(' ').toLowerCase();
   
   // First check: Direct keyword matching
-  for (const [need, keywords] of Object.entries(coreNeedKeywords)) {
-    if (need !== 'unknown' && containsAnyKeyword(textToAnalyze, keywords)) {
-      return need as CoreNeed;
+  for (const [trait, keywords] of Object.entries(coreTraitKeywords)) {
+    if (trait !== 'unknown' && containsAnyKeyword(textToAnalyze, keywords)) {
+      return trait as CoreTrait;
     }
   }
   
   // Second check: Emotion-based indicators
-  for (const [emotion, needs] of Object.entries(emotionToCoreNeedMap)) {
+  for (const [emotion, traits] of Object.entries(emotionToCoreTraitMap)) {
     if (textToAnalyze.includes(emotion.toLowerCase())) {
-      return needs[0]; // Take the first associated need
+      return traits[0]; // Take the first associated trait
     }
   }
   
   // Third check: Trading behavior indicators
-  for (const [behavior, needs] of Object.entries(tradingBehaviorToCoreNeedMap)) {
+  for (const [behavior, traits] of Object.entries(tradingBehaviorToCoreTraitMap)) {
     if (textToAnalyze.includes(behavior.toLowerCase())) {
-      return needs[0]; // Take the first associated need
+      return traits[0]; // Take the first associated trait
     }
   }
   
   // Fourth check: Context-based analysis
-  for (const [context, needs] of Object.entries(contextToCoreNeedMap)) {
+  for (const [context, traits] of Object.entries(contextToCoreTraitMap)) {
     if (textToAnalyze.includes(context.toLowerCase())) {
-      return needs[0]; // Take the first associated need
+      return traits[0]; // Take the first associated trait
     }
   }
   
   // Fifth check: Direct emotion detail analysis
   if (entry.emotion_detail) {
-    const needFromEmotion = extractNeedFromEmotionDetail(entry.emotion_detail);
-    if (needFromEmotion) {
-      return needFromEmotion;
+    const traitFromEmotion = extractTraitFromEmotionDetail(entry.emotion_detail);
+    if (traitFromEmotion) {
+      return traitFromEmotion;
     }
   }
   
-  // Additional check: Analyze session_type and outcome for implicit needs
+  // Additional check: Analyze session_type and outcome for implicit traits
   if (entry.session_type === 'pre') {
     // Pre-session often indicates control (preparation) or growth (learning)
     if (textToAnalyze.includes('plan') || textToAnalyze.includes('strategy')) {
@@ -269,16 +339,16 @@ function analyzeEntryForCoreNeeds(entry: JournalEntry): CoreNeed {
     }
   }
   
-  // Analyze trades for implicit needs
+  // Analyze trades for implicit traits
   if (entry.trades && entry.trades.length > 0) {
     const trade = entry.trades[0]; // Analyze first trade for simplicity
     
     if (trade.stopLoss && parseFloat(trade.stopLoss.toString()) > 0) {
-      return 'safety'; // Setting stop loss indicates safety need
+      return 'safety'; // Setting stop loss indicates safety trait
     }
     
     if (trade.setup && trade.setup.toLowerCase().includes('test')) {
-      return 'growth'; // Testing setups indicates growth need
+      return 'growth'; // Testing setups indicates growth trait
     }
   }
   
@@ -333,67 +403,67 @@ function detectHarmfulPatterns(entry: JournalEntry | null, textContent: string, 
   return { hasHarmfulPattern: false, patternType: null };
 }
 
-// Process all journal entries and categorize them by core need
-export function analyzeJournalEntriesForCoreNeeds(entries: JournalEntry[]): { 
-  coreNeed: CoreNeed; 
+// Process all journal entries and categorize them by core trait
+export function analyzeJournalEntriesForCoreTraits(entries: JournalEntry[]): { 
+  coreTrait: CoreTrait; 
   count: number;
 }[] {
-  // Map each entry to a core need
-  const needsMapping = entries.map(entry => {
+  // Map each entry to a core trait
+  const traitsMapping = entries.map(entry => {
     return {
-      coreNeed: analyzeEntryForCoreNeeds(entry),
+      coreTrait: analyzeEntryForCoreTraits(entry),
       entry
     };
   });
   
-  // Count occurrences of each core need
-  const needsCounts = needsMapping.reduce((acc, { coreNeed }) => {
-    if (!acc[coreNeed]) {
-      acc[coreNeed] = 0;
+  // Count occurrences of each core trait
+  const traitsCounts = traitsMapping.reduce((acc, { coreTrait }) => {
+    if (!acc[coreTrait]) {
+      acc[coreTrait] = 0;
     }
-    acc[coreNeed]++;
+    acc[coreTrait]++;
     return acc;
-  }, {} as Record<CoreNeed, number>);
+  }, {} as Record<CoreTrait, number>);
   
   // Convert to array format
-  return Object.entries(needsCounts).map(([need, count]) => ({
-    coreNeed: need as CoreNeed,
+  return Object.entries(traitsCounts).map(([trait, count]) => ({
+    coreTrait: trait as CoreTrait,
     count
   }));
 }
 
-// Process all journal entries and return them grouped by core need
+// Process all journal entries and return them grouped by core trait
 export function getEntriesByCoreSeed(entries: JournalEntry[]): { 
-  coreNeed: CoreNeed; 
+  coreTrait: CoreTrait; 
   entries: JournalEntry[];
 }[] {
-  // Map each entry to a core need
-  const needsMapping = entries.map(entry => {
+  // Map each entry to a core trait
+  const traitsMapping = entries.map(entry => {
     return {
-      coreNeed: analyzeEntryForCoreNeeds(entry),
+      coreTrait: analyzeEntryForCoreTraits(entry),
       entry
     };
   });
   
-  // Group entries by core need
-  const entriesByNeed = needsMapping.reduce((acc, { coreNeed, entry }) => {
-    if (!acc[coreNeed]) {
-      acc[coreNeed] = [];
+  // Group entries by core trait
+  const entriesByTrait = traitsMapping.reduce((acc, { coreTrait, entry }) => {
+    if (!acc[coreTrait]) {
+      acc[coreTrait] = [];
     }
-    acc[coreNeed].push(entry);
+    acc[coreTrait].push(entry);
     return acc;
-  }, {} as Record<CoreNeed, JournalEntry[]>);
+  }, {} as Record<CoreTrait, JournalEntry[]>);
   
   // Convert to array format
-  return Object.entries(entriesByNeed).map(([need, entries]) => ({
-    coreNeed: need as CoreNeed,
+  return Object.entries(entriesByTrait).map(([trait, entries]) => ({
+    coreTrait: trait as CoreTrait,
     entries
   }));
 }
 
 // Create an interface for the emotional data to match what EmotionalWaveform expects
 export interface EnhancedEmotionalDataPoint {
-  coreNeed: CoreNeed;
+  coreTrait: CoreTrait;
   emotion: string;
   date: Date;
   formattedDate: string;
@@ -409,10 +479,10 @@ export interface EnhancedEmotionalDataPoint {
   intensity: number;
 }
 
-// Generate emotional data for Core Needs Matrix
+// Generate emotional data for Core Traits Matrix
 export function generateEmotionalData(entries: JournalEntry[]): EnhancedEmotionalDataPoint[] {
   return entries.map(entry => {
-    const coreNeed = analyzeEntryForCoreNeeds(entry);
+    const coreTrait = analyzeEntryForCoreTraits(entry);
     const emotion = entry.emotion || 'neutral';
     
     // Calculate emotional scores for the waveform
@@ -497,7 +567,7 @@ export function generateEmotionalData(entries: JournalEntry[]): EnhancedEmotiona
 
     // Return enhanced emotional data point with all required fields
     return {
-      coreNeed,
+      coreTrait,
       emotion,
       date,
       formattedDate,
