@@ -337,6 +337,114 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
     }
   };
 
+  // Enhanced pattern descriptions
+  const patternDescriptions = {
+    'giving-back-profits': {
+      fullDescription: "Giving Back Profits occurs when a trader allows initial gains to slip away, often due to hesitation or lack of a clear exit strategy. This pattern can significantly erode trading performance.",
+      risks: [
+        "Failing to protect profits",
+        "Emotional attachment to open positions",
+        "Lack of predefined profit-taking rules"
+      ],
+      prevention: [
+        "Set and stick to trailing stop losses",
+        "Have a clear profit-taking plan before entering a trade",
+        "Use partial profit-taking strategies"
+      ]
+    },
+    'greed': {
+      fullDescription: "Greed manifests when a trader becomes overly focused on potential profits, leading to taking excessive risks or holding positions beyond rational analysis.",
+      risks: [
+        "Ignoring risk management principles",
+        "Overtrading",
+        "Increasing position sizes impulsively"
+      ],
+      prevention: [
+        "Stick to predefined position sizing rules",
+        "Use stop-loss orders",
+        "Take breaks after significant wins"
+      ]
+    },
+    'frustration-regret': {
+      fullDescription: "Frustration and Regret emerge from emotional responses to trading losses, often leading to impulsive decision-making and revenge trading.",
+      risks: [
+        "Making emotional trades to 'make back' losses",
+        "Deviating from trading plan",
+        "Increased stress and anxiety"
+      ],
+      prevention: [
+        "Implement a 'cooling-off' period after losses",
+        "Review and reflect on trades objectively",
+        "Practice mindfulness and emotional regulation"
+      ]
+    },
+    'overtrading': {
+      fullDescription: "Overtrading happens when a trader executes too many trades, often driven by boredom, anxiety, or a desire to recover losses.",
+      risks: [
+        "Increased transaction costs",
+        "Reduced focus and decision quality",
+        "Emotional exhaustion"
+      ],
+      prevention: [
+        "Set a daily trade limit",
+        "Focus on quality over quantity",
+        "Have strict entry and exit criteria"
+      ]
+    },
+    'fomo': {
+      fullDescription: "FOMO (Fear of Missing Out) drives traders to enter trades based on market excitement rather than solid analysis.",
+      risks: [
+        "Entering trades without proper analysis",
+        "Chasing market movements",
+        "Ignoring personal trading strategy"
+      ],
+      prevention: [
+        "Stick to your predefined trading plan",
+        "Wait for clear, confirmatory signals",
+        "Accept that not every move requires action"
+      ]
+    },
+    'discipline': {
+      fullDescription: "Discipline represents consistent adherence to a trading strategy, making rational decisions based on analysis rather than emotions.",
+      benefits: [
+        "Consistent decision-making",
+        "Reduced emotional trading",
+        "Long-term performance improvement"
+      ],
+      practices: [
+        "Follow your trading plan meticulously",
+        "Keep a detailed trading journal",
+        "Continuously review and refine your strategy"
+      ]
+    },
+    'revenge-trading': {
+      fullDescription: "Revenge Trading occurs when a trader attempts to immediately recover losses by making impulsive, high-risk trades.",
+      risks: [
+        "Increased potential for significant losses",
+        "Emotional decision-making",
+        "Breaking established risk management rules"
+      ],
+      prevention: [
+        "Take a mandatory break after a loss",
+        "Have a set maximum loss threshold",
+        "Review and analyze losing trades objectively"
+      ]
+    },
+    'peak-state': {
+      fullDescription: "Peak State or Flow represents a psychological condition of optimal performance where trading feels effortless and decisions are clear and confident.",
+      characteristics: [
+        "High focus and clarity",
+        "Calm and controlled emotional state",
+        "Intuitive decision-making"
+      ],
+      cultivation: [
+        "Practice meditation and mindfulness",
+        "Maintain consistent trading routines",
+        "Develop a strong understanding of your trading psychology"
+      ]
+    }
+  };
+
   return (
     <>
       <Card className="border border-primary/10 bg-card/30 backdrop-blur-md">
@@ -383,6 +491,13 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
                       </li>
                     ))}
                   </ul>
+                </div>
+                
+                <div className="mb-4">
+                  <p className="text-sm font-medium mb-2 text-muted-foreground">Pattern Overview</p>
+                  <div className="text-xs text-muted-foreground">
+                    {patternDescriptions[pattern.id]?.fullDescription || 'No description available'}
+                  </div>
                 </div>
                 
                 <p className="text-xs text-muted-foreground">{pattern.description}</p>
