@@ -1,13 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, Clock, TrendingDown, DollarSign, ThumbsDown, BarChart2, Zap, Award, Repeat, Target } from "lucide-react";
+import { AlertTriangle, Clock, TrendingDown, DollarSign, ThumbsDown, BarChart2, Zap, Award, Repeat, Target, FileText } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 interface BehavioralPatternsProps {
   journalEntries: any[];
 }
 
 export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalEntries }) => {
+  const [selectedPattern, setSelectedPattern] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [patternEntries, setPatternEntries] = useState<any[]>([]);
+
   const analyzePatterns = () => {
     // Early return if no entries
     if (!journalEntries || journalEntries.length === 0) {
@@ -143,7 +148,8 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
           'Watched profits disappear',
           'Let winners turn to losers'
         ],
-        description: 'Consider implementing trailing stops or taking partial profits to protect gains'
+        description: 'Consider implementing trailing stops or taking partial profits to protect gains',
+        entries: givingBackEntries
       });
     }
     
@@ -163,7 +169,8 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
           'Wanted more profit',
           'Tried to maximize the gain'
         ],
-        description: 'Greed often leads to poor risk management. Stick to your original plan and position sizing'
+        description: 'Greed often leads to poor risk management. Stick to your original plan and position sizing',
+        entries: greedEntries
       });
     }
     
@@ -183,7 +190,8 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
           'So frustrated with myself',
           'Regret taking that trade'
         ],
-        description: 'These emotions often lead to revenge trading. Take a break when you notice these feelings'
+        description: 'These emotions often lead to revenge trading. Take a break when you notice these feelings',
+        entries: frustrationEntries
       });
     }
     
@@ -203,7 +211,8 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
           'Too many trades today',
           'Couldn\'t stop myself from trading'
         ],
-        description: 'Consider setting a daily trade limit and stopping after reaching it. Quality over quantity'
+        description: 'Consider setting a daily trade limit and stopping after reaching it. Quality over quantity',
+        entries: overtradingEntries
       });
     }
     
@@ -223,7 +232,8 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
           'Didn\'t want to miss the move',
           'Fear of missing out on profits'
         ],
-        description: 'Remember there will always be another opportunity. Wait for setups that meet your criteria'
+        description: 'Remember there will always be another opportunity. Wait for setups that meet your criteria',
+        entries: fomoEntries
       });
     }
     
@@ -243,7 +253,8 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
           'Stayed patient and waited',
           'Resisted the urge to deviate'
         ],
-        description: 'Excellent! Discipline is the foundation of consistent trading. Continue to reinforce this strength'
+        description: 'Excellent! Discipline is the foundation of consistent trading. Continue to reinforce this strength',
+        entries: disciplineEntries
       });
     }
     
@@ -263,7 +274,8 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
           'Jumped back in right away',
           'Wasn\'t thinking clearly after that loss'
         ],
-        description: 'Consider implementing a "cooling off" period after losses. Step away for at least 30 minutes'
+        description: 'Consider implementing a "cooling off" period after losses. Step away for at least 30 minutes',
+        entries: revengeEntries
       });
     }
     
@@ -283,7 +295,8 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
           'I was in the zone',
           'Trading felt effortless and clear'
         ],
-        description: 'Excellent! Document what contributed to this state so you can recreate it in future sessions'
+        description: 'Excellent! Document what contributed to this state so you can recreate it in future sessions',
+        entries: peakStateEntries
       });
     }
     
@@ -296,49 +309,133 @@ export const BehavioralPatterns: React.FC<BehavioralPatternsProps> = ({ journalE
     return null;
   }
 
+  const handleViewJournalEntries = (patternId: string, entries: any[]) => {
+    const pattern = patterns.find(p => p.id === patternId);
+    if (pattern) {
+      setSelectedPattern(pattern.name);
+      setPatternEntries(pattern.entries);
+      setIsDialogOpen(true);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    try {
+      if (!dateString) return "No date";
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    } catch (e) {
+      return "Invalid date";
+    }
+  };
+
   return (
-    <Card className="border border-primary/10 bg-card/30 backdrop-blur-md">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-gradient-primary">Behavioral Recognition</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {patterns.map((pattern) => (
-            <div 
-              key={pattern.id}
-              className="p-4 rounded-lg border border-primary/20 bg-background/40 backdrop-blur-md"
-            >
-              <div className="flex items-start gap-3 mb-3">
-                <div className="p-2 rounded-full bg-muted">
-                  <pattern.icon className="h-5 w-5 text-primary" />
+    <>
+      <Card className="border border-primary/10 bg-card/30 backdrop-blur-md">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-gradient-primary">Behavioral Recognition</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {patterns.map((pattern) => (
+              <div 
+                key={pattern.id}
+                className="p-4 rounded-lg border border-primary/20 bg-background/40 backdrop-blur-md"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-full bg-muted">
+                      <pattern.icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-lg">{pattern.name}</h4>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm text-muted-foreground">
+                          Detected in {pattern.count} {pattern.count === 1 ? 'entry' : 'entries'}
+                        </p>
+                        <button 
+                          onClick={() => handleViewJournalEntries(pattern.id, pattern.entries)}
+                          className="p-1 rounded-full hover:bg-muted transition-colors"
+                          title="View journal entries"
+                        >
+                          <FileText className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-medium text-lg">{pattern.name}</h4>
-                  <p className="text-sm text-muted-foreground">Detected in {pattern.count} {pattern.count === 1 ? 'entry' : 'entries'}</p>
+                
+                <div className="mb-4">
+                  <p className="text-sm font-medium mb-2 text-muted-foreground">Typical phrases</p>
+                  <ul className="space-y-1 pl-1">
+                    {pattern.typicalPhrases.map((phrase, index) => (
+                      <li key={index} className="flex items-start gap-2 text-sm">
+                        <span className="text-primary">•</span>
+                        <span>{phrase}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
+                
+                <p className="text-xs text-muted-foreground">{pattern.description}</p>
               </div>
-              
-              <div className="mb-3">
-                <p className="text-sm font-medium mb-1 text-muted-foreground">Avg P&L {pattern.avgPnL < 0 ? '-' : '+'}{Math.abs(pattern.avgPnL).toFixed(1)}%</p>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Dialog for displaying journal entries */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{selectedPattern} Journal Entries</DialogTitle>
+            <DialogDescription>
+              Review the journal entries where this pattern was detected
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            {patternEntries.map((entry, index) => (
+              <div key={index} className="border rounded-md p-4 bg-background/50">
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-medium">{formatDate(entry.created_at)}</h3>
+                  <div className="flex gap-2">
+                    {entry.emotion && (
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        entry.emotion === 'positive' ? 'bg-green-100 text-green-700' :
+                        entry.emotion === 'neutral' ? 'bg-blue-100 text-blue-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {entry.emotion}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <p className="text-sm whitespace-pre-line">{entry.notes}</p>
+                {entry.trades && entry.trades.length > 0 && (
+                  <div className="mt-3">
+                    <h4 className="text-sm font-medium mb-1">Related Trades:</h4>
+                    <div className="space-y-2">
+                      {entry.trades.map((trade: any, tradeIndex: number) => (
+                        <div key={tradeIndex} className="text-xs p-2 bg-muted/50 rounded">
+                          <div className="flex justify-between">
+                            <span>{trade.instrument || 'Unknown'}</span>
+                            <span className={trade.pnl > 0 ? 'text-green-500' : 'text-red-500'}>
+                              {typeof trade.pnl === 'number' ? trade.pnl.toFixed(2) : trade.pnl}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-              
-              <div className="mb-4">
-                <p className="text-sm font-medium mb-2 text-muted-foreground">Typical phrases</p>
-                <ul className="space-y-1 pl-1">
-                  {pattern.typicalPhrases.map((phrase, index) => (
-                    <li key={index} className="flex items-start gap-2 text-sm">
-                      <span className="text-primary">•</span>
-                      <span>{phrase}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              <p className="text-xs text-muted-foreground">{pattern.description}</p>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
