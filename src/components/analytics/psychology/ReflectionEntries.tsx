@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
@@ -32,11 +31,17 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
   const associatedTrades = React.useMemo(() => {
     if (!analyticsData?.journalEntries) return [];
     
-    // Filter journal entries by date
+    // Filter journal entries by date - fix the date comparison logic
     const entriesForDate = analyticsData.journalEntries.filter(entry => {
       const entryDate = new Date(entry.created_at);
       const emotionalDate = emotionalData.date;
-      return entryDate.toDateString() === emotionalDate.toDateString();
+      
+      // Compare only the date part (year, month, day) ignoring time
+      return (
+        entryDate.getFullYear() === emotionalDate.getFullYear() && 
+        entryDate.getMonth() === emotionalDate.getMonth() && 
+        entryDate.getDate() === emotionalDate.getDate()
+      );
     });
     
     // Extract trades from those entries
@@ -94,7 +99,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
       window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
-
+  
   // Check if we have any emotional state data
   const hasEmotionalData = emotionalData.preEmotion || emotionalData.postEmotion;
   
