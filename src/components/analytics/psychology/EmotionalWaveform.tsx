@@ -126,11 +126,11 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
   };
 
   const formatYAxisTick = (value: number) => {
-    if (value === 10) return "Elated";
+    if (value === 10) return "Very Positive";
     if (value === 5) return "Positive";
     if (value === 0) return "Neutral";
     if (value === -5) return "Negative";
-    if (value === -10) return "Distressed";
+    if (value === -10) return "Very Negative";
     return "";
   };
 
