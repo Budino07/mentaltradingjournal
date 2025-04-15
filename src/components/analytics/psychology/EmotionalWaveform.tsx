@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -127,9 +126,7 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
 
   const formatYAxisTick = (value: number) => {
     if (value === 10) return "Positive";
-    if (value === 5) return "Positive";
     if (value === 0) return "Neutral";
-    if (value === -5) return "Negative";
     if (value === -10) return "Negative";
     return "";
   };
