@@ -36,7 +36,11 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
     const entriesForDate = analyticsData.journalEntries.filter(entry => {
       const entryDate = new Date(entry.created_at);
       const emotionalDate = emotionalData.date;
-      return entryDate.toDateString() === emotionalDate.toDateString();
+      
+      // Compare year, month, and day separately to avoid timezone issues
+      return entryDate.getFullYear() === emotionalDate.getFullYear() &&
+             entryDate.getMonth() === emotionalDate.getMonth() &&
+             entryDate.getDate() === emotionalDate.getDate();
     });
     
     // Extract trades from those entries
@@ -285,7 +289,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
           </div>
         </div>
         
-        {/* New section for trade details and screenshots */}
+        {/* Associated Trades section */}
         {associatedTrades && associatedTrades.length > 0 && (
           <div className="mt-8">
             <Separator className="mb-6" />
@@ -353,8 +357,8 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                     </div>
                   </div>
                   
-                  {/* Trade screenshots */}
-                  {(trade.forecastScreenshot || trade.resultScreenshot) && (
+                  {/* Trade screenshots - fixed to handle both forecastScreenshot and resultUrl/resultScreenshot */}
+                  {(trade.forecastScreenshot || trade.resultUrl || trade.resultScreenshot) && (
                     <div className="mt-4 pt-4 border-t border-primary/10">
                       <h6 className="text-sm font-medium mb-2">Trade Screenshots</h6>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -377,15 +381,16 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                           </div>
                         )}
                         
-                        {trade.resultScreenshot && (
+                        {/* Use either resultUrl or resultScreenshot, whichever is available */}
+                        {(trade.resultUrl || trade.resultScreenshot) && (
                           <div className="space-y-1">
                             <p className="text-xs text-muted-foreground">Result</p>
                             <div 
-                              onClick={() => openImageInNewTab(trade.resultScreenshot)} 
+                              onClick={() => openImageInNewTab(trade.resultUrl || trade.resultScreenshot)} 
                               className="cursor-pointer hover:opacity-90 transition-opacity relative group"
                             >
                               <img 
-                                src={trade.resultScreenshot} 
+                                src={trade.resultUrl || trade.resultScreenshot} 
                                 alt="Trade result" 
                                 className="rounded-md border border-border max-h-40 object-contain w-full" 
                               />
@@ -407,3 +412,4 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
     </Card>
   );
 };
+
