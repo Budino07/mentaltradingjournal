@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
@@ -216,7 +215,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                           <div className="h-3 w-3 rounded-full bg-blue-500"></div>
                           <h5 className="text-sm font-medium text-blue-700">Pre-Session Reflection</h5>
                         </div>
-                        <div className="bg-blue-50 border-l-4 border-blue-500 rounded-md p-4 relative">
+                        <div className="border-l-4 border-blue-500 rounded-md p-4 relative">
                           <p className="text-sm leading-relaxed whitespace-pre-line text-gray-800">{preSessionReflections}</p>
                         </div>
                       </div>
@@ -229,7 +228,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                           <div className="h-3 w-3 rounded-full bg-purple-500"></div>
                           <h5 className="text-sm font-medium text-purple-700">Trading Notes</h5>
                         </div>
-                        <div className="bg-purple-50 border-l-4 border-purple-500 rounded-md p-4 relative">
+                        <div className="border-l-4 border-purple-500 rounded-md p-4 relative">
                           <p className="text-sm leading-relaxed whitespace-pre-line text-gray-800">{tradeReflections}</p>
                         </div>
                       </div>
@@ -242,7 +241,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                           <div className="h-3 w-3 rounded-full bg-green-500"></div>
                           <h5 className="text-sm font-medium text-green-700">Post-Session Reflection</h5>
                         </div>
-                        <div className="bg-green-50 border-l-4 border-green-500 rounded-md p-4 relative">
+                        <div className="border-l-4 border-green-500 rounded-md p-4 relative">
                           <p className="text-sm leading-relaxed whitespace-pre-line text-gray-800">{postSessionReflections}</p>
                         </div>
                       </div>
