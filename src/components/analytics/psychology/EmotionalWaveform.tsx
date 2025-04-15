@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -62,6 +63,11 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
       default: return ['#d1d5db', '#6b7280'];
     }
   };
+
+  // Debug function to log the emotional data
+  useEffect(() => {
+    console.log('Emotional data for waveform:', emotionalData);
+  }, [emotionalData]);
 
   const renderCustomizedDot = ({ cx, cy, payload }: any) => {
     if (!payload) return null;
@@ -216,6 +222,41 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
     
   }, [svgRef.current]);
 
+  // Fix: Enhance the data to ensure postEmotion is correctly represented as a score
+  const enhancedData = emotionalData.map(entry => {
+    // Convert emotion strings to scores for visualization
+    const getScoreFromEmotion = (emotion: string | null): number | null => {
+      if (!emotion) return null;
+      
+      switch(emotion.toLowerCase()) {
+        case 'positive': return 10;
+        case 'negative': return -10;
+        case 'neutral': return 0;
+        default: return null;
+      }
+    };
+    
+    // If postEmotion exists but postScore is null/0 when it shouldn't be
+    if (entry.postEmotion && (entry.postScore === null || entry.postScore === 0) && 
+        entry.postEmotion.toLowerCase() === 'negative') {
+      return {
+        ...entry,
+        postScore: -10 // Set to negative for 'negative' emotion
+      };
+    }
+    
+    // If preEmotion exists but preScore is null/0 when it shouldn't be
+    if (entry.preEmotion && (entry.preScore === null || entry.preScore === 0) && 
+        entry.preEmotion.toLowerCase() === 'negative') {
+      return {
+        ...entry,
+        preScore: -10 // Set to negative for 'negative' emotion
+      };
+    }
+    
+    return entry;
+  });
+
   return (
     <div className="w-full h-full relative">
       {/* Background pattern */}
@@ -230,7 +271,7 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
       <ChartContainer config={chartConfig} className="h-full w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
-            data={emotionalData}
+            data={enhancedData}
             margin={{ top: 10, right: 0, left: 0, bottom: 30 }}
           >
             <defs>
@@ -252,7 +293,7 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
             <YAxis 
               domain={[-10, 10]} 
               tickFormatter={formatYAxisTick}
-              ticks={[-10, -5, 0, 5, 10]}
+              ticks={[-10, 0, 10]}
               tick={{ fill: 'currentColor', fontSize: 10 }}
               tickLine={false}
               axisLine={false}
