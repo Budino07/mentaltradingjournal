@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { EmotionTrend } from "./EmotionTrend";
@@ -24,7 +23,6 @@ import { OvertradingHeatMap } from "./OvertradingHeatMap";
 import { MentalScore } from "./MentalScore";
 import { TradeTimePerformance } from "./TradeTimePerformance";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { psychology } from "@/components/analytics/psychology/EmotionalJourneyChart";
 import { EmotionalJourneyChart } from "@/components/analytics/psychology/EmotionalJourneyChart";
 import { CoreTraitsMatrix } from "@/components/analytics/psychology/CoreTraitsMatrix";
 
