@@ -47,12 +47,39 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
     return entriesForDate.flatMap(entry => entry.trades || []);
   }, [analyticsData?.journalEntries, emotionalData?.date]);
   
+  // Find and categorize journal entries by session type
+  const journalEntries = React.useMemo(() => {
+    if (!analyticsData?.journalEntries) return { preSessions: [], postSessions: [], trades: [] };
+    
+    // Filter journal entries by date
+    const entriesForDate = analyticsData.journalEntries.filter(entry => {
+      const entryDate = new Date(entry.created_at);
+      const emotionalDate = emotionalData.date;
+      
+      // Compare year, month, and day separately to avoid timezone issues
+      return entryDate.getFullYear() === emotionalDate.getFullYear() &&
+             entryDate.getMonth() === emotionalDate.getMonth() &&
+             entryDate.getDate() === emotionalDate.getDate();
+    });
+    
+    return {
+      preSessions: entriesForDate.filter(entry => entry.session_type === 'pre'),
+      postSessions: entriesForDate.filter(entry => entry.session_type === 'post'),
+      trades: entriesForDate.filter(entry => entry.session_type === 'trade')
+    };
+  }, [analyticsData?.journalEntries, emotionalData?.date]);
+  
+  // Consolidate reflections by type
+  const preSessionReflections = journalEntries.preSessions.map(entry => entry.notes).filter(Boolean).join('\n\n');
+  const postSessionReflections = journalEntries.postSessions.map(entry => entry.notes).filter(Boolean).join('\n\n');
+  const tradeReflections = journalEntries.trades.map(entry => entry.notes).filter(Boolean).join('\n\n');
+  
   // Handle multiple reflections by joining them into a single consolidated text
-  const multipleReflections = emotionalData.reflection ? emotionalData.reflection.split('\n\n') : [];
-  const reflectionCount = multipleReflections.length;
+  const allReflections = [preSessionReflections, tradeReflections, postSessionReflections].filter(Boolean);
+  const reflectionCount = allReflections.length;
   
   // Consolidate all reflections into a single reflection with proper spacing
-  const consolidatedReflection = multipleReflections.join('\n\n');
+  const consolidatedReflection = allReflections.join('\n\n');
   
   const getCoreTraitIcon = (trait: CoreTrait) => {
     switch (trait) {
@@ -179,81 +206,117 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-medium mb-2">
-                      {reflectionCount > 1 ? 'Consolidated Daily Reflections' : 'Daily Reflection'}
+                      {reflectionCount > 1 ? 'Daily Reflections' : 'Daily Reflection'}
                     </h4>
-                    <div className="bg-primary/5 border border-primary/10 rounded-md p-4 relative">
-                      <div className="absolute -left-3 top-4 w-6 h-6 rotate-45 border-l border-b border-primary/10 bg-primary/5"></div>
-                      <p className="text-sm leading-relaxed whitespace-pre-line">{consolidatedReflection}</p>
-                      
-                      {consolidatedReflection.length > 10 && (
-                        <>
-                          <PatternAnalyzer reflection={consolidatedReflection} />
-                          
-                          <div className="mt-4 pt-3 border-t border-dashed border-primary/10">
-                            <h5 className="text-sm font-medium mb-2 text-muted-foreground">Psychological Insights</h5>
-                            <div className="flex flex-wrap gap-2">
-                              {consolidatedReflection.includes('fear') && (
-                                <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                                  Fear Reaction
-                                </Badge>
-                              )}
-                              {consolidatedReflection.includes('anxious') && (
-                                <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                                  Anxiety Response
-                                </Badge>
-                              )}
-                              {consolidatedReflection.includes('confident') && (
-                                <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                                  Confidence State
-                                </Badge>
-                              )}
-                              {consolidatedReflection.includes('loss') && (
-                                <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                                  Loss Processing
-                                </Badge>
-                              )}
-                              {consolidatedReflection.includes('learn') && (
-                                <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
-                                  Learning Mindset
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('greed') || consolidatedReflection.includes('greedy')) && (
-                                <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
-                                  Greed Response
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('frustrat') || consolidatedReflection.includes('regret')) && (
-                                <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                                  Frustration/Regret
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('slippage') || consolidatedReflection.includes('gave back')) && (
-                                <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
-                                  Giving Back Profits
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('recover') || consolidatedReflection.includes('fresh start') || 
-                                 consolidatedReflection.includes('yesterday') || consolidatedReflection.includes('previous day')) && (
-                                <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-300">
-                                  Recency Bias
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('feel good') || consolidatedReflection.includes('happy') || 
-                                 consolidatedReflection.includes('positive') || consolidatedReflection.includes('optimistic')) && (
-                                <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                                  Positive Mindset
-                                </Badge>
-                              )}
-                              {emotionalData.hasHarmfulPattern && emotionalData.patternType && (
-                                <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                                  {emotionalData.patternType}
-                                </Badge>
-                              )}
-                            </div>
+                    
+                    {/* Pre-Session Reflections */}
+                    {preSessionReflections && (
+                      <div className="mb-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="h-3 w-3 rounded-full bg-blue-500"></div>
+                          <h5 className="text-sm font-medium text-blue-700">Pre-Session Reflection</h5>
+                        </div>
+                        <div className="bg-blue-50 border-l-4 border-blue-500 rounded-md p-4 relative">
+                          <p className="text-sm leading-relaxed whitespace-pre-line">{preSessionReflections}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Trade Reflections */}
+                    {tradeReflections && (
+                      <div className="mb-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="h-3 w-3 rounded-full bg-purple-500"></div>
+                          <h5 className="text-sm font-medium text-purple-700">Trading Notes</h5>
+                        </div>
+                        <div className="bg-purple-50 border-l-4 border-purple-500 rounded-md p-4 relative">
+                          <p className="text-sm leading-relaxed whitespace-pre-line">{tradeReflections}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Post-Session Reflections */}
+                    {postSessionReflections && (
+                      <div className="mb-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="h-3 w-3 rounded-full bg-green-500"></div>
+                          <h5 className="text-sm font-medium text-green-700">Post-Session Reflection</h5>
+                        </div>
+                        <div className="bg-green-50 border-l-4 border-green-500 rounded-md p-4 relative">
+                          <p className="text-sm leading-relaxed whitespace-pre-line">{postSessionReflections}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Pattern Analysis */}
+                    {consolidatedReflection.length > 10 && (
+                      <>
+                        <PatternAnalyzer reflection={consolidatedReflection} />
+                        
+                        <div className="mt-4 pt-3 border-t border-dashed border-primary/10">
+                          <h5 className="text-sm font-medium mb-2 text-muted-foreground">Psychological Insights</h5>
+                          <div className="flex flex-wrap gap-2">
+                            {consolidatedReflection.includes('fear') && (
+                              <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                                Fear Reaction
+                              </Badge>
+                            )}
+                            {consolidatedReflection.includes('anxious') && (
+                              <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                                Anxiety Response
+                              </Badge>
+                            )}
+                            {consolidatedReflection.includes('confident') && (
+                              <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                                Confidence State
+                              </Badge>
+                            )}
+                            {consolidatedReflection.includes('loss') && (
+                              <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
+                                Loss Processing
+                              </Badge>
+                            )}
+                            {consolidatedReflection.includes('learn') && (
+                              <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
+                                Learning Mindset
+                              </Badge>
+                            )}
+                            {(consolidatedReflection.includes('greed') || consolidatedReflection.includes('greedy')) && (
+                              <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
+                                Greed Response
+                              </Badge>
+                            )}
+                            {(consolidatedReflection.includes('frustrat') || consolidatedReflection.includes('regret')) && (
+                              <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
+                                Frustration/Regret
+                              </Badge>
+                            )}
+                            {(consolidatedReflection.includes('slippage') || consolidatedReflection.includes('gave back')) && (
+                              <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
+                                Giving Back Profits
+                              </Badge>
+                            )}
+                            {(consolidatedReflection.includes('recover') || consolidatedReflection.includes('fresh start') || 
+                               consolidatedReflection.includes('yesterday') || consolidatedReflection.includes('previous day')) && (
+                              <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-300">
+                                Recency Bias
+                              </Badge>
+                            )}
+                            {(consolidatedReflection.includes('feel good') || consolidatedReflection.includes('happy') || 
+                               consolidatedReflection.includes('positive') || consolidatedReflection.includes('optimistic')) && (
+                              <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                                Positive Mindset
+                              </Badge>
+                            )}
+                            {emotionalData.hasHarmfulPattern && emotionalData.patternType && (
+                              <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
+                                {emotionalData.patternType}
+                              </Badge>
+                            )}
                           </div>
-                        </>
-                      )}
-                    </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
                 
@@ -412,4 +475,3 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
     </Card>
   );
 };
-
