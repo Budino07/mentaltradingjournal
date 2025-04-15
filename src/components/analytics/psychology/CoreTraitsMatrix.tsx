@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +10,11 @@ import {
   generateEmotionalData, 
   analyzeJournalEntriesForCoreTraits 
 } from '@/utils/psychology/coreNeedsAnalysis';
+import { cn } from '@/lib/utils';
+import { 
+  Brain, Shield, ThumbsUp, Users, Sprout, 
+  Target, Focus, Rocket 
+} from 'lucide-react';
 
 interface CoreTraitsMatrixProps {
   emotionalData?: any[];
@@ -62,7 +68,21 @@ export const CoreTraitsMatrix = ({ emotionalData: providedData }: CoreTraitsMatr
     return [];
   }, [providedData, analyticsData]);
   
+  // Enhanced gradient color palette for premium look
   const colors = {
+    control: 'url(#controlGradient)',
+    validation: 'url(#validationGradient)',
+    safety: 'url(#safetyGradient)',
+    connection: 'url(#connectionGradient)',
+    growth: 'url(#growthGradient)',
+    conviction: 'url(#convictionGradient)',
+    focus: 'url(#focusGradient)',
+    confidence: 'url(#confidenceGradient)',
+    unknown: 'url(#unknownGradient)',
+  };
+  
+  // Solid colors for icons and borders
+  const solidColors = {
     control: '#9333ea',
     validation: '#dc2626',
     safety: '#16a34a',
@@ -98,17 +118,27 @@ export const CoreTraitsMatrix = ({ emotionalData: providedData }: CoreTraitsMatr
     unknown: 'Journal more deeply about emotional reactions to uncover underlying psychological traits.'
   };
   
-  const getCoreTraitIcon = (trait: string) => {
+  // Enhanced trait icons using Lucide React
+  const getTraitIcon = (trait: string) => {
     switch (trait) {
-      case 'control': return '🧠';
-      case 'validation': return '👍';
-      case 'safety': return '🛡️';
-      case 'connection': return '👥';
-      case 'growth': return '🌱';
-      case 'conviction': return '🎯';
-      case 'focus': return '🔍';
-      case 'confidence': return '💪';
-      default: return '❓';
+      case 'control': 
+        return <Brain className="stroke-white" size={18} />;
+      case 'validation': 
+        return <ThumbsUp className="stroke-white" size={18} />;
+      case 'safety': 
+        return <Shield className="stroke-white" size={18} />;
+      case 'connection': 
+        return <Users className="stroke-white" size={18} />;
+      case 'growth': 
+        return <Sprout className="stroke-white" size={18} />;
+      case 'conviction': 
+        return <Target className="stroke-white" size={18} />;
+      case 'focus': 
+        return <Focus className="stroke-white" size={18} />;
+      case 'confidence': 
+        return <Rocket className="stroke-white" size={18} />;
+      default: 
+        return <Brain className="stroke-white" size={18} />;
     }
   };
   
@@ -140,14 +170,14 @@ export const CoreTraitsMatrix = ({ emotionalData: providedData }: CoreTraitsMatr
   // If there's no data, show a placeholder
   if (!traitsData.length) {
     return (
-      <Card className="border border-primary/10 bg-card/30 backdrop-blur-md overflow-hidden">
+      <Card className="border border-primary/10 bg-gradient-to-br from-background/95 to-background/80 backdrop-blur-md overflow-hidden shadow-lg">
         <CardHeader className="pb-2">
           <CardTitle className="text-gradient-primary">Core Traits Matrix</CardTitle>
         </CardHeader>
         <CardContent className="pt-2">
           <div className="flex flex-col items-center justify-center h-[200px] text-center">
-            <div className="text-4xl mb-4">🧠</div>
-            <h3 className="text-lg font-medium mb-2">No data available yet</h3>
+            <div className="text-4xl mb-4 bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">🧠</div>
+            <h3 className="text-lg font-medium mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">No data available yet</h3>
             <p className="text-sm text-muted-foreground">
               Start journaling about your trading emotions to see your psychological traits analysis
             </p>
@@ -158,15 +188,56 @@ export const CoreTraitsMatrix = ({ emotionalData: providedData }: CoreTraitsMatr
   }
 
   return (
-    <Card className="border border-primary/10 bg-card/30 backdrop-blur-md overflow-hidden">
+    <Card className="border border-primary/10 bg-gradient-to-br from-background/95 to-background/80 backdrop-blur-md overflow-hidden shadow-lg">
       <CardHeader className="pb-2">
-        <CardTitle className="text-gradient-primary">Core Traits Matrix</CardTitle>
+        <CardTitle className="bg-gradient-to-r from-primary via-primary-light to-accent bg-clip-text text-transparent">
+          Core Traits Matrix
+        </CardTitle>
       </CardHeader>
       <CardContent className="pt-2">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex items-center justify-center">
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
+                <defs>
+                  {/* Define gradients for each trait */}
+                  <linearGradient id="controlGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#a855f7" />
+                    <stop offset="100%" stopColor="#7e22ce" />
+                  </linearGradient>
+                  <linearGradient id="validationGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#ef4444" />
+                    <stop offset="100%" stopColor="#b91c1c" />
+                  </linearGradient>
+                  <linearGradient id="safetyGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#22c55e" />
+                    <stop offset="100%" stopColor="#15803d" />
+                  </linearGradient>
+                  <linearGradient id="connectionGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#3b82f6" />
+                    <stop offset="100%" stopColor="#1d4ed8" />
+                  </linearGradient>
+                  <linearGradient id="growthGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#fde047" />
+                    <stop offset="100%" stopColor="#ca8a04" />
+                  </linearGradient>
+                  <linearGradient id="convictionGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#f87171" />
+                    <stop offset="100%" stopColor="#b91c1c" />
+                  </linearGradient>
+                  <linearGradient id="focusGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#06b6d4" />
+                    <stop offset="100%" stopColor="#0e7490" />
+                  </linearGradient>
+                  <linearGradient id="confidenceGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#a78bfa" />
+                    <stop offset="100%" stopColor="#6d28d9" />
+                  </linearGradient>
+                  <linearGradient id="unknownGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#9ca3af" />
+                    <stop offset="100%" stopColor="#4b5563" />
+                  </linearGradient>
+                </defs>
                 <Pie
                   data={traitsData}
                   cx="50%"
@@ -180,9 +251,11 @@ export const CoreTraitsMatrix = ({ emotionalData: providedData }: CoreTraitsMatr
                   {traitsData.map((entry: TraitDataItem, index) => (
                     <Cell 
                       key={`cell-${index}`} 
-                      fill={colors[entry.name as keyof typeof colors] || '#6b7280'} 
-                      stroke="none"
+                      fill={colors[entry.name as keyof typeof colors] || colors.unknown} 
+                      stroke="rgba(255,255,255,0.1)"
+                      strokeWidth={1}
                       opacity={selectedTrait === null || selectedTrait === entry.name ? 1 : 0.5}
+                      className="drop-shadow-md transition-opacity duration-300"
                     />
                   ))}
                 </Pie>
@@ -196,19 +269,25 @@ export const CoreTraitsMatrix = ({ emotionalData: providedData }: CoreTraitsMatr
               {traitsData.map((trait: TraitDataItem) => (
                 <div 
                   key={trait.name}
-                  className={`p-2 rounded-md transition-all cursor-pointer
-                    ${selectedTrait === trait.name ? 'bg-primary/10 border border-primary/20' : 'hover:bg-primary/5'}`}
+                  className={cn(
+                    "p-2 rounded-md transition-all cursor-pointer",
+                    selectedTrait === trait.name 
+                      ? "bg-gradient-to-r from-background/80 to-background/50 border border-primary/20 shadow-sm" 
+                      : "hover:bg-primary/5"
+                  )}
                   onClick={() => handleTraitClick(trait.name)}
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <div 
-                      className="w-6 h-6 flex items-center justify-center rounded-full"
-                      style={{ backgroundColor: colors[trait.name as keyof typeof colors] || '#6b7280' }}
+                      className="w-8 h-8 flex items-center justify-center rounded-full shadow-md"
+                      style={{ 
+                        background: `linear-gradient(135deg, ${solidColors[trait.name as keyof typeof solidColors]} 0%, ${solidColors[trait.name as keyof typeof solidColors]}99 100%)` 
+                      }}
                     >
-                      <span>{getCoreTraitIcon(trait.name)}</span>
+                      {getTraitIcon(trait.name)}
                     </div>
                     <h3 className="font-medium capitalize">{trait.name}</h3>
-                    <Badge variant="outline" className="ml-auto text-xs">
+                    <Badge variant="outline" className="ml-auto text-xs bg-background/80 backdrop-blur-sm">
                       {calculatePercentage(trait.value)}%
                     </Badge>
                   </div>
@@ -218,7 +297,7 @@ export const CoreTraitsMatrix = ({ emotionalData: providedData }: CoreTraitsMatr
                       <p className="text-muted-foreground mb-2">
                         {traitDescriptions[trait.name as keyof typeof traitDescriptions]}
                       </p>
-                      <div className="bg-primary/5 p-2 rounded text-xs">
+                      <div className="bg-gradient-to-r from-primary/5 to-background p-3 rounded text-xs">
                         <strong>Recommendation:</strong> {traitRecommendations[trait.name as keyof typeof traitRecommendations]}
                       </div>
                     </div>
