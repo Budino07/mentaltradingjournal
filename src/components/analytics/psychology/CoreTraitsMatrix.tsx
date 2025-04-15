@@ -190,7 +190,7 @@ export const CoreTraitsMatrix = ({ emotionalData: providedData }: CoreTraitsMatr
   return (
     <Card className="border border-primary/10 bg-gradient-to-br from-background/95 to-background/80 backdrop-blur-md overflow-hidden shadow-lg">
       <CardHeader className="pb-2">
-        <CardTitle className="bg-gradient-to-r from-primary via-primary-light to-accent bg-clip-text text-transparent">
+        <CardTitle className="text-white bg-gradient-to-r from-primary via-primary-light to-accent bg-clip-text">
           Core Traits Matrix
         </CardTitle>
       </CardHeader>
