@@ -22,13 +22,24 @@ import { EmotionFrequency } from "./EmotionFrequency";
 import { SetupPerformance } from "./SetupPerformance";
 import { OvertradingHeatMap } from "./OvertradingHeatMap";
 import { MentalScore } from "./MentalScore";
-import { TradeTimePerformance } from "./TradeTimePerformance";
+import { TradeTimePerformance } from "./TradeTimePerformance"; // Import the new component
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
 export const AnalyticsDashboard = () => {
-  const [activeView, setActiveView] = useState<'all' | 'trading'>('all');
+  const [activeView, setActiveView] = useState<'all' | 'psychological' | 'trading'>('all');
+
+  const psychologicalComponents = [
+    EmotionTrend,
+    EmotionFrequency,
+    MistakeAnalysis,
+    EmotionRecovery,
+    PreTradingEvents,
+    PersonalityPatterns,
+    MentalScore,
+    OvertradingHeatMap,
+  ];
 
   const tradingComponents = [
     EquityCurve,
@@ -44,15 +55,49 @@ export const AnalyticsDashboard = () => {
     TradeFrequencyByMonth,
     RiskRewardAnalysis,
     WinLossRatio,
-    TradeTimePerformance,
+    TradeTimePerformance, // Add the new component to the trading components list
   ];
 
   const getFilteredComponents = () => {
-    if (activeView === 'trading') {
-      return tradingComponents;
-    } else {
-      // In "all" view, return all trading components
-      return tradingComponents;
+    switch (activeView) {
+      case 'psychological':
+        return psychologicalComponents;
+      case 'trading':
+        return tradingComponents;
+      default:
+        // Reordered components for the "all" view
+        // We'll put PersonalityPatterns and MentalScore side by side
+        return [
+          // Psychological components starting with EmotionTrend
+          EmotionTrend, 
+          EmotionFrequency,
+          
+          // Put PersonalityPatterns and MentalScore side by side
+          PersonalityPatterns,
+          MentalScore,
+          
+          // Other psychological components
+          MistakeAnalysis,
+          EmotionRecovery,
+          PreTradingEvents,
+          OvertradingHeatMap,
+          
+          // Trading components
+          EquityCurve,
+          TimeBasedPerformance,
+          SetupPerformance,
+          AssetPairPerformance,
+          PerformanceBreakdown, 
+          RuleAdherence,
+          TradeDuration,
+          ProfitLossDistribution,
+          TradeFrequency,
+          TradeFrequencyByWeek,
+          TradeFrequencyByMonth,
+          RiskRewardAnalysis,
+          WinLossRatio,
+          TradeTimePerformance, // Add the new component to the "all" view as well
+        ];
     }
   };
 
@@ -61,9 +106,9 @@ export const AnalyticsDashboard = () => {
       <div className="container mx-auto p-4 space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <h2 className="text-2xl md:text-3xl font-bold">Trading Data Analytics</h2>
+            <h2 className="text-2xl md:text-3xl font-bold">Trading Analytics</h2>
             <p className="text-sm md:text-base text-muted-foreground">
-              Analyze your trading performance metrics
+              Analyze your trading performance and emotional patterns
             </p>
           </div>
 
@@ -74,6 +119,13 @@ export const AnalyticsDashboard = () => {
               className="flex-1 sm:flex-none"
             >
               All Analytics
+            </Button>
+            <Button
+              variant={activeView === 'psychological' ? 'default' : 'outline'}
+              onClick={() => setActiveView('psychological')}
+              className="flex-1 sm:flex-none"
+            >
+              Psychological Analytics
             </Button>
             <Button
               variant={activeView === 'trading' ? 'default' : 'outline'}
