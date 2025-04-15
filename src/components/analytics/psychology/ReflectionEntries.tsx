@@ -216,7 +216,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                           <h5 className="text-sm font-medium text-blue-700">Pre-Session Reflection</h5>
                         </div>
                         <div className="border-l-4 border-blue-500 rounded-md p-4 relative">
-                          <p className="text-sm leading-relaxed whitespace-pre-line text-gray-800">{preSessionReflections}</p>
+                          <p className="text-sm leading-relaxed whitespace-pre-line text-white">{preSessionReflections}</p>
                         </div>
                       </div>
                     )}
@@ -229,7 +229,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                           <h5 className="text-sm font-medium text-purple-700">Trading Notes</h5>
                         </div>
                         <div className="border-l-4 border-purple-500 rounded-md p-4 relative">
-                          <p className="text-sm leading-relaxed whitespace-pre-line text-gray-800">{tradeReflections}</p>
+                          <p className="text-sm leading-relaxed whitespace-pre-line text-white">{tradeReflections}</p>
                         </div>
                       </div>
                     )}
@@ -242,7 +242,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                           <h5 className="text-sm font-medium text-green-700">Post-Session Reflection</h5>
                         </div>
                         <div className="border-l-4 border-green-500 rounded-md p-4 relative">
-                          <p className="text-sm leading-relaxed whitespace-pre-line text-gray-800">{postSessionReflections}</p>
+                          <p className="text-sm leading-relaxed whitespace-pre-line text-white">{postSessionReflections}</p>
                         </div>
                       </div>
                     )}
