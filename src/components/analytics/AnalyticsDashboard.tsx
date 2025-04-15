@@ -1,14 +1,10 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { EmotionTrend } from "./EmotionTrend";
 import { PerformanceBreakdown } from "./PerformanceBreakdown";
 import { RuleAdherence } from "./RuleAdherence";
-import { EmotionRecovery } from "./EmotionRecovery";
 import { PreTradingEvents } from "./PreTradingEvents";
 import { TradeDuration } from "./TradeDuration";
-import { MistakeAnalysis } from "./MistakeAnalysis";
-import { PersonalityPatterns } from "./PersonalityPatterns";
 import { ProfitLossDistribution } from "./ProfitLossDistribution";
 import { TradeFrequency } from "./TradeFrequency";
 import { TradeFrequencyByMonth } from "./TradeFrequencyByMonth";
@@ -18,28 +14,14 @@ import { WinLossRatio } from "./WinLossRatio";
 import { AssetPairPerformance } from "./AssetPairPerformance";
 import { TimeBasedPerformance } from "./TimeBasedPerformance";
 import { EquityCurve } from "./EquityCurve";
-import { EmotionFrequency } from "./EmotionFrequency";
 import { SetupPerformance } from "./SetupPerformance";
-import { OvertradingHeatMap } from "./OvertradingHeatMap";
-import { MentalScore } from "./MentalScore";
-import { TradeTimePerformance } from "./TradeTimePerformance"; // Import the new component
+import { TradeTimePerformance } from "./TradeTimePerformance";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
 export const AnalyticsDashboard = () => {
-  const [activeView, setActiveView] = useState<'all' | 'psychological' | 'trading'>('all');
-
-  const psychologicalComponents = [
-    EmotionTrend,
-    EmotionFrequency,
-    MistakeAnalysis,
-    EmotionRecovery,
-    PreTradingEvents,
-    PersonalityPatterns,
-    MentalScore,
-    OvertradingHeatMap,
-  ];
+  const [activeView, setActiveView] = useState<'all' | 'trading'>('all');
 
   const tradingComponents = [
     EquityCurve,
@@ -55,50 +37,13 @@ export const AnalyticsDashboard = () => {
     TradeFrequencyByMonth,
     RiskRewardAnalysis,
     WinLossRatio,
-    TradeTimePerformance, // Add the new component to the trading components list
+    TradeTimePerformance,
+    PreTradingEvents,
   ];
 
   const getFilteredComponents = () => {
-    switch (activeView) {
-      case 'psychological':
-        return psychologicalComponents;
-      case 'trading':
-        return tradingComponents;
-      default:
-        // Reordered components for the "all" view
-        // We'll put PersonalityPatterns and MentalScore side by side
-        return [
-          // Psychological components starting with EmotionTrend
-          EmotionTrend, 
-          EmotionFrequency,
-          
-          // Put PersonalityPatterns and MentalScore side by side
-          PersonalityPatterns,
-          MentalScore,
-          
-          // Other psychological components
-          MistakeAnalysis,
-          EmotionRecovery,
-          PreTradingEvents,
-          OvertradingHeatMap,
-          
-          // Trading components
-          EquityCurve,
-          TimeBasedPerformance,
-          SetupPerformance,
-          AssetPairPerformance,
-          PerformanceBreakdown, 
-          RuleAdherence,
-          TradeDuration,
-          ProfitLossDistribution,
-          TradeFrequency,
-          TradeFrequencyByWeek,
-          TradeFrequencyByMonth,
-          RiskRewardAnalysis,
-          WinLossRatio,
-          TradeTimePerformance, // Add the new component to the "all" view as well
-        ];
-    }
+    // Now we only have trading components
+    return tradingComponents;
   };
 
   return (
@@ -119,13 +64,6 @@ export const AnalyticsDashboard = () => {
               className="flex-1 sm:flex-none"
             >
               All Analytics
-            </Button>
-            <Button
-              variant={activeView === 'psychological' ? 'default' : 'outline'}
-              onClick={() => setActiveView('psychological')}
-              className="flex-1 sm:flex-none"
-            >
-              Psychological Analytics
             </Button>
             <Button
               variant={activeView === 'trading' ? 'default' : 'outline'}

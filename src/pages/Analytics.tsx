@@ -8,6 +8,13 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useState } from "react";
 import { EmotionalJourneyChart } from "@/components/analytics/psychology/EmotionalJourneyChart";
+import { PersonalityPatterns } from "@/components/analytics/PersonalityPatterns";
+import { MentalScore } from "@/components/analytics/MentalScore";
+import { EmotionTrend } from "@/components/analytics/EmotionTrend";
+import { EmotionFrequency } from "@/components/analytics/EmotionFrequency";
+import { MistakeAnalysis } from "@/components/analytics/MistakeAnalysis";
+import { EmotionRecovery } from "@/components/analytics/EmotionRecovery";
+import { OvertradingHeatMap } from "@/components/analytics/OvertradingHeatMap";
 
 export default function Analytics() {
   const { user, loading } = useAuth();
@@ -46,6 +53,17 @@ export default function Analytics() {
             
             <TabsContent value="psychology" className="w-full space-y-6 px-0 mx-0">
               <EmotionalJourneyChart />
+              <div className="container mx-auto mt-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+                  <PersonalityPatterns />
+                  <MentalScore />
+                  <EmotionTrend />
+                  <EmotionFrequency />
+                  <MistakeAnalysis />
+                  <EmotionRecovery />
+                  <OvertradingHeatMap />
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
