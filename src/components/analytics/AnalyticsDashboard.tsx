@@ -13,9 +13,9 @@ import { RiskRewardAnalysis } from "./RiskRewardAnalysis";
 import { WinLossRatio } from "./WinLossRatio";
 import { AssetPairPerformance } from "./AssetPairPerformance";
 import { TimeBasedPerformance } from "./TimeBasedPerformance";
+import { TradeTimePerformance } from "./TradeTimePerformance";
 import { EquityCurve } from "./EquityCurve";
 import { SetupPerformance } from "./SetupPerformance";
-import { TradeTimePerformance } from "./TradeTimePerformance";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -26,6 +26,7 @@ export const AnalyticsDashboard = () => {
   const tradingComponents = [
     EquityCurve,
     TimeBasedPerformance,
+    TradeTimePerformance, // Moved to be next to TimeBasedPerformance
     SetupPerformance,
     AssetPairPerformance,
     PerformanceBreakdown,
@@ -37,7 +38,6 @@ export const AnalyticsDashboard = () => {
     TradeFrequencyByMonth,
     RiskRewardAnalysis,
     WinLossRatio,
-    TradeTimePerformance,
     PreTradingEvents,
   ];
 
