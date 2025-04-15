@@ -8,6 +8,11 @@ import { Button } from '@/components/ui/button';
 import { PatternAnalyzer } from './PatternAnalyzer';
 import { AlertTriangle } from 'lucide-react';
 import { CoreTrait } from '@/utils/psychology/coreNeedsAnalysis';
+import { useQuery } from '@tanstack/react-query';
+import { generateAnalytics } from '@/utils/analyticsUtils';
+import { Separator } from '@/components/ui/separator';
+import { ExternalLink } from 'lucide-react';
+import { Trade } from '@/types/trade';
 
 interface ReflectionEntriesProps {
   emotionalData: any;
@@ -16,6 +21,27 @@ interface ReflectionEntriesProps {
 
 export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesProps) => {
   if (!emotionalData) return null;
+  
+  // Fetch analytics data to get associated trade details
+  const { data: analyticsData } = useQuery({
+    queryKey: ['analytics'],
+    queryFn: generateAnalytics,
+  });
+  
+  // Find the trades that correspond to this reflection date
+  const associatedTrades = React.useMemo(() => {
+    if (!analyticsData?.journalEntries) return [];
+    
+    // Filter journal entries by date
+    const entriesForDate = analyticsData.journalEntries.filter(entry => {
+      const entryDate = new Date(entry.created_at);
+      const emotionalDate = emotionalData.date;
+      return entryDate.toDateString() === emotionalDate.toDateString();
+    });
+    
+    // Extract trades from those entries
+    return entriesForDate.flatMap(entry => entry.trades || []);
+  }, [analyticsData?.journalEntries, emotionalData?.date]);
   
   // Handle multiple reflections by joining them into a single consolidated text
   const multipleReflections = emotionalData.reflection ? emotionalData.reflection.split('\n\n') : [];
@@ -57,6 +83,12 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
   const capitalizeEmotion = (emotion: string | null) => {
     if (!emotion) return 'No data';
     return emotion.charAt(0).toUpperCase() + emotion.slice(1);
+  };
+
+  const openImageInNewTab = (url?: string) => {
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
   };
 
   // Check if we have any emotional state data
@@ -252,6 +284,125 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
             )}
           </div>
         </div>
+        
+        {/* New section for trade details and screenshots */}
+        {associatedTrades && associatedTrades.length > 0 && (
+          <div className="mt-8">
+            <Separator className="mb-6" />
+            
+            <h4 className="text-lg font-medium mb-4">Associated Trades</h4>
+            
+            <div className="space-y-6">
+              {associatedTrades.map((trade: Trade, index: number) => (
+                <div key={trade.id || index} className="border border-primary/15 rounded-lg p-4 bg-background/40 backdrop-blur-sm">
+                  <div className="flex flex-col md:flex-row justify-between gap-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <span className={`h-3 w-3 rounded-full ${
+                          trade.pnl && Number(trade.pnl) > 0 ? 'bg-green-500' : 'bg-red-500'
+                        }`}></span>
+                        <h5 className="font-medium">{trade.instrument || 'Unknown Instrument'}</h5>
+                        <Badge variant={trade.direction === 'buy' ? 'variant-success' : 'destructive'}>
+                          {trade.direction === 'buy' ? 'Long' : 'Short'}
+                        </Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2 text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Entry Price</p>
+                          <p>{trade.entryPrice}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Exit Price</p>
+                          <p>{trade.exitPrice}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">P/L</p>
+                          <p className={`font-medium ${
+                            trade.pnl && Number(trade.pnl) > 0 ? 'text-green-500' : 'text-red-500'
+                          }`}>
+                            {trade.pnl ? (Number(trade.pnl) > 0 ? '+' : '') + trade.pnl : 'N/A'}
+                          </p>
+                        </div>
+                        {trade.setup && (
+                          <div>
+                            <p className="text-muted-foreground">Setup</p>
+                            <p>{trade.setup}</p>
+                          </div>
+                        )}
+                        {trade.stopLoss && (
+                          <div>
+                            <p className="text-muted-foreground">Stop Loss</p>
+                            <p>{trade.stopLoss}</p>
+                          </div>
+                        )}
+                        {trade.takeProfit && (
+                          <div>
+                            <p className="text-muted-foreground">Take Profit</p>
+                            <p>{trade.takeProfit}</p>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {trade.notes && (
+                        <div className="pt-2">
+                          <p className="text-muted-foreground text-sm mb-1">Trade Notes</p>
+                          <p className="text-sm bg-primary/5 p-2 rounded">{trade.notes}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Trade screenshots */}
+                  {(trade.forecastScreenshot || trade.resultScreenshot) && (
+                    <div className="mt-4 pt-4 border-t border-primary/10">
+                      <h6 className="text-sm font-medium mb-2">Trade Screenshots</h6>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {trade.forecastScreenshot && (
+                          <div className="space-y-1">
+                            <p className="text-xs text-muted-foreground">Forecast</p>
+                            <div 
+                              onClick={() => openImageInNewTab(trade.forecastScreenshot)} 
+                              className="cursor-pointer hover:opacity-90 transition-opacity relative group"
+                            >
+                              <img 
+                                src={trade.forecastScreenshot} 
+                                alt="Trade forecast" 
+                                className="rounded-md border border-border max-h-40 object-contain w-full" 
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                                <ExternalLink className="w-6 h-6 text-white" />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {trade.resultScreenshot && (
+                          <div className="space-y-1">
+                            <p className="text-xs text-muted-foreground">Result</p>
+                            <div 
+                              onClick={() => openImageInNewTab(trade.resultScreenshot)} 
+                              className="cursor-pointer hover:opacity-90 transition-opacity relative group"
+                            >
+                              <img 
+                                src={trade.resultScreenshot} 
+                                alt="Trade result" 
+                                className="rounded-md border border-border max-h-40 object-contain w-full" 
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                                <ExternalLink className="w-6 h-6 text-white" />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
