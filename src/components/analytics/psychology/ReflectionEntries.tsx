@@ -43,12 +43,16 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
     return entriesForDate.flatMap(entry => entry.trades || []);
   }, [analyticsData?.journalEntries, emotionalData?.date]);
   
-  // Handle multiple reflections by joining them into a single consolidated text
-  const multipleReflections = emotionalData.reflection ? emotionalData.reflection.split('\n\n') : [];
-  const reflectionCount = multipleReflections.length;
+  // Handle multiple reflections by separating them by type
+  const preSessionReflection = emotionalData.preSessionReflection || '';
+  const postSessionReflection = emotionalData.postSessionReflection || '';
   
-  // Consolidate all reflections into a single reflection with proper spacing
-  const consolidatedReflection = multipleReflections.join('\n\n');
+  // Check if we have different types of reflections
+  const hasPreSession = !!preSessionReflection.trim();
+  const hasPostSession = !!postSessionReflection.trim();
+  
+  // Consolidate reflections with proper labeling
+  const hasReflections = hasPreSession || hasPostSession;
   
   const getCoreTraitIcon = (trait: CoreTrait) => {
     switch (trait) {
@@ -109,6 +113,64 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
     return 'Pattern Detected';
   };
 
+  // Extract sentiment analysis functions for trade notes
+  const getNoteSentimentBadges = (noteText: string) => {
+    if (!noteText || noteText.length < 5) return [];
+    
+    const badges = [];
+    
+    if (noteText.includes('fear')) {
+      badges.push('Fear Reaction');
+    }
+    if (noteText.includes('anxious')) {
+      badges.push('Anxiety Response');
+    }
+    if (noteText.includes('confident')) {
+      badges.push('Confidence State');
+    }
+    if (noteText.includes('loss')) {
+      badges.push('Loss Processing');
+    }
+    if (noteText.includes('learn')) {
+      badges.push('Learning Mindset');
+    }
+    if (noteText.includes('greed') || noteText.includes('greedy')) {
+      badges.push('Greed Response');
+    }
+    if (noteText.includes('frustrat') || noteText.includes('regret')) {
+      badges.push('Frustration/Regret');
+    }
+    if (noteText.includes('slippage') || noteText.includes('gave back')) {
+      badges.push('Giving Back Profits');
+    }
+    if (noteText.includes('recover') || noteText.includes('fresh start') || 
+       noteText.includes('yesterday') || noteText.includes('previous day')) {
+      badges.push('Recency Bias');
+    }
+    if (noteText.includes('feel good') || noteText.includes('happy') || 
+       noteText.includes('positive') || noteText.includes('optimistic')) {
+      badges.push('Positive Mindset');
+    }
+    
+    return badges;
+  };
+  
+  const getBadgeVariant = (sentimentType: string) => {
+    if (sentimentType.includes('Fear') || sentimentType.includes('Anxiety') || 
+        sentimentType.includes('Loss') || sentimentType.includes('Frustration') || 
+        sentimentType.includes('Regret') || sentimentType.includes('Giving Back')) {
+      return "bg-red-100 text-red-800 border-red-300";
+    } else if (sentimentType.includes('Confidence') || sentimentType.includes('Positive') || 
+               sentimentType.includes('Learning')) {
+      return "bg-green-100 text-green-800 border-green-300";
+    } else if (sentimentType.includes('Greed')) {
+      return "bg-orange-100 text-orange-800 border-orange-300";
+    } else if (sentimentType.includes('Recency')) {
+      return "bg-purple-100 text-purple-800 border-purple-300";
+    }
+    return "bg-blue-100 text-blue-800 border-blue-300";
+  };
+
   return (
     <Card className="relative overflow-hidden border border-primary/15 bg-gradient-to-br from-background to-background/60 backdrop-blur-lg">
       <Button 
@@ -125,11 +187,6 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
           <div className="md:w-1/3">
             <h3 className="text-lg font-medium mb-2">
               {format(emotionalData.date, 'EEEE, MMMM d')}
-              {reflectionCount > 1 && (
-                <span className="text-sm text-muted-foreground ml-2">
-                  (Combined from {reflectionCount} entries)
-                </span>
-              )}
             </h3>
             
             <div className="space-y-3 mb-4">
@@ -170,76 +227,58 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
           </div>
           
           <div className="md:w-2/3">
-            {consolidatedReflection ? (
+            {hasReflections ? (
               <div className="space-y-8">
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-medium mb-2">
-                      {reflectionCount > 1 ? 'Consolidated Daily Reflections' : 'Daily Reflection'}
-                    </h4>
-                    <div className="bg-primary/5 border border-primary/10 rounded-md p-4 relative">
+                    <h4 className="font-medium mb-2">Daily Overview</h4>
+                    <div className="bg-primary/5 border border-primary/10 rounded-md p-4 relative space-y-4">
                       <div className="absolute -left-3 top-4 w-6 h-6 rotate-45 border-l border-b border-primary/10 bg-primary/5"></div>
-                      <p className="text-sm leading-relaxed whitespace-pre-line">{consolidatedReflection}</p>
                       
-                      {consolidatedReflection.length > 10 && (
+                      {hasPreSession && (
+                        <div className="pb-3">
+                          <h5 className="text-sm font-medium mb-2 text-primary/80 flex items-center gap-2">
+                            <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                            Pre-Session Reflection
+                          </h5>
+                          <p className="text-sm leading-relaxed whitespace-pre-line ml-3 pl-2 border-l border-blue-200">
+                            {preSessionReflection}
+                          </p>
+                        </div>
+                      )}
+                      
+                      {hasPostSession && (
+                        <div className="pt-1">
+                          <h5 className="text-sm font-medium mb-2 text-primary/80 flex items-center gap-2">
+                            <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                            Post-Session Reflection
+                          </h5>
+                          <p className="text-sm leading-relaxed whitespace-pre-line ml-3 pl-2 border-l border-green-200">
+                            {postSessionReflection}
+                          </p>
+                        </div>
+                      )}
+                      
+                      {/* Pattern analyzer on the combined text for overall analysis */}
+                      {hasReflections && (
                         <>
-                          <PatternAnalyzer reflection={consolidatedReflection} />
+                          <PatternAnalyzer reflection={hasPreSession ? preSessionReflection : '' + ' ' + 
+                                                      (hasPostSession ? postSessionReflection : '')} />
                           
                           <div className="mt-4 pt-3 border-t border-dashed border-primary/10">
                             <h5 className="text-sm font-medium mb-2 text-muted-foreground">Psychological Insights</h5>
                             <div className="flex flex-wrap gap-2">
-                              {consolidatedReflection.includes('fear') && (
-                                <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                                  Fear Reaction
+                              {/* Extract insights from pre-session and post-session reflections */}
+                              {getNoteSentimentBadges(preSessionReflection + ' ' + postSessionReflection).map((sentiment, index) => (
+                                <Badge 
+                                  key={index}
+                                  variant="outline" 
+                                  className={getBadgeVariant(sentiment)}
+                                >
+                                  {sentiment}
                                 </Badge>
-                              )}
-                              {consolidatedReflection.includes('anxious') && (
-                                <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                                  Anxiety Response
-                                </Badge>
-                              )}
-                              {consolidatedReflection.includes('confident') && (
-                                <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                                  Confidence State
-                                </Badge>
-                              )}
-                              {consolidatedReflection.includes('loss') && (
-                                <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                                  Loss Processing
-                                </Badge>
-                              )}
-                              {consolidatedReflection.includes('learn') && (
-                                <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
-                                  Learning Mindset
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('greed') || consolidatedReflection.includes('greedy')) && (
-                                <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
-                                  Greed Response
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('frustrat') || consolidatedReflection.includes('regret')) && (
-                                <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                                  Frustration/Regret
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('slippage') || consolidatedReflection.includes('gave back')) && (
-                                <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
-                                  Giving Back Profits
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('recover') || consolidatedReflection.includes('fresh start') || 
-                                 consolidatedReflection.includes('yesterday') || consolidatedReflection.includes('previous day')) && (
-                                <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-300">
-                                  Recency Bias
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('feel good') || consolidatedReflection.includes('happy') || 
-                                 consolidatedReflection.includes('positive') || consolidatedReflection.includes('optimistic')) && (
-                                <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                                  Positive Mindset
-                                </Badge>
-                              )}
+                              ))}
+                              
                               {emotionalData.hasHarmfulPattern && emotionalData.patternType && (
                                 <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
                                   {emotionalData.patternType}
@@ -346,8 +385,28 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                       
                       {trade.notes && (
                         <div className="pt-2">
-                          <p className="text-muted-foreground text-sm mb-1">Trade Notes</p>
-                          <p className="text-sm bg-primary/5 p-2 rounded">{trade.notes}</p>
+                          <p className="text-muted-foreground text-sm mb-1 flex items-center gap-1">
+                            <span className="h-1.5 w-1.5 rounded-full bg-purple-500"></span>
+                            Trade Notes
+                          </p>
+                          <div className="text-sm bg-primary/5 p-2 rounded border-l-2 border-purple-300">
+                            <p className="whitespace-pre-line">{trade.notes}</p>
+                            
+                            {/* Sentiment analysis for trade notes */}
+                            {trade.notes && trade.notes.length > 10 && (
+                              <div className="flex flex-wrap gap-1 mt-2 pt-2 border-t border-primary/10">
+                                {getNoteSentimentBadges(trade.notes).map((sentiment, idx) => (
+                                  <Badge 
+                                    key={idx} 
+                                    variant="outline" 
+                                    className={`text-xs px-1.5 py-0.5 ${getBadgeVariant(sentiment)}`}
+                                  >
+                                    {sentiment}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
