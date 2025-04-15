@@ -43,12 +43,30 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
     return entriesForDate.flatMap(entry => entry.trades || []);
   }, [analyticsData?.journalEntries, emotionalData?.date]);
   
-  // Handle multiple reflections by joining them into a single consolidated text
-  const multipleReflections = emotionalData.reflection ? emotionalData.reflection.split('\n\n') : [];
-  const reflectionCount = multipleReflections.length;
+  // Process reflections to exclude trade-specific notes
+  const processReflections = () => {
+    if (!emotionalData.reflection) return "";
+    
+    const reflections = emotionalData.reflection.split('\n\n');
+    
+    // Filter out reflections that are likely trade-specific
+    // These typically contain specific details about trade entries, PnL, etc.
+    const generalReflections = reflections.filter(reflection => {
+      const lowerReflection = reflection.toLowerCase();
+      return !lowerReflection.includes('trade entry') && 
+             !lowerReflection.includes('pnl') && 
+             !lowerReflection.includes('position') &&
+             !lowerReflection.includes('setup') &&
+             !lowerReflection.includes('entry price');
+    });
+    
+    return generalReflections.join('\n\n');
+  };
   
-  // Consolidate all reflections into a single reflection with proper spacing
-  const consolidatedReflection = multipleReflections.join('\n\n');
+  // Get consolidated daily reflection without trade-specific notes
+  const consolidatedReflection = processReflections();
+  const reflectionCount = emotionalData.reflection ? emotionalData.reflection.split('\n\n').length : 0;
+  const generalReflectionCount = consolidatedReflection.split('\n\n').length;
   
   const getCoreTraitIcon = (trait: CoreTrait) => {
     switch (trait) {
@@ -109,6 +127,30 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
     return 'Pattern Detected';
   };
 
+  // Analyze text for sentiment keywords
+  const getSentimentBadges = (text: string) => {
+    const badges = [];
+    
+    if (!text) return badges;
+    
+    const textLower = text.toLowerCase();
+    
+    if (textLower.includes('fear')) badges.push('Fear Reaction');
+    if (textLower.includes('anxious')) badges.push('Anxiety Response');
+    if (textLower.includes('confident')) badges.push('Confidence State');
+    if (textLower.includes('loss')) badges.push('Loss Processing');
+    if (textLower.includes('learn')) badges.push('Learning Mindset');
+    if (textLower.includes('greed') || textLower.includes('greedy')) badges.push('Greed Response');
+    if (textLower.includes('frustrat') || textLower.includes('regret')) badges.push('Frustration/Regret');
+    if (textLower.includes('slippage') || textLower.includes('gave back')) badges.push('Giving Back Profits');
+    if (textLower.includes('recover') || textLower.includes('fresh start') || 
+        textLower.includes('yesterday') || textLower.includes('previous day')) badges.push('Recency Bias');
+    if (textLower.includes('feel good') || textLower.includes('happy') || 
+        textLower.includes('positive') || textLower.includes('optimistic')) badges.push('Positive Mindset');
+    
+    return badges;
+  };
+
   return (
     <Card className="relative overflow-hidden border border-primary/15 bg-gradient-to-br from-background to-background/60 backdrop-blur-lg">
       <Button 
@@ -127,7 +169,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
               {format(emotionalData.date, 'EEEE, MMMM d')}
               {reflectionCount > 1 && (
                 <span className="text-sm text-muted-foreground ml-2">
-                  (Combined from {reflectionCount} entries)
+                  Daily Overview
                 </span>
               )}
             </h3>
@@ -175,7 +217,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-medium mb-2">
-                      {reflectionCount > 1 ? 'Consolidated Daily Reflections' : 'Daily Reflection'}
+                      {reflectionCount > 1 ? 'Daily Overview' : 'Daily Reflection'}
                     </h4>
                     <div className="bg-primary/5 border border-primary/10 rounded-md p-4 relative">
                       <div className="absolute -left-3 top-4 w-6 h-6 rotate-45 border-l border-b border-primary/10 bg-primary/5"></div>
@@ -188,58 +230,23 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                           <div className="mt-4 pt-3 border-t border-dashed border-primary/10">
                             <h5 className="text-sm font-medium mb-2 text-muted-foreground">Psychological Insights</h5>
                             <div className="flex flex-wrap gap-2">
-                              {consolidatedReflection.includes('fear') && (
-                                <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                                  Fear Reaction
+                              {getSentimentBadges(consolidatedReflection).map((badge, index) => (
+                                <Badge 
+                                  key={index} 
+                                  variant="outline" 
+                                  className={`
+                                    ${badge.includes('Fear') || badge.includes('Anxiety') || badge.includes('Loss') || 
+                                      badge.includes('Greed') || badge.includes('Frustration') || badge.includes('Back')
+                                      ? 'bg-red-100 text-red-800 border-red-300' 
+                                      : badge.includes('Confidence') || badge.includes('Learning') || badge.includes('Positive')
+                                      ? 'bg-green-100 text-green-800 border-green-300'
+                                      : 'bg-blue-100 text-blue-800 border-blue-300'
+                                    }
+                                  `}
+                                >
+                                  {badge}
                                 </Badge>
-                              )}
-                              {consolidatedReflection.includes('anxious') && (
-                                <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                                  Anxiety Response
-                                </Badge>
-                              )}
-                              {consolidatedReflection.includes('confident') && (
-                                <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                                  Confidence State
-                                </Badge>
-                              )}
-                              {consolidatedReflection.includes('loss') && (
-                                <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                                  Loss Processing
-                                </Badge>
-                              )}
-                              {consolidatedReflection.includes('learn') && (
-                                <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
-                                  Learning Mindset
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('greed') || consolidatedReflection.includes('greedy')) && (
-                                <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
-                                  Greed Response
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('frustrat') || consolidatedReflection.includes('regret')) && (
-                                <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                                  Frustration/Regret
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('slippage') || consolidatedReflection.includes('gave back')) && (
-                                <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
-                                  Giving Back Profits
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('recover') || consolidatedReflection.includes('fresh start') || 
-                                 consolidatedReflection.includes('yesterday') || consolidatedReflection.includes('previous day')) && (
-                                <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-300">
-                                  Recency Bias
-                                </Badge>
-                              )}
-                              {(consolidatedReflection.includes('feel good') || consolidatedReflection.includes('happy') || 
-                                 consolidatedReflection.includes('positive') || consolidatedReflection.includes('optimistic')) && (
-                                <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                                  Positive Mindset
-                                </Badge>
-                              )}
+                              ))}
                               {emotionalData.hasHarmfulPattern && emotionalData.patternType && (
                                 <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
                                   {emotionalData.patternType}
@@ -285,7 +292,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
           </div>
         </div>
         
-        {/* New section for trade details and screenshots */}
+        {/* Associated trades section with trade notes */}
         {associatedTrades && associatedTrades.length > 0 && (
           <div className="mt-8">
             <Separator className="mb-6" />
@@ -296,7 +303,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
               {associatedTrades.map((trade: Trade, index: number) => (
                 <div key={trade.id || index} className="border border-primary/15 rounded-lg p-4 bg-background/40 backdrop-blur-sm">
                   <div className="flex flex-col md:flex-row justify-between gap-4">
-                    <div className="space-y-3">
+                    <div className="md:w-1/2 space-y-3">
                       <div className="flex items-center space-x-2">
                         <span className={`h-3 w-3 rounded-full ${
                           trade.pnl && Number(trade.pnl) > 0 ? 'bg-green-500' : 'bg-red-500'
@@ -307,7 +314,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                         </Badge>
                       </div>
                       
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2 text-sm">
+                      <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
                         <div>
                           <p className="text-muted-foreground">Entry Price</p>
                           <p>{trade.entryPrice}</p>
@@ -343,14 +350,39 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                           </div>
                         )}
                       </div>
-                      
-                      {trade.notes && (
-                        <div className="pt-2">
-                          <p className="text-muted-foreground text-sm mb-1">Trade Notes</p>
-                          <p className="text-sm bg-primary/5 p-2 rounded">{trade.notes}</p>
-                        </div>
-                      )}
                     </div>
+                    
+                    {/* Trade notes section */}
+                    {trade.notes && (
+                      <div className="md:w-1/2 bg-primary/5 border border-primary/10 rounded-md p-4 relative">
+                        <p className="text-sm leading-relaxed">{trade.notes}</p>
+                        
+                        {/* Display sentiment badges for trade notes */}
+                        {trade.notes && trade.notes.length > 10 && (
+                          <div className="mt-3 pt-3 border-t border-dashed border-primary/10">
+                            <div className="flex flex-wrap gap-2">
+                              {getSentimentBadges(trade.notes).map((badge, index) => (
+                                <Badge 
+                                  key={index} 
+                                  variant="outline" 
+                                  className={`
+                                    ${badge.includes('Fear') || badge.includes('Anxiety') || badge.includes('Loss') || 
+                                      badge.includes('Greed') || badge.includes('Frustration') || badge.includes('Back')
+                                      ? 'bg-red-100 text-red-800 border-red-300' 
+                                      : badge.includes('Confidence') || badge.includes('Learning') || badge.includes('Positive')
+                                      ? 'bg-green-100 text-green-800 border-green-300'
+                                      : 'bg-blue-100 text-blue-800 border-blue-300'
+                                    }
+                                  `}
+                                >
+                                  {badge}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                   
                   {/* Trade screenshots */}
@@ -360,7 +392,10 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {trade.forecastScreenshot && (
                           <div className="space-y-1">
-                            <p className="text-xs text-muted-foreground">Forecast</p>
+                            <p className="text-xs font-medium flex items-center gap-1">
+                              Forecast
+                              <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                            </p>
                             <div 
                               onClick={() => openImageInNewTab(trade.forecastScreenshot)} 
                               className="cursor-pointer hover:opacity-90 transition-opacity relative group"
@@ -379,7 +414,10 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                         
                         {trade.resultScreenshot && (
                           <div className="space-y-1">
-                            <p className="text-xs text-muted-foreground">Result</p>
+                            <p className="text-xs font-medium flex items-center gap-1">
+                              Result
+                              <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                            </p>
                             <div 
                               onClick={() => openImageInNewTab(trade.resultScreenshot)} 
                               className="cursor-pointer hover:opacity-90 transition-opacity relative group"
