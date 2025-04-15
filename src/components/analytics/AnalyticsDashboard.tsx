@@ -22,15 +22,23 @@ import { EmotionFrequency } from "./EmotionFrequency";
 import { SetupPerformance } from "./SetupPerformance";
 import { OvertradingHeatMap } from "./OvertradingHeatMap";
 import { MentalScore } from "./MentalScore";
-import { TradeTimePerformance } from "./TradeTimePerformance"; // Import the new component
+import { TradeTimePerformance } from "./TradeTimePerformance";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { psychology } from "@/components/analytics/psychology/EmotionalJourneyChart";
+import { EmotionalJourneyChart } from "@/components/analytics/psychology/EmotionalJourneyChart";
+import { CoreTraitsMatrix } from "@/components/analytics/psychology/CoreTraitsMatrix";
 
 const queryClient = new QueryClient();
 
-export const AnalyticsDashboard = () => {
-  const [activeView, setActiveView] = useState<'all' | 'psychological' | 'trading'>('all');
+interface AnalyticsDashboardProps {
+  view?: 'psychology-only' | undefined;
+}
+
+export const AnalyticsDashboard = ({ view }: AnalyticsDashboardProps) => {
+  const [activeView, setActiveView] = useState<'all' | 'psychological' | 'trading'>(view === 'psychology-only' ? 'psychological' : 'all');
 
   const psychologicalComponents = [
+    EmotionalJourneyChart,
     EmotionTrend,
     EmotionFrequency,
     MistakeAnalysis,
@@ -38,6 +46,7 @@ export const AnalyticsDashboard = () => {
     PreTradingEvents,
     PersonalityPatterns,
     MentalScore,
+    CoreTraitsMatrix,
     OvertradingHeatMap,
   ];
 
@@ -55,21 +64,29 @@ export const AnalyticsDashboard = () => {
     TradeFrequencyByMonth,
     RiskRewardAnalysis,
     WinLossRatio,
-    TradeTimePerformance, // Add the new component to the trading components list
+    TradeTimePerformance,
   ];
 
   const getFilteredComponents = () => {
+    // If we're in psychology-only view, only show psychological components
+    if (view === 'psychology-only') {
+      return psychologicalComponents;
+    }
+
     switch (activeView) {
       case 'psychological':
         return psychologicalComponents;
       case 'trading':
         return tradingComponents;
       default:
-        // Reordered components for the "all" view
-        // We'll put PersonalityPatterns and MentalScore side by side
+        // For the "all" view, start with psychological components, then add trading components
         return [
-          // Psychological components starting with EmotionTrend
-          EmotionTrend, 
+          // Lead with EmotionalJourneyChart and core psychological components
+          EmotionalJourneyChart,
+          CoreTraitsMatrix,
+          
+          // Next group of psychological components
+          EmotionTrend,
           EmotionFrequency,
           
           // Put PersonalityPatterns and MentalScore side by side
@@ -96,10 +113,13 @@ export const AnalyticsDashboard = () => {
           TradeFrequencyByMonth,
           RiskRewardAnalysis,
           WinLossRatio,
-          TradeTimePerformance, // Add the new component to the "all" view as well
+          TradeTimePerformance,
         ];
     }
   };
+
+  // Don't show filter buttons in psychology-only view
+  const showFilterButtons = view !== 'psychology-only';
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -112,29 +132,31 @@ export const AnalyticsDashboard = () => {
             </p>
           </div>
 
-          <div className="flex gap-2">
-            <Button
-              variant={activeView === 'all' ? 'default' : 'outline'}
-              onClick={() => setActiveView('all')}
-              className="flex-1 sm:flex-none"
-            >
-              All Analytics
-            </Button>
-            <Button
-              variant={activeView === 'psychological' ? 'default' : 'outline'}
-              onClick={() => setActiveView('psychological')}
-              className="flex-1 sm:flex-none"
-            >
-              Psychological Analytics
-            </Button>
-            <Button
-              variant={activeView === 'trading' ? 'default' : 'outline'}
-              onClick={() => setActiveView('trading')}
-              className="flex-1 sm:flex-none"
-            >
-              Trading Analytics
-            </Button>
-          </div>
+          {showFilterButtons && (
+            <div className="flex gap-2">
+              <Button
+                variant={activeView === 'all' ? 'default' : 'outline'}
+                onClick={() => setActiveView('all')}
+                className="flex-1 sm:flex-none"
+              >
+                All Analytics
+              </Button>
+              <Button
+                variant={activeView === 'psychological' ? 'default' : 'outline'}
+                onClick={() => setActiveView('psychological')}
+                className="flex-1 sm:flex-none"
+              >
+                Psychological Analytics
+              </Button>
+              <Button
+                variant={activeView === 'trading' ? 'default' : 'outline'}
+                onClick={() => setActiveView('trading')}
+                className="flex-1 sm:flex-none"
+              >
+                Trading Analytics
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
