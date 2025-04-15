@@ -217,7 +217,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                           <h5 className="text-sm font-medium text-blue-700">Pre-Session Reflection</h5>
                         </div>
                         <div className="bg-blue-50 border-l-4 border-blue-500 rounded-md p-4 relative">
-                          <p className="text-sm leading-relaxed whitespace-pre-line">{preSessionReflections}</p>
+                          <p className="text-sm leading-relaxed whitespace-pre-line text-gray-800">{preSessionReflections}</p>
                         </div>
                       </div>
                     )}
@@ -230,7 +230,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                           <h5 className="text-sm font-medium text-purple-700">Trading Notes</h5>
                         </div>
                         <div className="bg-purple-50 border-l-4 border-purple-500 rounded-md p-4 relative">
-                          <p className="text-sm leading-relaxed whitespace-pre-line">{tradeReflections}</p>
+                          <p className="text-sm leading-relaxed whitespace-pre-line text-gray-800">{tradeReflections}</p>
                         </div>
                       </div>
                     )}
@@ -243,7 +243,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                           <h5 className="text-sm font-medium text-green-700">Post-Session Reflection</h5>
                         </div>
                         <div className="bg-green-50 border-l-4 border-green-500 rounded-md p-4 relative">
-                          <p className="text-sm leading-relaxed whitespace-pre-line">{postSessionReflections}</p>
+                          <p className="text-sm leading-relaxed whitespace-pre-line text-gray-800">{postSessionReflections}</p>
                         </div>
                       </div>
                     )}
@@ -377,11 +377,11 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2 text-sm">
                         <div>
                           <p className="text-muted-foreground">Entry Price</p>
-                          <p>{trade.entryPrice}</p>
+                          <p className="text-foreground">{trade.entryPrice}</p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">Exit Price</p>
-                          <p>{trade.exitPrice}</p>
+                          <p className="text-foreground">{trade.exitPrice}</p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">P/L</p>
@@ -394,19 +394,19 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                         {trade.setup && (
                           <div>
                             <p className="text-muted-foreground">Setup</p>
-                            <p>{trade.setup}</p>
+                            <p className="text-foreground">{trade.setup}</p>
                           </div>
                         )}
                         {trade.stopLoss && (
                           <div>
                             <p className="text-muted-foreground">Stop Loss</p>
-                            <p>{trade.stopLoss}</p>
+                            <p className="text-foreground">{trade.stopLoss}</p>
                           </div>
                         )}
                         {trade.takeProfit && (
                           <div>
                             <p className="text-muted-foreground">Take Profit</p>
-                            <p>{trade.takeProfit}</p>
+                            <p className="text-foreground">{trade.takeProfit}</p>
                           </div>
                         )}
                       </div>
@@ -414,7 +414,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                       {trade.notes && (
                         <div className="pt-2">
                           <p className="text-muted-foreground text-sm mb-1">Trade Notes</p>
-                          <p className="text-sm bg-primary/5 p-2 rounded">{trade.notes}</p>
+                          <p className="text-sm bg-primary/5 p-2 rounded text-foreground">{trade.notes}</p>
                         </div>
                       )}
                     </div>
