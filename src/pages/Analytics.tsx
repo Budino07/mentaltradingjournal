@@ -19,7 +19,7 @@ import { OvertradingHeatMap } from "@/components/analytics/OvertradingHeatMap";
 export default function Analytics() {
   const { user, loading } = useAuth();
   const isMobile = useIsMobile();
-  const [activeTab, setActiveTab] = useState<string>("dashboard");
+  const [activeTab, setActiveTab] = useState<string>("psychology");
 
   if (loading) {
     return (
@@ -42,14 +42,10 @@ export default function Analytics() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <div className="flex justify-center mb-4">
               <TabsList className="bg-background/50 backdrop-blur-sm">
-                <TabsTrigger value="dashboard">Trading Analytics</TabsTrigger>
                 <TabsTrigger value="psychology">Trader Psychology</TabsTrigger>
+                <TabsTrigger value="dashboard">Trading Analytics</TabsTrigger>
               </TabsList>
             </div>
-            
-            <TabsContent value="dashboard" className="space-y-6 container mx-auto">
-              <AnalyticsDashboard />
-            </TabsContent>
             
             <TabsContent value="psychology" className="w-full space-y-6 px-0 mx-0">
               <EmotionalJourneyChart />
@@ -65,9 +61,14 @@ export default function Analytics() {
                 </div>
               </div>
             </TabsContent>
+            
+            <TabsContent value="dashboard" className="space-y-6 container mx-auto">
+              <AnalyticsDashboard />
+            </TabsContent>
           </Tabs>
         </div>
       </SubscriptionGuard>
     </AppLayout>
   );
 }
+
