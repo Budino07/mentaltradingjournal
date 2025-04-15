@@ -175,11 +175,10 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-medium mb-2">
-                      {reflectionCount > 1 ? 'Consolidated Daily Reflections' : 'Daily Reflection'}
+                      {reflectionCount > 1 ? 'Daily Overview' : 'Daily Reflection'}
                     </h4>
                     <div className="bg-primary/5 border border-primary/10 rounded-md p-4 relative">
                       <div className="absolute -left-3 top-4 w-6 h-6 rotate-45 border-l border-b border-primary/10 bg-primary/5"></div>
-                      <p className="text-sm leading-relaxed whitespace-pre-line">{consolidatedReflection}</p>
                       
                       {consolidatedReflection.length > 10 && (
                         <>
@@ -285,7 +284,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
           </div>
         </div>
         
-        {/* New section for trade details and screenshots */}
+        {/* Trade details and screenshots section */}
         {associatedTrades && associatedTrades.length > 0 && (
           <div className="mt-8">
             <Separator className="mb-6" />
@@ -344,10 +343,42 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
                         )}
                       </div>
                       
+                      {/* Trade notes display beside the trade details */}
                       {trade.notes && (
                         <div className="pt-2">
-                          <p className="text-muted-foreground text-sm mb-1">Trade Notes</p>
-                          <p className="text-sm bg-primary/5 p-2 rounded">{trade.notes}</p>
+                          <p className="text-muted-foreground text-sm mb-1">Trade Reflection</p>
+                          <div className="bg-primary/5 border border-primary/10 rounded-md p-2">
+                            <p className="text-sm">{trade.notes}</p>
+                            
+                            {/* Optional: Add sentiment analysis for individual trade notes */}
+                            {trade.notes.length > 10 && (
+                              <div className="mt-2 pt-2 border-t border-dashed border-primary/10">
+                                <div className="flex flex-wrap gap-1">
+                                  {trade.notes.toLowerCase().includes('fear') && (
+                                    <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">Fear</Badge>
+                                  )}
+                                  {trade.notes.toLowerCase().includes('anxious') && (
+                                    <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">Anxiety</Badge>
+                                  )}
+                                  {trade.notes.toLowerCase().includes('confident') && (
+                                    <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300 text-xs">Confident</Badge>
+                                  )}
+                                  {trade.notes.toLowerCase().includes('happy') && (
+                                    <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300 text-xs">Happy</Badge>
+                                  )}
+                                  {trade.notes.toLowerCase().includes('frustrat') && (
+                                    <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300 text-xs">Frustrated</Badge>
+                                  )}
+                                  {trade.notes.toLowerCase().includes('regret') && (
+                                    <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300 text-xs">Regret</Badge>
+                                  )}
+                                  {trade.notes.toLowerCase().includes('greed') && (
+                                    <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300 text-xs">Greed</Badge>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
