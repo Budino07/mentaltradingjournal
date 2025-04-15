@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -300,7 +299,20 @@ export const EmotionalWaveform = ({ emotionalData, onDayClick }: EmotionalWavefo
             />
             <ReferenceLine y={0} stroke="#666" strokeDasharray="3 3" />
             <ChartTooltip
-              content={<ChartTooltipContent />}
+              content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  const data = payload[0].payload;
+                  return (
+                    <div className="bg-background/90 backdrop-blur-sm border border-border rounded-lg p-3 shadow-lg">
+                      <p className="font-medium mb-1">{data.formattedDate}</p>
+                      <p className="text-sm text-primary mt-1 flex items-center gap-1 font-medium">
+                        Click to view
+                      </p>
+                    </div>
+                  );
+                }
+                return null;
+              }}
             />
             
             {/* Pre-trading emotional curve */}
