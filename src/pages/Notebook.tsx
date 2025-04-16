@@ -21,54 +21,59 @@ const Notebook = () => {
       {
         href: "https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap",
         rel: "stylesheet"
+      },
+      // Add custom font styles for fonts not available in Google Fonts
+      {
+        type: "text/css",
+        innerContent: `
+          @font-face {
+            font-family: 'Archer';
+            src: url('/fonts/Archer-Medium.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+          }
+          @font-face {
+            font-family: 'Gotham Rounded';
+            src: url('/fonts/GothamRounded-Medium.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+          }
+          @font-face {
+            font-family: 'Ideal Sans';
+            src: url('/fonts/IdealSans-Medium.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+          }
+          @font-face {
+            font-family: 'Verlag';
+            src: url('/fonts/Verlag-Book.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+          }
+        `
       }
     ];
 
     // Create and append style/link elements
     fontLinks.forEach(link => {
-      // Create link element for Google Fonts
-      const linkElement = document.createElement('link');
-      linkElement.rel = link.rel || 'stylesheet';
-      linkElement.href = link.href;
-      document.head.appendChild(linkElement);
+      if (link.type === "text/css") {
+        // Create style element for custom fonts
+        const style = document.createElement('style');
+        style.type = 'text/css';
+        style.innerHTML = link.innerContent || '';
+        document.head.appendChild(style);
+      } else {
+        // Create link element for Google Fonts
+        const linkElement = document.createElement('link');
+        linkElement.rel = link.rel || 'stylesheet';
+        linkElement.href = link.href;
+        document.head.appendChild(linkElement);
+      }
     });
-
-    // Add custom fonts that aren't available through Google Fonts
-    const customFontsStyle = document.createElement('style');
-    customFontsStyle.textContent = `
-      @font-face {
-        font-family: 'Archer';
-        src: url('https://use.typekit.net/af/3627af/00000000000000007735a075/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3') format('woff2');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-      }
-      
-      @font-face {
-        font-family: 'Gotham Rounded';
-        src: url('https://use.typekit.net/af/a9b802/00000000000000007735a60b/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3') format('woff2');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-      }
-      
-      @font-face {
-        font-family: 'Ideal Sans';
-        src: url('https://use.typekit.net/af/cda208/00000000000000007735a686/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3') format('woff2');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-      }
-      
-      @font-face {
-        font-family: 'Verlag';
-        src: url('https://use.typekit.net/af/494bd9/00000000000000007735faa5/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3') format('woff2');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-      }
-    `;
-    document.head.appendChild(customFontsStyle);
 
     // Clean up function
     return () => {
@@ -79,7 +84,6 @@ const Notebook = () => {
           style.remove();
         }
       });
-      document.head.removeChild(customFontsStyle);
     };
   }, []);
 

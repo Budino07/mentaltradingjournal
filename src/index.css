@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -88,7 +89,7 @@
     overflow-x: hidden;
   }
 
-  /* Font declarations - updated with correct paths and formats */
+  /* Font declarations */
   @font-face {
     font-family: 'Archer';
     src: url('https://use.typekit.net/af/3627af/00000000000000007735a075/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3') format('woff2');
