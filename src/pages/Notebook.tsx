@@ -26,19 +26,11 @@ const Notebook = () => {
 
     // Create and append style/link elements
     fontLinks.forEach(link => {
-      if (link.type === "text/css") {
-        // Create style element for custom fonts
-        const style = document.createElement('style');
-        style.type = 'text/css';
-        style.innerHTML = link.innerContent || '';
-        document.head.appendChild(style);
-      } else {
-        // Create link element for Google Fonts
-        const linkElement = document.createElement('link');
-        linkElement.rel = link.rel || 'stylesheet';
-        linkElement.href = link.href;
-        document.head.appendChild(linkElement);
-      }
+      // Create link element for Google Fonts
+      const linkElement = document.createElement('link');
+      linkElement.rel = link.rel || 'stylesheet';
+      linkElement.href = link.href;
+      document.head.appendChild(linkElement);
     });
 
     // Add custom fonts that aren't available through Google Fonts
