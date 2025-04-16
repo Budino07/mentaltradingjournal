@@ -13,6 +13,8 @@ import { ColorPickerDialog } from "./ColorPickerDialog";
 import { LinkDialog } from "./LinkDialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
+import { FontSettingsPanel } from "./FontSettingsPanel";
+import { useFontSettings } from "@/hooks/useFontSettings";
 
 interface NoteViewProps {
   noteId: string | null;
@@ -26,6 +28,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
   const [selectedText, setSelectedText] = useState("");
   const [savedSelection, setSavedSelection] = useState<Range | null>(null);
   
+  const { fontSettings, updateFontSettings } = useFontSettings();
   const editorRef = useRef<HTMLDivElement | null>(null);
   
   const {
@@ -165,20 +168,27 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
             onRemoveTag={handleRemoveTag} 
             onUpdateTagColor={handleUpdateTagColor}
           />
-          <FormatToolbar 
-            onBold={handleBold}
-            onItalic={handleItalic}
-            onUnderline={handleUnderline}
-            onStrikethrough={handleStrikethrough}
-            onColorChange={handleColorChange}
-            onLink={handleLink}
-          />
+          <div className="flex items-center space-x-2">
+            <FormatToolbar 
+              onBold={handleBold}
+              onItalic={handleItalic}
+              onUnderline={handleUnderline}
+              onStrikethrough={handleStrikethrough}
+              onColorChange={handleColorChange}
+              onLink={handleLink}
+            />
+            <FontSettingsPanel 
+              settings={fontSettings}
+              onSettingsChange={updateFontSettings}
+            />
+          </div>
           <Separator className="my-4" />
           <div className="flex-1 overflow-hidden">
             <NoteContent 
               content={content} 
-              onContentChange={handleContentChange} 
+              onContentChange={handleContentChange}
               editorRef={editorRef}
+              fontSettings={fontSettings}
             />
           </div>
           <ColorPickerDialog

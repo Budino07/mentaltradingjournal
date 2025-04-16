@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -88,6 +89,39 @@
     overflow-x: hidden;
   }
 
+  /* Font declarations */
+  @font-face {
+    font-family: 'Archer';
+    src: url('https://use.typekit.net/af/3627af/00000000000000007735a075/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Gotham Rounded';
+    src: url('https://use.typekit.net/af/a9b802/00000000000000007735a60b/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Ideal Sans';
+    src: url('https://use.typekit.net/af/cda208/00000000000000007735a686/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Verlag';
+    src: url('https://use.typekit.net/af/494bd9/00000000000000007735faa5/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
   /* Improve hover states */
   button:hover, 
   a:hover {
@@ -109,7 +143,7 @@
   }
 }
 
-/* Enhanced gradient backgrounds */
+/* Keep existing code (Enhanced gradient backgrounds, Glass effect utilities, etc.) */
 .bg-gradient-glow {
   background: radial-gradient(
     circle at center,
@@ -164,12 +198,11 @@
 
 /* Mobile-specific adjustments */
 @media (max-width: 640px) {
-  /* Ensure proper container padding */
+  /* Keep existing code (mobile styling) */
   .container {
     @apply px-3;
   }
   
-  /* Reduce padding on mobile */
   .p-4 {
     @apply p-2;
   }
@@ -178,7 +211,6 @@
     @apply p-3;
   }
   
-  /* Adjust font sizes for better mobile viewing */
   h1, h2, h3 {
     @apply tracking-tight;
   }
@@ -191,7 +223,6 @@
     @apply text-xl;
   }
 
-  /* Ensure proper scrolling on mobile */
   html, body {
     @apply overflow-x-hidden;
     position: relative;
@@ -199,7 +230,6 @@
     width: 100%;
   }
 
-  /* Reset problematic max-width constraints */
   #root {
     max-width: 100%;
     width: 100%;
@@ -207,7 +237,6 @@
     margin: 0;
   }
   
-  /* Form inputs and buttons */
   .form-control {
     @apply p-2 text-sm;
   }
@@ -216,7 +245,6 @@
     @apply text-sm;
   }
   
-  /* Fix spacing in grids */
   .grid-cols-2 {
     @apply gap-2;
   }
@@ -225,12 +253,10 @@
     @apply gap-2;
   }
   
-  /* Add better touch targets */
   .checkbox, .radio, button, a {
     min-height: 44px;
   }
   
-  /* Improve label readability */
   label {
     @apply text-sm font-medium;
   }

@@ -1,13 +1,15 @@
 
 import { useEffect, useRef, forwardRef } from "react";
+import { FontSettings } from "@/hooks/useFontSettings";
 
 interface NoteContentProps {
   content: string;
   onContentChange: (newContent: string) => void;
   editorRef?: React.RefObject<HTMLDivElement>;
+  fontSettings: FontSettings;
 }
 
-export const NoteContent = ({ content, onContentChange, editorRef }: NoteContentProps) => {
+export const NoteContent = ({ content, onContentChange, editorRef, fontSettings }: NoteContentProps) => {
   const localEditorRef = useRef<HTMLDivElement>(null);
   
   // Use provided ref or local ref
@@ -151,6 +153,10 @@ export const NoteContent = ({ content, onContentChange, editorRef }: NoteContent
           document.execCommand('insertLineBreak');
           e.preventDefault();
         }
+      }}
+      style={{
+        fontFamily: fontSettings.fontFamily,
+        fontSize: `${fontSettings.fontSize}px`,
       }}
     />
   );
