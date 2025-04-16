@@ -33,14 +33,14 @@ const FONT_OPTIONS = [
   { name: "Verlag", value: "'Verlag', sans-serif" }
 ];
 
-const FONT_SIZE_OPTIONS = [10, 11, 12, 13, 14];
+const FONT_SIZE_OPTIONS = [10, 12, 14, 16, 18, 20, 22, 25];
 
 interface FontSettingsPanelProps {
   settings: FontSettings;
   onSettingsChange: (settings: FontSettings) => void;
   isApplyingToSelection: boolean;
   onApplyToSelectionChange: (value: boolean) => void;
-  onApplyFormatting: () => void; // New prop to explicitly apply formatting
+  onApplyFormatting: () => void;
 }
 
 export const FontSettingsPanel = ({ 
@@ -106,7 +106,7 @@ export const FontSettingsPanel = ({
               <Slider
                 value={[fontSize]}
                 min={10}
-                max={14}
+                max={25}
                 step={1}
                 onValueChange={(value) => setFontSize(value[0])}
                 className="flex-1"

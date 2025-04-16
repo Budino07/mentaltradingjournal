@@ -147,23 +147,37 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0 || selection.toString().trim() === '') return;
     
-    // Apply font styling to the selected text
-    document.execCommand('fontName', false, fontSettings.fontFamily);
-    
-    // Font size exec command uses 1-7 scale, but this is unreliable
-    // So we'll use a span with direct styling
+    // Create a span with the desired font styling
     const range = selection.getRangeAt(0);
     const span = document.createElement('span');
     span.style.fontSize = `${fontSettings.fontSize}px`;
     span.style.fontFamily = fontSettings.fontFamily;
     
     try {
+      // Apply the span to the selected content
       range.surroundContents(span);
+      
+      // Update the note content to save changes
       if (editorRef.current) {
         handleContentChange(editorRef.current.innerHTML);
       }
     } catch (e) {
       console.error('Could not apply formatting to selection', e);
+      
+      // Fallback method for complex selections (when surroundContents fails)
+      try {
+        // Delete the selection and insert a styled span
+        const fragment = range.extractContents();
+        span.appendChild(fragment);
+        range.insertNode(span);
+        
+        // Update the note content to save changes
+        if (editorRef.current) {
+          handleContentChange(editorRef.current.innerHTML);
+        }
+      } catch (err) {
+        console.error('Font formatting fallback also failed', err);
+      }
     }
   };
 

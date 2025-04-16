@@ -128,11 +128,11 @@ export const NoteContent = ({
     return () => observer.disconnect();
   }, [finalEditorRef]);
 
-  // Apply font formatting to selected text
+  // Apply font formatting to the entire document
   const applyFontFormatting = () => {
     if (isApplyingFontToSelection) {
       // Don't apply global styling when we're in selection mode
-      return;
+      return {};
     }
     
     // Only apply global font settings when not in selection mode
