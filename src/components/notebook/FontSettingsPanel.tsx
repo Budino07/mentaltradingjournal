@@ -33,41 +33,30 @@ const FONT_OPTIONS = [
   { name: "Verlag", value: "'Verlag', sans-serif" }
 ];
 
-const FONT_SIZE_OPTIONS = [10, 12, 14, 16, 18, 20, 22, 25];
+const FONT_SIZE_OPTIONS = [10, 11, 12, 13, 14];
 
 interface FontSettingsPanelProps {
   settings: FontSettings;
   onSettingsChange: (settings: FontSettings) => void;
   isApplyingToSelection: boolean;
   onApplyToSelectionChange: (value: boolean) => void;
-  onApplyFormatting: () => void;
 }
 
 export const FontSettingsPanel = ({ 
   settings, 
   onSettingsChange,
   isApplyingToSelection,
-  onApplyToSelectionChange,
-  onApplyFormatting
+  onApplyToSelectionChange
 }: FontSettingsPanelProps) => {
   const [fontFamily, setFontFamily] = useState(settings.fontFamily);
   const [fontSize, setFontSize] = useState(settings.fontSize);
-  const [open, setOpen] = useState(false);
   
   useEffect(() => {
     onSettingsChange({ fontFamily, fontSize });
   }, [fontFamily, fontSize, onSettingsChange]);
 
-  // Handle applying the formatting and closing the popover
-  const handleApply = () => {
-    if (isApplyingToSelection) {
-      onApplyFormatting();
-    }
-    setOpen(false);
-  };
-
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover>
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="h-8 w-8" title="Font Settings">
           <Type className="h-4 w-4" />
@@ -106,7 +95,7 @@ export const FontSettingsPanel = ({
               <Slider
                 value={[fontSize]}
                 min={10}
-                max={25}
+                max={14}
                 step={1}
                 onValueChange={(value) => setFontSize(value[0])}
                 className="flex-1"
@@ -125,16 +114,6 @@ export const FontSettingsPanel = ({
             />
             <Label htmlFor="apply-to-selection">Apply to selected text only</Label>
           </div>
-
-          {isApplyingToSelection && (
-            <Button 
-              className="w-full mt-2" 
-              onClick={handleApply}
-              size="sm"
-            >
-              Apply to Selection
-            </Button>
-          )}
         </div>
       </PopoverContent>
     </Popover>

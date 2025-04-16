@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { NoteTitle } from "./NoteTitle";
 import { NoteTags } from "./NoteTags";
@@ -136,51 +137,6 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
     }
   };
 
-  // Apply font formatting to selected text
-  const applyFontToSelection = () => {
-    if (!isApplyingToSelection) {
-      // When not in selection mode, we don't need to do anything here
-      // as the global style is applied via the style prop in NoteContent
-      return;
-    }
-    
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0 || selection.toString().trim() === '') return;
-    
-    // Create a span with the desired font styling
-    const range = selection.getRangeAt(0);
-    const span = document.createElement('span');
-    span.style.fontSize = `${fontSettings.fontSize}px`;
-    span.style.fontFamily = fontSettings.fontFamily;
-    
-    try {
-      // Apply the span to the selected content
-      range.surroundContents(span);
-      
-      // Update the note content to save changes
-      if (editorRef.current) {
-        handleContentChange(editorRef.current.innerHTML);
-      }
-    } catch (e) {
-      console.error('Could not apply formatting to selection', e);
-      
-      // Fallback method for complex selections (when surroundContents fails)
-      try {
-        // Delete the selection and insert a styled span
-        const fragment = range.extractContents();
-        span.appendChild(fragment);
-        range.insertNode(span);
-        
-        // Update the note content to save changes
-        if (editorRef.current) {
-          handleContentChange(editorRef.current.innerHTML);
-        }
-      } catch (err) {
-        console.error('Font formatting fallback also failed', err);
-      }
-    }
-  };
-
   if (!noteId) {
     return <EmptyNoteState />;
   }
@@ -226,7 +182,6 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
               onSettingsChange={updateFontSettings}
               isApplyingToSelection={isApplyingToSelection}
               onApplyToSelectionChange={toggleApplyToSelection}
-              onApplyFormatting={applyFontToSelection} // Pass the explicit formatting function
             />
           </div>
           <Separator className="my-4" />
