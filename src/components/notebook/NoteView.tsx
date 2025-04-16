@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { NoteTitle } from "./NoteTitle";
 import { NoteTags } from "./NoteTags";
@@ -165,7 +164,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
     }
   };
 
-  // Apply font to selected text
+  // Apply font to selected text with proper span styling
   const handleApplyFontToSelection = () => {
     if (!hasSelection || !savedSelection) return;
 
@@ -176,13 +175,9 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
     selection.removeAllRanges();
     selection.addRange(savedSelection);
 
-    // Apply font styling
-    if (fontSettings.fontFamily) {
-      document.execCommand('fontName', false, fontSettings.fontFamily);
-    }
-
-    // Create a span with the desired font size
+    // Create a span with the desired font styling
     const span = document.createElement('span');
+    span.style.fontFamily = fontSettings.fontFamily;
     span.style.fontSize = `${fontSettings.fontSize}px`;
     
     try {
@@ -197,6 +192,29 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
       }
     } catch (e) {
       console.error('Could not apply font formatting to selection', e);
+      
+      // Alternative approach if surroundContents fails 
+      // (which can happen if the selection crosses multiple nodes)
+      try {
+        document.execCommand('fontName', false, fontSettings.fontFamily);
+        
+        // Apply font size with a CSS class or style attribute
+        const fontSize = fontSettings.fontSize;
+        
+        // Use execCommand to insert HTML for a span with the right font size
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+          const range = sel.getRangeAt(0);
+          const selectedText = range.toString();
+          
+          // Create new span with our styles
+          const styled = `<span style="font-size: ${fontSize}px; font-family: ${fontSettings.fontFamily};">${selectedText}</span>`;
+          
+          document.execCommand('insertHTML', false, styled);
+        }
+      } catch (err) {
+        console.error('Alternative font application failed', err);
+      }
     }
 
     // Clear selection after applying

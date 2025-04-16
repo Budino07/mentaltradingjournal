@@ -29,12 +29,14 @@ export const useFontSettings = () => {
   
   // Save font settings to localStorage whenever they change
   const updateFontSettings = (newSettings: FontSettings) => {
+    console.log('Updating font settings:', newSettings);
     setFontSettings(newSettings);
     localStorage.setItem('notebook-font-settings', JSON.stringify(newSettings));
   };
   
   // Toggle and save the application mode (selection vs entire document)
   const toggleApplyToSelection = (value: boolean) => {
+    console.log('Setting isApplyingToSelection to:', value);
     setIsApplyingToSelection(value);
   };
   

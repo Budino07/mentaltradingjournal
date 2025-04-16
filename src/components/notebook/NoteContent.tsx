@@ -21,7 +21,7 @@ export const NoteContent = ({
   
   // Use provided ref or local ref
   const finalEditorRef = editorRef || localEditorRef;
-
+  
   const makeLinksClickable = () => {
     const editor = finalEditorRef.current;
     if (!editor) return;

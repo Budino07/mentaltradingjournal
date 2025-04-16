@@ -23,6 +23,7 @@ export interface FontSettings {
   fontSize: number;
 }
 
+// Define font options with user-friendly display names and actual CSS values
 const FONT_OPTIONS = [
   { name: "Archer", value: "'Archer', serif" },
   { name: "Gotham Rounded", value: "'Gotham Rounded', sans-serif" },
@@ -59,6 +60,12 @@ export const FontSettingsPanel = ({
     onSettingsChange({ fontFamily, fontSize });
   }, [fontFamily, fontSize, onSettingsChange]);
 
+  // Find the proper display name for the current font family
+  const getFontDisplayName = (cssValue: string) => {
+    const option = FONT_OPTIONS.find(opt => opt.value === cssValue);
+    return option ? option.name : cssValue;
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -75,7 +82,9 @@ export const FontSettingsPanel = ({
               onValueChange={setFontFamily}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select font" />
+                <SelectValue placeholder="Select font">
+                  {getFontDisplayName(fontFamily)}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {FONT_OPTIONS.map((font) => (
