@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { NoteTitle } from "./NoteTitle";
 import { NoteTags } from "./NoteTags";
@@ -137,6 +136,37 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
     }
   };
 
+  // Apply font formatting to selected text
+  const applyFontToSelection = () => {
+    if (!isApplyingToSelection) {
+      // When not in selection mode, we don't need to do anything here
+      // as the global style is applied via the style prop in NoteContent
+      return;
+    }
+    
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.toString().trim() === '') return;
+    
+    // Apply font styling to the selected text
+    document.execCommand('fontName', false, fontSettings.fontFamily);
+    
+    // Font size exec command uses 1-7 scale, but this is unreliable
+    // So we'll use a span with direct styling
+    const range = selection.getRangeAt(0);
+    const span = document.createElement('span');
+    span.style.fontSize = `${fontSettings.fontSize}px`;
+    span.style.fontFamily = fontSettings.fontFamily;
+    
+    try {
+      range.surroundContents(span);
+      if (editorRef.current) {
+        handleContentChange(editorRef.current.innerHTML);
+      }
+    } catch (e) {
+      console.error('Could not apply formatting to selection', e);
+    }
+  };
+
   if (!noteId) {
     return <EmptyNoteState />;
   }
@@ -182,6 +212,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
               onSettingsChange={updateFontSettings}
               isApplyingToSelection={isApplyingToSelection}
               onApplyToSelectionChange={toggleApplyToSelection}
+              onApplyFormatting={applyFontToSelection} // Pass the explicit formatting function
             />
           </div>
           <Separator className="my-4" />

@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, forwardRef } from "react";
 import { FontSettings } from "@/hooks/useFontSettings";
 
@@ -143,30 +142,11 @@ export const NoteContent = ({
     };
   };
 
-  // Handle selection formatting
+  // We're removing the automatic application on selection and only exposing this method
+  // to be called explicitly from the font settings panel
   const handleSelectionFormat = () => {
-    if (!isApplyingFontToSelection) return;
-    
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0 || selection.toString().trim() === '') return;
-    
-    // Apply font styling to the selected text
-    document.execCommand('fontName', false, fontSettings.fontFamily);
-    document.execCommand('fontSize', false, (fontSettings.fontSize / 4).toString()); // Font size exec command uses 1-7 scale
-    
-    // Additional way to ensure font size is applied correctly
-    const range = selection.getRangeAt(0);
-    const span = document.createElement('span');
-    span.style.fontSize = `${fontSettings.fontSize}px`;
-    span.style.fontFamily = fontSettings.fontFamily;
-    
-    // We need to use this approach because execCommand for fontSize isn't very reliable
-    try {
-      range.surroundContents(span);
-      onContentChange(finalEditorRef.current?.innerHTML || '');
-    } catch (e) {
-      console.error('Could not apply formatting to selection', e);
-    }
+    // This function is now only called explicitly from the font panel
+    // and not on mouse up or key up events
   };
 
   // Handle paste to ensure links are clickable immediately
@@ -195,8 +175,6 @@ export const NoteContent = ({
       aria-multiline="true"
       onPaste={handlePaste}
       onClick={handleClick}
-      onMouseUp={handleSelectionFormat}
-      onKeyUp={handleSelectionFormat}
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
           document.execCommand('insertLineBreak');

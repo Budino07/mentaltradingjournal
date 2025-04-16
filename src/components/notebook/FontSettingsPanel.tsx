@@ -40,23 +40,34 @@ interface FontSettingsPanelProps {
   onSettingsChange: (settings: FontSettings) => void;
   isApplyingToSelection: boolean;
   onApplyToSelectionChange: (value: boolean) => void;
+  onApplyFormatting: () => void; // New prop to explicitly apply formatting
 }
 
 export const FontSettingsPanel = ({ 
   settings, 
   onSettingsChange,
   isApplyingToSelection,
-  onApplyToSelectionChange
+  onApplyToSelectionChange,
+  onApplyFormatting
 }: FontSettingsPanelProps) => {
   const [fontFamily, setFontFamily] = useState(settings.fontFamily);
   const [fontSize, setFontSize] = useState(settings.fontSize);
+  const [open, setOpen] = useState(false);
   
   useEffect(() => {
     onSettingsChange({ fontFamily, fontSize });
   }, [fontFamily, fontSize, onSettingsChange]);
 
+  // Handle applying the formatting and closing the popover
+  const handleApply = () => {
+    if (isApplyingToSelection) {
+      onApplyFormatting();
+    }
+    setOpen(false);
+  };
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="h-8 w-8" title="Font Settings">
           <Type className="h-4 w-4" />
@@ -114,6 +125,16 @@ export const FontSettingsPanel = ({
             />
             <Label htmlFor="apply-to-selection">Apply to selected text only</Label>
           </div>
+
+          {isApplyingToSelection && (
+            <Button 
+              className="w-full mt-2" 
+              onClick={handleApply}
+              size="sm"
+            >
+              Apply to Selection
+            </Button>
+          )}
         </div>
       </PopoverContent>
     </Popover>
