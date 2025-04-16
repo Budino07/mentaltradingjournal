@@ -7,9 +7,16 @@ interface NoteContentProps {
   onContentChange: (newContent: string) => void;
   editorRef?: React.RefObject<HTMLDivElement>;
   fontSettings: FontSettings;
+  isApplyingFontToSelection: boolean;
 }
 
-export const NoteContent = ({ content, onContentChange, editorRef, fontSettings }: NoteContentProps) => {
+export const NoteContent = ({ 
+  content, 
+  onContentChange, 
+  editorRef, 
+  fontSettings,
+  isApplyingFontToSelection
+}: NoteContentProps) => {
   const localEditorRef = useRef<HTMLDivElement>(null);
   
   // Use provided ref or local ref
@@ -122,6 +129,46 @@ export const NoteContent = ({ content, onContentChange, editorRef, fontSettings 
     return () => observer.disconnect();
   }, [finalEditorRef]);
 
+  // Apply font formatting to selected text
+  const applyFontFormatting = () => {
+    if (isApplyingFontToSelection) {
+      // Don't apply global styling when we're in selection mode
+      return;
+    }
+    
+    // Only apply global font settings when not in selection mode
+    return {
+      fontFamily: fontSettings.fontFamily,
+      fontSize: `${fontSettings.fontSize}px`,
+    };
+  };
+
+  // Handle selection formatting
+  const handleSelectionFormat = () => {
+    if (!isApplyingFontToSelection) return;
+    
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.toString().trim() === '') return;
+    
+    // Apply font styling to the selected text
+    document.execCommand('fontName', false, fontSettings.fontFamily);
+    document.execCommand('fontSize', false, (fontSettings.fontSize / 4).toString()); // Font size exec command uses 1-7 scale
+    
+    // Additional way to ensure font size is applied correctly
+    const range = selection.getRangeAt(0);
+    const span = document.createElement('span');
+    span.style.fontSize = `${fontSettings.fontSize}px`;
+    span.style.fontFamily = fontSettings.fontFamily;
+    
+    // We need to use this approach because execCommand for fontSize isn't very reliable
+    try {
+      range.surroundContents(span);
+      onContentChange(finalEditorRef.current?.innerHTML || '');
+    } catch (e) {
+      console.error('Could not apply formatting to selection', e);
+    }
+  };
+
   // Handle paste to ensure links are clickable immediately
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
@@ -148,16 +195,15 @@ export const NoteContent = ({ content, onContentChange, editorRef, fontSettings 
       aria-multiline="true"
       onPaste={handlePaste}
       onClick={handleClick}
+      onMouseUp={handleSelectionFormat}
+      onKeyUp={handleSelectionFormat}
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
           document.execCommand('insertLineBreak');
           e.preventDefault();
         }
       }}
-      style={{
-        fontFamily: fontSettings.fontFamily,
-        fontSize: `${fontSettings.fontSize}px`,
-      }}
+      style={applyFontFormatting()}
     />
   );
 };

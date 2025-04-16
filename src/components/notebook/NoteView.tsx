@@ -28,7 +28,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
   const [selectedText, setSelectedText] = useState("");
   const [savedSelection, setSavedSelection] = useState<Range | null>(null);
   
-  const { fontSettings, updateFontSettings } = useFontSettings();
+  const { fontSettings, updateFontSettings, isApplyingToSelection, toggleApplyToSelection } = useFontSettings();
   const editorRef = useRef<HTMLDivElement | null>(null);
   
   const {
@@ -180,6 +180,8 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
             <FontSettingsPanel 
               settings={fontSettings}
               onSettingsChange={updateFontSettings}
+              isApplyingToSelection={isApplyingToSelection}
+              onApplyToSelectionChange={toggleApplyToSelection}
             />
           </div>
           <Separator className="my-4" />
@@ -189,6 +191,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
               onContentChange={handleContentChange}
               editorRef={editorRef}
               fontSettings={fontSettings}
+              isApplyingFontToSelection={isApplyingToSelection}
             />
           </div>
           <ColorPickerDialog

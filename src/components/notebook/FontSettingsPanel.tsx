@@ -15,6 +15,8 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Type } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export interface FontSettings {
   fontFamily: string;
@@ -36,9 +38,16 @@ const FONT_SIZE_OPTIONS = [10, 11, 12, 13, 14];
 interface FontSettingsPanelProps {
   settings: FontSettings;
   onSettingsChange: (settings: FontSettings) => void;
+  isApplyingToSelection: boolean;
+  onApplyToSelectionChange: (value: boolean) => void;
 }
 
-export const FontSettingsPanel = ({ settings, onSettingsChange }: FontSettingsPanelProps) => {
+export const FontSettingsPanel = ({ 
+  settings, 
+  onSettingsChange,
+  isApplyingToSelection,
+  onApplyToSelectionChange
+}: FontSettingsPanelProps) => {
   const [fontFamily, setFontFamily] = useState(settings.fontFamily);
   const [fontSize, setFontSize] = useState(settings.fontSize);
   
@@ -95,6 +104,15 @@ export const FontSettingsPanel = ({ settings, onSettingsChange }: FontSettingsPa
                 {fontSize}px
               </div>
             </div>
+          </div>
+
+          <div className="flex items-center space-x-2 pt-2">
+            <Switch
+              id="apply-to-selection"
+              checked={isApplyingToSelection}
+              onCheckedChange={onApplyToSelectionChange}
+            />
+            <Label htmlFor="apply-to-selection">Apply to selected text only</Label>
           </div>
         </div>
       </PopoverContent>
