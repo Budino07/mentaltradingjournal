@@ -33,20 +33,24 @@ const FONT_OPTIONS = [
   { name: "Verlag", value: "'Verlag', sans-serif" }
 ];
 
-const FONT_SIZE_OPTIONS = [10, 11, 12, 13, 14];
+const FONT_SIZE_OPTIONS = Array.from({ length: 16 }, (_, i) => i + 10); // Font sizes 10-25
 
 interface FontSettingsPanelProps {
   settings: FontSettings;
   onSettingsChange: (settings: FontSettings) => void;
   isApplyingToSelection: boolean;
   onApplyToSelectionChange: (value: boolean) => void;
+  onApplyClick: () => void;
+  hasSelection: boolean;
 }
 
 export const FontSettingsPanel = ({ 
   settings, 
   onSettingsChange,
   isApplyingToSelection,
-  onApplyToSelectionChange
+  onApplyToSelectionChange,
+  onApplyClick,
+  hasSelection
 }: FontSettingsPanelProps) => {
   const [fontFamily, setFontFamily] = useState(settings.fontFamily);
   const [fontSize, setFontSize] = useState(settings.fontSize);
@@ -95,7 +99,7 @@ export const FontSettingsPanel = ({
               <Slider
                 value={[fontSize]}
                 min={10}
-                max={14}
+                max={25}
                 step={1}
                 onValueChange={(value) => setFontSize(value[0])}
                 className="flex-1"
@@ -109,11 +113,21 @@ export const FontSettingsPanel = ({
           <div className="flex items-center space-x-2 pt-2">
             <Switch
               id="apply-to-selection"
-              checked={isApplyingToSelection}
-              onCheckedChange={onApplyToSelectionChange}
+              checked={true}
+              disabled={true}
             />
-            <Label htmlFor="apply-to-selection">Apply to selected text only</Label>
+            <Label htmlFor="apply-to-selection">
+              Apply to selected text only
+            </Label>
           </div>
+
+          <Button 
+            onClick={onApplyClick}
+            disabled={!hasSelection}
+            className="w-full"
+          >
+            {hasSelection ? "Apply to Selection" : "No Text Selected"}
+          </Button>
         </div>
       </PopoverContent>
     </Popover>

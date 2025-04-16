@@ -25,12 +25,6 @@ export const useFontSettings = () => {
         console.error('Failed to parse saved font settings', error);
       }
     }
-    
-    // Load selection preference
-    const applyToSelection = localStorage.getItem('notebook-font-apply-to-selection');
-    if (applyToSelection !== null) {
-      setIsApplyingToSelection(applyToSelection === 'true');
-    }
   }, []);
   
   // Save font settings to localStorage whenever they change
@@ -42,7 +36,6 @@ export const useFontSettings = () => {
   // Toggle and save the application mode (selection vs entire document)
   const toggleApplyToSelection = (value: boolean) => {
     setIsApplyingToSelection(value);
-    localStorage.setItem('notebook-font-apply-to-selection', value.toString());
   };
   
   return { fontSettings, updateFontSettings, isApplyingToSelection, toggleApplyToSelection };

@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { NoteViewSkeleton } from "./NoteViewSkeleton";
 import { EmptyNoteState } from "./EmptyNoteState";
 import { useNote } from "@/hooks/useNote";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ColorPickerDialog } from "./ColorPickerDialog";
 import { LinkDialog } from "./LinkDialog";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   const [selectedText, setSelectedText] = useState("");
   const [savedSelection, setSavedSelection] = useState<Range | null>(null);
+  const [hasSelection, setHasSelection] = useState(false);
   
   const { fontSettings, updateFontSettings, isApplyingToSelection, toggleApplyToSelection } = useFontSettings();
   const editorRef = useRef<HTMLDivElement | null>(null);
@@ -43,6 +44,33 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
     handleRemoveTag,
     handleUpdateTagColor,
   } = useNote(noteId, user);
+
+  // Check for selection constantly
+  useEffect(() => {
+    const checkForSelection = () => {
+      const selection = window.getSelection();
+      const hasActiveSelection = 
+        selection && 
+        selection.rangeCount > 0 && 
+        selection.toString().trim() !== "" &&
+        editorRef.current?.contains(selection.anchorNode);
+      
+      setHasSelection(!!hasActiveSelection);
+      
+      if (hasActiveSelection && selection) {
+        // Save the selection range for later use
+        const range = selection.getRangeAt(0);
+        setSavedSelection(range.cloneRange());
+      }
+    };
+
+    // Add event listeners to detect text selection
+    document.addEventListener("selectionchange", checkForSelection);
+    
+    return () => {
+      document.removeEventListener("selectionchange", checkForSelection);
+    };
+  }, []);
 
   const execCommand = (command: string, value: string | undefined = undefined) => {
     document.execCommand(command, false, value);
@@ -137,6 +165,46 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
     }
   };
 
+  // Apply font to selected text
+  const handleApplyFontToSelection = () => {
+    if (!hasSelection || !savedSelection) return;
+
+    // Restore the saved selection
+    const selection = window.getSelection();
+    if (!selection) return;
+    
+    selection.removeAllRanges();
+    selection.addRange(savedSelection);
+
+    // Apply font styling
+    if (fontSettings.fontFamily) {
+      document.execCommand('fontName', false, fontSettings.fontFamily);
+    }
+
+    // Create a span with the desired font size
+    const span = document.createElement('span');
+    span.style.fontSize = `${fontSettings.fontSize}px`;
+    
+    try {
+      // Use the surroundContents method to wrap the selection in the span
+      const range = selection.getRangeAt(0);
+      span.appendChild(range.extractContents());
+      range.insertNode(span);
+      
+      // Update content
+      if (editorRef.current) {
+        handleContentChange(editorRef.current.innerHTML);
+      }
+    } catch (e) {
+      console.error('Could not apply font formatting to selection', e);
+    }
+
+    // Clear selection after applying
+    selection.removeAllRanges();
+    setSavedSelection(null);
+    setHasSelection(false);
+  };
+
   if (!noteId) {
     return <EmptyNoteState />;
   }
@@ -180,8 +248,10 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
             <FontSettingsPanel 
               settings={fontSettings}
               onSettingsChange={updateFontSettings}
-              isApplyingToSelection={isApplyingToSelection}
+              isApplyingToSelection={true}
               onApplyToSelectionChange={toggleApplyToSelection}
+              onApplyClick={handleApplyFontToSelection}
+              hasSelection={hasSelection}
             />
           </div>
           <Separator className="my-4" />
@@ -191,7 +261,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
               onContentChange={handleContentChange}
               editorRef={editorRef}
               fontSettings={fontSettings}
-              isApplyingFontToSelection={isApplyingToSelection}
+              isApplyingFontToSelection={true}
             />
           </div>
           <ColorPickerDialog
