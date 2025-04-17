@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 
 interface PatternAnalysisResult {
   detected: boolean;
-  confidence: 'Low' | 'Medium' | 'High';
+  confidence: 'Medium' | 'High';
   indicators: string[];
   summary: string;
 }
@@ -19,7 +19,7 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
     if (!text || text.length < 10) {
       return {
         detected: false,
-        confidence: 'Low',
+        confidence: 'Medium',
         indicators: [],
         summary: 'Insufficient text to analyze'
       };
@@ -89,16 +89,14 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
     }
     
     // Determine confidence level based on hits
-    let confidence: 'Low' | 'Medium' | 'High' = 'Low';
+    let confidence: 'Medium' | 'High' = 'Medium';
     
     if (phraseHits.length >= 2 || (keywordHits.length >= 3 && phraseHits.length >= 1)) {
       confidence = 'High';
-    } else if (phraseHits.length === 1 || keywordHits.length >= 2) {
-      confidence = 'Medium';
     }
     
     // Determine if pattern is detected (at least Medium confidence)
-    const detected = confidence !== 'Low';
+    const detected = phraseHits.length > 0 || keywordHits.length > 1;
     
     // Create summary
     let summary = '';
@@ -127,7 +125,7 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
     if (!text || text.length < 10) {
       return {
         detected: false,
-        confidence: 'Low',
+        confidence: 'Medium',
         indicators: [],
         summary: 'Insufficient text to analyze'
       };
@@ -185,15 +183,13 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
       });
     }
     
-    let confidence: 'Low' | 'Medium' | 'High' = 'Low';
+    let confidence: 'Medium' | 'High' = 'Medium';
     
     if (phraseHits.length >= 2 || (keywordHits.length >= 2 && phraseHits.length >= 1)) {
       confidence = 'High';
-    } else if (phraseHits.length === 1 || keywordHits.length >= 1) {
-      confidence = 'Medium';
     }
     
-    const detected = confidence !== 'Low';
+    const detected = phraseHits.length > 0 || keywordHits.length > 1;
     
     let summary = '';
     if (detected) {
@@ -215,7 +211,7 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
     if (!text || text.length < 10) {
       return {
         detected: false,
-        confidence: 'Low',
+        confidence: 'Medium',
         indicators: [],
         summary: 'Insufficient text to analyze'
       };
@@ -273,15 +269,13 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
       });
     }
     
-    let confidence: 'Low' | 'Medium' | 'High' = 'Low';
+    let confidence: 'Medium' | 'High' = 'Medium';
     
     if (phraseHits.length >= 1 || keywordHits.includes('greed') || keywordHits.includes('greedy')) {
       confidence = 'High';
-    } else if (keywordHits.length >= 2) {
-      confidence = 'Medium';
     }
     
-    const detected = confidence !== 'Low';
+    const detected = phraseHits.length > 0 || keywordHits.length > 1;
     
     let summary = '';
     if (detected) {
@@ -303,7 +297,7 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
     if (!text || text.length < 10) {
       return {
         detected: false,
-        confidence: 'Low',
+        confidence: 'Medium',
         indicators: [],
         summary: 'Insufficient text to analyze'
       };
@@ -361,15 +355,13 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
       });
     }
     
-    let confidence: 'Low' | 'Medium' | 'High' = 'Low';
+    let confidence: 'Medium' | 'High' = 'Medium';
     
     if ((phraseHits.length >= 1 && keywordHits.length >= 1) || keywordHits.length >= 3) {
       confidence = 'High';
-    } else if (phraseHits.length === 1 || keywordHits.length >= 1) {
-      confidence = 'Medium';
     }
     
-    const detected = confidence !== 'Low';
+    const detected = phraseHits.length > 0 || keywordHits.length > 1;
     
     let summary = '';
     if (detected) {
@@ -391,7 +383,7 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
     if (!text || text.length < 10) {
       return {
         detected: false,
-        confidence: 'Low',
+        confidence: 'Medium',
         indicators: [],
         summary: 'Insufficient text to analyze'
       };
@@ -450,15 +442,13 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
       });
     }
     
-    let confidence: 'Low' | 'Medium' | 'High' = 'Low';
+    let confidence: 'Medium' | 'High' = 'Medium';
     
     if ((phraseHits.length >= 1 && keywordHits.length >= 2) || phraseHits.length >= 2) {
       confidence = 'High';
-    } else if (phraseHits.length === 1 || keywordHits.length >= 2) {
-      confidence = 'Medium';
     }
     
-    const detected = confidence !== 'Low';
+    const detected = phraseHits.length > 0 || keywordHits.length > 1;
     
     let summary = '';
     if (detected) {
@@ -480,7 +470,7 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
     if (!text || text.length < 10) {
       return {
         detected: false,
-        confidence: 'Low',
+        confidence: 'Medium',
         indicators: [],
         summary: 'Insufficient text to analyze'
       };
@@ -540,15 +530,13 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
       });
     }
     
-    let confidence: 'Low' | 'Medium' | 'High' = 'Low';
+    let confidence: 'Medium' | 'High' = 'Medium';
     
     if ((phraseHits.length >= 1 && keywordHits.length >= 2) || keywordHits.length >= 3) {
       confidence = 'High';
-    } else if (phraseHits.length === 1 || keywordHits.length >= 1) {
-      confidence = 'Medium';
     }
     
-    const detected = confidence !== 'Low';
+    const detected = phraseHits.length > 0 || keywordHits.length > 1;
     
     let summary = '';
     if (detected) {
@@ -642,7 +630,7 @@ export const PatternAnalyzer: React.FC<PatternAnalyzerProps> = ({ reflection }) 
               <span className="text-xs text-muted-foreground">
                 Confidence: <span className={`font-medium ${
                   pattern.result.confidence === 'High' ? 'text-red-500' : 
-                  pattern.result.confidence === 'Medium' ? 'text-yellow-500' : 'text-blue-500'
+                  'text-yellow-500'
                 }`}>{pattern.result.confidence}</span>
               </span>
             </div>
