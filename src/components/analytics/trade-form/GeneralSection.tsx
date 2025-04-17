@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,6 +47,18 @@ export const GeneralSection = ({
     const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
     if (setupInput) {
       setupInput.value = setup;
+    }
+  };
+
+  // Add the missing setTodayDate function
+  const setTodayDate = (inputId: string) => {
+    const now = new Date();
+    const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+    const input = document.getElementById(inputId) as HTMLInputElement;
+    if (input) {
+      input.value = localDateTime;
     }
   };
 
