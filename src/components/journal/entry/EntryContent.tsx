@@ -1,13 +1,13 @@
-
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { TradesList } from "./TradesList";
+import { TradingRules } from "./TradingRules";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronUp, ListChecks, NotebookPen, LineChart, ExternalLink, Pencil, Target, AlertTriangle } from "lucide-react";
 import { Trade } from "@/types/trade";
 import { NoteEditDialog } from "./NoteEditDialog";
 import { TradingMistakes } from "./TradingMistakes";
-import { TradingRules } from "./TradingRules";
 
 interface EntryContentProps {
   id: string;
@@ -153,7 +153,7 @@ export const EntryContent = ({
             <LineChart className="w-4 h-4 text-primary" />
             Chart Screenshots
           </h4>
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {weeklyUrl && (
               <div className="space-y-1">
                 <p className="text-xs font-medium flex items-center gap-1">
@@ -302,6 +302,16 @@ export const EntryContent = ({
             dangerouslySetInnerHTML={{ __html: formatNotes(localPostNotes) }}
           />
         </div>
+      )}
+
+      {trades && trades.length > 0 && (
+        <>
+          <Separator />
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium">Trades</h4>
+            <TradesList journalEntryId={id} trades={trades} />
+          </div>
+        </>
       )}
 
       {isEditingNotes && (
