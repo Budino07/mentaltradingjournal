@@ -61,7 +61,7 @@ export const TradeFormContent = ({
             setupInput.value = setupValue;
           }
         }
-      }, 100);
+      }, 200); // Increased delay to ensure component mounting
     }
   }, [editTrade, setDirection]);
 

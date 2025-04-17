@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Trade } from "@/types/trade";
 import { SetupSelector } from "./SetupSelector";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface GeneralSectionProps {
   direction: 'buy' | 'sell' | null;
@@ -19,6 +19,16 @@ export const GeneralSection = ({
   formValues, 
   onSetupChange 
 }: GeneralSectionProps) => {
+  // Add state to ensure setup value is tracked locally
+  const [setupValue, setSetupValue] = useState(formValues?.setup || "");
+
+  useEffect(() => {
+    // Update local state when formValues changes
+    if (formValues?.setup) {
+      setSetupValue(formValues.setup);
+    }
+  }, [formValues?.setup]);
+
   const setTodayDate = (inputId: string) => {
     const now = new Date();
     const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
@@ -31,6 +41,8 @@ export const GeneralSection = ({
   };
 
   const handleSetupChange = (setup: string) => {
+    setSetupValue(setup); // Update local state
+    
     if (onSetupChange) {
       onSetupChange(setup);
     }
@@ -88,7 +100,7 @@ export const GeneralSection = ({
         </div>
         
         <SetupSelector 
-          value={formValues?.setup || ""}
+          value={setupValue}
           onChange={handleSetupChange}
         />
         
@@ -96,7 +108,7 @@ export const GeneralSection = ({
         <input 
           type="hidden" 
           name="setup" 
-          value={formValues?.setup || ""} 
+          value={setupValue || ""} 
         />
         
         <div className="grid w-full gap-1.5">
