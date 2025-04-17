@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,43 +18,31 @@ export const GeneralSection = ({
   formValues, 
   onSetupChange 
 }: GeneralSectionProps) => {
-  // Add state to ensure setup value is tracked locally
   const [setupValue, setSetupValue] = useState(formValues?.setup || "");
 
-  // Update local state when formValues changes
+  // Ensure setup value is synchronized
   useEffect(() => {
-    if (formValues?.setup) {
-      setSetupValue(formValues.setup);
+    if (formValues?.setup !== undefined) {
+      setSetupValue(formValues.setup || "");
       
-      // Also ensure the hidden input is updated
+      // Ensure hidden input is updated
       setTimeout(() => {
         const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
         if (setupInput) {
           setupInput.value = formValues.setup || "";
         }
-      }, 10);
+      }, 50);
     }
   }, [formValues?.setup]);
 
-  const setTodayDate = (inputId: string) => {
-    const now = new Date();
-    const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-      .toISOString()
-      .slice(0, 16);
-    const input = document.getElementById(inputId) as HTMLInputElement;
-    if (input) {
-      input.value = localDateTime;
-    }
-  };
-
   const handleSetupChange = (setup: string) => {
-    setSetupValue(setup); // Update local state
+    setSetupValue(setup);
     
     if (onSetupChange) {
       onSetupChange(setup);
     }
     
-    // Also update the hidden input for form submission
+    // Update hidden input
     const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
     if (setupInput) {
       setupInput.value = setup;
@@ -102,7 +89,6 @@ export const GeneralSection = ({
           onChange={handleSetupChange}
         />
         
-        {/* Hidden input to preserve form submission */}
         <input 
           type="hidden" 
           name="setup" 

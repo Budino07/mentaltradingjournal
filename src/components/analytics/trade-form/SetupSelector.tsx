@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,10 +29,10 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
     }
   }, [user]);
 
-  // Determine if we should be in custom mode based on the value
+  // More precise check for custom setup
   useEffect(() => {
     if (value && previousSetups.length > 0) {
-      const setupExists = previousSetups.some(setup => setup === value);
+      const setupExists = previousSetups.some(setup => setup.trim() === value.trim());
       setIsCustomSetup(!setupExists);
     }
   }, [value, previousSetups]);
@@ -41,7 +40,6 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
   const fetchPreviousSetups = async () => {
     setIsLoading(true);
     try {
-      // Get all journal entries with trades from the current user
       const { data: journalEntries, error } = await supabase
         .from("journal_entries")
         .select("trades")
@@ -50,7 +48,6 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
 
       if (error) throw error;
 
-      // Extract all unique setups from trades
       const setups = new Set<string>();
       
       journalEntries?.forEach(entry => {
@@ -66,8 +63,8 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
       const setupsArray = Array.from(setups).sort();
       setPreviousSetups(setupsArray);
       
-      // After loading setups, check if our value should trigger custom mode
-      if (value && !setupsArray.includes(value)) {
+      // Check if current value is in existing setups
+      if (value && !setupsArray.includes(value.trim())) {
         setIsCustomSetup(true);
       }
     } catch (error) {

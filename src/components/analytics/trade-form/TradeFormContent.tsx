@@ -32,22 +32,23 @@ export const TradeFormContent = ({
   // Pre-populate form fields when editing
   useEffect(() => {
     if (editTrade) {
+      // Ensure direction is set first
       setDirection(editTrade.direction as 'buy' | 'sell');
       
-      // Ensure setup is properly set from the editTrade data
+      // Carefully handle setup value
       const setupValue = editTrade.setup || "";
       
-      // Update the form values state with all trade data including setup
+      // Update form values with all trade data
       setFormValues({
         ...editTrade,
         setup: setupValue
       });
       
-      // A larger delay to ensure the form and all components are fully mounted
+      // Comprehensive delayed update to ensure form is fully mounted
       setTimeout(() => {
         const form = document.querySelector('form');
         if (form) {
-          // Set all the form field values based on editTrade data
+          // Update all form fields
           Object.entries(editTrade).forEach(([key, value]) => {
             const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
             if (input && value !== undefined && value !== null) {
@@ -55,13 +56,13 @@ export const TradeFormContent = ({
             }
           });
           
-          // Explicitly update the setup hidden field
+          // Explicitly update setup input
           const setupInput = form.querySelector('input[name="setup"]') as HTMLInputElement;
           if (setupInput) {
             setupInput.value = setupValue;
           }
         }
-      }, 300); // Increased delay to ensure component mounting
+      }, 500); // Increased delay to ensure complete mounting
     }
   }, [editTrade, setDirection]);
 
