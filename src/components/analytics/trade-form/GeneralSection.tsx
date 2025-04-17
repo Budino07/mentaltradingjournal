@@ -19,38 +19,43 @@ export const GeneralSection = ({
   formValues, 
   onSetupChange 
 }: GeneralSectionProps) => {
-  const [setupValue, setSetupValue] = useState(formValues?.setup || "");
+  const [setupValue, setSetupValue] = useState("");
 
   // Ensure setup value is synchronized
   useEffect(() => {
     if (formValues?.setup !== undefined) {
-      setSetupValue(formValues.setup || "");
+      const normalizedSetup = formValues.setup ? formValues.setup.trim() : "";
+      console.log("FormValues setup changed to:", normalizedSetup);
+      setSetupValue(normalizedSetup);
       
       // Ensure hidden input is updated
       setTimeout(() => {
         const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
         if (setupInput) {
-          setupInput.value = formValues.setup || "";
+          setupInput.value = normalizedSetup;
+          console.log("Hidden setup input updated to:", normalizedSetup);
         }
-      }, 50);
+      }, 100);
     }
   }, [formValues?.setup]);
 
   const handleSetupChange = (setup: string) => {
-    setSetupValue(setup);
+    const normalizedSetup = setup.trim();
+    console.log("Setup changed in GeneralSection:", normalizedSetup);
+    setSetupValue(normalizedSetup);
     
     if (onSetupChange) {
-      onSetupChange(setup);
+      onSetupChange(normalizedSetup);
     }
     
     // Update hidden input
     const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
     if (setupInput) {
-      setupInput.value = setup;
+      setupInput.value = normalizedSetup;
     }
   };
 
-  // Add the missing setTodayDate function
+  // Define the setTodayDate function
   const setTodayDate = (inputId: string) => {
     const now = new Date();
     const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
@@ -105,7 +110,7 @@ export const GeneralSection = ({
         <input 
           type="hidden" 
           name="setup" 
-          value={setupValue || ""} 
+          value={setupValue} 
           id="setup-hidden-input"
         />
         

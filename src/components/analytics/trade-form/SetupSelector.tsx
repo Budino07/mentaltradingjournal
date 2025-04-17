@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,11 +30,19 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
     }
   }, [user]);
 
-  // More precise check for custom setup
+  // Initialize custom mode based on value
   useEffect(() => {
-    if (value && previousSetups.length > 0) {
-      const setupExists = previousSetups.some(setup => setup.trim() === value.trim());
-      setIsCustomSetup(!setupExists);
+    if (value) {
+      console.log("Setup value in SetupSelector:", value);
+      // Normalize the setup value
+      const normalizedValue = value.trim();
+      
+      // If we have previous setups and the value isn't in them, set custom mode
+      if (previousSetups.length > 0) {
+        const setupExists = previousSetups.some(setup => setup.trim() === normalizedValue);
+        setIsCustomSetup(!setupExists);
+        console.log("Custom setup mode:", !setupExists);
+      }
     }
   }, [value, previousSetups]);
 
@@ -62,10 +71,12 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
 
       const setupsArray = Array.from(setups).sort();
       setPreviousSetups(setupsArray);
+      console.log("Previous setups loaded:", setupsArray);
       
       // Check if current value is in existing setups
       if (value && !setupsArray.includes(value.trim())) {
         setIsCustomSetup(true);
+        console.log("Setting custom mode because value not in setups:", value);
       }
     } catch (error) {
       console.error("Error fetching previous setups:", error);
@@ -75,15 +86,20 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
   };
 
   const handleSelectSetup = (setupValue: string) => {
-    onChange(setupValue);
+    const normalizedSetup = setupValue.trim();
+    console.log("Setup selected from dropdown:", normalizedSetup);
+    onChange(normalizedSetup);
     setIsCustomSetup(false);
   };
 
   const handleCustomSetup = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value);
+    const normalizedSetup = e.target.value.trim();
+    console.log("Custom setup changed:", normalizedSetup);
+    onChange(normalizedSetup);
   };
 
   const toggleCustomMode = () => {
+    console.log("Toggling custom mode from", isCustomSetup, "to", !isCustomSetup);
     setIsCustomSetup(!isCustomSetup);
     if (!isCustomSetup) {
       onChange(""); // Clear value when switching to custom mode
@@ -117,7 +133,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
       ) : (
         <div className="flex gap-2">
           <Select 
-            value={value} 
+            value={value || ""} 
             onValueChange={handleSelectSetup}
             disabled={isLoading || previousSetups.length === 0}
           >

@@ -35,8 +35,8 @@ export const TradeFormContent = ({
       // Ensure direction is set first
       setDirection(editTrade.direction as 'buy' | 'sell');
       
-      // Carefully handle setup value
-      const setupValue = editTrade.setup || "";
+      // Extract and normalize the setup value
+      const setupValue = editTrade.setup ? editTrade.setup.trim() : "";
       
       // Update form values with all trade data
       setFormValues({
@@ -44,15 +44,19 @@ export const TradeFormContent = ({
         setup: setupValue
       });
       
+      console.log("Edit trade setup value:", setupValue);
+      
       // Comprehensive delayed update to ensure form is fully mounted
       setTimeout(() => {
         const form = document.querySelector('form');
         if (form) {
           // Update all form fields
           Object.entries(editTrade).forEach(([key, value]) => {
-            const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
-            if (input && value !== undefined && value !== null) {
-              input.value = value.toString();
+            if (value !== undefined && value !== null) {
+              const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
+              if (input) {
+                input.value = value.toString();
+              }
             }
           });
           
@@ -60,9 +64,10 @@ export const TradeFormContent = ({
           const setupInput = form.querySelector('input[name="setup"]') as HTMLInputElement;
           if (setupInput) {
             setupInput.value = setupValue;
+            console.log("Setup input updated to:", setupValue);
           }
         }
-      }, 500); // Increased delay to ensure complete mounting
+      }, 800); // Increased delay to ensure complete mounting
     }
   }, [editTrade, setDirection]);
 
@@ -108,6 +113,7 @@ export const TradeFormContent = ({
   };
 
   const handleSetupChange = (setup: string) => {
+    console.log("Setup changed to:", setup);
     setFormValues({
       ...formValues,
       setup
