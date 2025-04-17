@@ -37,9 +37,9 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
   }, [user]);
 
   useEffect(() => {
-    // If value is not empty and not in previous setups, set custom mode
-    if (value && !previousSetups.includes(value) && previousSetups.length > 0) {
-      setIsCustomSetup(true);
+    // If value exists and setup options are loaded, check if it's custom or existing
+    if (value && previousSetups.length > 0) {
+      setIsCustomSetup(!previousSetups.includes(value));
     }
   }, [value, previousSetups]);
 

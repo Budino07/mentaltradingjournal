@@ -33,7 +33,10 @@ export const TradeFormContent = ({
   useEffect(() => {
     if (editTrade) {
       setDirection(editTrade.direction as 'buy' | 'sell');
-      setFormValues(editTrade);
+      setFormValues({
+        ...editTrade,
+        setup: editTrade.setup || ""  // Ensure setup is set even if null/undefined
+      });
       
       const form = document.querySelector('form');
       if (form) {
