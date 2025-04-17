@@ -29,7 +29,7 @@ export const TradeFormContent = ({
   });
   const isMobile = useIsMobile();
 
-  // Pre-populate form fields when editing
+  // Pre-populate form fields when editing - optimized for immediate display
   useEffect(() => {
     if (editTrade) {
       // Ensure direction is set first
@@ -38,7 +38,7 @@ export const TradeFormContent = ({
       // Extract and normalize the setup value
       const setupValue = editTrade.setup ? editTrade.setup.trim() : "";
       
-      // Update form values with all trade data
+      // Update form values with all trade data immediately
       setFormValues({
         ...editTrade,
         setup: setupValue
@@ -46,28 +46,26 @@ export const TradeFormContent = ({
       
       console.log("Edit trade setup value:", setupValue);
       
-      // Comprehensive delayed update to ensure form is fully mounted
-      setTimeout(() => {
-        const form = document.querySelector('form');
-        if (form) {
-          // Update all form fields
-          Object.entries(editTrade).forEach(([key, value]) => {
-            if (value !== undefined && value !== null) {
-              const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
-              if (input) {
-                input.value = value.toString();
-              }
+      // Immediate update without delay
+      const form = document.querySelector('form');
+      if (form) {
+        // Update all form fields
+        Object.entries(editTrade).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
+            if (input) {
+              input.value = value.toString();
             }
-          });
-          
-          // Explicitly update setup input
-          const setupInput = form.querySelector('input[name="setup"]') as HTMLInputElement;
-          if (setupInput) {
-            setupInput.value = setupValue;
-            console.log("Setup input updated to:", setupValue);
           }
+        });
+        
+        // Explicitly update setup input
+        const setupInput = form.querySelector('input[name="setup"]') as HTMLInputElement;
+        if (setupInput) {
+          setupInput.value = setupValue;
+          console.log("Setup input updated to:", setupValue);
         }
-      }, 800); // Increased delay to ensure complete mounting
+      }
     }
   }, [editTrade, setDirection]);
 
@@ -95,21 +93,19 @@ export const TradeFormContent = ({
       direction: newDirection
     });
     
-    // Need to wait for next render cycle
-    setTimeout(() => {
-      const updatedForm = document.querySelector('form');
-      if (updatedForm) {
-        // Restore all form values
-        Object.entries(currentValues).forEach(([key, value]) => {
-          if (key !== 'direction' && value !== undefined && value !== null) {
-            const input = updatedForm.querySelector(`[name="${key}"]`) as HTMLInputElement;
-            if (input) {
-              input.value = value.toString();
-            }
+    // Immediate update without delay
+    const updatedForm = document.querySelector('form');
+    if (updatedForm) {
+      // Restore all form values
+      Object.entries(currentValues).forEach(([key, value]) => {
+        if (key !== 'direction' && value !== undefined && value !== null) {
+          const input = updatedForm.querySelector(`[name="${key}"]`) as HTMLInputElement;
+          if (input) {
+            input.value = value.toString();
           }
-        });
-      }
-    }, 0);
+        }
+      });
+    }
   };
 
   const handleSetupChange = (setup: string) => {

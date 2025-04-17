@@ -30,7 +30,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
     }
   }, [user]);
 
-  // Initialize custom mode based on value
+  // Initialize custom mode based on value - optimized for immediate recognition
   useEffect(() => {
     if (value) {
       console.log("Setup value in SetupSelector:", value);
@@ -40,8 +40,8 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
       // If we have previous setups and the value isn't in them, set custom mode
       if (previousSetups.length > 0) {
         const setupExists = previousSetups.some(setup => setup.trim() === normalizedValue);
-        setIsCustomSetup(!setupExists);
-        console.log("Custom setup mode:", !setupExists);
+        setIsCustomSetup(!setupExists && normalizedValue !== "");
+        console.log("Custom setup mode:", !setupExists && normalizedValue !== "");
       }
     }
   }, [value, previousSetups]);
@@ -74,7 +74,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
       console.log("Previous setups loaded:", setupsArray);
       
       // Check if current value is in existing setups
-      if (value && !setupsArray.includes(value.trim())) {
+      if (value && !setupsArray.includes(value.trim()) && value.trim() !== "") {
         setIsCustomSetup(true);
         console.log("Setting custom mode because value not in setups:", value);
       }

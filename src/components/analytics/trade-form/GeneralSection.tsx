@@ -21,21 +21,19 @@ export const GeneralSection = ({
 }: GeneralSectionProps) => {
   const [setupValue, setSetupValue] = useState("");
 
-  // Ensure setup value is synchronized
+  // Optimized setup value synchronization
   useEffect(() => {
     if (formValues?.setup !== undefined) {
       const normalizedSetup = formValues.setup ? formValues.setup.trim() : "";
       console.log("FormValues setup changed to:", normalizedSetup);
       setSetupValue(normalizedSetup);
       
-      // Ensure hidden input is updated
-      setTimeout(() => {
-        const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
-        if (setupInput) {
-          setupInput.value = normalizedSetup;
-          console.log("Hidden setup input updated to:", normalizedSetup);
-        }
-      }, 100);
+      // Immediately update the hidden input
+      const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
+      if (setupInput) {
+        setupInput.value = normalizedSetup;
+        console.log("Hidden setup input updated to:", normalizedSetup);
+      }
     }
   }, [formValues?.setup]);
 
@@ -48,7 +46,7 @@ export const GeneralSection = ({
       onSetupChange(normalizedSetup);
     }
     
-    // Update hidden input
+    // Immediately update hidden input
     const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
     if (setupInput) {
       setupInput.value = normalizedSetup;
