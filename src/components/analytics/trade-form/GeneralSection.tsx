@@ -41,11 +41,6 @@ export const GeneralSection = ({
       setupInput.value = setup;
     }
   };
-  
-  // Debug logging to track setup value
-  useEffect(() => {
-    console.log("General Section - Current setup value:", formValues?.setup);
-  }, [formValues?.setup]);
 
   return (
     <div className="space-y-4">

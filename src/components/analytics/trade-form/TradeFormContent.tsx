@@ -34,32 +34,34 @@ export const TradeFormContent = ({
     if (editTrade) {
       setDirection(editTrade.direction as 'buy' | 'sell');
       
-      // Ensure we properly set the setup value in the form
+      // Ensure setup is properly set from the editTrade data
       const setupValue = editTrade.setup || "";
       
+      // Update the form values state with all trade data including setup
       setFormValues({
         ...editTrade,
         setup: setupValue
       });
       
-      const form = document.querySelector('form');
-      if (form) {
-        // Set all the form field values based on editTrade data
-        Object.entries(editTrade).forEach(([key, value]) => {
-          const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
-          if (input && value !== undefined && value !== null) {
-            input.value = value.toString();
+      // A small delay to ensure the form is mounted before we attempt to update input values
+      setTimeout(() => {
+        const form = document.querySelector('form');
+        if (form) {
+          // Set all the form field values based on editTrade data
+          Object.entries(editTrade).forEach(([key, value]) => {
+            const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
+            if (input && value !== undefined && value !== null) {
+              input.value = value.toString();
+            }
+          });
+          
+          // Explicitly update the setup hidden field
+          const setupInput = form.querySelector('input[name="setup"]') as HTMLInputElement;
+          if (setupInput) {
+            setupInput.value = setupValue;
           }
-        });
-        
-        // Explicitly update the setup hidden field
-        const setupInput = form.querySelector('input[name="setup"]') as HTMLInputElement;
-        if (setupInput) {
-          setupInput.value = setupValue;
         }
-      }
-      
-      console.log("Setting up form with trade data. Setup value:", setupValue);
+      }, 50);
     }
   }, [editTrade, setDirection]);
 
