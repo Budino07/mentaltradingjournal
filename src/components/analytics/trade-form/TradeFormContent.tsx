@@ -44,28 +44,31 @@ export const TradeFormContent = ({
         setup: setupValue
       });
       
-      console.log("Edit trade setup value:", setupValue);
-      
-      // Immediate update without delay
-      const form = document.querySelector('form');
-      if (form) {
-        // Update all form fields
-        Object.entries(editTrade).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
-            if (input) {
-              input.value = value.toString();
+      // Force immediate DOM update
+      setTimeout(() => {
+        const form = document.querySelector('form');
+        if (form) {
+          // Update all form fields immediately
+          Object.entries(editTrade).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+              const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
+              if (input) {
+                input.value = value.toString();
+              }
             }
+          });
+          
+          // Explicitly force update setup input and the hidden input
+          const setupInput = form.querySelector('input[name="setup"]') as HTMLInputElement;
+          if (setupInput) {
+            setupInput.value = setupValue;
+            
+            // Dispatch input event to trigger any listeners
+            const event = new Event('input', { bubbles: true });
+            setupInput.dispatchEvent(event);
           }
-        });
-        
-        // Explicitly update setup input
-        const setupInput = form.querySelector('input[name="setup"]') as HTMLInputElement;
-        if (setupInput) {
-          setupInput.value = setupValue;
-          console.log("Setup input updated to:", setupValue);
         }
-      }
+      }, 0);
     }
   }, [editTrade, setDirection]);
 
@@ -94,22 +97,27 @@ export const TradeFormContent = ({
     });
     
     // Immediate update without delay
-    const updatedForm = document.querySelector('form');
-    if (updatedForm) {
-      // Restore all form values
-      Object.entries(currentValues).forEach(([key, value]) => {
-        if (key !== 'direction' && value !== undefined && value !== null) {
-          const input = updatedForm.querySelector(`[name="${key}"]`) as HTMLInputElement;
-          if (input) {
-            input.value = value.toString();
+    setTimeout(() => {
+      const updatedForm = document.querySelector('form');
+      if (updatedForm) {
+        // Restore all form values
+        Object.entries(currentValues).forEach(([key, value]) => {
+          if (key !== 'direction' && value !== undefined && value !== null) {
+            const input = updatedForm.querySelector(`[name="${key}"]`) as HTMLInputElement;
+            if (input) {
+              input.value = value.toString();
+              
+              // Dispatch input event to trigger any listeners
+              const event = new Event('input', { bubbles: true });
+              input.dispatchEvent(event);
+            }
           }
-        }
-      });
-    }
+        });
+      }
+    }, 0);
   };
 
   const handleSetupChange = (setup: string) => {
-    console.log("Setup changed to:", setup);
     setFormValues({
       ...formValues,
       setup

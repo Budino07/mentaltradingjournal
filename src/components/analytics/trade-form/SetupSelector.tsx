@@ -33,15 +33,19 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
   // Initialize custom mode based on value - optimized for immediate recognition
   useEffect(() => {
     if (value) {
-      console.log("Setup value in SetupSelector:", value);
-      // Normalize the setup value
+      // Clean the value
       const normalizedValue = value.trim();
       
-      // If we have previous setups and the value isn't in them, set custom mode
-      if (previousSetups.length > 0) {
-        const setupExists = previousSetups.some(setup => setup.trim() === normalizedValue);
-        setIsCustomSetup(!setupExists && normalizedValue !== "");
-        console.log("Custom setup mode:", !setupExists && normalizedValue !== "");
+      if (normalizedValue !== "") {
+        // If we have previous setups and the value isn't in them, set custom mode
+        if (previousSetups.length > 0) {
+          const setupExists = previousSetups.some(setup => setup.trim() === normalizedValue);
+          const shouldUseCustomMode = !setupExists && normalizedValue !== "";
+          
+          if (shouldUseCustomMode !== isCustomSetup) {
+            setIsCustomSetup(shouldUseCustomMode);
+          }
+        }
       }
     }
   }, [value, previousSetups]);
@@ -71,12 +75,12 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
 
       const setupsArray = Array.from(setups).sort();
       setPreviousSetups(setupsArray);
-      console.log("Previous setups loaded:", setupsArray);
       
       // Check if current value is in existing setups
-      if (value && !setupsArray.includes(value.trim()) && value.trim() !== "") {
-        setIsCustomSetup(true);
-        console.log("Setting custom mode because value not in setups:", value);
+      if (value && value.trim() !== "") {
+        const normalizedValue = value.trim();
+        const setupExists = setupsArray.some(setup => setup.trim() === normalizedValue);
+        setIsCustomSetup(!setupExists);
       }
     } catch (error) {
       console.error("Error fetching previous setups:", error);
@@ -87,22 +91,43 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
 
   const handleSelectSetup = (setupValue: string) => {
     const normalizedSetup = setupValue.trim();
-    console.log("Setup selected from dropdown:", normalizedSetup);
     onChange(normalizedSetup);
     setIsCustomSetup(false);
+    
+    // Force update the hidden input
+    setTimeout(() => {
+      const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
+      if (setupInput) {
+        setupInput.value = normalizedSetup;
+      }
+    }, 0);
   };
 
   const handleCustomSetup = (e: React.ChangeEvent<HTMLInputElement>) => {
     const normalizedSetup = e.target.value.trim();
-    console.log("Custom setup changed:", normalizedSetup);
     onChange(normalizedSetup);
+    
+    // Force update the hidden input
+    setTimeout(() => {
+      const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
+      if (setupInput) {
+        setupInput.value = normalizedSetup;
+      }
+    }, 0);
   };
 
   const toggleCustomMode = () => {
-    console.log("Toggling custom mode from", isCustomSetup, "to", !isCustomSetup);
     setIsCustomSetup(!isCustomSetup);
     if (!isCustomSetup) {
       onChange(""); // Clear value when switching to custom mode
+      
+      // Force update the hidden input
+      setTimeout(() => {
+        const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
+        if (setupInput) {
+          setupInput.value = "";
+        }
+      }, 0);
     }
   };
 

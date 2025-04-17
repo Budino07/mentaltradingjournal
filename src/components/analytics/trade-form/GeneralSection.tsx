@@ -25,21 +25,24 @@ export const GeneralSection = ({
   useEffect(() => {
     if (formValues?.setup !== undefined) {
       const normalizedSetup = formValues.setup ? formValues.setup.trim() : "";
-      console.log("FormValues setup changed to:", normalizedSetup);
       setSetupValue(normalizedSetup);
       
       // Immediately update the hidden input
-      const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
-      if (setupInput) {
-        setupInput.value = normalizedSetup;
-        console.log("Hidden setup input updated to:", normalizedSetup);
-      }
+      setTimeout(() => {
+        const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
+        if (setupInput) {
+          setupInput.value = normalizedSetup;
+          
+          // Dispatch input event to trigger any listeners
+          const event = new Event('input', { bubbles: true });
+          setupInput.dispatchEvent(event);
+        }
+      }, 0);
     }
   }, [formValues?.setup]);
 
   const handleSetupChange = (setup: string) => {
     const normalizedSetup = setup.trim();
-    console.log("Setup changed in GeneralSection:", normalizedSetup);
     setSetupValue(normalizedSetup);
     
     if (onSetupChange) {
@@ -47,10 +50,16 @@ export const GeneralSection = ({
     }
     
     // Immediately update hidden input
-    const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
-    if (setupInput) {
-      setupInput.value = normalizedSetup;
-    }
+    setTimeout(() => {
+      const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
+      if (setupInput) {
+        setupInput.value = normalizedSetup;
+        
+        // Dispatch input event to trigger any listeners
+        const event = new Event('input', { bubbles: true });
+        setupInput.dispatchEvent(event);
+      }
+    }, 0);
   };
 
   // Define the setTodayDate function
@@ -134,7 +143,6 @@ export const GeneralSection = ({
               Sell
             </Button>
           </div>
-          {/* Hidden input to store the direction value for form submission */}
           <input 
             type="hidden" 
             name="direction" 
