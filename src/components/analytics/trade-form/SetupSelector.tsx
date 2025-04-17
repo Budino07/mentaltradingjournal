@@ -30,10 +30,11 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
     }
   }, [user]);
 
+  // Determine if we should be in custom mode based on the value
   useEffect(() => {
-    // If value exists and setup options are loaded, check if it's custom or existing
     if (value && previousSetups.length > 0) {
-      setIsCustomSetup(!previousSetups.includes(value));
+      const setupExists = previousSetups.some(setup => setup === value);
+      setIsCustomSetup(!setupExists);
     }
   }, [value, previousSetups]);
 
@@ -62,10 +63,11 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
         }
       });
 
-      setPreviousSetups(Array.from(setups).sort());
+      const setupsArray = Array.from(setups).sort();
+      setPreviousSetups(setupsArray);
       
       // After loading setups, check if our value should trigger custom mode
-      if (value && !Array.from(setups).includes(value)) {
+      if (value && !setupsArray.includes(value)) {
         setIsCustomSetup(true);
       }
     } catch (error) {
@@ -118,7 +120,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
       ) : (
         <div className="flex gap-2">
           <Select 
-            value={value || ""} 
+            value={value} 
             onValueChange={handleSelectSetup}
             disabled={isLoading || previousSetups.length === 0}
           >

@@ -22,10 +22,18 @@ export const GeneralSection = ({
   // Add state to ensure setup value is tracked locally
   const [setupValue, setSetupValue] = useState(formValues?.setup || "");
 
+  // Update local state when formValues changes
   useEffect(() => {
-    // Update local state when formValues changes
     if (formValues?.setup) {
       setSetupValue(formValues.setup);
+      
+      // Also ensure the hidden input is updated
+      setTimeout(() => {
+        const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
+        if (setupInput) {
+          setupInput.value = formValues.setup || "";
+        }
+      }, 10);
     }
   }, [formValues?.setup]);
 
@@ -53,16 +61,6 @@ export const GeneralSection = ({
       setupInput.value = setup;
     }
   };
-
-  // Ensure the setup value is initialized properly
-  useEffect(() => {
-    if (formValues?.setup) {
-      const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
-      if (setupInput) {
-        setupInput.value = formValues.setup;
-      }
-    }
-  }, [formValues?.setup]);
 
   return (
     <div className="space-y-4">
@@ -109,6 +107,7 @@ export const GeneralSection = ({
           type="hidden" 
           name="setup" 
           value={setupValue || ""} 
+          id="setup-hidden-input"
         />
         
         <div className="grid w-full gap-1.5">
