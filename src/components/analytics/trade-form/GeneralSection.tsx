@@ -42,6 +42,16 @@ export const GeneralSection = ({
     }
   };
 
+  // Ensure the setup value is initialized properly
+  useEffect(() => {
+    if (formValues?.setup) {
+      const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
+      if (setupInput) {
+        setupInput.value = formValues.setup;
+      }
+    }
+  }, [formValues?.setup]);
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold mb-3">General</h3>

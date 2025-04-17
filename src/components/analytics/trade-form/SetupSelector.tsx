@@ -10,12 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Check, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -124,7 +118,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
       ) : (
         <div className="flex gap-2">
           <Select 
-            value={value} 
+            value={value || ""} 
             onValueChange={handleSelectSetup}
             disabled={isLoading || previousSetups.length === 0}
           >

@@ -43,7 +43,7 @@ export const TradeFormContent = ({
         setup: setupValue
       });
       
-      // A small delay to ensure the form is mounted before we attempt to update input values
+      // A larger delay to ensure the form and all components are fully mounted
       setTimeout(() => {
         const form = document.querySelector('form');
         if (form) {
@@ -61,7 +61,7 @@ export const TradeFormContent = ({
             setupInput.value = setupValue;
           }
         }
-      }, 50);
+      }, 100);
     }
   }, [editTrade, setDirection]);
 
