@@ -33,9 +33,13 @@ export const TradeFormContent = ({
   useEffect(() => {
     if (editTrade) {
       setDirection(editTrade.direction as 'buy' | 'sell');
+      
+      // Ensure we properly set the setup value in the form
+      const setupValue = editTrade.setup || "";
+      
       setFormValues({
         ...editTrade,
-        setup: editTrade.setup || ""  // Ensure setup is set even if null/undefined
+        setup: setupValue
       });
       
       const form = document.querySelector('form');
@@ -47,7 +51,15 @@ export const TradeFormContent = ({
             input.value = value.toString();
           }
         });
+        
+        // Explicitly update the setup hidden field
+        const setupInput = form.querySelector('input[name="setup"]') as HTMLInputElement;
+        if (setupInput) {
+          setupInput.value = setupValue;
+        }
       }
+      
+      console.log("Setting up form with trade data. Setup value:", setupValue);
     }
   }, [editTrade, setDirection]);
 

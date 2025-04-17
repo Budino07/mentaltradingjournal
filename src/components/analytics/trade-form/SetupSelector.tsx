@@ -69,6 +69,12 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
       });
 
       setPreviousSetups(Array.from(setups).sort());
+      
+      // After loading setups, check if our value should trigger custom mode
+      if (value && !Array.from(setups).includes(value)) {
+        setIsCustomSetup(true);
+      }
+      
     } catch (error) {
       console.error("Error fetching previous setups:", error);
     } finally {
@@ -91,6 +97,13 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
       onChange(""); // Clear value when switching to custom mode
     }
   };
+
+  // Debug the current value and setup mode
+  useEffect(() => {
+    console.log("Setup selector value:", value);
+    console.log("Is custom setup:", isCustomSetup);
+    console.log("Previous setups:", previousSetups);
+  }, [value, isCustomSetup, previousSetups]);
 
   return (
     <div className="grid w-full items-center gap-1.5">

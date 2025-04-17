@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Trade } from "@/types/trade";
 import { SetupSelector } from "./SetupSelector";
+import { useEffect } from "react";
 
 interface GeneralSectionProps {
   direction: 'buy' | 'sell' | null;
@@ -40,6 +41,11 @@ export const GeneralSection = ({
       setupInput.value = setup;
     }
   };
+  
+  // Debug logging to track setup value
+  useEffect(() => {
+    console.log("General Section - Current setup value:", formValues?.setup);
+  }, [formValues?.setup]);
 
   return (
     <div className="space-y-4">
