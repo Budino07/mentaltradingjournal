@@ -1,4 +1,3 @@
-
 import React from "react";
 import { WrappedMonthData } from "@/hooks/useWrappedData";
 import { Timer } from "lucide-react";
@@ -29,10 +28,9 @@ export const HoldingTimeInsight: React.FC<HoldingTimeInsightProps> = ({ data }) 
   };
 
   const holdingTimeCategory = () => {
-    if (data.avgHoldingTime < 10) return "Scalper";
-    if (data.avgHoldingTime < 60) return "Day Trader";
-    if (data.avgHoldingTime < 240) return "Intraday Trader";
-    return "Swing Trader";
+    if (data.avgHoldingTime < 120) return "Momentum Trader"; // Less than 2 hours
+    if (data.avgHoldingTime < 420) return "Day Trader"; // 2-7 hours
+    return "Swing Trader"; // Over 7 hours
   };
 
   return (
@@ -62,13 +60,13 @@ export const HoldingTimeInsight: React.FC<HoldingTimeInsightProps> = ({ data }) 
           <div 
             className="h-full bg-gradient-to-r from-blue-400 to-indigo-600 rounded-full absolute"
             style={{ 
-              width: `${Math.min(100, (data.avgHoldingTime / 240) * 100)}%`,
+              width: `${Math.min(100, (data.avgHoldingTime / 420) * 100)}%`,
               transition: 'width 1s ease-in-out'
             }}
           />
         </div>
         <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-          <span>Scalper</span>
+          <span>Momentum Trader</span>
           <span>Day Trader</span>
           <span>Swing Trader</span>
         </div>
