@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Check, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -21,7 +28,6 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
   const [previousSetups, setPreviousSetups] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCustomSetup, setIsCustomSetup] = useState(false);
-  const [customInputValue, setCustomInputValue] = useState(value);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -30,31 +36,17 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
     }
   }, [user]);
 
-  // Initialize custom mode based on value - optimized for immediate recognition
   useEffect(() => {
-    if (value) {
-      // Clean the value
-      const normalizedValue = value.trim();
-      
-      if (normalizedValue !== "") {
-        // If we have previous setups and the value isn't in them, set custom mode
-        if (previousSetups.length > 0) {
-          const setupExists = previousSetups.some(setup => setup.trim() === normalizedValue);
-          const shouldUseCustomMode = !setupExists && normalizedValue !== "";
-          
-          if (shouldUseCustomMode !== isCustomSetup) {
-            setIsCustomSetup(shouldUseCustomMode);
-          }
-        }
-      }
-      // Also update customInputValue when value prop changes externally
-      setCustomInputValue(value);
+    // If value is not empty and not in previous setups, set custom mode
+    if (value && !previousSetups.includes(value) && previousSetups.length > 0) {
+      setIsCustomSetup(true);
     }
   }, [value, previousSetups]);
 
   const fetchPreviousSetups = async () => {
     setIsLoading(true);
     try {
+      // Get all journal entries with trades from the current user
       const { data: journalEntries, error } = await supabase
         .from("journal_entries")
         .select("trades")
@@ -63,6 +55,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
 
       if (error) throw error;
 
+      // Extract all unique setups from trades
       const setups = new Set<string>();
       
       journalEntries?.forEach(entry => {
@@ -75,15 +68,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
         }
       });
 
-      const setupsArray = Array.from(setups).sort();
-      setPreviousSetups(setupsArray);
-      
-      // Check if current value is in existing setups
-      if (value && value.trim() !== "") {
-        const normalizedValue = value.trim();
-        const setupExists = setupsArray.some(setup => setup.trim() === normalizedValue);
-        setIsCustomSetup(!setupExists);
-      }
+      setPreviousSetups(Array.from(setups).sort());
     } catch (error) {
       console.error("Error fetching previous setups:", error);
     } finally {
@@ -92,50 +77,18 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
   };
 
   const handleSelectSetup = (setupValue: string) => {
-    const normalizedSetup = setupValue.trim();
-    onChange(normalizedSetup);
+    onChange(setupValue);
     setIsCustomSetup(false);
-    setCustomInputValue(normalizedSetup);
-    
-    // Force update the hidden input
-    setTimeout(() => {
-      const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
-      if (setupInput) {
-        setupInput.value = normalizedSetup;
-      }
-    }, 0);
   };
 
   const handleCustomSetup = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Important: do NOT trim here to allow spaces while typing
-    const inputValue = e.target.value;
-    setCustomInputValue(inputValue);
-    
-    // Propagate trimmed value onChange, but keep input value as-is for typing
-    onChange(inputValue.trimStart()); 
-
-    // Force update the hidden input with trimmed value
-    setTimeout(() => {
-      const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
-      if (setupInput) {
-        setupInput.value = inputValue.trim();
-      }
-    }, 0);
+    onChange(e.target.value);
   };
 
   const toggleCustomMode = () => {
     setIsCustomSetup(!isCustomSetup);
     if (!isCustomSetup) {
       onChange(""); // Clear value when switching to custom mode
-      setCustomInputValue("");
-      
-      // Force update the hidden input
-      setTimeout(() => {
-        const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
-        if (setupInput) {
-          setupInput.value = "";
-        }
-      }, 0);
     }
   };
 
@@ -149,7 +102,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
             type="text"
             id="setup"
             name="setup"
-            value={customInputValue}
+            value={value}
             onChange={handleCustomSetup}
             placeholder="Enter your trading setup"
             className="flex-1"
@@ -166,7 +119,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
       ) : (
         <div className="flex gap-2">
           <Select 
-            value={value || ""} 
+            value={value} 
             onValueChange={handleSelectSetup}
             disabled={isLoading || previousSetups.length === 0}
           >

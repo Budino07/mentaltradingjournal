@@ -29,46 +29,22 @@ export const TradeFormContent = ({
   });
   const isMobile = useIsMobile();
 
-  // Pre-populate form fields when editing - optimized for immediate display
+  // Pre-populate form fields when editing
   useEffect(() => {
     if (editTrade) {
-      // Ensure direction is set first
       setDirection(editTrade.direction as 'buy' | 'sell');
+      setFormValues(editTrade);
       
-      // Extract and normalize the setup value
-      const setupValue = editTrade.setup ? editTrade.setup.trim() : "";
-      
-      // Update form values with all trade data immediately
-      setFormValues({
-        ...editTrade,
-        setup: setupValue
-      });
-      
-      // Force immediate DOM update
-      setTimeout(() => {
-        const form = document.querySelector('form');
-        if (form) {
-          // Update all form fields immediately
-          Object.entries(editTrade).forEach(([key, value]) => {
-            if (value !== undefined && value !== null) {
-              const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
-              if (input) {
-                input.value = value.toString();
-              }
-            }
-          });
-          
-          // Explicitly force update setup input and the hidden input
-          const setupInput = form.querySelector('input[name="setup"]') as HTMLInputElement;
-          if (setupInput) {
-            setupInput.value = setupValue;
-            
-            // Dispatch input event to trigger any listeners
-            const event = new Event('input', { bubbles: true });
-            setupInput.dispatchEvent(event);
+      const form = document.querySelector('form');
+      if (form) {
+        // Set all the form field values based on editTrade data
+        Object.entries(editTrade).forEach(([key, value]) => {
+          const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
+          if (input && value !== undefined && value !== null) {
+            input.value = value.toString();
           }
-        }
-      }, 0);
+        });
+      }
     }
   }, [editTrade, setDirection]);
 
@@ -96,7 +72,7 @@ export const TradeFormContent = ({
       direction: newDirection
     });
     
-    // Immediate update without delay
+    // Need to wait for next render cycle
     setTimeout(() => {
       const updatedForm = document.querySelector('form');
       if (updatedForm) {
@@ -106,10 +82,6 @@ export const TradeFormContent = ({
             const input = updatedForm.querySelector(`[name="${key}"]`) as HTMLInputElement;
             if (input) {
               input.value = value.toString();
-              
-              // Dispatch input event to trigger any listeners
-              const event = new Event('input', { bubbles: true });
-              input.dispatchEvent(event);
             }
           }
         });

@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Trade } from "@/types/trade";
 import { SetupSelector } from "./SetupSelector";
-import { useEffect, useState } from "react";
 
 interface GeneralSectionProps {
   direction: 'buy' | 'sell' | null;
@@ -19,50 +18,6 @@ export const GeneralSection = ({
   formValues, 
   onSetupChange 
 }: GeneralSectionProps) => {
-  const [setupValue, setSetupValue] = useState("");
-
-  // Optimized setup value synchronization
-  useEffect(() => {
-    if (formValues?.setup !== undefined) {
-      const normalizedSetup = formValues.setup ? formValues.setup.trim() : "";
-      setSetupValue(normalizedSetup);
-      
-      // Immediately update the hidden input
-      setTimeout(() => {
-        const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
-        if (setupInput) {
-          setupInput.value = normalizedSetup;
-          
-          // Dispatch input event to trigger any listeners
-          const event = new Event('input', { bubbles: true });
-          setupInput.dispatchEvent(event);
-        }
-      }, 0);
-    }
-  }, [formValues?.setup]);
-
-  const handleSetupChange = (setup: string) => {
-    const normalizedSetup = setup.trim();
-    setSetupValue(normalizedSetup);
-    
-    if (onSetupChange) {
-      onSetupChange(normalizedSetup);
-    }
-    
-    // Immediately update hidden input
-    setTimeout(() => {
-      const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
-      if (setupInput) {
-        setupInput.value = normalizedSetup;
-        
-        // Dispatch input event to trigger any listeners
-        const event = new Event('input', { bubbles: true });
-        setupInput.dispatchEvent(event);
-      }
-    }, 0);
-  };
-
-  // Define the setTodayDate function
   const setTodayDate = (inputId: string) => {
     const now = new Date();
     const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
@@ -71,6 +26,18 @@ export const GeneralSection = ({
     const input = document.getElementById(inputId) as HTMLInputElement;
     if (input) {
       input.value = localDateTime;
+    }
+  };
+
+  const handleSetupChange = (setup: string) => {
+    if (onSetupChange) {
+      onSetupChange(setup);
+    }
+    
+    // Also update the hidden input for form submission
+    const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
+    if (setupInput) {
+      setupInput.value = setup;
     }
   };
 
@@ -110,15 +77,15 @@ export const GeneralSection = ({
         </div>
         
         <SetupSelector 
-          value={setupValue}
+          value={formValues?.setup || ""}
           onChange={handleSetupChange}
         />
         
+        {/* Hidden input to preserve form submission */}
         <input 
           type="hidden" 
           name="setup" 
-          value={setupValue} 
-          id="setup-hidden-input"
+          value={formValues?.setup || ""} 
         />
         
         <div className="grid w-full gap-1.5">
@@ -143,6 +110,7 @@ export const GeneralSection = ({
               Sell
             </Button>
           </div>
+          {/* Hidden input to store the direction value for form submission */}
           <input 
             type="hidden" 
             name="direction" 
