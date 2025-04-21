@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +21,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
   const [previousSetups, setPreviousSetups] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCustomSetup, setIsCustomSetup] = useState(false);
+  const [customInputValue, setCustomInputValue] = useState(value);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -47,6 +47,8 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
           }
         }
       }
+      // Also update customInputValue when value prop changes externally
+      setCustomInputValue(value);
     }
   }, [value, previousSetups]);
 
@@ -93,6 +95,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
     const normalizedSetup = setupValue.trim();
     onChange(normalizedSetup);
     setIsCustomSetup(false);
+    setCustomInputValue(normalizedSetup);
     
     // Force update the hidden input
     setTimeout(() => {
@@ -104,14 +107,18 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
   };
 
   const handleCustomSetup = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const normalizedSetup = e.target.value.trim();
-    onChange(normalizedSetup);
+    // Important: do NOT trim here to allow spaces while typing
+    const inputValue = e.target.value;
+    setCustomInputValue(inputValue);
     
-    // Force update the hidden input
+    // Propagate trimmed value onChange, but keep input value as-is for typing
+    onChange(inputValue.trimStart()); 
+
+    // Force update the hidden input with trimmed value
     setTimeout(() => {
       const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
       if (setupInput) {
-        setupInput.value = normalizedSetup;
+        setupInput.value = inputValue.trim();
       }
     }, 0);
   };
@@ -120,6 +127,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
     setIsCustomSetup(!isCustomSetup);
     if (!isCustomSetup) {
       onChange(""); // Clear value when switching to custom mode
+      setCustomInputValue("");
       
       // Force update the hidden input
       setTimeout(() => {
@@ -141,7 +149,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
             type="text"
             id="setup"
             name="setup"
-            value={value}
+            value={customInputValue}
             onChange={handleCustomSetup}
             placeholder="Enter your trading setup"
             className="flex-1"
