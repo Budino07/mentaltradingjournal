@@ -91,7 +91,7 @@ export const TradeTimePerformance = () => {
     if (tradesByTime.length === 0) return null;
     
     // Group trades by hour
-    const tradesByTime.reduce((acc, trade) => {
+    const tradesByHour = tradesByTime.reduce((acc, trade) => {
       const hour = trade.hour;
       if (!acc[hour]) {
         acc[hour] = { trades: [], totalPnl: 0, avgPnl: 0, winRate: 0 };
@@ -252,7 +252,7 @@ export const TradeTimePerformance = () => {
               />
               <Scatter 
                 name="Profitable Trades" 
-                data={tradesByTime.filter(trade => trade.pnl > 0)} 
+                data={tradesByTime.filter(trade => trade.pnl >= 0)} 
                 fill="#4ade80" 
                 cursor="pointer"
                 onClick={(data) => handlePointClick(data)}
@@ -261,13 +261,6 @@ export const TradeTimePerformance = () => {
                 name="Losing Trades" 
                 data={tradesByTime.filter(trade => trade.pnl < 0)} 
                 fill="#f87171" 
-                cursor="pointer"
-                onClick={(data) => handlePointClick(data)}
-              />
-              <Scatter 
-                name="Breakeven Trades" 
-                data={tradesByTime.filter(trade => trade.pnl === 0)} 
-                fill="#9ca3af" // Tailwind's gray-500 for breakeven trades
                 cursor="pointer"
                 onClick={(data) => handlePointClick(data)}
               />
