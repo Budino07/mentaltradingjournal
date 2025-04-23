@@ -53,6 +53,13 @@ export const GeneralSection = ({
     if (setupInput) {
       setupInput.value = setup;
     }
+    
+    // Dispatch a custom event to ensure the change is propagated
+    const setupChangeEvent = new CustomEvent('setup-value-changed', { 
+      detail: { value: setup },
+      bubbles: true 
+    });
+    document.dispatchEvent(setupChangeEvent);
   };
 
   return (

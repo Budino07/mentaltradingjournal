@@ -37,6 +37,9 @@ export const TradeFormContent = ({
       // Ensure we have a clean object with all properties
       const cleanValues = {...editTrade};
       
+      // Log setup value for debugging
+      console.log("Edit trade setup value:", editTrade.setup);
+      
       // Set formValues directly from editTrade
       setFormValues(cleanValues);
       
@@ -70,6 +73,18 @@ export const TradeFormContent = ({
                 bubbles: true 
               });
               setupInput.dispatchEvent(setupChangeEvent);
+              
+              // Force trigger a forced render with this specific setup
+              setTimeout(() => {
+                const setupSelector = document.querySelector('.setup-selector');
+                if (setupSelector) {
+                  const forceEvent = new CustomEvent('force-setup-update', { 
+                    detail: { value: editTrade.setup },
+                    bubbles: true 
+                  });
+                  setupSelector.dispatchEvent(forceEvent);
+                }
+              }, 100);
             }
           }
         }
@@ -120,10 +135,10 @@ export const TradeFormContent = ({
 
   const handleSetupChange = (setup: string) => {
     console.log("Setup change in TradeFormContent:", setup);
-    setFormValues({
-      ...formValues,
+    setFormValues(prev => ({
+      ...prev,
       setup
-    });
+    }));
     
     // Also ensure the hidden input is updated
     const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;

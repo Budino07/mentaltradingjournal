@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +24,8 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
   const [isCustomSetup, setIsCustomSetup] = useState(false);
   const [inputValue, setInputValue] = useState(value || "");
   const { user } = useAuth();
+  const initialSetupRef = useRef<string | null>(null);
+  const setupExists = useRef<boolean>(false);
 
   useEffect(() => {
     if (user) {
@@ -31,17 +33,26 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
     }
   }, [user]);
 
+  // Store initial setup value when component mounts
+  useEffect(() => {
+    if (value && initialSetupRef.current === null) {
+      initialSetupRef.current = value;
+      console.log("Initial setup value stored:", value);
+    }
+  }, [value]);
+
   // Update local input value when prop value changes
   useEffect(() => {
     console.log("Setup value changed to:", value);
-    setInputValue(value || "");
-  }, [value]);
-
-  // Check if the current value exists in the previous setups
-  useEffect(() => {
-    if (value && previousSetups.length > 0) {
-      const exists = previousSetups.includes(value);
-      setIsCustomSetup(!exists && value.trim() !== "");
+    if (value && value.trim() !== "") {
+      setInputValue(value);
+      
+      // If we have previous setups loaded, check if this is custom
+      if (previousSetups.length > 0) {
+        const exists = previousSetups.includes(value);
+        setupExists.current = exists;
+        setIsCustomSetup(!exists);
+      }
     }
   }, [value, previousSetups]);
 
@@ -52,23 +63,51 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
       console.log("Custom setup value changed event:", newValue);
       if (newValue !== undefined && newValue !== null) {
         setInputValue(newValue);
+        onChange(newValue);
         
         // Check if this is a custom or existing setup
         if (previousSetups.length > 0) {
           const exists = previousSetups.includes(newValue);
+          setupExists.current = exists;
           setIsCustomSetup(!exists && newValue.trim() !== "");
         }
       }
     };
-
-    // Add event listener
+    
+    // Add event listener for setup-value-changed
     document.addEventListener('setup-value-changed', handleSetupValueChanged as EventListener);
+    
+    // Add event listener for force-setup-update
+    const handleForceSetupUpdate = (e: CustomEvent) => {
+      const forcedValue = e.detail?.value;
+      console.log("Forced setup update:", forcedValue);
+      if (forcedValue) {
+        setInputValue(forcedValue);
+        onChange(forcedValue);
+        
+        // Check if this value exists in previous setups
+        if (previousSetups.length > 0) {
+          const exists = previousSetups.includes(forcedValue);
+          setupExists.current = exists;
+          setIsCustomSetup(!exists);
+        } else {
+          // If we don't have setups yet, we'll assume it might be a custom one
+          setIsCustomSetup(true);
+        }
+        
+        // Update the hidden input value
+        updateHiddenInput(forcedValue);
+      }
+    };
+    
+    document.addEventListener('force-setup-update', handleForceSetupUpdate as EventListener);
 
     // Cleanup
     return () => {
       document.removeEventListener('setup-value-changed', handleSetupValueChanged as EventListener);
+      document.removeEventListener('force-setup-update', handleForceSetupUpdate as EventListener);
     };
-  }, [previousSetups]);
+  }, [previousSetups, onChange]);
 
   const fetchPreviousSetups = async () => {
     setIsLoading(true);
@@ -98,9 +137,14 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
       const setupsArray = Array.from(setups).sort();
       setPreviousSetups(setupsArray);
       
-      // If current value is not in the list and not empty, set custom mode
-      if (value && value.trim() !== "" && !setupsArray.includes(value)) {
-        setIsCustomSetup(true);
+      console.log("Loaded previous setups:", setupsArray);
+      
+      // If current value is not empty, check if it's in the list
+      if (value && value.trim() !== "") {
+        const exists = setupsArray.includes(value);
+        setupExists.current = exists;
+        setIsCustomSetup(!exists);
+        console.log(`Setup "${value}" exists in list: ${exists}, setting custom mode: ${!exists}`);
       }
     } catch (error) {
       console.error("Error fetching previous setups:", error);
@@ -110,6 +154,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
   };
 
   const handleSelectSetup = (setupValue: string) => {
+    console.log("Selected setup from dropdown:", setupValue);
     onChange(setupValue);
     setInputValue(setupValue);
     setIsCustomSetup(false);
@@ -131,6 +176,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
     const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
     if (setupInput) {
       setupInput.value = setupValue;
+      console.log("Updated hidden input value:", setupValue);
     }
   };
 
@@ -152,7 +198,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
   };
 
   return (
-    <div className="grid w-full items-center gap-1.5">
+    <div className="grid w-full items-center gap-1.5 setup-selector">
       <Label htmlFor="setup">Setup</Label>
       
       {isCustomSetup ? (
@@ -178,12 +224,14 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
       ) : (
         <div className="flex gap-2">
           <Select 
-            value={value} 
+            value={inputValue} 
             onValueChange={handleSelectSetup}
             disabled={isLoading || previousSetups.length === 0}
           >
             <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Select a setup" />
+              <SelectValue placeholder="Select a setup">
+                {inputValue}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {previousSetups.map((setup) => (
@@ -208,7 +256,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
       <input 
         type="hidden" 
         name="setup" 
-        value={value || ""} 
+        value={inputValue} 
       />
     </div>
   );

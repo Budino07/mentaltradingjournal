@@ -33,6 +33,7 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         console.log("Using original setup:", setup);
       }
       
+      // Get all other form values
       const tradeData = {
         entryDate: formData.get("entryDate") as string,
         instrument: formData.get("instrument") as string,
@@ -52,7 +53,7 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         notes: formData.get("notes") as string,
       };
 
-      console.log("Trade data to submit:", tradeData);
+      console.log("Final trade data to submit:", tradeData);
 
       if (editTrade) {
         const { data: entries, error: fetchError } = await supabase
@@ -73,7 +74,8 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         
         const updatedTradeObject = {
           id: editTrade.id,
-          ...tradeData
+          ...tradeData,
+          setup: setup || editTrade.setup, // Ensure setup isn't lost
         };
 
         const updatedTrades = trades.map(trade => 
