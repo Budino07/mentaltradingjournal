@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info, Settings } from "lucide-react";
@@ -252,8 +253,15 @@ export const TradeTimePerformance = () => {
               />
               <Scatter 
                 name="Profitable Trades" 
-                data={tradesByTime.filter(trade => trade.pnl >= 0)} 
+                data={tradesByTime.filter(trade => trade.pnl > 0)} 
                 fill="#4ade80" 
+                cursor="pointer"
+                onClick={(data) => handlePointClick(data)}
+              />
+              <Scatter 
+                name="Breakeven Trades" 
+                data={tradesByTime.filter(trade => trade.pnl === 0)} 
+                fill="#9ca3af" 
                 cursor="pointer"
                 onClick={(data) => handlePointClick(data)}
               />
