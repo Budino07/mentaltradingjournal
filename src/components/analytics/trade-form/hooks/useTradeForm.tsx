@@ -21,10 +21,18 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
 
     try {
       const formData = new FormData(event.currentTarget);
+      
+      // Get setup value directly from form or fallback to original editTrade value
+      let setup = formData.get("setup") as string;
+      // If the setup is empty and we're editing a trade with a setup, preserve the original setup
+      if ((!setup || setup.trim() === '') && editTrade?.setup) {
+        setup = editTrade.setup;
+      }
+      
       const tradeData = {
         entryDate: formData.get("entryDate") as string,
         instrument: formData.get("instrument") as string,
-        setup: formData.get("setup") as string,
+        setup: setup, // Use the preserved setup value
         direction: formData.get("direction") as 'buy' | 'sell',
         entryPrice: parseFloat(formData.get("entryPrice") as string),
         exitPrice: parseFloat(formData.get("exitPrice") as string),
@@ -37,7 +45,7 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         resultUrl: formData.get("resultUrl") as string,
         highestPrice: parseFloat(formData.get("highestPrice") as string),
         lowestPrice: parseFloat(formData.get("lowestPrice") as string),
-        notes: formData.get("notes") as string, // Add notes field to trade data
+        notes: formData.get("notes") as string,
       };
 
       console.log("Trade data to submit:", tradeData);

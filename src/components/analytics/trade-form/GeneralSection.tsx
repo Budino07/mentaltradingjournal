@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Trade } from "@/types/trade";
 import { SetupSelector } from "./SetupSelector";
+import { useEffect, useState } from "react";
 
 interface GeneralSectionProps {
   direction: 'buy' | 'sell' | null;
@@ -18,6 +19,15 @@ export const GeneralSection = ({
   formValues, 
   onSetupChange 
 }: GeneralSectionProps) => {
+  const [setupValue, setSetupValue] = useState(formValues?.setup || "");
+  
+  useEffect(() => {
+    // Update setup value when formValues changes
+    if (formValues?.setup !== undefined) {
+      setSetupValue(formValues.setup);
+    }
+  }, [formValues]);
+  
   const setTodayDate = (inputId: string) => {
     const now = new Date();
     const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
@@ -30,6 +40,8 @@ export const GeneralSection = ({
   };
 
   const handleSetupChange = (setup: string) => {
+    setSetupValue(setup);
+    
     if (onSetupChange) {
       onSetupChange(setup);
     }
@@ -77,15 +89,8 @@ export const GeneralSection = ({
         </div>
         
         <SetupSelector 
-          value={formValues?.setup || ""}
+          value={setupValue}
           onChange={handleSetupChange}
-        />
-        
-        {/* Hidden input to preserve form submission */}
-        <input 
-          type="hidden" 
-          name="setup" 
-          value={formValues?.setup || ""} 
         />
         
         <div className="grid w-full gap-1.5">

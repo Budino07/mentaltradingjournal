@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Check, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,6 +22,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
   const [previousSetups, setPreviousSetups] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCustomSetup, setIsCustomSetup] = useState(false);
+  const [inputValue, setInputValue] = useState(value || "");
   const { user } = useAuth();
 
   useEffect(() => {
@@ -36,10 +31,16 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
     }
   }, [user]);
 
+  // Update local input value when prop value changes
   useEffect(() => {
-    // If value is not empty and not in previous setups, set custom mode
-    if (value && !previousSetups.includes(value) && previousSetups.length > 0) {
-      setIsCustomSetup(true);
+    setInputValue(value || "");
+  }, [value]);
+
+  // Check if the current value exists in the previous setups
+  useEffect(() => {
+    if (value && previousSetups.length > 0) {
+      const exists = previousSetups.includes(value);
+      setIsCustomSetup(!exists && value.trim() !== "");
     }
   }, [value, previousSetups]);
 
@@ -78,17 +79,43 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
 
   const handleSelectSetup = (setupValue: string) => {
     onChange(setupValue);
+    setInputValue(setupValue);
     setIsCustomSetup(false);
+    
+    // Update hidden input for form submission
+    updateHiddenInput(setupValue);
   };
 
   const handleCustomSetup = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value);
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    onChange(newValue);
+    
+    // Update hidden input for form submission
+    updateHiddenInput(newValue);
+  };
+
+  const updateHiddenInput = (setupValue: string) => {
+    const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
+    if (setupInput) {
+      setupInput.value = setupValue;
+    }
   };
 
   const toggleCustomMode = () => {
     setIsCustomSetup(!isCustomSetup);
-    if (!isCustomSetup) {
-      onChange(""); // Clear value when switching to custom mode
+    
+    // If switching to existing mode, update to selected setup if available
+    if (isCustomSetup && previousSetups.length > 0) {
+      if (value && previousSetups.includes(value)) {
+        // Keep current value if it exists in previous setups
+        setInputValue(value);
+      } else {
+        // Reset to empty to allow selection
+        setInputValue("");
+        onChange("");
+        updateHiddenInput("");
+      }
     }
   };
 
@@ -101,8 +128,8 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
           <Input
             type="text"
             id="setup"
-            name="setup"
-            value={value}
+            name="setup-input"
+            value={inputValue}
             onChange={handleCustomSetup}
             placeholder="Enter your trading setup"
             className="flex-1"
@@ -144,6 +171,13 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
           </Button>
         </div>
       )}
+      
+      {/* Hidden input to preserve form submission */}
+      <input 
+        type="hidden" 
+        name="setup" 
+        value={value || ""} 
+      />
     </div>
   );
 };

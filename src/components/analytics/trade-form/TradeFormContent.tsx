@@ -33,18 +33,40 @@ export const TradeFormContent = ({
   useEffect(() => {
     if (editTrade) {
       setDirection(editTrade.direction as 'buy' | 'sell');
-      setFormValues(editTrade);
       
-      const form = document.querySelector('form');
-      if (form) {
-        // Set all the form field values based on editTrade data
-        Object.entries(editTrade).forEach(([key, value]) => {
-          const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
-          if (input && value !== undefined && value !== null) {
-            input.value = value.toString();
+      // Ensure we have a clean object with all properties
+      const cleanValues = {...editTrade};
+      
+      // Set formValues directly from editTrade
+      setFormValues(cleanValues);
+      
+      // Synchronously update form fields
+      setTimeout(() => {
+        const form = document.querySelector('form');
+        if (form) {
+          // Set all the form field values based on editTrade data
+          Object.entries(editTrade).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+              const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
+              if (input) {
+                input.value = value.toString();
+              }
+            }
+          });
+          
+          // Explicitly set the setup field
+          if (editTrade.setup) {
+            const setupInput = form.querySelector('input[name="setup"]') as HTMLInputElement;
+            if (setupInput) {
+              setupInput.value = editTrade.setup;
+              
+              // Dispatch an input event to ensure any listeners are triggered
+              const event = new Event('input', { bubbles: true });
+              setupInput.dispatchEvent(event);
+            }
           }
-        });
-      }
+        }
+      }, 0);
     }
   }, [editTrade, setDirection]);
 
@@ -94,6 +116,12 @@ export const TradeFormContent = ({
       ...formValues,
       setup
     });
+    
+    // Also ensure the hidden input is updated
+    const setupInput = document.querySelector('input[name="setup"]') as HTMLInputElement;
+    if (setupInput) {
+      setupInput.value = setup;
+    }
   };
 
   return (
