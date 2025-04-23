@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { 
@@ -157,8 +158,8 @@ export const WeeklyPerformance = ({ entries, currentMonth }: WeeklyPerformancePr
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      minimumFractionDigits: 0,  // Changed from 2 to 0 to remove decimal points
+      maximumFractionDigits: 0   // Ensure no decimal points
     }).format(amount);
   };
   
