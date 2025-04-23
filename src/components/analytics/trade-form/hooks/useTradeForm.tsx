@@ -24,9 +24,13 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
       
       // Get setup value directly from form or fallback to original editTrade value
       let setup = formData.get("setup") as string;
+      console.log("Setup from form:", setup); 
+      console.log("Original setup:", editTrade?.setup);
+      
       // If the setup is empty and we're editing a trade with a setup, preserve the original setup
       if ((!setup || setup.trim() === '') && editTrade?.setup) {
         setup = editTrade.setup;
+        console.log("Using original setup:", setup);
       }
       
       const tradeData = {
@@ -124,6 +128,9 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         window.location.reload();
       } else {
         toast.success("Trade updated successfully!");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
     } catch (error: any) {
       console.error(editTrade ? "Error updating trade:" : "Error saving trade:", error);

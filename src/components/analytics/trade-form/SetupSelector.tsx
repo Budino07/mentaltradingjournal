@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Check, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -33,6 +33,7 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
 
   // Update local input value when prop value changes
   useEffect(() => {
+    console.log("Setup value changed to:", value);
     setInputValue(value || "");
   }, [value]);
 
@@ -43,6 +44,31 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
       setIsCustomSetup(!exists && value.trim() !== "");
     }
   }, [value, previousSetups]);
+
+  // Listen for custom setup-value-changed events from parent components
+  useEffect(() => {
+    const handleSetupValueChanged = (e: CustomEvent) => {
+      const newValue = e.detail?.value;
+      console.log("Custom setup value changed event:", newValue);
+      if (newValue !== undefined && newValue !== null) {
+        setInputValue(newValue);
+        
+        // Check if this is a custom or existing setup
+        if (previousSetups.length > 0) {
+          const exists = previousSetups.includes(newValue);
+          setIsCustomSetup(!exists && newValue.trim() !== "");
+        }
+      }
+    };
+
+    // Add event listener
+    document.addEventListener('setup-value-changed', handleSetupValueChanged as EventListener);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener('setup-value-changed', handleSetupValueChanged as EventListener);
+    };
+  }, [previousSetups]);
 
   const fetchPreviousSetups = async () => {
     setIsLoading(true);
@@ -69,7 +95,13 @@ export const SetupSelector = ({ value, onChange }: SetupSelectorProps) => {
         }
       });
 
-      setPreviousSetups(Array.from(setups).sort());
+      const setupsArray = Array.from(setups).sort();
+      setPreviousSetups(setupsArray);
+      
+      // If current value is not in the list and not empty, set custom mode
+      if (value && value.trim() !== "" && !setupsArray.includes(value)) {
+        setIsCustomSetup(true);
+      }
     } catch (error) {
       console.error("Error fetching previous setups:", error);
     } finally {

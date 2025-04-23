@@ -54,7 +54,7 @@ export const TradeFormContent = ({
             }
           });
           
-          // Explicitly set the setup field
+          // Explicitly set the setup field and trigger change events
           if (editTrade.setup) {
             const setupInput = form.querySelector('input[name="setup"]') as HTMLInputElement;
             if (setupInput) {
@@ -63,6 +63,13 @@ export const TradeFormContent = ({
               // Dispatch an input event to ensure any listeners are triggered
               const event = new Event('input', { bubbles: true });
               setupInput.dispatchEvent(event);
+              
+              // We also need to trigger a custom event for our setup selector component
+              const setupChangeEvent = new CustomEvent('setup-value-changed', { 
+                detail: { value: editTrade.setup },
+                bubbles: true 
+              });
+              setupInput.dispatchEvent(setupChangeEvent);
             }
           }
         }
@@ -112,6 +119,7 @@ export const TradeFormContent = ({
   };
 
   const handleSetupChange = (setup: string) => {
+    console.log("Setup change in TradeFormContent:", setup);
     setFormValues({
       ...formValues,
       setup

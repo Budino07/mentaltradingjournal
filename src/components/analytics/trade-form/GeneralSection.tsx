@@ -24,6 +24,7 @@ export const GeneralSection = ({
   useEffect(() => {
     // Update setup value when formValues changes
     if (formValues?.setup !== undefined) {
+      console.log("Updating setup value in GeneralSection:", formValues.setup);
       setSetupValue(formValues.setup);
     }
   }, [formValues]);
@@ -40,6 +41,7 @@ export const GeneralSection = ({
   };
 
   const handleSetupChange = (setup: string) => {
+    console.log("Setup changed in GeneralSection:", setup);
     setSetupValue(setup);
     
     if (onSetupChange) {
