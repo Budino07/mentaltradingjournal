@@ -5,6 +5,8 @@ import { TradeEntrySection } from "../TradeEntrySection";
 import { TradeExitSection } from "../TradeExitSection";
 import { NotesSection } from "../NotesSection";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTradingAccounts } from "@/contexts/TradingAccountsContext";
+import { useEffect } from "react";
 
 interface FormSectionsProps {
   direction: 'buy' | 'sell' | null;
@@ -20,6 +22,21 @@ export const FormSections = ({
   onSetupChange
 }: FormSectionsProps) => {
   const isMobile = useIsMobile();
+  const { currentAccount } = useTradingAccounts();
+  
+  // Add account_id to form values when creating a new trade
+  useEffect(() => {
+    if (currentAccount && formValues && !formValues.id && !formValues.account_id) {
+      const formElement = document.querySelector('form');
+      if (formElement) {
+        const accountInput = document.createElement('input');
+        accountInput.type = 'hidden';
+        accountInput.name = 'account_id';
+        accountInput.value = currentAccount.id;
+        formElement.appendChild(accountInput);
+      }
+    }
+  }, [currentAccount, formValues]);
   
   return (
     <div className={`${isMobile ? 'p-3 pt-0' : 'p-2 md:p-6 pt-2'} grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-6`}>
