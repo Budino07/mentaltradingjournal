@@ -122,7 +122,6 @@ export type Database = {
       }
       journal_entries: {
         Row: {
-          account_id: string | null
           created_at: string
           daily_goals: string[] | null
           daily_url: string | null
@@ -145,7 +144,6 @@ export type Database = {
           weekly_url: string | null
         }
         Insert: {
-          account_id?: string | null
           created_at?: string
           daily_goals?: string[] | null
           daily_url?: string | null
@@ -168,7 +166,6 @@ export type Database = {
           weekly_url?: string | null
         }
         Update: {
-          account_id?: string | null
           created_at?: string
           daily_goals?: string[] | null
           daily_url?: string | null
@@ -463,33 +460,6 @@ export type Database = {
           stripe_price_id?: string | null
           stripe_subscription_id?: string | null
           updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      trading_accounts: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          name: string
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name: string
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name?: string
-          updated_at?: string | null
           user_id?: string
         }
         Relationships: []

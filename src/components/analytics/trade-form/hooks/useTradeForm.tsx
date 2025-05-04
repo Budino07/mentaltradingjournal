@@ -4,7 +4,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Trade } from "@/types/trade";
 import { toast } from "sonner";
-import { useTradingAccounts } from "@/contexts/TradingAccountsContext";
 
 interface UseTradeFormProps {
   editTrade?: Trade;
@@ -15,7 +14,6 @@ interface UseTradeFormProps {
 export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
-  const { activeAccount } = useTradingAccounts();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -101,7 +99,6 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
           .from('journal_entries')
           .insert({
             user_id: user?.id,
-            account_id: activeAccount?.id, // Include account_id from the active account
             notes: tradeData.notes || `Write anything that stands out for ${tradeData.instrument}`, // Use trade notes if provided
             trades: [tradeObject],
             session_type: 'trade',

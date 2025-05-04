@@ -6,7 +6,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { CalendarModeProvider } from "@/contexts/CalendarModeContext";
 import { MorningRecap } from "@/components/notifications/MorningRecap";
 import { ThemeProvider } from "next-themes";
-import { TradingAccountsProvider } from "@/contexts/TradingAccountsContext";
 
 const Index = () => {
   const isMobile = useIsMobile();
@@ -15,14 +14,12 @@ const Index = () => {
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <TimeFilterProvider>
         <CalendarModeProvider>
-          <TradingAccountsProvider>
-            <AppLayout>
-              <div className={`container mx-auto py-0 ${isMobile ? 'px-3' : 'px-2'}`}>
-                <EmotionLogger />
-                <MorningRecap />
-              </div>
-            </AppLayout>
-          </TradingAccountsProvider>
+          <AppLayout>
+            <div className={`container mx-auto py-0 ${isMobile ? 'px-3' : 'px-2'}`}>
+              <EmotionLogger />
+              <MorningRecap />
+            </div>
+          </AppLayout>
         </CalendarModeProvider>
       </TimeFilterProvider>
     </ThemeProvider>
