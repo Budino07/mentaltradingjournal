@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export interface TradingAccount {
   id: string;
@@ -37,73 +37,69 @@ export const TradingAccountsProvider: React.FC<{ children: React.ReactNode }> = 
       return;
     }
 
-    const fetchAccounts = async () => {
+    // For now, use localStorage to persist accounts
+    const loadAccounts = () => {
       setIsLoading(true);
       setError(null);
       
       try {
-        const { data, error } = await supabase
-          .from('trading_accounts')
-          .select('*')
-          .eq('user_id', user.id);
-          
-        if (error) {
-          throw new Error(error.message);
-        }
+        const storedAccounts = localStorage.getItem(`trading_accounts_${user.id}`);
+        const parsedAccounts = storedAccounts ? JSON.parse(storedAccounts) as TradingAccount[] : [];
         
-        if (data) {
-          setAccounts(data as TradingAccount[]);
-          
-          // Set the first account as active if no active account
-          if (data.length > 0 && !activeAccount) {
-            setActiveAccount(data[0] as TradingAccount);
-          }
+        setAccounts(parsedAccounts);
+        
+        // Set first account as active if we have accounts and no active account
+        if (parsedAccounts.length > 0 && !activeAccount) {
+          setActiveAccount(parsedAccounts[0]);
         }
       } catch (err) {
-        console.error('Error fetching trading accounts:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch trading accounts');
+        console.error('Error loading trading accounts:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load trading accounts');
       } finally {
         setIsLoading(false);
       }
     };
     
-    fetchAccounts();
+    loadAccounts();
   }, [user]);
   
+  // Save accounts to localStorage whenever accounts change
+  useEffect(() => {
+    if (user && accounts.length > 0) {
+      localStorage.setItem(`trading_accounts_${user.id}`, JSON.stringify(accounts));
+    }
+  }, [accounts, user]);
+
   const addAccount = async (name: string, description?: string) => {
     if (!user) return;
     
     try {
       setError(null);
       
-      const newAccount = {
+      const newAccount: TradingAccount = {
+        id: crypto.randomUUID(),
         name,
         description,
-        user_id: user.id
+        user_id: user.id,
+        created_at: new Date().toISOString()
       };
       
-      const { data, error } = await supabase
-        .from('trading_accounts')
-        .insert(newAccount)
-        .select()
-        .single();
-        
-      if (error) {
-        throw new Error(error.message);
+      // Update state with new account
+      const updatedAccounts = [...accounts, newAccount];
+      setAccounts(updatedAccounts);
+      
+      // If this is the first account, set it as active
+      if (accounts.length === 0) {
+        setActiveAccount(newAccount);
       }
       
-      if (data) {
-        const typedAccount = data as unknown as TradingAccount;
-        setAccounts(prevAccounts => [...prevAccounts, typedAccount]);
-        
-        // If this is the first account, set it as active
-        if (accounts.length === 0) {
-          setActiveAccount(typedAccount);
-        }
-      }
+      toast.success("Trading account added successfully");
+      
+      return;
     } catch (err) {
       console.error('Error adding trading account:', err);
       setError(err instanceof Error ? err.message : 'Failed to add trading account');
+      toast.error("Failed to add trading account");
     }
   };
 
