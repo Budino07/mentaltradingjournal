@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Trade } from "@/types/trade";
 import { toast } from "sonner";
+import { useTradingAccount } from "@/contexts/TradingAccountContext";
 
 interface UseTradeFormProps {
   editTrade?: Trade;
@@ -14,6 +15,7 @@ interface UseTradeFormProps {
 export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
+  const { currentAccount } = useTradingAccount();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -31,6 +33,12 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
       if ((!setup || setup.trim() === '') && editTrade?.setup) {
         setup = editTrade.setup;
         console.log("Using original setup:", setup);
+      }
+      
+      // Get account_id from form or use current account
+      let accountId = formData.get("account_id") as string;
+      if ((!accountId || accountId.trim() === '') && currentAccount) {
+        accountId = currentAccount.id;
       }
       
       // Get all other form values
@@ -51,6 +59,7 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         highestPrice: parseFloat(formData.get("highestPrice") as string),
         lowestPrice: parseFloat(formData.get("lowestPrice") as string),
         notes: formData.get("notes") as string,
+        account_id: accountId,
       };
 
       console.log("Final trade data to submit:", tradeData);
@@ -76,6 +85,7 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
           id: editTrade.id,
           ...tradeData,
           setup: setup || editTrade.setup, // Ensure setup isn't lost
+          account_id: accountId || editTrade.account_id,
         };
 
         const updatedTrades = trades.map(trade => 

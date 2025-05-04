@@ -1,38 +1,36 @@
 
 import { Trade } from "@/types/trade";
-import { GeneralSection } from "../GeneralSection";
 import { TradeEntrySection } from "../TradeEntrySection";
 import { TradeExitSection } from "../TradeExitSection";
-import { NotesSection } from "../NotesSection";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { TradeDetailsSection } from "../TradeDetailsSection";
+import { TradeNoteSection } from "../TradeNoteSection";
+import { DirectionSelector } from "../DirectionSelector";
+import { AccountSelector } from "../AccountSelector";
 
 interface FormSectionsProps {
   direction: 'buy' | 'sell' | null;
   setDirection: (direction: 'buy' | 'sell') => void;
-  formValues?: Partial<Trade>;
+  formValues: Partial<Trade>;
   onSetupChange?: (setup: string) => void;
 }
 
 export const FormSections = ({ 
   direction, 
-  setDirection, 
+  setDirection,
   formValues,
-  onSetupChange
+  onSetupChange 
 }: FormSectionsProps) => {
-  const isMobile = useIsMobile();
-  
   return (
-    <div className={`${isMobile ? 'p-3 pt-0' : 'p-2 md:p-6 pt-2'} grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-6`}>
-      <GeneralSection 
-        direction={direction} 
-        setDirection={setDirection}
-        formValues={formValues}
-        onSetupChange={onSetupChange}
-      />
-      <TradeEntrySection formValues={formValues} />
-      <TradeExitSection formValues={formValues} />
-      <div className="md:col-span-3">
-        <NotesSection formValues={formValues} />
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 p-6">
+      <div className="space-y-6 md:col-span-1">
+        <DirectionSelector direction={direction} onDirectionChange={setDirection} />
+        <AccountSelector defaultAccountId={formValues?.account_id} />
+        <TradeDetailsSection formValues={formValues} onSetupChange={onSetupChange} />
+        <TradeNoteSection defaultNote={formValues?.notes} />
+      </div>
+      <div className="space-y-6 md:col-span-1">
+        <TradeEntrySection formValues={formValues} />
+        <TradeExitSection formValues={formValues} />
       </div>
     </div>
   );

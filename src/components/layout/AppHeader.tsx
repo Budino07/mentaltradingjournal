@@ -1,5 +1,4 @@
-
-import { Home, BookOpen, BarChart2, Menu, User, BrainCircuit, FlaskConical, Notebook, LineChart, Settings, UserCog } from "lucide-react";
+import { Home, BookOpen, BarChart2, Menu, User, BrainCircuit, FlaskConical, Notebook, LineChart, Settings, UserCog, Wallet } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -22,6 +21,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NotificationBell } from "@/components/ui/notification-bell";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { AccountsDialog } from "@/components/trading/accounts/AccountsDialog";
+import { useTradingAccount } from "@/contexts/TradingAccountContext";
 
 export function AppHeader() {
   const location = useLocation();
@@ -83,6 +84,9 @@ export function AppHeader() {
     setIsOpen(false);
   };
 
+  const [showAccountsDialog, setShowAccountsDialog] = useState(false);
+  const { currentAccount } = useTradingAccount();
+
   return (
     <header className="border-b border-border/40 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
@@ -142,6 +146,27 @@ export function AppHeader() {
                         <span className="text-sm font-medium">{displayName}</span>
                         <span className="text-xs text-muted-foreground">{userEmail}</span>
                       </div>
+                    </div>
+                  </div>
+                  
+                  {/* Trading Account Section */}
+                  <div className="pb-2 border-b border-border/50">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-medium text-muted-foreground">Trading Account</span>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 text-xs"
+                        onClick={() => setShowAccountsDialog(true)}
+                      >
+                        Manage
+                      </Button>
+                    </div>
+                    <div className="flex items-center gap-2 px-2 py-1 bg-muted/50 rounded">
+                      <Wallet className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-sm font-medium">
+                        {currentAccount?.name || "Default Account"}
+                      </span>
                     </div>
                   </div>
                   
@@ -343,6 +368,11 @@ export function AppHeader() {
           </SheetContent>
         </Sheet>
       </div>
+      
+      <AccountsDialog 
+        open={showAccountsDialog} 
+        onOpenChange={setShowAccountsDialog} 
+      />
       
       <Dialog open={showMentorDialog} onOpenChange={setShowMentorDialog}>
         <DialogContent>

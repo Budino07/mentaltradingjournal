@@ -13,9 +13,10 @@ export const normalizeTradePnL = (trade: Trade): Trade => {
   };
 };
 
-export const processJournalTrades = (journalEntries: JournalEntry[]): Trade[] => {
+export const processJournalTrades = (journalEntries: JournalEntry[], accountId?: string): Trade[] => {
   return journalEntries.flatMap(entry => 
     (entry.trades || [])
+      .filter(trade => !accountId || trade.account_id === accountId)
       .map(normalizeTradePnL)
       .map(trade => ({
         ...trade,
