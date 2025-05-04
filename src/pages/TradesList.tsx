@@ -7,7 +7,7 @@ const TradesList = () => {
   return (
     <TimeFilterProvider>
       <AppLayout>
-        <div className="container mx-auto py-6 px-4 max-w-6xl">
+        <div className="container mx-auto py-6 px-4 max-w-6xl" style={{ scrollBehavior: 'auto' }}>
           <JournalTradesList />
         </div>
       </AppLayout>

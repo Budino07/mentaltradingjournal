@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Info, Settings } from "lucide-react";
@@ -188,7 +187,7 @@ export const TradeTimePerformance = () => {
   }
 
   return (
-    <Card className="col-span-1">
+    <Card className="col-span-1 overflow-auto" style={{ scrollBehavior: 'auto' }}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <CardTitle className="text-base font-medium">Trade Time Performance</CardTitle>

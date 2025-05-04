@@ -150,7 +150,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
         <X className="h-4 w-4" />
       </Button>
       
-      <CardContent className="p-6">
+      <CardContent className="p-6 overflow-auto" style={{ scrollBehavior: 'auto' }}>
         <div className="flex flex-col md:flex-row gap-6 items-start">
           <div className="md:w-1/3">
             <h3 className="text-lg font-medium mb-2">

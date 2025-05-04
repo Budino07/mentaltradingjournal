@@ -78,7 +78,7 @@ export const EntryContent = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-auto" style={{ scrollBehavior: 'auto' }}>
       {marketConditions && (
         <div className="space-y-2">
           <h4 className="text-sm font-medium text-muted-foreground">Market Conditions</h4>
@@ -110,7 +110,7 @@ export const EntryContent = ({
               </CollapsibleTrigger>
             </div>
           </div>
-          <CollapsibleContent className="space-y-2">
+          <CollapsibleContent className="space-y-2 overflow-auto" style={{ scrollBehavior: 'auto' }}>
             <div
               className="text-sm text-muted-foreground"
               dangerouslySetInnerHTML={{ __html: formatNotes(localNotes) }}
@@ -255,7 +255,7 @@ export const EntryContent = ({
               </Button>
             </CollapsibleTrigger>
           </div>
-          <CollapsibleContent>
+          <CollapsibleContent className="overflow-auto" style={{ scrollBehavior: 'auto' }}>
             <TradingRules rules={followedRules} />
           </CollapsibleContent>
         </Collapsible>
@@ -274,7 +274,7 @@ export const EntryContent = ({
               </Button>
             </CollapsibleTrigger>
           </div>
-          <CollapsibleContent>
+          <CollapsibleContent className="overflow-auto" style={{ scrollBehavior: 'auto' }}>
             <TradingMistakes mistakes={mistakes} />
           </CollapsibleContent>
         </Collapsible>

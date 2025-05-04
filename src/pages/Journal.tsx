@@ -239,6 +239,13 @@ const Journal = () => {
                   // Dispatch an event to notify other components that search should be cleared
                   const clearSearchEvent = new CustomEvent('journal-search-clear');
                   window.dispatchEvent(clearSearchEvent);
+                  
+                  setTimeout(() => {
+                    const journalEntriesSection = document.querySelector('#journal-entries');
+                    if (journalEntriesSection) {
+                      journalEntriesSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }, 100);
                 }}
                 entries={calendarEntries}
               />
@@ -261,7 +268,7 @@ const Journal = () => {
                   <JournalFilters />
                 </div>
                 
-                <ScrollArea className="h-[600px] pr-4">
+                <ScrollArea className="h-[600px] pr-4" disableSmooth={true}>
                   {displayedEntries.length > 0 ? (
                     <div className="space-y-4">
                       {displayedEntries.map((entry) => (

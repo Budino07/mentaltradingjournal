@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -200,7 +199,7 @@ export const NotebookContent = () => {
   };
 
   return (
-    <div className="flex h-full flex-col md:flex-row">
+    <div className="flex h-full flex-col md:flex-row overflow-auto" style={{ scrollBehavior: 'auto' }}>
       {/* Folders Section (20% on desktop, full width dropdown on mobile) */}
       <div className="w-full md:w-1/5 md:min-w-[200px] border-b md:border-r bg-background/50 flex flex-col">
         <div className="p-4 space-y-4">

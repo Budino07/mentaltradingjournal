@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { NoteTitle } from "./NoteTitle";
 import { NoteTags } from "./NoteTags";
@@ -214,7 +213,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
   }
 
   return (
-    <div className="h-full bg-background overflow-hidden flex flex-col">
+    <div className="h-full bg-background overflow-hidden flex flex-col" style={{ scrollBehavior: 'auto' }}>
       {onBack && (
         <Button
           variant="ghost"
