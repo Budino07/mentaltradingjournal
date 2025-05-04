@@ -52,7 +52,7 @@ export const TradingAccountsProvider = ({ children }: { children: React.ReactNod
       if (error) throw error;
 
       // Cast as TradingAccount[] to ensure type safety
-      const typedAccounts = data as TradingAccount[];
+      const typedAccounts = (data || []) as TradingAccount[];
       setAccounts(typedAccounts);
       
       // Set current account to default account or first account if available
@@ -85,8 +85,7 @@ export const TradingAccountsProvider = ({ children }: { children: React.ReactNod
           user_id: user.id,
           is_default: isFirstAccount
         })
-        .select()
-        .single();
+        .select();
 
       if (error) throw error;
       
