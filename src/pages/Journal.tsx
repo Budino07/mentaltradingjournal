@@ -1,8 +1,6 @@
-
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { JournalCalendar } from "@/components/journal/JournalCalendar";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -268,7 +266,7 @@ const Journal = () => {
                   <JournalFilters />
                 </div>
                 
-                <ScrollArea className="h-[600px] pr-4" disableSmooth={true}>
+                <div className="space-y-4">
                   {displayedEntries.length > 0 ? (
                     <div className="space-y-4">
                       {displayedEntries.map((entry) => (
@@ -285,7 +283,7 @@ const Journal = () => {
                     }
                   </p>
                   )}
-                </ScrollArea>
+                </div>
               </Card>
                 
               <JournalTradesList />

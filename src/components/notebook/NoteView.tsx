@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { NoteTitle } from "./NoteTitle";
 import { NoteTags } from "./NoteTags";
@@ -213,7 +214,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
   }
 
   return (
-    <div className="h-full bg-background overflow-hidden flex flex-col" style={{ scrollBehavior: 'auto' }}>
+    <div className="h-full bg-background flex flex-col">
       {onBack && (
         <Button
           variant="ghost"
@@ -225,7 +226,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
           Back to Notes
         </Button>
       )}
-      <div className="p-8 flex-1 overflow-hidden">
+      <div className="p-8 flex-1 overflow-auto">
         <div className="max-w-3xl mx-auto space-y-4 h-full flex flex-col">
           <NoteTitle title={title} onTitleChange={handleTitleChange} />
           <NoteTags 
@@ -254,7 +255,7 @@ export const NoteView = ({ noteId, onBack }: NoteViewProps) => {
             />
           </div>
           <Separator className="my-4" />
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1">
             <NoteContent 
               content={content} 
               onContentChange={handleContentChange}

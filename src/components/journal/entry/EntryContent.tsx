@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -78,7 +79,7 @@ export const EntryContent = ({
   };
 
   return (
-    <div className="space-y-4 overflow-auto" style={{ scrollBehavior: 'auto' }}>
+    <div className="space-y-4">
       {marketConditions && (
         <div className="space-y-2">
           <h4 className="text-sm font-medium text-muted-foreground">Market Conditions</h4>
@@ -110,7 +111,7 @@ export const EntryContent = ({
               </CollapsibleTrigger>
             </div>
           </div>
-          <CollapsibleContent className="space-y-2 overflow-auto" style={{ scrollBehavior: 'auto' }}>
+          <CollapsibleContent className="space-y-2">
             <div
               className="text-sm text-muted-foreground"
               dangerouslySetInnerHTML={{ __html: formatNotes(localNotes) }}
@@ -255,7 +256,7 @@ export const EntryContent = ({
               </Button>
             </CollapsibleTrigger>
           </div>
-          <CollapsibleContent className="overflow-auto" style={{ scrollBehavior: 'auto' }}>
+          <CollapsibleContent>
             <TradingRules rules={followedRules} />
           </CollapsibleContent>
         </Collapsible>
@@ -274,7 +275,7 @@ export const EntryContent = ({
               </Button>
             </CollapsibleTrigger>
           </div>
-          <CollapsibleContent className="overflow-auto" style={{ scrollBehavior: 'auto' }}>
+          <CollapsibleContent>
             <TradingMistakes mistakes={mistakes} />
           </CollapsibleContent>
         </Collapsible>
