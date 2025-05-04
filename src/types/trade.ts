@@ -18,6 +18,5 @@ export interface Trade {
   forecastScreenshot?: string;
   resultScreenshot?: string;
   htfBias?: string;
-  notes?: string;
-  account_id?: string; // Added account_id field
+  notes?: string; // Add notes field to Trade type
 }
