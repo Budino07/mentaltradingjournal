@@ -4,13 +4,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Trade } from "@/types/trade";
 import { supabase } from "@/integrations/supabase/client";
 import { TradesTable } from './trades/TradesTable';
-import { useTradingAccount } from '@/contexts/TradingAccountContext';
 
 export const JournalTradesList = () => {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  const { currentAccount } = useTradingAccount();
 
   useEffect(() => {
     const fetchTrades = async () => {
@@ -32,17 +30,14 @@ export const JournalTradesList = () => {
         }
         
         // Extract trades from all entries and flatten them into a single array
-        const allTrades = data.flatMap(entry => {
-          const trades = entry.trades as unknown as Trade[];
-          return trades || [];
-        }).filter(trade => trade && Object.keys(trade).length > 0);
-        
-        // Filter trades by current account if one is selected
-        const filteredTrades = currentAccount 
-          ? allTrades.filter(trade => trade.account_id === currentAccount.id)
-          : allTrades;
-        
-        setTrades(filteredTrades);
+        const extractedTrades: Trade[] = data
+          .flatMap(entry => {
+            const trades = entry.trades as unknown as Trade[];
+            return trades || [];
+          })
+          .filter(trade => trade && Object.keys(trade).length > 0);
+          
+        setTrades(extractedTrades);
       } catch (error) {
         console.error('Error in fetching trades:', error);
       } finally {
@@ -73,7 +68,7 @@ export const JournalTradesList = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, currentAccount]);
+  }, [user]);
   
   if (loading) {
     return (
