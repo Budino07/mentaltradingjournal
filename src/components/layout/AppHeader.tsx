@@ -1,3 +1,4 @@
+
 import { Home, BookOpen, BarChart2, Menu, User, BrainCircuit, FlaskConical, Notebook, LineChart, Settings, UserCog } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NotificationBell } from "@/components/ui/notification-bell";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { AccountSelector } from "../trading/accounts/AccountSelector";
 
 export function AppHeader() {
   const location = useLocation();
@@ -113,12 +113,7 @@ export function AppHeader() {
 
           <ThemeToggle />
 
-          {user && (
-            <>
-              <AccountSelector />
-              <NotificationBell />
-            </>
-          )}
+          {user && <NotificationBell />}
 
           {user ? (
             <Popover>
@@ -245,12 +240,6 @@ export function AppHeader() {
               </div>
             )}
             
-            {user && (
-              <div className="py-4">
-                <AccountSelector />
-              </div>
-            )}
-            
             <nav className="flex flex-col gap-4 mt-6">
               {/* App Navigation Items */}
               <div className="space-y-4">
@@ -290,52 +279,65 @@ export function AppHeader() {
               <div className="border-t border-border/40 pt-4 mt-2">
                 <h4 className="text-sm font-medium text-muted-foreground mb-2 px-2">Account</h4>
                 <ThemeToggle />
-                {isEditing ? (
-                  <div className="space-y-2">
-                    <label htmlFor="mobile-username" className="text-xs font-medium text-muted-foreground px-2">
-                      Username
-                    </label>
-                    <Input
-                      id="mobile-username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder="Enter new username"
-                    />
-                    <div className="flex gap-2">
-                      <Button onClick={handleUpdateUsername} className="flex-1">
-                        Save
+                {user ? (
+                  <div className="space-y-2 mt-4">
+                    {isEditing ? (
+                      <div className="space-y-2">
+                        <label htmlFor="mobile-username" className="text-xs font-medium text-muted-foreground px-2">
+                          Username
+                        </label>
+                        <Input
+                          id="mobile-username"
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                          placeholder="Enter new username"
+                        />
+                        <div className="flex gap-2">
+                          <Button onClick={handleUpdateUsername} className="flex-1">
+                            Save
+                          </Button>
+                          <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1">
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => {
+                          setUsername(displayName);
+                          setIsEditing(true);
+                        }}
+                      >
+                        Edit Username
                       </Button>
-                      <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1">
-                        Cancel
-                      </Button>
-                    </div>
+                    )}
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleManageSubscription}
+                    >
+                      Manage Subscription
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      className="w-full"
+                      onClick={() => signOut()}
+                    >
+                      Sign Out
+                    </Button>
                   </div>
                 ) : (
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => {
-                      setUsername(displayName);
-                      setIsEditing(true);
-                    }}
-                  >
-                    Edit Username
-                  </Button>
+                  <div className="space-y-2 mt-4">
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link to="/login">Sign In</Link>
+                    </Button>
+                    <Button className="w-full" asChild>
+                      <Link to="/pricing">Get Started</Link>
+                    </Button>
+                  </div>
                 )}
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleManageSubscription}
-                >
-                  Manage Subscription
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="w-full"
-                  onClick={() => signOut()}
-                >
-                  Sign Out
-                </Button>
               </div>
             </nav>
           </SheetContent>
