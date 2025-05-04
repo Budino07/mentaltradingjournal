@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Trade } from "@/types/trade";
 import { useNotifications } from "@/contexts/NotificationsContext";
+import { useTradingAccounts } from "@/contexts/TradingAccountsContext";
 
 interface JournalFormSubmissionProps {
   sessionType: "pre" | "post";
@@ -56,6 +57,7 @@ export const useJournalFormSubmission = ({
   const { updateProgress } = useProgressTracking();
   const { user } = useAuth();
   const { addNotification } = useNotifications();
+  const { activeAccount } = useTradingAccounts();
 
   const handleSubmit = async () => {
     if (!user) {
@@ -117,6 +119,7 @@ export const useJournalFormSubmission = ({
       
       const { error } = await supabase.from('journal_entries').insert({
         user_id: user.id,
+        account_id: activeAccount?.id, // Include account_id from the active account
         session_type: sessionType,
         emotion: selectedEmotion,
         emotion_detail: selectedEmotionDetail,

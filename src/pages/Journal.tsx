@@ -1,3 +1,4 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -17,6 +18,7 @@ import { JournalTradesList } from "@/components/journal/TradesList";
 import { CalendarModeProvider } from "@/contexts/CalendarModeContext";
 import { DailyInsightsDialog } from "@/components/journal/insights/DailyInsightsDialog";
 import { MorningRecap } from "@/components/notifications/MorningRecap";
+import { TradingAccountsProvider } from "@/contexts/TradingAccountsContext";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
@@ -217,86 +219,85 @@ const Journal = () => {
     session_type: entry.session_type
   }));
 
-  // Ensure the searchFilteredEntries function exists
-  
-
   return (
     <AppLayout>
       <SubscriptionGuard>
         <TimeFilterProvider>
           <CalendarModeProvider>
-            <div className="max-w-7xl mx-auto space-y-8 px-4">
-              <StatsHeader />
+            <TradingAccountsProvider>
+              <div className="max-w-7xl mx-auto space-y-8 px-4">
+                <StatsHeader />
 
-              <JournalCalendar 
-                date={selectedDate}
-                onDateSelect={(date) => {
-                  setSelectedDate(date);
-                  setSearchQuery(""); // Clear search query when a date is directly selected
-                  
-                  // Dispatch an event to notify other components that search should be cleared
-                  const clearSearchEvent = new CustomEvent('journal-search-clear');
-                  window.dispatchEvent(clearSearchEvent);
-                  
-                  setTimeout(() => {
-                    const journalEntriesSection = document.querySelector('#journal-entries');
-                    if (journalEntriesSection) {
-                      journalEntriesSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }, 100);
-                }}
-                entries={calendarEntries}
-              />
+                <JournalCalendar 
+                  date={selectedDate}
+                  onDateSelect={(date) => {
+                    setSelectedDate(date);
+                    setSearchQuery(""); // Clear search query when a date is directly selected
+                    
+                    // Dispatch an event to notify other components that search should be cleared
+                    const clearSearchEvent = new CustomEvent('journal-search-clear');
+                    window.dispatchEvent(clearSearchEvent);
+                    
+                    setTimeout(() => {
+                      const journalEntriesSection = document.querySelector('#journal-entries');
+                      if (journalEntriesSection) {
+                        journalEntriesSection.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }, 100);
+                  }}
+                  entries={calendarEntries}
+                />
 
-              <Card id="journal-entries" className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-                    {searchQuery 
-                      ? `Search Results for "${searchQuery}"`
-                      : selectedDate 
-                        ? `Journal Entries for ${selectedDate.toLocaleDateString('en-US', { 
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                          })}`
-                        : 'Journal Entries'
-                    }
-                  </h2>
-                  <JournalFilters />
-                </div>
-                
-                <div className="space-y-4">
-                  {displayedEntries.length > 0 ? (
-                    <div className="space-y-4">
-                      {displayedEntries.map((entry) => (
-                        <JournalEntry key={entry.id} entry={entry} />
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground text-center py-8">
-                      {searchQuery
-                        ? `No entries found for "${searchQuery}"`
+                <Card id="journal-entries" className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
+                      {searchQuery 
+                        ? `Search Results for "${searchQuery}"`
                         : selectedDate 
-                          ? `No entries found for ${selectedDate.toLocaleDateString()}`
-                          : 'No entries found for the selected filters'
-                    }
-                  </p>
-                  )}
-                </div>
-              </Card>
-                
-              <JournalTradesList />
-            </div>
+                          ? `Journal Entries for ${selectedDate.toLocaleDateString('en-US', { 
+                              weekday: 'long',
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}`
+                          : 'Journal Entries'
+                      }
+                    </h2>
+                    <JournalFilters />
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {displayedEntries.length > 0 ? (
+                      <div className="space-y-4">
+                        {displayedEntries.map((entry) => (
+                          <JournalEntry key={entry.id} entry={entry} />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-center py-8">
+                        {searchQuery
+                          ? `No entries found for "${searchQuery}"`
+                          : selectedDate 
+                            ? `No entries found for ${selectedDate.toLocaleDateString()}`
+                            : 'No entries found for the selected filters'
+                      }
+                    </p>
+                    )}
+                  </div>
+                </Card>
+                  
+                <JournalTradesList />
+              </div>
 
-            <DailyInsightsDialog
-              open={isInsightsOpen}
-              onOpenChange={setIsInsightsOpen}
-              date={selectedDate || new Date()}
-              trades={selectedDateTrades}
-            />
-            
-            <MorningRecap />
+              <DailyInsightsDialog
+                open={isInsightsOpen}
+                onOpenChange={setIsInsightsOpen}
+                date={selectedDate || new Date()}
+                trades={selectedDateTrades}
+              />
+              
+              <MorningRecap />
+            </TradingAccountsProvider>
           </CalendarModeProvider>
         </TimeFilterProvider>
       </SubscriptionGuard>

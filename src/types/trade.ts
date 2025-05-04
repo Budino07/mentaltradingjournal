@@ -18,5 +18,5 @@ export interface Trade {
   forecastScreenshot?: string;
   resultScreenshot?: string;
   htfBias?: string;
-  notes?: string; // Add notes field to Trade type
+  notes?: string;
 }

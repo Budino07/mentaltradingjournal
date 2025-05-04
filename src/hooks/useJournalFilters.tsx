@@ -1,7 +1,8 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { isWithinInterval, startOfMonth, endOfMonth, subMonths, isSameDay, startOfYear, endOfYear, subYears } from "date-fns";
 import { JournalEntryType } from "@/types/journal";
+import { useTradingAccounts } from "@/contexts/TradingAccountsContext";
 
 export type TimeFilter = "this-month" | "last-month" | "last-three-months" | "last-year" | "eternal" | "custom" | null;
 
@@ -11,8 +12,15 @@ export const useJournalFilters = (entries: JournalEntryType[]) => {
   const [detailFilter, setDetailFilter] = useState<string | null>(null);
   const [timeFilter, setTimeFilter] = useState<TimeFilter>(null);
   const [outcomeFilter, setOutcomeFilter] = useState<string | null>(null);
+  const { activeAccount } = useTradingAccounts();
 
-  const filteredEntries = entries.filter(entry => {
+  // Filter entries by the active account
+  const accountFilteredEntries = entries.filter(entry => {
+    if (!activeAccount) return true; // If no active account, show all entries
+    return entry.account_id === activeAccount.id;
+  });
+
+  const filteredEntries = accountFilteredEntries.filter(entry => {
     const entryDate = new Date(entry.created_at);
     const matchesDate = !selectedDate || isSameDay(entryDate, selectedDate);
     const matchesEmotion = !emotionFilter || entry.emotion.toLowerCase() === emotionFilter.toLowerCase();
@@ -47,6 +55,15 @@ export const useJournalFilters = (entries: JournalEntryType[]) => {
 
     return matchesDate && matchesEmotion && matchesDetail && matchesTimeFilter && matchesOutcome;
   });
+
+  // Reset filters when active account changes
+  useEffect(() => {
+    setSelectedDate(new Date());
+    setEmotionFilter(null);
+    setDetailFilter(null);
+    setTimeFilter(null);
+    setOutcomeFilter(null);
+  }, [activeAccount]);
 
   return {
     selectedDate,
