@@ -19,5 +19,5 @@ export interface Trade {
   resultScreenshot?: string;
   htfBias?: string;
   notes?: string;
-  account_id?: string; // Add account_id field to Trade type
+  account_id?: string;
 }

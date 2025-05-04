@@ -40,8 +40,10 @@ export const TradingAccountsProvider = ({ children }: { children: React.ReactNod
     try {
       setIsLoading(true);
       
+      // Use a type assertion to work around the TypeScript limitation
+      // since the trading_accounts table exists in the database but not in the generated types
       const { data, error } = await supabase
-        .from('trading_accounts')
+        .from('trading_accounts' as any)
         .select('*')
         .eq('user_id', user.id)
         .order('is_default', { ascending: false })
@@ -76,7 +78,7 @@ export const TradingAccountsProvider = ({ children }: { children: React.ReactNod
       const isFirstAccount = accounts.length === 0;
       
       const { data, error } = await supabase
-        .from('trading_accounts')
+        .from('trading_accounts' as any)
         .insert({
           name,
           description,
@@ -99,7 +101,7 @@ export const TradingAccountsProvider = ({ children }: { children: React.ReactNod
   const updateAccount = async (id: string, name: string, description?: string) => {
     try {
       const { error } = await supabase
-        .from('trading_accounts')
+        .from('trading_accounts' as any)
         .update({ name, description, updated_at: new Date().toISOString() })
         .eq('id', id);
 
@@ -126,7 +128,7 @@ export const TradingAccountsProvider = ({ children }: { children: React.ReactNod
       }
       
       const { error } = await supabase
-        .from('trading_accounts')
+        .from('trading_accounts' as any)
         .delete()
         .eq('id', id);
 
@@ -152,13 +154,13 @@ export const TradingAccountsProvider = ({ children }: { children: React.ReactNod
     try {
       // First remove default status from all accounts
       await supabase
-        .from('trading_accounts')
+        .from('trading_accounts' as any)
         .update({ is_default: false })
         .eq('user_id', user?.id);
       
       // Then set the selected account as default
       const { error } = await supabase
-        .from('trading_accounts')
+        .from('trading_accounts' as any)
         .update({ is_default: true })
         .eq('id', id);
 
