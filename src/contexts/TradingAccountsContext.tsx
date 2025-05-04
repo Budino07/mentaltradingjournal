@@ -51,8 +51,8 @@ export const TradingAccountsProvider = ({ children }: { children: React.ReactNod
 
       if (error) throw error;
 
-      // Cast as TradingAccount[] to ensure type safety
-      const typedAccounts = (data || []) as TradingAccount[];
+      // Use a more explicit type casting approach with unknown as an intermediary
+      const typedAccounts = (data || []) as unknown as TradingAccount[];
       setAccounts(typedAccounts);
       
       // Set current account to default account or first account if available
