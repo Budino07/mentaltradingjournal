@@ -25,6 +25,7 @@ import MentalWrapped from "./pages/MentalWrapped";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ScrollToTop } from "./components/ui/ScrollToTop";
 import { NotificationsProvider } from "./contexts/NotificationsContext";
+import { TradingAccountsProvider } from "./contexts/TradingAccountsContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -60,97 +61,99 @@ const App = () => {
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <NotificationsProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                  <ScrollToTop />
-                  <Routes>
-                    {/* Public routes */}
-                    <Route path="/" element={<Landing />} />
-                    <Route path="/features" element={<Features />} />
-                    <Route path="/pricing" element={<Pricing />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                    <Route path="/terms-of-service" element={<TermsOfService />} />
-                    <Route path="/login" element={<Login />} />
-                    
-                    {/* Protected routes */}
-                    <Route
-                      path="/journal-entry"
-                      element={
-                        <ProtectedRoute>
-                          <Index />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard"
-                      element={
-                        <ProtectedRoute>
-                          <Journal />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/analytics"
-                      element={
-                        <ProtectedRoute>
-                          <Analytics />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/trades"
-                      element={
-                        <ProtectedRoute>
-                          <TradesList />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/backtesting"
-                      element={
-                        <ProtectedRoute>
-                          <Backtesting />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/mfe-mae"
-                      element={
-                        <ProtectedRoute>
-                          <MfeMae />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/mental-wrapped"
-                      element={
-                        <ProtectedRoute>
-                          <MentalWrapped />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/notebook"
-                      element={
-                        <ProtectedRoute>
-                          <Notebook />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/blueprint/:blueprintId"
-                      element={
-                        <ProtectedRoute>
-                          <BlueprintSessions />
-                        </ProtectedRoute>
-                      }
-                    />
-                  </Routes>
-                </BrowserRouter>
-              </TooltipProvider>
+              <TradingAccountsProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter>
+                    <ScrollToTop />
+                    <Routes>
+                      {/* Public routes */}
+                      <Route path="/" element={<Landing />} />
+                      <Route path="/features" element={<Features />} />
+                      <Route path="/pricing" element={<Pricing />} />
+                      <Route path="/contact" element={<Contact />} />
+                      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                      <Route path="/terms-of-service" element={<TermsOfService />} />
+                      <Route path="/login" element={<Login />} />
+                      
+                      {/* Protected routes */}
+                      <Route
+                        path="/journal-entry"
+                        element={
+                          <ProtectedRoute>
+                            <Index />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/dashboard"
+                        element={
+                          <ProtectedRoute>
+                            <Journal />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/analytics"
+                        element={
+                          <ProtectedRoute>
+                            <Analytics />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/trades"
+                        element={
+                          <ProtectedRoute>
+                            <TradesList />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/backtesting"
+                        element={
+                          <ProtectedRoute>
+                            <Backtesting />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/mfe-mae"
+                        element={
+                          <ProtectedRoute>
+                            <MfeMae />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/mental-wrapped"
+                        element={
+                          <ProtectedRoute>
+                            <MentalWrapped />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/notebook"
+                        element={
+                          <ProtectedRoute>
+                            <Notebook />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/blueprint/:blueprintId"
+                        element={
+                          <ProtectedRoute>
+                            <BlueprintSessions />
+                          </ProtectedRoute>
+                        }
+                      />
+                    </Routes>
+                  </BrowserRouter>
+                </TooltipProvider>
+              </TradingAccountsProvider>
             </NotificationsProvider>
           </AuthProvider>
         </ThemeProvider>

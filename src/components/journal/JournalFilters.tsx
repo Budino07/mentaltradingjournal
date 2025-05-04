@@ -10,12 +10,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { DailyInsightsDialog } from "./insights/DailyInsightsDialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { TradingAccountsManager } from "./TradingAccountsManager";
+import { useTradingAccounts } from "@/contexts/TradingAccountsContext";
 
 export const JournalFilters = () => {
   const navigate = useNavigate();
   const [isTradeFormOpen, setIsTradeFormOpen] = useState(false);
   const [isInsightsOpen, setIsInsightsOpen] = useState(false);
   const { user } = useAuth();
+  const { activeAccount } = useTradingAccounts();
 
   const handleTradeSubmit = async (tradeData: Trade, isEdit: boolean) => {
     if (!user) return;
@@ -38,6 +41,7 @@ export const JournalFilters = () => {
         pnl: tradeData.pnl?.toString() || '',
         forecastScreenshot: tradeData.forecastScreenshot || '',
         resultScreenshot: tradeData.resultScreenshot || '',
+        account_id: activeAccount?.id || null, // Add the account_id to the trade
       };
 
       if (isEdit) {
@@ -63,60 +67,64 @@ export const JournalFilters = () => {
   };
 
   return (
-    <div className="flex gap-2 justify-start">
-      <Button 
-        variant="outline" 
-        onClick={() => navigate('/journal-entry')}
-      >
-        Pre-Session
-      </Button>
-
-      <Button 
-        variant="outline" 
-        onClick={() => setIsTradeFormOpen(true)}
-      >
-        <Plus className="h-4 w-4 mr-1" />
-        Add Trade
-      </Button>
+    <div className="space-y-4">
+      <TradingAccountsManager />
       
-      <Button 
-        variant="outline"
-        onClick={() => navigate('/journal-entry')}
-      >
-        Post-Session
-      </Button>
+      <div className="flex gap-2 justify-start">
+        <Button 
+          variant="outline" 
+          onClick={() => navigate('/journal-entry')}
+        >
+          Pre-Session
+        </Button>
 
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button 
-              variant="outline" 
-              onClick={handleOpenInsights}
-              className="p-1.5 h-10 w-10 relative group overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <img
-                src="/lovable-uploads/3de77a29-8ca1-4638-8f34-18f3ecc1a113.png"
-                alt="Brain Logo"
-                className="h-full w-full rounded-full object-cover"
-              />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-none">
-            <p>Mental Insights</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+        <Button 
+          variant="outline" 
+          onClick={() => setIsTradeFormOpen(true)}
+        >
+          <Plus className="h-4 w-4 mr-1" />
+          Add Trade
+        </Button>
+        
+        <Button 
+          variant="outline"
+          onClick={() => navigate('/journal-entry')}
+        >
+          Post-Session
+        </Button>
 
-      <TradeFormDialog
-        open={isTradeFormOpen}
-        onOpenChange={setIsTradeFormOpen}
-        onSubmit={handleTradeSubmit}
-      >
-        <></>
-      </TradeFormDialog>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="outline" 
+                onClick={handleOpenInsights}
+                className="p-1.5 h-10 w-10 relative group overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <img
+                  src="/lovable-uploads/3de77a29-8ca1-4638-8f34-18f3ecc1a113.png"
+                  alt="Brain Logo"
+                  className="h-full w-full rounded-full object-cover"
+                />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-none">
+              <p>Mental Insights</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
-      {/* The DailyInsightsDialog is handled by Journal.tsx */}
+        <TradeFormDialog
+          open={isTradeFormOpen}
+          onOpenChange={setIsTradeFormOpen}
+          onSubmit={handleTradeSubmit}
+        >
+          <></>
+        </TradeFormDialog>
+
+        {/* The DailyInsightsDialog is handled by Journal.tsx */}
+      </div>
     </div>
   );
 };
