@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
@@ -188,15 +189,7 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
               </div>
             </div>
             
-            {emotionalData.hasHarmfulPattern && (
-              <div className="mt-4 p-2 rounded-md bg-red-50 border border-red-200 flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-red-500" />
-                <div>
-                  <p className="text-xs text-red-700 font-medium">Pattern Warning</p>
-                  <p className="text-xs text-red-600">{getHarmfulPatternReason()}</p>
-                </div>
-              </div>
-            )}
+            {/* Pattern Warning section has been removed */}
           </div>
           
           <div className="md:w-2/3">
@@ -474,3 +467,4 @@ export const ReflectionEntries = ({ emotionalData, onClose }: ReflectionEntriesP
     </Card>
   );
 };
+

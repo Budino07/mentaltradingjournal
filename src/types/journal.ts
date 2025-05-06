@@ -22,4 +22,5 @@ export interface JournalEntryType {
   four_hour_label?: string;
   one_hour_label?: string;
   daily_goals?: string[];
+  account_id?: string; // Add account_id to support multi-account filtering
 }
