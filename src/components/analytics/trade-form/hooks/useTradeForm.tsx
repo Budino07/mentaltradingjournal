@@ -85,9 +85,17 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
           trade.id === editTrade.id ? updatedTradeObject : trade
         );
 
+        // Update both the trades array and the journal entry notes
+        const updateData: { trades: any[]; notes?: string } = { trades: updatedTrades };
+        
+        // If trade notes were provided, also update the journal entry's main notes field
+        if (tradeData.notes) {
+          updateData.notes = tradeData.notes;
+        }
+
         const { error: updateError } = await supabase
           .from('journal_entries')
-          .update({ trades: updatedTrades })
+          .update(updateData)
           .eq('id', entry.id)
           .eq('user_id', user.id);
 
