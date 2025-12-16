@@ -56,9 +56,12 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
       console.log("Final trade data to submit:", tradeData);
 
       if (editTrade) {
+        if (!user?.id) throw new Error('User not authenticated');
+        
         const { data: entries, error: fetchError } = await supabase
           .from('journal_entries')
           .select('*')
+          .eq('user_id', user.id)
           .eq('session_type', 'trade');
 
         if (fetchError) throw fetchError;
@@ -85,7 +88,8 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         const { error: updateError } = await supabase
           .from('journal_entries')
           .update({ trades: updatedTrades })
-          .eq('id', entry.id);
+          .eq('id', entry.id)
+          .eq('user_id', user.id);
 
         if (updateError) throw updateError;
       } else {
