@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
-import { AlertTriangle, CalendarDays, Clock, Filter, Globe, TrendingUp } from "lucide-react";
+import { AlertTriangle, CalendarDays, Clock, Filter, Globe, Loader2, RefreshCw, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -8,12 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 
 type Impact = "high" | "medium" | "low";
 
 interface EconEvent {
-  time: string;
+  id: string;
+  timestamp: string;
   flag: string;
   country: string;
   currency: string;
@@ -24,22 +28,18 @@ interface EconEvent {
   previous: string | null;
 }
 
-const EVENTS: EconEvent[] = [
-  { time: "03:00", flag: "🇳🇿", country: "New Zealand", currency: "NZD", impact: "high", name: "RBNZ Inflation Expectations (QoQ)", actual: "2.34", forecast: null, previous: "2.53" },
-  { time: "06:00", flag: "🇯🇵", country: "Japan", currency: "JPY", impact: "low", name: "Machine Tool Orders (YoY)", actual: "50.4", forecast: null, previous: "52.8" },
-  { time: "06:00", flag: "🇬🇧", country: "United Kingdom", currency: "GBP", impact: "low", name: "Goods Trade Balance", actual: "-23.007", forecast: "-20.5", previous: "-18.66" },
-  { time: "06:00", flag: "🇬🇧", country: "United Kingdom", currency: "GBP", impact: "medium", name: "Gross Domestic Product (MoM)", actual: "0.3", forecast: "0", previous: "0.1" },
-  { time: "06:00", flag: "🇬🇧", country: "United Kingdom", currency: "GBP", impact: "high", name: "Gross Domestic Product (QoQ)", actual: "0.4", forecast: "0.4", previous: "0.6" },
-  { time: "06:00", flag: "🇬🇧", country: "United Kingdom", currency: "GBP", impact: "high", name: "Gross Domestic Product (YoY)", actual: "1.2", forecast: "1.1", previous: "0.9" },
-  { time: "06:00", flag: "🇬🇧", country: "United Kingdom", currency: "GBP", impact: "low", name: "Industrial Production (YoY)", actual: "-0.2", forecast: "0.2", previous: "0.1" },
-  { time: "06:00", flag: "🇬🇧", country: "United Kingdom", currency: "GBP", impact: "low", name: "Manufacturing Production (MoM)", actual: "0.5", forecast: "0.2", previous: "-1.1" },
-  { time: "09:00", flag: "🇪🇺", country: "Euro Zone", currency: "EUR", impact: "medium", name: "Industrial Production (MoM)", actual: null, forecast: "-0.3", previous: "1.7" },
-  { time: "12:30", flag: "🇺🇸", country: "United States", currency: "USD", impact: "high", name: "Consumer Price Index (YoY)", actual: null, forecast: "2.8", previous: "2.7" },
-  { time: "14:30", flag: "🇺🇸", country: "United States", currency: "USD", impact: "medium", name: "EIA Crude Oil Stocks Change", actual: null, forecast: "-1.2", previous: "-3.06" },
-  { time: "18:00", flag: "🇺🇸", country: "United States", currency: "USD", impact: "high", name: "Fed Monetary Policy Statement", actual: null, forecast: null, previous: null },
-  { time: "22:45", flag: "🇳🇿", country: "New Zealand", currency: "NZD", impact: "low", name: "Food Price Index (MoM)", actual: null, forecast: null, previous: "0.6" },
-  { time: "23:50", flag: "🇯🇵", country: "Japan", currency: "JPY", impact: "medium", name: "Foreign Bond Investment", actual: null, forecast: null, previous: "-1140.1" },
-];
+type Week = "lastweek" | "thisweek" | "nextweek";
+
+const fetchEvents = async (week: Week): Promise<EconEvent[]> => {
+  const { data, error } = await supabase.functions.invoke("economic-calendar", {
+    body: null,
+    method: "GET",
+    // @ts-expect-error - query params supported at runtime
+    query: undefined,
+  });
+  if (error) throw error;
+  return (data?.events ?? []) as EconEvent[];
+};
 
 const IMPACT_COLOR: Record<Impact, string> = {
   high: "bg-destructive",
