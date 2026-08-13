@@ -31,11 +31,8 @@ interface EconEvent {
 type Week = "lastweek" | "thisweek" | "nextweek";
 
 const fetchEvents = async (week: Week): Promise<EconEvent[]> => {
-  const { data, error } = await supabase.functions.invoke("economic-calendar", {
-    body: null,
+  const { data, error } = await supabase.functions.invoke(`economic-calendar?week=${week}`, {
     method: "GET",
-    // @ts-expect-error - query params supported at runtime
-    query: undefined,
   });
   if (error) throw error;
   return (data?.events ?? []) as EconEvent[];
@@ -82,38 +79,103 @@ export const EconomicCalendarCard = () => {
   const [impact, setImpact] = useState("all");
   const [currency, setCurrency] = useState("all");
   const [country, setCountry] = useState("all");
+  const [week, setWeek] = useState<Week>("thisweek");
+  const [range, setRange] = useState<"today" | "week">("today");
+  const [tz, setTz] = useState<"utc" | "local">("utc");
+
+  const { data, isLoading, isError, error, isFetching, refetch } = useQuery({
+    queryKey: ["economic-calendar", week],
+    queryFn: () => fetchEvents(week),
+    staleTime: 15 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  const allEvents = useMemo(() => data ?? [], [data]);
+
+  const scoped = useMemo(() => {
+    if (range === "today" && week === "thisweek") {
+      const now = new Date();
+      return allEvents.filter((e) => isSameDay(new Date(e.timestamp), now));
+    }
+    return allEvents;
+  }, [allEvents, range, week]);
 
   const events = useMemo(
     () =>
-      EVENTS.filter(
+      scoped.filter(
         (e) =>
           (impact === "all" || e.impact === impact) &&
           (currency === "all" || e.currency === currency) &&
           (country === "all" || e.country === country)
       ),
-    [impact, currency, country]
+    [scoped, impact, currency, country]
   );
 
-  const countries = Array.from(new Set(EVENTS.map((e) => e.country)));
-  const currencies = Array.from(new Set(EVENTS.map((e) => e.currency)));
+  const countries = useMemo(
+    () => Array.from(new Set(scoped.map((e) => e.country))).sort(),
+    [scoped]
+  );
+  const currencies = useMemo(
+    () => Array.from(new Set(scoped.map((e) => e.currency))).sort(),
+    [scoped]
+  );
   const highImpact = events.filter((e) => e.impact === "high").length;
-  const upcoming = events.filter((e) => e.actual === null).length;
+  const upcoming = events.filter((e) => new Date(e.timestamp).getTime() > Date.now()).length;
+
+  const formatTime = (iso: string) => {
+    const d = new Date(iso);
+    return tz === "utc"
+      ? `${String(d.getUTCHours()).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")}`
+      : format(d, "HH:mm");
+  };
+
+  const groups = useMemo(() => {
+    const map = new Map<string, EconEvent[]>();
+    for (const e of events) {
+      const key = format(new Date(e.timestamp), "yyyy-MM-dd");
+      const list = map.get(key) ?? [];
+      list.push(e);
+      map.set(key, list);
+    }
+    return Array.from(map.entries()).sort(([x], [y]) => x.localeCompare(y));
+  }, [events]);
 
   return (
     <Card className="flex flex-col h-full overflow-hidden">
       <div className="p-5 pb-3 space-y-4">
-        <div>
-          <h2 className="text-xl md:text-2xl font-bold">Economic Calendar</h2>
-          <p className="text-sm text-muted-foreground">Market-moving events and releases</p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-xl md:text-2xl font-bold">Economic Calendar</h2>
+            <p className="text-sm text-muted-foreground">
+              Market-moving events and releases · live from ForexFactory
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            aria-label="Refresh calendar"
+          >
+            <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
+          </Button>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select defaultValue="recent">
+          <Select value={week} onValueChange={(v) => setWeek(v as Week)}>
+            <SelectTrigger className="w-[130px] h-9 rounded-full"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="lastweek">Last week</SelectItem>
+              <SelectItem value="thisweek">This week</SelectItem>
+              <SelectItem value="nextweek">Next week</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={range} onValueChange={(v) => setRange(v as "today" | "week")}>
             <SelectTrigger className="w-[120px] h-9 rounded-full"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="recent">Recent</SelectItem>
-              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="week">Full week</SelectItem>
             </SelectContent>
           </Select>
           <Select value={country} onValueChange={setCountry}>
@@ -139,7 +201,7 @@ export const EconomicCalendarCard = () => {
               <SelectItem value="low">Low</SelectItem>
             </SelectContent>
           </Select>
-          <Select defaultValue="utc">
+          <Select value={tz} onValueChange={(v) => setTz(v as "utc" | "local")}>
             <SelectTrigger className="w-[150px] h-9 rounded-full"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="utc">GMT+0 (UTC)</SelectItem>
@@ -169,43 +231,64 @@ export const EconomicCalendarCard = () => {
       </div>
 
       <div className="flex-1 overflow-y-auto max-h-[720px]">
-        <div className="sticky top-0 z-10 flex items-center justify-between gap-3 bg-card/95 backdrop-blur border-y border-border px-5 py-2.5">
-          <span className="flex items-center gap-2 text-sm">
-            <CalendarDays className="h-4 w-4 text-muted-foreground" />
-            <span className="font-bold tracking-wide">TODAY</span>
-            <span className="text-muted-foreground">{format(new Date(), "EEE, MMM d")}</span>
-          </span>
-          <span className="text-xs px-2.5 py-1 rounded-full bg-primary/15 text-primary font-medium">
-            {events.length} events
-          </span>
-        </div>
+        {isLoading && (
+          <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading economic events…
+          </div>
+        )}
 
-        {events.map((e, i) => (
-          <div key={i} className="px-5 py-3 border-b border-border hover:bg-muted/30 transition-colors">
-            <div className="flex items-start gap-3">
-              <span className="font-mono text-sm text-muted-foreground w-12 shrink-0 pt-0.5">{e.time}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium leading-snug">{e.name}</p>
-                <div className="mt-1.5 flex flex-wrap items-center gap-x-6 gap-y-1">
-                  <span className="flex items-center gap-2">
-                    <span className="text-base leading-none">{e.flag}</span>
-                    <ImpactBars impact={e.impact} />
-                    <span className={`text-[10px] font-semibold uppercase tracking-wide ${IMPACT_TEXT[e.impact]}`}>
-                      {e.impact}
-                    </span>
-                  </span>
-                  <span className="text-xs font-mono">
-                    A: <span className={valueClass(e.actual, e.previous)}>{e.actual ?? "--"}</span>
-                  </span>
-                  <span className="text-xs font-mono text-muted-foreground">F: {e.forecast ?? "--"}</span>
-                  <span className="text-xs font-mono text-muted-foreground">P: {e.previous ?? "--"}</span>
+        {isError && (
+          <div className="px-5 py-12 text-center space-y-3">
+            <p className="text-sm text-destructive">
+              Couldn't load the calendar{error instanceof Error ? `: ${error.message}` : ""}.
+            </p>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>Try again</Button>
+          </div>
+        )}
+
+        {!isLoading && !isError && groups.map(([day, dayEvents]) => (
+          <div key={day}>
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 bg-card/95 backdrop-blur border-y border-border px-5 py-2.5">
+              <span className="flex items-center gap-2 text-sm">
+                <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                <span className="font-bold tracking-wide">
+                  {isSameDay(new Date(day), new Date()) ? "TODAY" : format(new Date(day), "EEEE").toUpperCase()}
+                </span>
+                <span className="text-muted-foreground">{format(new Date(day), "EEE, MMM d")}</span>
+              </span>
+              <span className="text-xs px-2.5 py-1 rounded-full bg-primary/15 text-primary font-medium">
+                {dayEvents.length} events
+              </span>
+            </div>
+
+            {dayEvents.map((e) => (
+              <div key={e.id} className="px-5 py-3 border-b border-border hover:bg-muted/30 transition-colors">
+                <div className="flex items-start gap-3">
+                  <span className="font-mono text-sm text-muted-foreground w-12 shrink-0 pt-0.5">{formatTime(e.timestamp)}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium leading-snug">{e.name}</p>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-x-6 gap-y-1">
+                      <span className="flex items-center gap-2">
+                        <span className="text-base leading-none">{e.flag}</span>
+                        <ImpactBars impact={e.impact} />
+                        <span className={`text-[10px] font-semibold uppercase tracking-wide ${IMPACT_TEXT[e.impact]}`}>
+                          {e.impact}
+                        </span>
+                      </span>
+                      <span className="text-xs font-mono">
+                        A: <span className={valueClass(e.actual, e.previous)}>{e.actual ?? "--"}</span>
+                      </span>
+                      <span className="text-xs font-mono text-muted-foreground">F: {e.forecast ?? "--"}</span>
+                      <span className="text-xs font-mono text-muted-foreground">P: {e.previous ?? "--"}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         ))}
 
-        {events.length === 0 && (
+        {!isLoading && !isError && events.length === 0 && (
           <p className="px-5 py-10 text-center text-sm text-muted-foreground">
             No events match the selected filters.
           </p>
