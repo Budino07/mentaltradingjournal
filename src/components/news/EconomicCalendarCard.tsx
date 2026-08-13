@@ -275,9 +275,11 @@ export const EconomicCalendarCard = () => {
                           {e.impact}
                         </span>
                       </span>
-                      <span className="text-xs font-mono">
-                        A: <span className={valueClass(e.actual, e.previous)}>{e.actual ?? "--"}</span>
-                      </span>
+                      {e.actual && (
+                        <span className="text-xs font-mono">
+                          A: <span className={valueClass(e.actual, e.previous)}>{e.actual}</span>
+                        </span>
+                      )}
                       <span className="text-xs font-mono text-muted-foreground">F: {e.forecast ?? "--"}</span>
                       <span className="text-xs font-mono text-muted-foreground">P: {e.previous ?? "--"}</span>
                     </div>
