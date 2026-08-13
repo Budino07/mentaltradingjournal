@@ -644,7 +644,7 @@ export type Database = {
       check_subscription: { Args: never; Returns: boolean }
       get_trade_duration: {
         Args: { entry_date: string; exit_date: string }
-        Returns: unknown
+        Returns: string
       }
       get_week_number_in_month: {
         Args: { check_date: string }

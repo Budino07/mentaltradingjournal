@@ -35,7 +35,7 @@ export const NoteEditDialog = ({
     setIsSubmitting(true);
     try {
       // Create an update object with the appropriate field based on noteType
-      const updateData = { [noteType]: text };
+      const updateData = { [noteType]: text } as any;
       
       const { error } = await supabase
         .from('journal_entries')

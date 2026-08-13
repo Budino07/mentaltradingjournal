@@ -11,7 +11,7 @@ export const useNote = (noteId: string | null, user: any) => {
   const [tagColors, setTagColors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const updateTimeoutRef = useRef<NodeJS.Timeout>();
+  const updateTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const { data: note, isLoading } = useQuery({
     queryKey: ["note", noteId],
