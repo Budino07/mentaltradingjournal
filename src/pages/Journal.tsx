@@ -94,7 +94,7 @@ const Journal = () => {
     fetchEntries();
 
     const channel = supabase
-      .channel('journal_entries_changes')
+      .channel('journal_entries_changes_page')
       .on(
         'postgres_changes',
         {

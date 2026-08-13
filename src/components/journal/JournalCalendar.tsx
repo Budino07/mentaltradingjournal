@@ -56,7 +56,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
   // Subscribe to real-time updates
   useEffect(() => {
     const channel = supabase
-      .channel('journal_entries_changes')
+      .channel('journal_entries_changes_calendar')
       .on(
         'postgres_changes',
         {

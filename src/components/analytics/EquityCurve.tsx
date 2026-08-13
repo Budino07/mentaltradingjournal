@@ -20,7 +20,7 @@ export const EquityCurve = () => {
   // Subscribe to real-time updates
   useEffect(() => {
     const channel = supabase
-      .channel('journal_entries_changes')
+      .channel('journal_entries_changes_equity')
       .on(
         'postgres_changes',
         {
