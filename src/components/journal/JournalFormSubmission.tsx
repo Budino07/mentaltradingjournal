@@ -135,7 +135,7 @@ export const useJournalFormSubmission = ({
         daily_label: dailyLabel,
         four_hour_label: fourHourLabel,
         one_hour_label: oneHourLabel,
-      });
+      } as any);
 
       if (error) {
         console.error('Error submitting journal entry:', error);
