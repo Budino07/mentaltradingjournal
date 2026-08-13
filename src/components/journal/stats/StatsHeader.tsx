@@ -36,7 +36,7 @@ export const StatsHeader = () => {
   
   useEffect(() => {
     const channel = supabase
-      .channel('journal_entries_changes')
+      .channel('journal_entries_changes_stats')
       .on(
         'postgres_changes',
         {
