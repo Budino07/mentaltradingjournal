@@ -3,6 +3,9 @@ import { Card } from "@/components/ui/card";
 import { WorldMap } from "./WorldMap";
 import {
   MARKET_SESSIONS,
+  formatDuration,
+  getActiveSessions,
+  hoursUntilClose,
   hoursUntilOpen,
   isSessionActive,
   localTime,
@@ -21,15 +24,17 @@ export const SessionClockCard = () => {
   const userLocal = localTime(userZone, now);
   const utcHours = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
 
-  const { activeSession, nextSession, countdown } = useMemo(() => {
-    const active = MARKET_SESSIONS.find((s) => isSessionActive(s, utcHours));
+  const { activeSessions, activeNames, nextSession, countdown } = useMemo(() => {
+    const active = getActiveSessions(utcHours);
     const upcoming = [...MARKET_SESSIONS]
-      .filter((s) => s.name !== active?.name)
+      .filter((s) => !isSessionActive(s, utcHours))
       .sort((a, b) => hoursUntilOpen(a, utcHours) - hoursUntilOpen(b, utcHours))[0];
-    const untilHours = upcoming ? hoursUntilOpen(upcoming, utcHours) : 0;
-    const h = Math.floor(untilHours);
-    const m = Math.floor((untilHours - h) * 60);
-    return { activeSession: active, nextSession: upcoming, countdown: `${h}h ${m}m` };
+    return {
+      activeSessions: active,
+      activeNames: new Set(active.map((s) => s.name)),
+      nextSession: upcoming,
+      countdown: upcoming ? formatDuration(hoursUntilOpen(upcoming, utcHours)) : "",
+    };
   }, [utcHours]);
 
   return (
@@ -45,7 +50,7 @@ export const SessionClockCard = () => {
           </p>
 
           <div className="mt-4 rounded-lg border border-border bg-muted/30 h-[220px] text-foreground">
-            <WorldMap activeSession={activeSession} nextSession={nextSession} />
+            <WorldMap activeSessions={activeSessions} />
           </div>
         </div>
 
@@ -55,7 +60,7 @@ export const SessionClockCard = () => {
           </p>
           <div className="flex-1">
             {MARKET_SESSIONS.map((s) => {
-              const active = activeSession?.name === s.name;
+              const active = activeNames.has(s.name);
               return (
                 <div
                   key={s.name}
@@ -65,14 +70,19 @@ export const SessionClockCard = () => {
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <span
-                      className={`h-2 w-2 rounded-full shrink-0 ${
-                        active ? "bg-primary animate-pulse" : "bg-muted-foreground/40"
+                      className={`h-2.5 w-2.5 rounded-full shrink-0 border-2 ${
+                        active
+                          ? "bg-primary/30 border-primary animate-pulse"
+                          : "bg-muted border-border"
                       }`}
                     />
                     <div className="min-w-0">
                       <p className="text-sm font-medium truncate">{s.name}</p>
                       <p className="font-mono text-xs text-muted-foreground">
                         {localTime(s.timeZone, now)}
+                        {active
+                          ? ` · closes in ${formatDuration(hoursUntilClose(s, utcHours))}`
+                          : ` · opens in ${formatDuration(hoursUntilOpen(s, utcHours))}`}
                       </p>
                     </div>
                   </div>
@@ -86,7 +96,14 @@ export const SessionClockCard = () => {
             })}
           </div>
           <div className="border-t border-border px-4 py-3 text-sm text-muted-foreground">
-            Next: <span className="font-medium text-foreground">{nextSession?.name}</span> in {countdown}
+            {nextSession ? (
+              <>
+                Next: <span className="font-medium text-foreground">{nextSession.name}</span> in{" "}
+                {countdown}
+              </>
+            ) : (
+              <>All sessions open</>
+            )}
           </div>
         </div>
       </div>
