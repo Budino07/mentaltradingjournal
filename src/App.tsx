@@ -22,6 +22,7 @@ import Login from "./pages/Login";
 import MfeMae from "./pages/MfeMae";
 import TradesList from "./pages/TradesList";
 import MentalWrapped from "./pages/MentalWrapped";
+import News from "./pages/News";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ScrollToTop } from "./components/ui/ScrollToTop";
 import { NotificationsProvider } from "./contexts/NotificationsContext";
@@ -129,6 +130,14 @@ const App = () => {
                       element={
                         <ProtectedRoute>
                           <MentalWrapped />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/news"
+                      element={
+                        <ProtectedRoute>
+                          <News />
                         </ProtectedRoute>
                       }
                     />
