@@ -88,15 +88,14 @@ const Notebook = () => {
   }, []);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-      <AppLayout>
-        <SubscriptionGuard>
-          <div className="h-[calc(100vh-4rem)] overflow-hidden">
-            <NotebookContent />
-          </div>
-        </SubscriptionGuard>
-      </AppLayout>
-    </ThemeProvider>
+    <AppLayout>
+      <SubscriptionGuard>
+        <div className="h-[calc(100vh-9rem)] min-h-[500px] overflow-hidden rounded-lg border bg-background/40">
+          <NotebookContent />
+        </div>
+      </SubscriptionGuard>
+    </AppLayout>
+
   );
 };
 
