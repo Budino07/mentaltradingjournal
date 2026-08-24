@@ -2,7 +2,7 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { NotebookContent } from "@/components/notebook/NotebookContent";
 import { SubscriptionGuard } from "@/components/subscription/SubscriptionGuard";
-import { ThemeProvider } from "next-themes";
+
 import { useEffect } from "react";
 
 const Notebook = () => {
