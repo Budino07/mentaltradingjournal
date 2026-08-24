@@ -63,7 +63,7 @@ const Notebook = () => {
       if (link.type === "text/css") {
         // Create style element for custom fonts
         const style = document.createElement('style');
-        style.type = 'text/css';
+        style.setAttribute('data-notebook-fonts', 'true');
         style.innerHTML = link.innerContent || '';
         document.head.appendChild(style);
       } else {
@@ -77,13 +77,10 @@ const Notebook = () => {
 
     // Clean up function
     return () => {
-      // Remove any dynamically added style/link elements if component unmounts
-      const styles = document.querySelectorAll('style[type="text/css"]');
-      styles.forEach(style => {
-        if (style.innerHTML.includes('@font-face')) {
-          style.remove();
-        }
-      });
+      // Only remove the elements this component injected
+      document
+        .querySelectorAll('style[data-notebook-fonts="true"]')
+        .forEach(el => el.remove());
     };
   }, []);
 
