@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Trade } from "@/types/trade";
 import { useNotifications } from "@/contexts/NotificationsContext";
+import { trackEvent } from "@/lib/analytics";
 
 interface JournalFormSubmissionProps {
   sessionType: "pre" | "post";
@@ -182,6 +183,7 @@ export const useJournalFormSubmission = ({
       }
       
       showSuccessToast(sessionType);
+      trackEvent("journal_entry_created", { session_type: sessionType });
       resetForm();
       onSubmitSuccess?.();
     } catch (error) {

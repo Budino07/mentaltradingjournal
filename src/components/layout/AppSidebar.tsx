@@ -1,5 +1,5 @@
 
-import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, Notebook, LineChart, List, Gift, Newspaper } from "lucide-react";
+import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, Notebook, LineChart, List, Gift, Newspaper, Shield } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -22,6 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsAdmin } from "@/hooks/useAdmin";
 
 function SidebarToggleIcon({ className }: { className?: string }) {
   return (
@@ -58,6 +59,7 @@ export function AppSidebar() {
   const { setOpenMobile, toggleSidebar, open } = useSidebar();
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { isAdmin } = useIsAdmin();
 
   // Close mobile sidebar when navigating to a new page
   const handleNavigation = () => {
@@ -109,6 +111,25 @@ export function AppSidebar() {
                     </SidebarMenuItem>
                   );
                 })}
+                {isAdmin && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={location.pathname.startsWith("/admin")}
+                      tooltip="Admin"
+                      className={cn(
+                        "transition-all duration-200",
+                        "data-[active=true]:bg-primary/10 data-[active=true]:text-primary",
+                        "data-[active=true]:shadow-[0_0_0_1px_hsl(var(--primary)/0.4),0_0_16px_hsl(var(--primary)/0.25)]"
+                      )}
+                    >
+                      <Link to="/admin" onClick={handleNavigation}>
+                        <Shield className={cn("h-4 w-4", location.pathname.startsWith("/admin") && "text-primary")} />
+                        <span>Admin</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     onClick={() => setShowMentorDialog(true)}

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { trackEvent } from "@/lib/analytics";
 
 interface FormData {
   entryDate: string;
@@ -170,6 +171,7 @@ export function useBacktestingForm(userId: string | undefined, navigate: (path: 
 
       if (error) throw error;
 
+      trackEvent("backtesting_session_created", { blueprint_id: selectedBlueprint });
       toast.success("Session created successfully!");
       navigate(`/blueprint/${selectedBlueprint}`);
     } catch (error) {
