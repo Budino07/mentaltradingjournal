@@ -59,6 +59,7 @@ export function AppSidebar() {
   const { setOpenMobile, toggleSidebar, open } = useSidebar();
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { isAdmin } = useIsAdmin();
 
   // Close mobile sidebar when navigating to a new page
   const handleNavigation = () => {
