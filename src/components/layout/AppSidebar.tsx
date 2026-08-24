@@ -1,12 +1,11 @@
 
-import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, Notebook, LineChart, List, Gift, Newspaper, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, Notebook, LineChart, List, Gift, Newspaper } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -19,10 +18,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+
+function SidebarToggleIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <rect x="3" y="5" width="18" height="14" rx="3" />
+      <polyline points="10 9 14 12 10 15" />
+    </svg>
+  );
+}
 
 const menuItems = [
   { title: "Journal", icon: Home, url: "/journal-entry" },
@@ -53,25 +68,20 @@ export function AppSidebar() {
   return (
     <>
       <Sidebar className="hidden md:flex border-r border-primary/20" collapsible="icon">
-        <SidebarHeader className="p-2 flex items-center justify-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-            onClick={toggleSidebar}
-          >
-            {open ? (
-              <ChevronsLeft className="h-4 w-4" />
-            ) : (
-              <ChevronsRight className="h-4 w-4" />
-            )}
-            <span className="sr-only">Toggle sidebar</span>
-          </Button>
-        </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu className="gap-1 py-1">
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={toggleSidebar}
+                    tooltip={open ? "Collapse sidebar" : "Expand sidebar"}
+                    className="transition-all duration-200"
+                  >
+                    <SidebarToggleIcon className="h-4 w-4" />
+                    <span>{open ? "Collapse" : "Expand"}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
                 {menuItems.map((item) => {
                   const isActive = location.pathname === item.url;
                   return (
