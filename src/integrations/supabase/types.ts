@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_name: string
+          event_type: string
+          id: string
+          metadata: Json
+          path: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_name: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+          path?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_name?: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+          path?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       backtesting_sessions: {
         Row: {
           after_url: string | null
@@ -559,6 +592,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       week_stats: {
         Row: {
           created_at: string
@@ -633,6 +687,89 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_active_users: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          dau: number
+          day: string
+          mau: number
+          wau: number
+        }[]
+      }
+      admin_activity: {
+        Args: { p_end?: string; p_start?: string }
+        Returns: {
+          kind: string
+          label: string
+          ts: string
+          user_id: string
+        }[]
+      }
+      admin_churn_trend: {
+        Args: { p_weeks?: number }
+        Returns: {
+          base: number
+          churn_rate: number
+          churned: number
+          week: string
+        }[]
+      }
+      admin_cohort_retention: {
+        Args: { p_cohorts?: number; p_periods?: number }
+        Returns: {
+          cohort: string
+          cohort_size: number
+          period: number
+          retained: number
+        }[]
+      }
+      admin_feature_usage: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          feature: string
+          users: number
+          uses: number
+        }[]
+      }
+      admin_growth_series: {
+        Args: { p_bucket?: string; p_end: string; p_start: string }
+        Returns: {
+          bucket: string
+          cumulative: number
+          signups: number
+        }[]
+      }
+      admin_kpis: { Args: never; Returns: Json }
+      admin_sessions_series: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          avg_duration_sec: number
+          day: string
+          sessions: number
+        }[]
+      }
+      admin_user_list: {
+        Args: { p_churn_days?: number; p_search?: string; p_segment?: string }
+        Returns: {
+          activity_count: number
+          email: string
+          full_name: string
+          last_active: string
+          plan: string
+          session_count: number
+          signup_date: string
+          status: string
+          user_id: string
+        }[]
+      }
+      admin_user_timeline: {
+        Args: { p_limit?: number; p_user_id: string }
+        Returns: {
+          kind: string
+          label: string
+          ts: string
+        }[]
+      }
       calculate_duration: {
         Args: { entry_time: string; exit_time: string }
         Returns: string
@@ -651,9 +788,16 @@ export type Database = {
         Returns: number
       }
       has_active_subscription: { Args: { user_id: string }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -780,6 +924,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
