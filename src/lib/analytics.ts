@@ -27,8 +27,8 @@ export function resetSessionId() {
 
 export async function trackEvent(
   eventName: string,
-  eventType: "page_view" | "feature" | "engagement" = "feature",
-  metadata: Record<string, unknown> = {}
+  metadata: Record<string, unknown> = {},
+  eventType: "page_view" | "feature" | "engagement" = "feature"
 ) {
   try {
     const user = await supabase.auth.getUser().then(({ data }) => data.user);
@@ -48,5 +48,5 @@ export async function trackEvent(
 }
 
 export function trackPageView(path?: string) {
-  return trackEvent(path ?? window.location.pathname, "page_view", {});
+  return trackEvent(path ?? window.location.pathname, {}, "page_view");
 }
