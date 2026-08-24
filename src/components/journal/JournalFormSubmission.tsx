@@ -183,6 +183,7 @@ export const useJournalFormSubmission = ({
       }
       
       showSuccessToast(sessionType);
+      trackEvent("journal_entry_created", { session_type: sessionType });
       resetForm();
       onSubmitSuccess?.();
     } catch (error) {
