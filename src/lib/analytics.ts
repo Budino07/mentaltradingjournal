@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 
 const SESSION_KEY = "mtj_analytics_session";
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
