@@ -93,6 +93,7 @@ export const NotebookContent = () => {
       return data;
     },
     onSuccess: (data) => {
+      trackEvent("note_created", { note_id: data.id });
       queryClient.invalidateQueries({ queryKey: ["notes"] });
       setSelectedNoteId(data.id);
       toast({
