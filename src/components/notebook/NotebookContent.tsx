@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
+import { trackEvent } from "@/lib/analytics";
 
 export const NotebookContent = () => {
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
