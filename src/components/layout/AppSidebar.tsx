@@ -111,6 +111,25 @@ export function AppSidebar() {
                     </SidebarMenuItem>
                   );
                 })}
+                {isAdmin && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={location.pathname.startsWith("/admin")}
+                      tooltip="Admin"
+                      className={cn(
+                        "transition-all duration-200",
+                        "data-[active=true]:bg-primary/10 data-[active=true]:text-primary",
+                        "data-[active=true]:shadow-[0_0_0_1px_hsl(var(--primary)/0.4),0_0_16px_hsl(var(--primary)/0.25)]"
+                      )}
+                    >
+                      <Link to="/admin" onClick={handleNavigation}>
+                        <Shield className={cn("h-4 w-4", location.pathname.startsWith("/admin") && "text-primary")} />
+                        <span>Admin</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     onClick={() => setShowMentorDialog(true)}
