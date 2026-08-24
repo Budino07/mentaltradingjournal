@@ -50,7 +50,7 @@ export function AppSidebar() {
 
   return (
     <>
-      <Sidebar className="w-14 flex-shrink-0 border-r border-primary/20 hidden md:flex fixed h-screen z-20" collapsible="none">
+      <Sidebar className="w-20 flex-shrink-0 border-r border-primary/20 hidden md:flex fixed h-screen z-20" collapsible="none">
         <SidebarContent>
           <div className="p-3 flex justify-center">
             <Link to="/" className="flex items-center justify-center" onClick={handleNavigation}>
@@ -67,13 +67,16 @@ export function AppSidebar() {
                       <SidebarMenuItem key={item.title} className="flex justify-center">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <SidebarMenuButton asChild className={`w-10 h-10 flex items-center justify-center ${isActive ? 'bg-primary/10' : ''}`}>
+                            <SidebarMenuButton asChild className={`w-16 h-auto py-2 px-1 flex flex-col items-center justify-center gap-1 rounded-md ${isActive ? 'bg-primary/10' : ''}`}>
                               <Link 
                                 to={item.url} 
-                                className="flex items-center justify-center"
+                                className="flex flex-col items-center justify-center text-center"
                                 onClick={handleNavigation}
                               >
                                 <item.icon className={`w-4 h-4 ${isActive ? 'text-primary' : ''}`} />
+                                <span className={`text-[10px] leading-tight ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                                  {item.title}
+                                </span>
                               </Link>
                             </SidebarMenuButton>
                           </TooltipTrigger>
@@ -87,8 +90,9 @@ export function AppSidebar() {
                   <SidebarMenuItem className="flex justify-center">
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <SidebarMenuButton className="w-10 h-10 flex items-center justify-center" onClick={() => setShowMentorDialog(true)}>
+                        <SidebarMenuButton className="w-16 h-auto py-2 px-1 flex flex-col items-center justify-center gap-1 rounded-md" onClick={() => setShowMentorDialog(true)}>
                           <UserCog className="w-4 h-4" />
+                          <span className="text-[10px] leading-tight text-muted-foreground">Mentor</span>
                         </SidebarMenuButton>
                       </TooltipTrigger>
                       <TooltipContent side="right" className="bg-popover text-popover-foreground">
