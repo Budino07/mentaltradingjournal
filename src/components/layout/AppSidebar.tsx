@@ -6,6 +6,7 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -68,20 +69,24 @@ export function AppSidebar() {
   return (
     <>
       <Sidebar className="hidden md:flex border-r border-primary/20" collapsible="icon">
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={toggleSidebar}
+                tooltip={open ? "Collapse sidebar" : "Expand sidebar"}
+                className="transition-all duration-200"
+              >
+                <SidebarToggleIcon className="h-4 w-4" />
+                <span>{open ? "Collapse" : "Expand"}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu className="gap-1 py-1">
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    onClick={toggleSidebar}
-                    tooltip={open ? "Collapse sidebar" : "Expand sidebar"}
-                    className="transition-all duration-200"
-                  >
-                    <SidebarToggleIcon className="h-4 w-4" />
-                    <span>{open ? "Collapse" : "Expand"}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
                 {menuItems.map((item) => {
                   const isActive = location.pathname === item.url;
                   return (
