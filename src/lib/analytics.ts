@@ -27,7 +27,7 @@ export function resetSessionId() {
 
 export async function trackEvent(
   eventName: string,
-  metadata: Record<string, unknown> = {},
+  metadata: { [key: string]: Json | undefined } = {},
   eventType: "page_view" | "feature" | "engagement" = "feature"
 ) {
   try {
