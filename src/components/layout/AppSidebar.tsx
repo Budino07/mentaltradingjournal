@@ -68,25 +68,20 @@ export function AppSidebar() {
   return (
     <>
       <Sidebar className="hidden md:flex border-r border-primary/20" collapsible="icon">
-        <SidebarHeader className="p-2 flex items-center justify-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-            onClick={toggleSidebar}
-          >
-            {open ? (
-              <ChevronsLeft className="h-4 w-4" />
-            ) : (
-              <ChevronsRight className="h-4 w-4" />
-            )}
-            <span className="sr-only">Toggle sidebar</span>
-          </Button>
-        </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu className="gap-1 py-1">
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={toggleSidebar}
+                    tooltip={open ? "Collapse sidebar" : "Expand sidebar"}
+                    className="transition-all duration-200"
+                  >
+                    <SidebarToggleIcon className="h-4 w-4" />
+                    <span>{open ? "Collapse" : "Expand"}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
                 {menuItems.map((item) => {
                   const isActive = location.pathname === item.url;
                   return (
