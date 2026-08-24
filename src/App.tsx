@@ -183,6 +183,20 @@ const App = () => {
                         </ProtectedRoute>
                       }
                     />
+                    <Route
+                      path="/admin"
+                      element={
+                        <AdminRoute>
+                          <AdminLayout />
+                        </AdminRoute>
+                      }
+                    >
+                      <Route index element={<AdminOverview />} />
+                      <Route path="growth" element={<AdminGrowth />} />
+                      <Route path="engagement" element={<AdminEngagement />} />
+                      <Route path="retention" element={<AdminRetention />} />
+                      <Route path="users" element={<AdminUsers />} />
+                    </Route>
                   </Routes>
                 </BrowserRouter>
               </TooltipProvider>
