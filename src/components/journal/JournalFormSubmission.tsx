@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Trade } from "@/types/trade";
 import { useNotifications } from "@/contexts/NotificationsContext";
+import { trackEvent } from "@/lib/analytics";
 
 interface JournalFormSubmissionProps {
   sessionType: "pre" | "post";
