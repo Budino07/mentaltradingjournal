@@ -5,21 +5,26 @@ import { format, subDays } from "date-fns";
 export type DateRange = { from: Date; to: Date };
 export type Segment = "all" | "subscribed" | "free";
 
-export function useAdminKPIs() {
+export function useAdminKPIs(range: DateRange) {
+  const start = format(range.from, "yyyy-MM-dd");
+  const end = format(range.to, "yyyy-MM-dd");
   return useQuery({
-    queryKey: ["admin", "kpis"],
+    queryKey: ["admin", "kpis", start, end],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_kpis");
+      const { data, error } = await supabase.rpc("admin_kpis_range", {
+        p_start: start,
+        p_end: end,
+      });
       if (error) throw error;
-      return data as Record<string, number>;
+      return data as unknown as Record<string, number>;
     },
-    staleTime: 2 * 60 * 1000,
+    staleTime: 60 * 1000,
   });
 }
 
 export function useAdminGrowth(range: DateRange, bucket: "day" | "week" | "month") {
   return useQuery({
-    queryKey: ["admin", "growth", range.from, range.to, bucket],
+    queryKey: ["admin", "growth", format(range.from, "yyyy-MM-dd"), format(range.to, "yyyy-MM-dd"), bucket],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_growth_series", {
         p_start: format(range.from, "yyyy-MM-dd"),
@@ -34,7 +39,7 @@ export function useAdminGrowth(range: DateRange, bucket: "day" | "week" | "month
 
 export function useAdminActiveUsers(range: DateRange) {
   return useQuery({
-    queryKey: ["admin", "active-users", range.from, range.to],
+    queryKey: ["admin", "active-users", format(range.from, "yyyy-MM-dd"), format(range.to, "yyyy-MM-dd")],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_active_users", {
         p_start: format(range.from, "yyyy-MM-dd"),
@@ -48,7 +53,7 @@ export function useAdminActiveUsers(range: DateRange) {
 
 export function useAdminSessions(range: DateRange) {
   return useQuery({
-    queryKey: ["admin", "sessions", range.from, range.to],
+    queryKey: ["admin", "sessions", format(range.from, "yyyy-MM-dd"), format(range.to, "yyyy-MM-dd")],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_sessions_series", {
         p_start: format(range.from, "yyyy-MM-dd"),
@@ -62,7 +67,7 @@ export function useAdminSessions(range: DateRange) {
 
 export function useAdminFeatureUsage(range: DateRange) {
   return useQuery({
-    queryKey: ["admin", "feature-usage", range.from, range.to],
+    queryKey: ["admin", "feature-usage", format(range.from, "yyyy-MM-dd"), format(range.to, "yyyy-MM-dd")],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_feature_usage", {
         p_start: format(range.from, "yyyy-MM-dd"),
