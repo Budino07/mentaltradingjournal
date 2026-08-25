@@ -464,6 +464,9 @@ export type Database = {
         Row: {
           cancel_at: string | null
           canceled_at: string | null
+          cancellation_comment: string | null
+          cancellation_reason: string | null
+          cancellation_source: string | null
           created_at: string
           current_period_end: string | null
           current_period_start: string | null
@@ -478,6 +481,9 @@ export type Database = {
         Insert: {
           cancel_at?: string | null
           canceled_at?: string | null
+          cancellation_comment?: string | null
+          cancellation_reason?: string | null
+          cancellation_source?: string | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
@@ -492,6 +498,9 @@ export type Database = {
         Update: {
           cancel_at?: string | null
           canceled_at?: string | null
+          cancellation_comment?: string | null
+          cancellation_reason?: string | null
+          cancellation_source?: string | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
@@ -715,6 +724,24 @@ export type Database = {
           total_seconds: number
           users: number
           uses: number
+        }[]
+      }
+      admin_cancellation_comments: {
+        Args: { p_end: string; p_limit?: number; p_start: string }
+        Returns: {
+          canceled_at: string
+          comment: string
+          reason: string
+        }[]
+      }
+      admin_cancellation_reasons: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          avg_months: number
+          cancels: number
+          reason: string
+          share: number
+          users: number
         }[]
       }
       admin_churn_trend: {

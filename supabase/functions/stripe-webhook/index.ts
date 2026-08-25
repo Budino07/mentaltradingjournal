@@ -151,9 +151,13 @@ const handler = async (req: Request): Promise<Response> => {
           priceId: subscription.items.data[0].price.id
         });
         
+        const cd = (subscription as any).cancellation_details ?? null;
         const { error } = await supabase.from("subscriptions").update({
           status: subscription.status,
           stripe_price_id: subscription.items.data[0].price.id,
+          cancellation_reason: cd?.feedback ?? null,
+          cancellation_comment: cd?.comment ?? null,
+          cancellation_source: cd?.reason ?? null,
           current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
           current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
           cancel_at: subscription.cancel_at ? new Date(subscription.cancel_at * 1000).toISOString() : null,
@@ -175,9 +179,18 @@ const handler = async (req: Request): Promise<Response> => {
         const subscription = event.data.object as Stripe.Subscription;
         console.log("Processing subscription deletion:", subscription.id);
         
+        const details = (subscription as any).cancellation_details ?? null;
         const { error } = await supabase
           .from("subscriptions")
-          .update({ status: "canceled" })
+          .update({
+            status: "canceled",
+            canceled_at: subscription.canceled_at
+              ? new Date(subscription.canceled_at * 1000).toISOString()
+              : new Date().toISOString(),
+            cancellation_reason: details?.feedback ?? null,
+            cancellation_comment: details?.comment ?? null,
+            cancellation_source: details?.reason ?? null,
+          })
           .match({ stripe_subscription_id: subscription.id });
 
         if (error) {

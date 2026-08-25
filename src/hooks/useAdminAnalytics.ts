@@ -209,6 +209,52 @@ export function useAdminSubscriptionStats() {
   });
 }
 
+export type CancellationReasonRow = {
+  reason: string;
+  cancels: number;
+  users: number;
+  share: number;
+  avg_months: number;
+};
+
+export function useAdminCancellationReasons(range: DateRange) {
+  const start = format(range.from, "yyyy-MM-dd");
+  const end = format(range.to, "yyyy-MM-dd");
+  return useQuery({
+    queryKey: ["admin", "cancellation-reasons", start, end],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_cancellation_reasons" as never, {
+        p_start: start,
+        p_end: end,
+      } as never);
+      if (error) throw error;
+      return (data ?? []) as unknown as CancellationReasonRow[];
+    },
+    staleTime: 60 * 1000,
+  });
+}
+
+export type CancellationComment = { canceled_at: string; reason: string; comment: string | null };
+
+export function useAdminCancellationComments(range: DateRange, limit = 50) {
+  const start = format(range.from, "yyyy-MM-dd");
+  const end = format(range.to, "yyyy-MM-dd");
+  return useQuery({
+    queryKey: ["admin", "cancellation-comments", start, end, limit],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_cancellation_comments" as never, {
+        p_start: start,
+        p_end: end,
+        p_limit: limit,
+      } as never);
+      if (error) throw error;
+      return (data ?? []) as unknown as CancellationComment[];
+    },
+    staleTime: 60 * 1000,
+  });
+}
+
+
 export const defaultRange: DateRange = {
   from: subDays(new Date(), 29),
   to: new Date(),
