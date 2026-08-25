@@ -221,6 +221,143 @@ export type Database = {
         }
         Relationships: []
       }
+      broker_accounts: {
+        Row: {
+          balance: number | null
+          connection_status: string | null
+          created_at: string
+          currency: string | null
+          equity: number | null
+          id: string
+          last_sync_at: string | null
+          login: string
+          name: string | null
+          platform: string
+          provider: string
+          provider_account_id: string | null
+          server: string
+          state: string
+          sync_error: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number | null
+          connection_status?: string | null
+          created_at?: string
+          currency?: string | null
+          equity?: number | null
+          id?: string
+          last_sync_at?: string | null
+          login: string
+          name?: string | null
+          platform: string
+          provider?: string
+          provider_account_id?: string | null
+          server: string
+          state?: string
+          sync_error?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number | null
+          connection_status?: string | null
+          created_at?: string
+          currency?: string | null
+          equity?: number | null
+          id?: string
+          last_sync_at?: string | null
+          login?: string
+          name?: string | null
+          platform?: string
+          provider?: string
+          provider_account_id?: string | null
+          server?: string
+          state?: string
+          sync_error?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      imported_trades: {
+        Row: {
+          broker_account_id: string
+          close_price: number | null
+          close_time: string | null
+          comment: string | null
+          commission: number | null
+          created_at: string
+          direction: string | null
+          external_id: string
+          id: string
+          open_price: number | null
+          open_time: string | null
+          profit: number | null
+          raw: Json
+          stop_loss: number | null
+          swap: number | null
+          symbol: string | null
+          take_profit: number | null
+          updated_at: string
+          user_id: string
+          volume: number | null
+        }
+        Insert: {
+          broker_account_id: string
+          close_price?: number | null
+          close_time?: string | null
+          comment?: string | null
+          commission?: number | null
+          created_at?: string
+          direction?: string | null
+          external_id: string
+          id?: string
+          open_price?: number | null
+          open_time?: string | null
+          profit?: number | null
+          raw?: Json
+          stop_loss?: number | null
+          swap?: number | null
+          symbol?: string | null
+          take_profit?: number | null
+          updated_at?: string
+          user_id: string
+          volume?: number | null
+        }
+        Update: {
+          broker_account_id?: string
+          close_price?: number | null
+          close_time?: string | null
+          comment?: string | null
+          commission?: number | null
+          created_at?: string
+          direction?: string | null
+          external_id?: string
+          id?: string
+          open_price?: number | null
+          open_time?: string | null
+          profit?: number | null
+          raw?: Json
+          stop_loss?: number | null
+          swap?: number | null
+          symbol?: string | null
+          take_profit?: number | null
+          updated_at?: string
+          user_id?: string
+          volume?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "imported_trades_broker_account_id_fkey"
+            columns: ["broker_account_id"]
+            isOneToOne: false
+            referencedRelation: "broker_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       journal_entries: {
         Row: {
           account_id: string | null
