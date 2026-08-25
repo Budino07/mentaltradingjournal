@@ -6,7 +6,11 @@ import {
   useAdminLandingPages,
   useAdminTopReferrers,
   useAdminTrafficSources,
+  useTrackingStart,
 } from "@/hooks/useAdminAnalytics";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info } from "lucide-react";
+import { format } from "date-fns";
 import { KPICard } from "@/components/admin/KPICard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,6 +36,8 @@ export default function Acquisition() {
   const landing = useAdminLandingPages(range);
   const referrers = useAdminTopReferrers(range);
   const campaigns = useAdminAdCampaigns();
+  const trackingStart = useTrackingStart();
+  const partial = !!trackingStart.data && trackingStart.data > range.from;
 
   const a = acq.data;
   const totalImpressions = (campaigns.data ?? []).reduce((s, c) => s + Number(c.impressions || 0), 0);
@@ -45,6 +51,20 @@ export default function Acquisition() {
         <h1 className="text-2xl font-bold tracking-tight">Acquisition</h1>
         <p className="text-muted-foreground">Top of funnel: reach, traffic and where visitors come from.</p>
       </div>
+
+      {partial && (
+        <Alert className="border-amber-500/40 bg-amber-500/10">
+          <Info className="h-4 w-4" />
+          <AlertTitle>Visit tracking only covers part of this range</AlertTitle>
+          <AlertDescription>
+            Visitor, session and traffic-source tracking started on{" "}
+            {format(trackingStart.data!, "MMM d, yyyy")}, so visits before then were never recorded.
+            Signups on this page come from your full account history, which is why signups can look
+            far larger than visits. Comparisons like visit → signup only become meaningful for ranges
+            that start after {format(trackingStart.data!, "MMM d, yyyy")}.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {acq.isLoading || !a ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
