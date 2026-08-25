@@ -418,6 +418,36 @@ export type Database = {
         }
         Relationships: []
       }
+      plan_prices: {
+        Row: {
+          created_at: string
+          currency: string
+          interval: string
+          nickname: string | null
+          price_id: string
+          unit_amount: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          interval?: string
+          nickname?: string | null
+          price_id: string
+          unit_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          interval?: string
+          nickname?: string | null
+          price_id?: string
+          unit_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pricing_plans: {
         Row: {
           created_at: string
@@ -759,6 +789,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_acquisition: {
+        Args: { p_end: string; p_start: string }
+        Returns: Json
+      }
+      admin_activation: {
+        Args: { p_end: string; p_start: string }
+        Returns: Json
+      }
       admin_active_users: {
         Args: { p_end: string; p_start: string }
         Returns: {
@@ -825,6 +863,22 @@ export type Database = {
           retained: number
         }[]
       }
+      admin_device_breakdown: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          avg_seconds: number
+          bounce_rate: number
+          device: string
+          pages_per_session: number
+          sessions: number
+          signups: number
+          visitors: number
+        }[]
+      }
+      admin_engagement_quality: {
+        Args: { p_end: string; p_start: string }
+        Returns: Json
+      }
       admin_feature_usage: {
         Args: { p_end: string; p_start: string }
         Returns: {
@@ -848,6 +902,51 @@ export type Database = {
             Args: { p_end: string; p_segment?: string; p_start: string }
             Returns: Json
           }
+      admin_landing_pages: {
+        Args: { p_end: string; p_limit?: number; p_start: string }
+        Returns: {
+          avg_pages: number
+          avg_seconds: number
+          bounce_rate: number
+          path: string
+          signups: number
+          visits: number
+        }[]
+      }
+      admin_monetization: {
+        Args: { p_end: string; p_start: string }
+        Returns: Json
+      }
+      admin_page_bounce: {
+        Args: { p_end: string; p_limit?: number; p_start: string }
+        Returns: {
+          avg_seconds: number
+          bounce_rate: number
+          entries: number
+          path: string
+        }[]
+      }
+      admin_retention_dn: {
+        Args: { p_end: string; p_start: string }
+        Returns: Json
+      }
+      admin_sessions_base: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          device_type: string
+          ended: string
+          landing_path: string
+          pageviews: number
+          referrer: string
+          session_id: string
+          started: string
+          user_id: string
+          utm_campaign: string
+          utm_medium: string
+          utm_source: string
+          visitor_id: string
+        }[]
+      }
       admin_sessions_series: {
         Args: { p_end: string; p_start: string }
         Returns: {
@@ -856,7 +955,35 @@ export type Database = {
           sessions: number
         }[]
       }
+      admin_signup_funnel: {
+        Args: { p_end: string; p_start: string }
+        Returns: Json
+      }
+      admin_source_of: {
+        Args: { p_referrer: string; p_utm_medium: string; p_utm_source: string }
+        Returns: string
+      }
       admin_subscription_stats: { Args: never; Returns: Json }
+      admin_top_referrers: {
+        Args: { p_end: string; p_limit?: number; p_start: string }
+        Returns: {
+          referrer: string
+          signups: number
+          visitors: number
+          visits: number
+        }[]
+      }
+      admin_traffic_sources: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          avg_pages: number
+          bounce_rate: number
+          signups: number
+          source: string
+          visitors: number
+          visits: number
+        }[]
+      }
       admin_user_list: {
         Args: { p_churn_days?: number; p_search?: string; p_segment?: string }
         Returns: {
