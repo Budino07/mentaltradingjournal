@@ -80,6 +80,34 @@ export function useAdminFeatureUsage(range: DateRange) {
   });
 }
 
+export function useAdminActivityBreakdown(range: DateRange) {
+  return useQuery({
+    queryKey: [
+      "admin",
+      "activity-breakdown",
+      format(range.from, "yyyy-MM-dd"),
+      format(range.to, "yyyy-MM-dd"),
+    ],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_activity_breakdown", {
+        p_start: format(range.from, "yyyy-MM-dd"),
+        p_end: format(range.to, "yyyy-MM-dd"),
+      });
+      if (error) throw error;
+      return data as {
+        feature: string;
+        kind: string;
+        uses: number;
+        users: number;
+        total_seconds: number;
+        avg_seconds: number;
+        share: number;
+      }[];
+    },
+    staleTime: 60 * 1000,
+  });
+}
+
 export function useAdminCohortRetention() {
   return useQuery({
     queryKey: ["admin", "cohort-retention"],

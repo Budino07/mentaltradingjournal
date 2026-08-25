@@ -5,6 +5,7 @@ import { KPICard } from "@/components/admin/KPICard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { OverviewUserTable } from "@/components/admin/OverviewUserTable";
+import { ActivitiesBreakdown } from "@/components/admin/ActivitiesBreakdown";
 
 
 export default function Overview() {
@@ -68,6 +69,8 @@ export default function Overview() {
           </div>
 
           <OverviewUserTable segment={segment} />
+
+          <ActivitiesBreakdown range={range} />
 
 
           <Card className="bg-card/60 border-border/60">
