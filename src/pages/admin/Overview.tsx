@@ -34,7 +34,7 @@ export default function Overview() {
       ) : (
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <KPICard title="Total users" value={data.total_users.toLocaleString()} />
+            <KPICard title={`Total users (${segmentLabel.toLowerCase()})`} value={data.total_users.toLocaleString()} />
             <KPICard title="DAU" value={data.dau.toLocaleString()} />
             <KPICard title="WAU" value={data.wau.toLocaleString()} />
             <KPICard title="MAU" value={data.mau.toLocaleString()} />
