@@ -41,11 +41,18 @@ export function ActivitiesBreakdown({ range }: { range: DateRange }) {
 
   const chartData = useMemo(() => {
     if (!data) return [];
+    const dir = sortDir === "desc" ? -1 : 1;
     return [...data]
-      .sort((a, b) => Number(b[metric]) - Number(a[metric]))
+      .sort((a, b) => dir * (Number(a[metric]) - Number(b[metric])))
       .slice(0, 10)
       .map((d) => ({ ...d, value: Number(d[metric]) }));
-  }, [data, metric]);
+  }, [data, metric, sortDir]);
+
+  const tableRows = useMemo(() => {
+    if (!data) return [];
+    const dir = sortDir === "desc" ? -1 : 1;
+    return [...data].sort((a, b) => dir * (Number(a[metric]) - Number(b[metric])));
+  }, [data, metric, sortDir]);
 
   const totals = useMemo(() => {
     if (!data) return { uses: 0, users: 0, seconds: 0 };
@@ -55,6 +62,15 @@ export function ActivitiesBreakdown({ range }: { range: DateRange }) {
       seconds: data.reduce((s, d) => s + Number(d.total_seconds), 0),
     };
   }, [data]);
+
+  const handleMetricClick = (key: Metric) => {
+    if (metric === key) {
+      setSortDir((prev) => (prev === "desc" ? "asc" : "desc"));
+    } else {
+      setMetric(key);
+      setSortDir("desc");
+    }
+  };
 
   return (
     <Card className="bg-card/60 border-border/60">
@@ -71,9 +87,16 @@ export function ActivitiesBreakdown({ range }: { range: DateRange }) {
               key={m.key}
               size="sm"
               variant={metric === m.key ? "default" : "outline"}
-              onClick={() => setMetric(m.key)}
+              onClick={() => handleMetricClick(m.key)}
+              className="gap-1"
             >
               {m.label}
+              {metric === m.key &&
+                (sortDir === "desc" ? (
+                  <ArrowDown className="h-3.5 w-3.5" />
+                ) : (
+                  <ArrowUp className="h-3.5 w-3.5" />
+                ))}
             </Button>
           ))}
         </div>
