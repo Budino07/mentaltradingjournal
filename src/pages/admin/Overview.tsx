@@ -1,13 +1,15 @@
 import { useOutletContext } from "react-router-dom";
 import { format } from "date-fns";
-import { DateRange, useAdminKPIs } from "@/hooks/useAdminAnalytics";
+import { DateRange, Segment, useAdminKPIs } from "@/hooks/useAdminAnalytics";
 import { KPICard } from "@/components/admin/KPICard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Overview() {
-  const { range } = useOutletContext<{ range: DateRange }>();
-  const { data, isLoading } = useAdminKPIs(range);
+  const { range, segment } = useOutletContext<{ range: DateRange; segment: Segment }>();
+  const { data, isLoading } = useAdminKPIs(range, segment);
+  const segmentLabel =
+    segment === "subscribed" ? "Subscribed users" : segment === "free" ? "Free users" : "All users";
 
   const pctChange = (cur: number, prev: number) => {
     if (prev === 0) return 0;
@@ -19,7 +21,7 @@ export default function Overview() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Overview</h1>
         <p className="text-muted-foreground">
-          {format(range.from, "MMM d, yyyy")} – {format(range.to, "MMM d, yyyy")}
+          {format(range.from, "MMM d, yyyy")} – {format(range.to, "MMM d, yyyy")} · {segmentLabel}
         </p>
       </div>
 
@@ -32,7 +34,7 @@ export default function Overview() {
       ) : (
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <KPICard title="Total users" value={data.total_users.toLocaleString()} />
+            <KPICard title={`Total users (${segmentLabel.toLowerCase()})`} value={data.total_users.toLocaleString()} />
             <KPICard title="DAU" value={data.dau.toLocaleString()} />
             <KPICard title="WAU" value={data.wau.toLocaleString()} />
             <KPICard title="MAU" value={data.mau.toLocaleString()} />
@@ -52,6 +54,7 @@ export default function Overview() {
               changeLabel="vs previous period"
             />
             <KPICard title="Subscribed users" value={data.subscribed_users.toLocaleString()} />
+            <KPICard title="Free users" value={(data.free_users ?? 0).toLocaleString()} />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -5,15 +5,16 @@ import { format, subDays } from "date-fns";
 export type DateRange = { from: Date; to: Date };
 export type Segment = "all" | "subscribed" | "free";
 
-export function useAdminKPIs(range: DateRange) {
+export function useAdminKPIs(range: DateRange, segment: Segment = "all") {
   const start = format(range.from, "yyyy-MM-dd");
   const end = format(range.to, "yyyy-MM-dd");
   return useQuery({
-    queryKey: ["admin", "kpis", start, end],
+    queryKey: ["admin", "kpis", start, end, segment],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_kpis_range", {
         p_start: start,
         p_end: end,
+        p_segment: segment,
       });
       if (error) throw error;
       return data as unknown as Record<string, number>;

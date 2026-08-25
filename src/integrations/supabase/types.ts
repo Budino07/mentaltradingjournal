@@ -740,10 +740,12 @@ export type Database = {
         }[]
       }
       admin_kpis: { Args: never; Returns: Json }
-      admin_kpis_range: {
-        Args: { p_end: string; p_start: string }
-        Returns: Json
-      }
+      admin_kpis_range:
+        | { Args: { p_end: string; p_start: string }; Returns: Json }
+        | {
+            Args: { p_end: string; p_segment?: string; p_start: string }
+            Returns: Json
+          }
       admin_sessions_series: {
         Args: { p_end: string; p_start: string }
         Returns: {

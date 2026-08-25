@@ -64,12 +64,29 @@ export function AdminTopBar({
     },
   ];
 
+  const isActive = (from: Date, to: Date) =>
+    format(range.from, "yyyy-MM-dd") === format(from, "yyyy-MM-dd") &&
+    format(range.to, "yyyy-MM-dd") === format(to, "yyyy-MM-dd");
+
   return (
-    <header className="h-14 border-b bg-card/50 backdrop-blur-sm flex items-center justify-between px-4 md:px-6 gap-3 sticky top-0 z-20">
-      <div className="flex items-center gap-2">
+    <header className="min-h-14 border-b bg-card/50 backdrop-blur-sm flex flex-wrap items-center justify-between px-4 md:px-6 py-2 gap-3 sticky top-0 z-20">
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1">
+          {presets.map((p) => (
+            <Button
+              key={p.label}
+              variant={isActive(p.from, p.to) ? "default" : "outline"}
+              size="sm"
+              className="h-8"
+              onClick={() => setRange({ from: p.from, to: p.to })}
+            >
+              {p.label}
+            </Button>
+          ))}
+        </div>
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2 min-w-[180px]">
+            <Button variant="outline" size="sm" className="gap-2 h-8">
               <Calendar className="h-4 w-4" />
               <span className="hidden sm:inline">
                 {format(range.from, "MMM d")} - {format(range.to, "MMM d, yyyy")}
@@ -77,19 +94,7 @@ export function AdminTopBar({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <div className="flex flex-col md:flex-row gap-3 p-3">
-              <div className="flex flex-wrap gap-1 max-w-[200px]">
-                {presets.map((p) => (
-                  <Button
-                    key={p.label}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setRange({ from: p.from, to: p.to })}
-                  >
-                    {p.label}
-                  </Button>
-                ))}
-              </div>
+            <div className="p-3">
               <CalendarComponent
                 mode="range"
                 selected={{ from: range.from, to: range.to }}
