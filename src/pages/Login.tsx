@@ -9,6 +9,7 @@ import { LoginForm } from "@/components/login/LoginForm";
 import { PasswordResetForm } from "@/components/login/PasswordResetForm";
 import { ForgotPasswordForm } from "@/components/login/ForgotPasswordForm";
 import { AuthLinks } from "@/components/login/AuthLinks";
+import { trackLogin, trackSignupCompleted, trackSignupStarted } from "@/lib/analytics";
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -146,13 +147,16 @@ const Login = () => {
         });
         setIsForgotPassword(false);
       } else if (isSignUp) {
+        void trackSignupStarted("email");
         await signUp(email, password);
+        void trackSignupCompleted("email");
         toast({
           title: "Account created successfully",
           description: "Please check your email to verify your account.",
         });
       } else {
         await signIn(email, password);
+        void trackLogin("email");
         navigate(returnTo);
       }
     } catch (error) {
