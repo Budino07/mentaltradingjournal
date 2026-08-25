@@ -52,12 +52,16 @@ const handler = async (req: Request): Promise<Response> => {
     console.log('Checking subscription for user:', user.id);
 
     // Query subscriptions table
-    const { data: subscription, error: subscriptionError } = await supabase
+    const { data: subscriptions, error: subscriptionError } = await supabase
       .from('subscriptions')
       .select()
       .eq('user_id', user.id)
       .eq('status', 'active')
-      .maybeSingle();
+      .order('current_period_end', { ascending: false })
+      .limit(1);
+
+    const subscription = subscriptions?.[0] ?? null;
+
 
     if (subscriptionError) {
       console.error('Error checking subscription:', subscriptionError);
