@@ -65,6 +65,9 @@ export default function Overview() {
             />
           </div>
 
+          <OverviewUserTable segment={segment} />
+
+
           <Card className="bg-card/60 border-border/60">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-muted-foreground">
