@@ -519,3 +519,20 @@ export function useAdminAdCampaigns() {
     },
   });
 }
+
+/** First recorded analytics event — anything before this date has no visit data. */
+export function useTrackingStart() {
+  return useQuery({
+    queryKey: ["admin", "tracking-start"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("analytics_events")
+        .select("created_at")
+        .order("created_at", { ascending: true })
+        .limit(1);
+      if (error) throw error;
+      return data?.[0]?.created_at ? new Date(data[0].created_at) : null;
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+}
