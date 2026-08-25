@@ -179,10 +179,8 @@ export function ActivitiesBreakdown({ range }: { range: DateRange }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...data]
-                    .sort((a, b) => Number(b.uses) - Number(a.uses))
-                    .map((d) => (
-                      <tr key={d.feature} className="border-b border-border/40 last:border-0">
+                  {tableRows.map((d) => (
+                    <tr key={d.feature} className="border-b border-border/40 last:border-0">
                         <td className="py-2">
                           <span className="font-medium">{d.feature}</span>{" "}
                           <Badge variant="outline" className="ml-1 text-[10px]">
