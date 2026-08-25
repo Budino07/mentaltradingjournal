@@ -21,7 +21,7 @@ export default function Overview() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Overview</h1>
         <p className="text-muted-foreground">
-          {format(range.from, "MMM d, yyyy")} – {format(range.to, "MMM d, yyyy")}
+          {format(range.from, "MMM d, yyyy")} – {format(range.to, "MMM d, yyyy")} · {segmentLabel}
         </p>
       </div>
 
