@@ -705,6 +705,18 @@ export type Database = {
           user_id: string
         }[]
       }
+      admin_activity_breakdown: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          avg_seconds: number
+          feature: string
+          kind: string
+          share: number
+          total_seconds: number
+          users: number
+          uses: number
+        }[]
+      }
       admin_churn_trend: {
         Args: { p_weeks?: number }
         Returns: {
