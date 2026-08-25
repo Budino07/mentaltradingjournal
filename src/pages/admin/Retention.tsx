@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
+import { SubscriptionLifetime } from "@/components/admin/SubscriptionLifetime";
+
 
 export default function Retention() {
   const cohort = useAdminCohortRetention();
@@ -26,6 +28,9 @@ export default function Retention() {
         <h1 className="text-2xl font-bold tracking-tight">Retention & Churn</h1>
         <p className="text-muted-foreground">Cohort behavior and churn trends.</p>
       </div>
+
+      <SubscriptionLifetime />
+
 
       <Card className="bg-card/60 border-border/60">
         <CardHeader>
