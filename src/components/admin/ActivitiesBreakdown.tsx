@@ -17,12 +17,22 @@ import { ArrowUp, ArrowDown } from "lucide-react";
 import { DateRange, useAdminActivityBreakdown } from "@/hooks/useAdminAnalytics";
 
 type Metric = "uses" | "users" | "total_seconds";
+type SortKey = "feature" | "uses" | "share" | "users" | "avg_seconds" | "total_seconds";
 type SortDir = "desc" | "asc";
 
 const metrics: { key: Metric; label: string }[] = [
   { key: "uses", label: "Interactions" },
   { key: "users", label: "Unique users" },
   { key: "total_seconds", label: "Time spent" },
+];
+
+const columns: { key: SortKey; label: string; align: "left" | "right" }[] = [
+  { key: "feature", label: "Feature", align: "left" },
+  { key: "uses", label: "Interactions", align: "right" },
+  { key: "share", label: "Share", align: "right" },
+  { key: "users", label: "Users", align: "right" },
+  { key: "avg_seconds", label: "Avg time", align: "right" },
+  { key: "total_seconds", label: "Total time", align: "right" },
 ];
 
 function fmtDuration(sec: number) {
@@ -37,22 +47,23 @@ function fmtDuration(sec: number) {
 export function ActivitiesBreakdown({ range }: { range: DateRange }) {
   const { data, isLoading } = useAdminActivityBreakdown(range);
   const [metric, setMetric] = useState<Metric>("uses");
+  const [sortKey, setSortKey] = useState<SortKey>("uses");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
-  const chartData = useMemo(() => {
+  const sortedData = useMemo(() => {
     if (!data) return [];
     const dir = sortDir === "desc" ? -1 : 1;
-    return [...data]
-      .sort((a, b) => dir * (Number(a[metric]) - Number(b[metric])))
-      .slice(0, 10)
-      .map((d) => ({ ...d, value: Number(d[metric]) }));
-  }, [data, metric, sortDir]);
+    return [...data].sort((a, b) => {
+      if (sortKey === "feature") {
+        return dir * a.feature.localeCompare(b.feature);
+      }
+      return dir * (Number(a[sortKey]) - Number(b[sortKey]));
+    });
+  }, [data, sortKey, sortDir]);
 
-  const tableRows = useMemo(() => {
-    if (!data) return [];
-    const dir = sortDir === "desc" ? -1 : 1;
-    return [...data].sort((a, b) => dir * (Number(a[metric]) - Number(b[metric])));
-  }, [data, metric, sortDir]);
+  const chartData = useMemo(() => {
+    return sortedData.slice(0, 10).map((d) => ({ ...d, value: Number(d[metric]) }));
+  }, [sortedData, metric]);
 
   const totals = useMemo(() => {
     if (!data) return { uses: 0, users: 0, seconds: 0 };
@@ -63,11 +74,11 @@ export function ActivitiesBreakdown({ range }: { range: DateRange }) {
     };
   }, [data]);
 
-  const handleMetricClick = (key: Metric) => {
-    if (metric === key) {
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
       setSortDir((prev) => (prev === "desc" ? "asc" : "desc"));
     } else {
-      setMetric(key);
+      setSortKey(key);
       setSortDir("desc");
     }
   };
@@ -87,16 +98,9 @@ export function ActivitiesBreakdown({ range }: { range: DateRange }) {
               key={m.key}
               size="sm"
               variant={metric === m.key ? "default" : "outline"}
-              onClick={() => handleMetricClick(m.key)}
-              className="gap-1"
+              onClick={() => setMetric(m.key)}
             >
               {m.label}
-              {metric === m.key &&
-                (sortDir === "desc" ? (
-                  <ArrowDown className="h-3.5 w-3.5" />
-                ) : (
-                  <ArrowUp className="h-3.5 w-3.5" />
-                ))}
             </Button>
           ))}
         </div>
@@ -170,34 +174,47 @@ export function ActivitiesBreakdown({ range }: { range: DateRange }) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-muted-foreground border-b border-border/60">
-                    <th className="py-2 font-medium">Feature</th>
-                    <th className="py-2 font-medium text-right">Interactions</th>
-                    <th className="py-2 font-medium text-right">Share</th>
-                    <th className="py-2 font-medium text-right">Users</th>
-                    <th className="py-2 font-medium text-right">Avg time</th>
-                    <th className="py-2 font-medium text-right">Total time</th>
+                    {columns.map((col) => (
+                      <th
+                        key={col.key}
+                        className={`py-2 font-medium ${col.align === "right" ? "text-right" : ""}`}
+                      >
+                        <button
+                          onClick={() => handleSort(col.key)}
+                          className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+                        >
+                          {col.label}
+                          {sortKey === col.key &&
+                            (sortDir === "desc" ? (
+                              <ArrowDown className="h-3.5 w-3.5" />
+                            ) : (
+                              <ArrowUp className="h-3.5 w-3.5" />
+                            ))}
+                        </button>
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {tableRows.map((d) => (
+                  {sortedData.map((d) => (
                     <tr key={d.feature} className="border-b border-border/40 last:border-0">
-                        <td className="py-2">
-                          <span className="font-medium">{d.feature}</span>{" "}
-                          <Badge variant="outline" className="ml-1 text-[10px]">
-                            {d.kind === "page" ? "page" : d.kind}
-                          </Badge>
-                        </td>
-                        <td className="py-2 text-right">{Number(d.uses).toLocaleString()}</td>
-                        <td className="py-2 text-right text-muted-foreground">{Number(d.share ?? 0)}%</td>
-                        <td className="py-2 text-right">{Number(d.users).toLocaleString()}</td>
-                        <td className="py-2 text-right text-muted-foreground">
-                          {fmtDuration(Number(d.avg_seconds))}
-                        </td>
-                        <td className="py-2 text-right text-muted-foreground">
-                          {fmtDuration(Number(d.total_seconds))}
-                        </td>
-                      </tr>
-                    ))}
+                      <td className="py-2">
+                        <span className="font-medium">{d.feature}</span>{" "}
+                        <Badge variant="outline" className="ml-1 text-[10px]">
+                          {d.kind === "page" ? "page" : d.kind}
+                        </Badge>
+                      </td>
+                      <td className="py-2 text-right">{Number(d.uses).toLocaleString()}</td>
+                      <td className="py-2 text-right text-muted-foreground">{Number(d.share ?? 0)}%</td>
+                      <td className="py-2 text-right">{Number(d.users).toLocaleString()}</td>
+                      <td className="py-2 text-right text-muted-foreground">
+                        {fmtDuration(Number(d.avg_seconds))}
+                      </td>
+                      <td className="py-2 text-right text-muted-foreground">
+                        {fmtDuration(Number(d.total_seconds))}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
