@@ -174,7 +174,43 @@ export function useAdminUserTimeline(userId: string | null) {
   });
 }
 
+export type SubscriptionStats = {
+  by_plan: {
+    plan: string;
+    total: number;
+    churned: number;
+    active: number;
+    avg_months_churned: number | null;
+    median_months_churned: number | null;
+    avg_months_active: number | null;
+    avg_months_all: number | null;
+    max_months_churned: number | null;
+  }[];
+  distribution: { plan: string; bucket: string; subs: number }[];
+  survival: { month: number; surviving: number; cohort: number; pct: number }[];
+  totals: {
+    subscriptions: number;
+    subscribers: number;
+    repeat_subscribers: number;
+    avg_months_monthly_churned: number | null;
+    median_months_monthly_churned: number | null;
+  };
+};
+
+export function useAdminSubscriptionStats() {
+  return useQuery({
+    queryKey: ["admin", "subscription-stats"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_subscription_stats");
+      if (error) throw error;
+      return data as unknown as SubscriptionStats;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 export const defaultRange: DateRange = {
   from: subDays(new Date(), 29),
   to: new Date(),
 };
+
