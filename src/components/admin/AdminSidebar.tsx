@@ -7,15 +7,23 @@ import {
   Users,
   RotateCcw,
   ChevronLeft,
+  Megaphone,
+  Filter,
+  DollarSign,
+  Lightbulb,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const nav = [
   { title: "Overview", icon: LayoutDashboard, url: "/admin" },
+  { title: "Acquisition", icon: Megaphone, url: "/admin/acquisition" },
   { title: "Growth", icon: TrendingUp, url: "/admin/growth" },
   { title: "Engagement", icon: Activity, url: "/admin/engagement" },
   { title: "Retention", icon: RotateCcw, url: "/admin/retention" },
+  { title: "Signup & activation", icon: Filter, url: "/admin/funnel" },
+  { title: "Monetization", icon: DollarSign, url: "/admin/monetization" },
   { title: "Users", icon: Users, url: "/admin/users" },
+  { title: "Takeaways", icon: Lightbulb, url: "/admin/takeaways" },
 ];
 
 export function AdminSidebar({ collapsed, setCollapsed }: { collapsed: boolean; setCollapsed: (v: boolean) => void }) {

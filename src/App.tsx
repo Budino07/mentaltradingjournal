@@ -33,6 +33,11 @@ import AdminGrowth from "./pages/admin/Growth";
 import AdminEngagement from "./pages/admin/Engagement";
 import AdminRetention from "./pages/admin/Retention";
 import AdminUsers from "./pages/admin/Users";
+import AdminAcquisition from "./pages/admin/Acquisition";
+import AdminFunnel from "./pages/admin/Funnel";
+import AdminMonetization from "./pages/admin/Monetization";
+import AdminTakeaways from "./pages/admin/Takeaways";
+import { AnalyticsTracker } from "./components/analytics/AnalyticsTracker";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -92,6 +97,7 @@ const App = () => {
                 <Sonner />
                 <BrowserRouter>
                   <ScrollToTop />
+                  <AnalyticsTracker />
                   <Routes>
                     {/* Public routes */}
                     <Route path="/" element={<Landing />} />
@@ -192,9 +198,13 @@ const App = () => {
                       }
                     >
                       <Route index element={<AdminOverview />} />
+                      <Route path="acquisition" element={<AdminAcquisition />} />
                       <Route path="growth" element={<AdminGrowth />} />
                       <Route path="engagement" element={<AdminEngagement />} />
                       <Route path="retention" element={<AdminRetention />} />
+                      <Route path="funnel" element={<AdminFunnel />} />
+                      <Route path="monetization" element={<AdminMonetization />} />
+                      <Route path="takeaways" element={<AdminTakeaways />} />
                       <Route path="users" element={<AdminUsers />} />
                     </Route>
                   </Routes>
