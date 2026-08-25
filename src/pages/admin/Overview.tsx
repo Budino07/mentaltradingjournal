@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { OverviewUserTable } from "@/components/admin/OverviewUserTable";
 import { ActivitiesBreakdown } from "@/components/admin/ActivitiesBreakdown";
+import { SubscriptionLifetime } from "@/components/admin/SubscriptionLifetime";
+
 
 
 export default function Overview() {
@@ -71,6 +73,10 @@ export default function Overview() {
           <OverviewUserTable segment={segment} />
 
           <ActivitiesBreakdown range={range} />
+
+          <SubscriptionLifetime />
+
+
 
 
           <Card className="bg-card/60 border-border/60">
