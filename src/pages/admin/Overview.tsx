@@ -6,8 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Overview() {
-  const { range } = useOutletContext<{ range: DateRange }>();
-  const { data, isLoading } = useAdminKPIs(range);
+  const { range, segment } = useOutletContext<{ range: DateRange; segment: Segment }>();
+  const { data, isLoading } = useAdminKPIs(range, segment);
+  const segmentLabel =
+    segment === "subscribed" ? "Subscribed users" : segment === "free" ? "Free users" : "All users";
 
   const pctChange = (cur: number, prev: number) => {
     if (prev === 0) return 0;
