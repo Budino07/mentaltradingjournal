@@ -3,17 +3,10 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { AppHeader } from "./AppHeader";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { trackPageView } from "@/lib/analytics";
 
 export const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const isMobile = useIsMobile();
-  const location = useLocation();
 
-  useEffect(() => {
-    trackPageView(location.pathname);
-  }, [location.pathname]);
 
   return (
     <SidebarProvider defaultOpen={false}>
