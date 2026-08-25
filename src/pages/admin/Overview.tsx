@@ -4,6 +4,8 @@ import { DateRange, Segment, useAdminKPIs } from "@/hooks/useAdminAnalytics";
 import { KPICard } from "@/components/admin/KPICard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { OverviewUserTable } from "@/components/admin/OverviewUserTable";
+
 
 export default function Overview() {
   const { range, segment } = useOutletContext<{ range: DateRange; segment: Segment }>();
