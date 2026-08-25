@@ -13,9 +13,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ArrowUp, ArrowDown } from "lucide-react";
 import { DateRange, useAdminActivityBreakdown } from "@/hooks/useAdminAnalytics";
 
 type Metric = "uses" | "users" | "total_seconds";
+type SortDir = "desc" | "asc";
 
 const metrics: { key: Metric; label: string }[] = [
   { key: "uses", label: "Interactions" },
@@ -35,14 +37,22 @@ function fmtDuration(sec: number) {
 export function ActivitiesBreakdown({ range }: { range: DateRange }) {
   const { data, isLoading } = useAdminActivityBreakdown(range);
   const [metric, setMetric] = useState<Metric>("uses");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   const chartData = useMemo(() => {
     if (!data) return [];
+    const dir = sortDir === "desc" ? -1 : 1;
     return [...data]
-      .sort((a, b) => Number(b[metric]) - Number(a[metric]))
+      .sort((a, b) => dir * (Number(a[metric]) - Number(b[metric])))
       .slice(0, 10)
       .map((d) => ({ ...d, value: Number(d[metric]) }));
-  }, [data, metric]);
+  }, [data, metric, sortDir]);
+
+  const tableRows = useMemo(() => {
+    if (!data) return [];
+    const dir = sortDir === "desc" ? -1 : 1;
+    return [...data].sort((a, b) => dir * (Number(a[metric]) - Number(b[metric])));
+  }, [data, metric, sortDir]);
 
   const totals = useMemo(() => {
     if (!data) return { uses: 0, users: 0, seconds: 0 };
@@ -52,6 +62,15 @@ export function ActivitiesBreakdown({ range }: { range: DateRange }) {
       seconds: data.reduce((s, d) => s + Number(d.total_seconds), 0),
     };
   }, [data]);
+
+  const handleMetricClick = (key: Metric) => {
+    if (metric === key) {
+      setSortDir((prev) => (prev === "desc" ? "asc" : "desc"));
+    } else {
+      setMetric(key);
+      setSortDir("desc");
+    }
+  };
 
   return (
     <Card className="bg-card/60 border-border/60">
@@ -68,9 +87,16 @@ export function ActivitiesBreakdown({ range }: { range: DateRange }) {
               key={m.key}
               size="sm"
               variant={metric === m.key ? "default" : "outline"}
-              onClick={() => setMetric(m.key)}
+              onClick={() => handleMetricClick(m.key)}
+              className="gap-1"
             >
               {m.label}
+              {metric === m.key &&
+                (sortDir === "desc" ? (
+                  <ArrowDown className="h-3.5 w-3.5" />
+                ) : (
+                  <ArrowUp className="h-3.5 w-3.5" />
+                ))}
             </Button>
           ))}
         </div>
@@ -131,9 +157,10 @@ export function ActivitiesBreakdown({ range }: { range: DateRange }) {
                     ]}
                   />
                   <Bar dataKey="value" radius={[0, 6, 6, 0]}>
-                    {chartData.map((_, i) => (
-                      <Cell key={i} fill="hsl(var(--primary))" fillOpacity={1 - i * 0.07} />
-                    ))}
+                    {chartData.map((_, i) => {
+                      const rank = sortDir === "desc" ? i : chartData.length - 1 - i;
+                      return <Cell key={i} fill="hsl(var(--primary))" fillOpacity={1 - rank * 0.07} />;
+                    })}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
@@ -152,10 +179,8 @@ export function ActivitiesBreakdown({ range }: { range: DateRange }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...data]
-                    .sort((a, b) => Number(b.uses) - Number(a.uses))
-                    .map((d) => (
-                      <tr key={d.feature} className="border-b border-border/40 last:border-0">
+                  {tableRows.map((d) => (
+                    <tr key={d.feature} className="border-b border-border/40 last:border-0">
                         <td className="py-2">
                           <span className="font-medium">{d.feature}</span>{" "}
                           <Badge variant="outline" className="ml-1 text-[10px]">
