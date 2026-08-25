@@ -260,3 +260,262 @@ export const defaultRange: DateRange = {
   to: new Date(),
 };
 
+
+/* ------------------------------------------------------------------ */
+/* Full-funnel analytics                                               */
+/* ------------------------------------------------------------------ */
+
+const fmt = (d: Date) => format(d, "yyyy-MM-dd");
+
+function rangeQuery<T>(key: string, range: DateRange, fn: (s: string, e: string) => Promise<T>) {
+  const start = fmt(range.from);
+  const end = fmt(range.to);
+  return { queryKey: ["admin", key, start, end], queryFn: () => fn(start, end), staleTime: 60 * 1000 };
+}
+
+export type Acquisition = {
+  visits: number;
+  visitors: number;
+  new_visitors: number;
+  pageviews: number;
+  signups: number;
+  anon_visits: number;
+  tracked_visitors: number;
+};
+
+export function useAdminAcquisition(range: DateRange) {
+  return useQuery(
+    rangeQuery("acquisition", range, async (p_start, p_end) => {
+      const { data, error } = await supabase.rpc("admin_acquisition", { p_start, p_end });
+      if (error) throw error;
+      return data as unknown as Acquisition;
+    })
+  );
+}
+
+export type TrafficSource = {
+  source: string;
+  visits: number;
+  visitors: number;
+  signups: number;
+  bounce_rate: number | null;
+  avg_pages: number | null;
+};
+
+export function useAdminTrafficSources(range: DateRange) {
+  return useQuery(
+    rangeQuery("traffic-sources", range, async (p_start, p_end) => {
+      const { data, error } = await supabase.rpc("admin_traffic_sources", { p_start, p_end });
+      if (error) throw error;
+      return (data ?? []) as TrafficSource[];
+    })
+  );
+}
+
+export type LandingPage = {
+  path: string;
+  visits: number;
+  bounce_rate: number | null;
+  avg_pages: number | null;
+  avg_seconds: number | null;
+  signups: number;
+};
+
+export function useAdminLandingPages(range: DateRange) {
+  return useQuery(
+    rangeQuery("landing-pages", range, async (p_start, p_end) => {
+      const { data, error } = await supabase.rpc("admin_landing_pages", { p_start, p_end, p_limit: 15 });
+      if (error) throw error;
+      return (data ?? []) as LandingPage[];
+    })
+  );
+}
+
+export type Referrer = { referrer: string; visits: number; visitors: number; signups: number };
+
+export function useAdminTopReferrers(range: DateRange) {
+  return useQuery(
+    rangeQuery("top-referrers", range, async (p_start, p_end) => {
+      const { data, error } = await supabase.rpc("admin_top_referrers", { p_start, p_end, p_limit: 15 });
+      if (error) throw error;
+      return (data ?? []) as Referrer[];
+    })
+  );
+}
+
+export type EngagementQuality = {
+  sessions: number;
+  avg_duration_sec: number;
+  median_duration_sec: number;
+  pages_per_session: number;
+  bounce_rate: number;
+};
+
+export function useAdminEngagementQuality(range: DateRange) {
+  return useQuery(
+    rangeQuery("engagement-quality", range, async (p_start, p_end) => {
+      const { data, error } = await supabase.rpc("admin_engagement_quality", { p_start, p_end });
+      if (error) throw error;
+      return data as unknown as EngagementQuality;
+    })
+  );
+}
+
+export type PageBounce = { path: string; entries: number; bounce_rate: number | null; avg_seconds: number | null };
+
+export function useAdminPageBounce(range: DateRange) {
+  return useQuery(
+    rangeQuery("page-bounce", range, async (p_start, p_end) => {
+      const { data, error } = await supabase.rpc("admin_page_bounce", { p_start, p_end, p_limit: 12 });
+      if (error) throw error;
+      return (data ?? []) as PageBounce[];
+    })
+  );
+}
+
+export type DeviceRow = {
+  device: string;
+  sessions: number;
+  visitors: number;
+  avg_seconds: number | null;
+  pages_per_session: number | null;
+  bounce_rate: number | null;
+  signups: number;
+};
+
+export function useAdminDeviceBreakdown(range: DateRange) {
+  return useQuery(
+    rangeQuery("device-breakdown", range, async (p_start, p_end) => {
+      const { data, error } = await supabase.rpc("admin_device_breakdown", { p_start, p_end });
+      if (error) throw error;
+      return (data ?? []) as DeviceRow[];
+    })
+  );
+}
+
+export type SignupFunnel = {
+  visitors: number;
+  signups: number;
+  journaled: number;
+  second_session: number;
+  paid: number;
+  methods: { method: string; users: number }[];
+  time_to_signup: { bucket: string; users: number }[];
+};
+
+export function useAdminSignupFunnel(range: DateRange) {
+  return useQuery(
+    rangeQuery("signup-funnel", range, async (p_start, p_end) => {
+      const { data, error } = await supabase.rpc("admin_signup_funnel", { p_start, p_end });
+      if (error) throw error;
+      return data as unknown as SignupFunnel;
+    })
+  );
+}
+
+export type Activation = {
+  cohort: number;
+  entry_24h: number;
+  entry_7d: number;
+  entry_ever: number;
+  backtest_7d: number;
+  second_session_7d: number;
+  never_active: number;
+  signed_up_never_journaled: number;
+  median_hours_to_first_entry: number;
+};
+
+export function useAdminActivation(range: DateRange) {
+  return useQuery(
+    rangeQuery("activation", range, async (p_start, p_end) => {
+      const { data, error } = await supabase.rpc("admin_activation", { p_start, p_end });
+      if (error) throw error;
+      return data as unknown as Activation;
+    })
+  );
+}
+
+export type RetentionDn = {
+  cohort: number;
+  d1: number;
+  d7: number;
+  d30: number;
+  weekly_active: { week: string; users: number }[];
+  active_users: number;
+  entries_per_active_user: number;
+};
+
+export function useAdminRetentionDn(range: DateRange) {
+  return useQuery(
+    rangeQuery("retention-dn", range, async (p_start, p_end) => {
+      const { data, error } = await supabase.rpc("admin_retention_dn", { p_start, p_end });
+      if (error) throw error;
+      return data as unknown as RetentionDn;
+    })
+  );
+}
+
+export type Monetization = {
+  total_users: number;
+  paying_users: number;
+  free_to_paid_rate: number;
+  avg_days_to_upgrade: number;
+  median_days_to_upgrade: number;
+  mrr: number;
+  currency: string;
+  prices_configured: number;
+  mrr_trend: { month: string; mrr: number }[];
+  upgrade_sources: { source: string; clicks: number; users: number }[];
+};
+
+export function useAdminMonetization(range: DateRange) {
+  return useQuery(
+    rangeQuery("monetization", range, async (p_start, p_end) => {
+      const { data, error } = await supabase.rpc("admin_monetization", { p_start, p_end });
+      if (error) throw error;
+      return data as unknown as Monetization;
+    })
+  );
+}
+
+export type PlanPrice = {
+  price_id: string;
+  nickname: string | null;
+  unit_amount: number;
+  currency: string;
+  interval: string;
+};
+
+export function useAdminPlanPrices() {
+  return useQuery({
+    queryKey: ["admin", "plan-prices"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("plan_prices").select("*").order("price_id");
+      if (error) throw error;
+      return (data ?? []) as PlanPrice[];
+    },
+  });
+}
+
+export type AdCampaign = {
+  id: string;
+  name: string;
+  channel: string;
+  utm_campaign: string | null;
+  impressions: number;
+  clicks: number;
+  spend: number;
+  start_date: string | null;
+  end_date: string | null;
+};
+
+export function useAdminAdCampaigns() {
+  return useQuery({
+    queryKey: ["admin", "ad-campaigns"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("ad_campaigns").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as AdCampaign[];
+    },
+  });
+}

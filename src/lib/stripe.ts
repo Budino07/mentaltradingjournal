@@ -1,8 +1,14 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { trackUpgradeClicked } from "@/lib/analytics";
 
-export async function createCheckoutSession(priceId: string) {
+export async function createCheckoutSession(priceId: string, source?: string) {
   try {
+    void trackUpgradeClicked(
+      source ?? (typeof window !== "undefined" ? window.location.pathname : "unknown"),
+      priceId
+    );
+
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session?.user) {

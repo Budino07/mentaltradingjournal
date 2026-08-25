@@ -10,6 +10,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { trackUpgradeClicked, trackUpgradePromptShown } from "@/lib/analytics";
 import { useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
 
@@ -60,7 +62,12 @@ const pricingPlans: PricingPlan[] = [
 export const SubscriptionDialog = ({ open, onClose, showPricingPlans = false, featureName = "Premium Feature" }: SubscriptionDialogProps) => {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (open) void trackUpgradePromptShown(`in_app:${featureName}`);
+  }, [open, featureName]);
+
   const handleUpgrade = () => {
+    void trackUpgradeClicked(`in_app:${featureName}`);
     onClose();
     navigate("/pricing");
   };

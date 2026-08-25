@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { useAdminCohortRetention, useAdminChurnTrend, type DateRange } from "@/hooks/useAdminAnalytics";
+import {
+  useAdminCohortRetention,
+  useAdminChurnTrend,
+  useAdminRetentionDn,
+  type DateRange,
+} from "@/hooks/useAdminAnalytics";
+import { KPICard } from "@/components/admin/KPICard";
 import { ChurnTrendChart } from "@/components/admin/AdminCharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,6 +20,7 @@ export default function Retention() {
   const { range } = useOutletContext<{ range: DateRange }>();
   const cohort = useAdminCohortRetention();
   const churn = useAdminChurnTrend(12);
+  const dn = useAdminRetentionDn(range);
   const [weeks] = useState(12);
 
   const cohorts = new Map<string, { size: number; periods: Map<number, number> }>();
@@ -31,6 +38,21 @@ export default function Retention() {
         <h1 className="text-2xl font-bold tracking-tight">Retention & Churn</h1>
         <p className="text-muted-foreground">Cohort behavior and churn trends.</p>
       </div>
+
+      {dn.isLoading || !dn.data ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-32" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <KPICard title="Day 1 retention" value={`${dn.data.d1}%`} />
+          <KPICard title="Day 7 retention" value={`${dn.data.d7}%`} />
+          <KPICard title="Day 30 retention" value={`${dn.data.d30}%`} />
+          <KPICard title="Entries per active user" value={dn.data.entries_per_active_user ?? 0} />
+        </div>
+      )}
 
       <SubscriptionLifetime />
 
