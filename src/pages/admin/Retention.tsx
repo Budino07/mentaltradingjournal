@@ -1,14 +1,17 @@
 import { useState } from "react";
-import { useAdminCohortRetention, useAdminChurnTrend } from "@/hooks/useAdminAnalytics";
+import { useOutletContext } from "react-router-dom";
+import { useAdminCohortRetention, useAdminChurnTrend, type DateRange } from "@/hooks/useAdminAnalytics";
 import { ChurnTrendChart } from "@/components/admin/AdminCharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { SubscriptionLifetime } from "@/components/admin/SubscriptionLifetime";
+import { CancellationReasons } from "@/components/admin/CancellationReasons";
 
 
 export default function Retention() {
+  const { range } = useOutletContext<{ range: DateRange }>();
   const cohort = useAdminCohortRetention();
   const churn = useAdminChurnTrend(12);
   const [weeks] = useState(12);
@@ -30,6 +33,8 @@ export default function Retention() {
       </div>
 
       <SubscriptionLifetime />
+
+      <CancellationReasons range={range} />
 
 
       <Card className="bg-card/60 border-border/60">
