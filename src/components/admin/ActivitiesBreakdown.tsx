@@ -13,9 +13,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ArrowUp, ArrowDown } from "lucide-react";
 import { DateRange, useAdminActivityBreakdown } from "@/hooks/useAdminAnalytics";
 
 type Metric = "uses" | "users" | "total_seconds";
+type SortDir = "desc" | "asc";
 
 const metrics: { key: Metric; label: string }[] = [
   { key: "uses", label: "Interactions" },
@@ -35,6 +37,7 @@ function fmtDuration(sec: number) {
 export function ActivitiesBreakdown({ range }: { range: DateRange }) {
   const { data, isLoading } = useAdminActivityBreakdown(range);
   const [metric, setMetric] = useState<Metric>("uses");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   const chartData = useMemo(() => {
     if (!data) return [];
