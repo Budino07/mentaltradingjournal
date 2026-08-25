@@ -54,6 +54,7 @@ export default function Overview() {
               changeLabel="vs previous period"
             />
             <KPICard title="Subscribed users" value={data.subscribed_users.toLocaleString()} />
+            <KPICard title="Free users" value={(data.free_users ?? 0).toLocaleString()} />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
