@@ -14,36 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_campaigns: {
+        Row: {
+          channel: string
+          clicks: number
+          created_at: string
+          end_date: string | null
+          id: string
+          impressions: number
+          name: string
+          spend: number
+          start_date: string | null
+          updated_at: string
+          utm_campaign: string | null
+        }
+        Insert: {
+          channel?: string
+          clicks?: number
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          impressions?: number
+          name: string
+          spend?: number
+          start_date?: string | null
+          updated_at?: string
+          utm_campaign?: string | null
+        }
+        Update: {
+          channel?: string
+          clicks?: number
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          impressions?: number
+          name?: string
+          spend?: number
+          start_date?: string | null
+          updated_at?: string
+          utm_campaign?: string | null
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string
+          device_type: string | null
+          event_index: number | null
           event_name: string
           event_type: string
           id: string
           metadata: Json
           path: string | null
+          referrer: string | null
           session_id: string | null
           user_id: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          visitor_id: string | null
         }
         Insert: {
           created_at?: string
+          device_type?: string | null
+          event_index?: number | null
           event_name: string
           event_type?: string
           id?: string
           metadata?: Json
           path?: string | null
+          referrer?: string | null
           session_id?: string | null
           user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          visitor_id?: string | null
         }
         Update: {
           created_at?: string
+          device_type?: string | null
+          event_index?: number | null
           event_name?: string
           event_type?: string
           id?: string
           metadata?: Json
           path?: string | null
+          referrer?: string | null
           session_id?: string | null
           user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          visitor_id?: string | null
         }
         Relationships: []
       }
