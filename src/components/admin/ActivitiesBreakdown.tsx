@@ -157,9 +157,10 @@ export function ActivitiesBreakdown({ range }: { range: DateRange }) {
                     ]}
                   />
                   <Bar dataKey="value" radius={[0, 6, 6, 0]}>
-                    {chartData.map((_, i) => (
-                      <Cell key={i} fill="hsl(var(--primary))" fillOpacity={1 - i * 0.07} />
-                    ))}
+                    {chartData.map((_, i) => {
+                      const rank = sortDir === "desc" ? i : chartData.length - 1 - i;
+                      return <Cell key={i} fill="hsl(var(--primary))" fillOpacity={1 - rank * 0.07} />;
+                    })}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
