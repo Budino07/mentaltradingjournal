@@ -766,6 +766,7 @@ export type Database = {
           sessions: number
         }[]
       }
+      admin_subscription_stats: { Args: never; Returns: Json }
       admin_user_list: {
         Args: { p_churn_days?: number; p_search?: string; p_segment?: string }
         Returns: {
