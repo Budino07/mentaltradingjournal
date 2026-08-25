@@ -1,10 +1,13 @@
-import { useAdminKPIs } from "@/hooks/useAdminAnalytics";
+import { useOutletContext } from "react-router-dom";
+import { format } from "date-fns";
+import { DateRange, useAdminKPIs } from "@/hooks/useAdminAnalytics";
 import { KPICard } from "@/components/admin/KPICard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Overview() {
-  const { data, isLoading } = useAdminKPIs();
+  const { range } = useOutletContext<{ range: DateRange }>();
+  const { data, isLoading } = useAdminKPIs(range);
 
   const pctChange = (cur: number, prev: number) => {
     if (prev === 0) return 0;
@@ -15,7 +18,9 @@ export default function Overview() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Overview</h1>
-        <p className="text-muted-foreground">High-level metrics for your trading journal.</p>
+        <p className="text-muted-foreground">
+          {format(range.from, "MMM d, yyyy")} – {format(range.to, "MMM d, yyyy")}
+        </p>
       </div>
 
       {isLoading || !data ? (
@@ -35,30 +40,24 @@ export default function Overview() {
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <KPICard
-              title="New signups today"
-              value={data.signups_today.toLocaleString()}
-              change={pctChange(data.signups_today, data.signups_yesterday)}
-              changeLabel="vs yesterday"
+              title="New signups"
+              value={data.signups.toLocaleString()}
+              change={pctChange(data.signups, data.signups_prev)}
+              changeLabel="vs previous period"
             />
             <KPICard
-              title="New signups this week"
-              value={data.signups_week.toLocaleString()}
-              change={pctChange(data.signups_week, data.signups_prev_week)}
-              changeLabel="vs previous week"
-            />
-            <KPICard
-              title="New signups this month"
-              value={data.signups_month.toLocaleString()}
-              change={pctChange(data.signups_month, data.signups_prev_month)}
-              changeLabel="vs previous month"
+              title="Active users"
+              value={data.active_users.toLocaleString()}
+              change={pctChange(data.active_users, data.active_users_prev)}
+              changeLabel="vs previous period"
             />
             <KPICard title="Subscribed users" value={data.subscribed_users.toLocaleString()} />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <KPICard title="30-day churn rate" value={`${data.churn_rate}%`} />
+            <KPICard title="Churn rate (vs previous period)" value={`${data.churn_rate}%`} />
             <KPICard
-              title={`${data.retention_days}-day retention`}
+              title="Retention of new signups"
               value={`${data.retention_rate}%`}
             />
           </div>
