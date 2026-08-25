@@ -1,6 +1,6 @@
 import { useOutletContext } from "react-router-dom";
 import { format } from "date-fns";
-import { DateRange, useAdminKPIs } from "@/hooks/useAdminAnalytics";
+import { DateRange, Segment, useAdminKPIs } from "@/hooks/useAdminAnalytics";
 import { KPICard } from "@/components/admin/KPICard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
