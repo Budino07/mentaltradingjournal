@@ -121,32 +121,11 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 )}
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    onClick={() => setShowMentorDialog(true)}
-                    tooltip="Mentor"
-                    className="transition-all duration-200"
-                  >
-                    <UserCog className="h-4 w-4" />
-                    <span>Mentor</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-
-      <Dialog open={showMentorDialog} onOpenChange={setShowMentorDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Restricted Access</DialogTitle>
-            <DialogDescription>
-              Access to this feature is restricted. Only members of Tenacity Group are authorized to use it.
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
