@@ -27,6 +27,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ScrollToTop } from "./components/ui/ScrollToTop";
 import { NotificationsProvider } from "./contexts/NotificationsContext";
 import { useIsAdmin } from "./hooks/useAdmin";
+import { useIsCapitalAdmin } from "./hooks/useTraderAnalytics";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminOverview from "./pages/admin/Overview";
 import AdminGrowth from "./pages/admin/Growth";
@@ -37,6 +38,8 @@ import AdminAcquisition from "./pages/admin/Acquisition";
 import AdminFunnel from "./pages/admin/Funnel";
 import AdminMonetization from "./pages/admin/Monetization";
 import AdminTakeaways from "./pages/admin/Takeaways";
+import AdminTraders from "./pages/admin/Traders";
+import AdminTraderDetail from "./pages/admin/TraderDetail";
 import { AnalyticsTracker } from "./components/analytics/AnalyticsTracker";
 
 const queryClient = new QueryClient({
@@ -61,6 +64,25 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+/** Trader performance / capital allocation: locked to the single owner account. */
+const CapitalAdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { allowed, loading } = useIsCapitalAdmin();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[40vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!allowed) {
+    return <Navigate to="/admin" replace />;
   }
 
   return <>{children}</>;
@@ -205,6 +227,8 @@ const App = () => {
                       <Route path="funnel" element={<AdminFunnel />} />
                       <Route path="monetization" element={<AdminMonetization />} />
                       <Route path="takeaways" element={<AdminTakeaways />} />
+                      <Route path="traders" element={<CapitalAdminRoute><AdminTraders /></CapitalAdminRoute>} />
+                      <Route path="traders/:userId" element={<CapitalAdminRoute><AdminTraderDetail /></CapitalAdminRoute>} />
                       <Route path="users" element={<AdminUsers />} />
                     </Route>
                   </Routes>
