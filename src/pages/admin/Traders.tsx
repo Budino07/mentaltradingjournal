@@ -150,13 +150,18 @@ export default function Traders() {
             onChange={setSelectedIds}
           />
           <p className="text-xs text-muted-foreground">
-            Pick specific traders by email — the prop firm book, leaderboard and CSV export all follow this
-            selection. Leave empty to include everyone above the min-trade threshold.
+            Select one or more traders by email or name. Once selected, the minimum-trades threshold is bypassed
+            and every section below recalculates for only those traders.
           </p>
         </CardContent>
       </Card>
 
-      <PropFirmReturns traders={rows} />
+      <PropFirmReturns
+        traders={rows}
+        selectedTraderNames={selectedIds
+          .map((id) => data?.find((r) => r.user_id === id)?.email || data?.find((r) => r.user_id === id)?.full_name)
+          .filter((name): name is string => Boolean(name))}
+      />
 
 
       {leaders.length > 0 && (
