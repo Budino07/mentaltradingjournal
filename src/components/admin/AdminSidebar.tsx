@@ -11,6 +11,7 @@ import {
   Filter,
   DollarSign,
   Lightbulb,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
