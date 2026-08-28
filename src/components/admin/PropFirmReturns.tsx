@@ -18,6 +18,8 @@ import { fmtMoney, fmtPct, sortPoints, type PnlPoint } from "@/lib/traderMetrics
 interface Props {
   /** Every trader currently passing the leaderboard filters. */
   traders: { user_id: string; points: PnlPoint[] }[];
+  /** Names shown to make the active multi-trader pool explicit. */
+  selectedTraderNames?: string[];
 }
 
 const monthLabel = (key: string) => {
@@ -27,7 +29,7 @@ const monthLabel = (key: string) => {
   });
 };
 
-export function PropFirmReturns({ traders }: Props) {
+export function PropFirmReturns({ traders, selectedTraderNames = [] }: Props) {
   const [capital, setCapital] = useState(1_000_000);
   const [firmSplit, setFirmSplit] = useState(20); // % of trader profits the firm keeps
   const [compound, setCompound] = useState(true);
@@ -121,9 +123,10 @@ export function PropFirmReturns({ traders }: Props) {
           <Badge variant="outline">HYPOTHETICAL</Badge>
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Every filtered trader's journalled P&amp;L pooled into one firm book. The firm keeps{" "}
-          {firmSplit}% of profitable months and absorbs 100% of losing months. Self-reported,
-          gross of fees.
+          {selectedTraderNames.length > 0
+            ? `Copy-trade simulation for ${selectedTraderNames.join(", ")}.`
+            : "Every trader currently passing the minimum-trades filter is pooled into one firm book."} {" "}
+          The firm keeps {firmSplit}% of profitable months and absorbs 100% of losing months. Self-reported, gross of fees.
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
