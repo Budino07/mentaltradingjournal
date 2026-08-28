@@ -33,6 +33,7 @@ const nav: NavItem[] = [
 
 export function AdminSidebar({ collapsed, setCollapsed }: { collapsed: boolean; setCollapsed: (v: boolean) => void }) {
   const location = useLocation();
+  const { allowed: capitalAdmin } = useIsCapitalAdmin();
 
   return (
     <aside
