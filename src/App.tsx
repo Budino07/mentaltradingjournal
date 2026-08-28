@@ -37,6 +37,8 @@ import AdminAcquisition from "./pages/admin/Acquisition";
 import AdminFunnel from "./pages/admin/Funnel";
 import AdminMonetization from "./pages/admin/Monetization";
 import AdminTakeaways from "./pages/admin/Takeaways";
+import AdminTraders from "./pages/admin/Traders";
+import AdminTraderDetail from "./pages/admin/TraderDetail";
 import { AnalyticsTracker } from "./components/analytics/AnalyticsTracker";
 
 const queryClient = new QueryClient({
@@ -205,7 +207,9 @@ const App = () => {
                       <Route path="funnel" element={<AdminFunnel />} />
                       <Route path="monetization" element={<AdminMonetization />} />
                       <Route path="takeaways" element={<AdminTakeaways />} />
-                      <Route path="users" element={<AdminUsers />} />
+                      <Route path="traders" element={<AdminTraders />} />
+                      <Route path="traders/:userId" element={<AdminTraderDetail />} />
+                      <Route path="users" element={<AdminUsers />} />return
                     </Route>
                   </Routes>
                 </BrowserRouter>
