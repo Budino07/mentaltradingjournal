@@ -123,9 +123,10 @@ export function PropFirmReturns({ traders, selectedTraderNames = [] }: Props) {
           <Badge variant="outline">HYPOTHETICAL</Badge>
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Every filtered trader's journalled P&amp;L pooled into one firm book. The firm keeps{" "}
-          {firmSplit}% of profitable months and absorbs 100% of losing months. Self-reported,
-          gross of fees.
+          {selectedTraderNames.length > 0
+            ? `Copy-trade simulation for ${selectedTraderNames.join(", ")}.`
+            : "Every trader currently passing the minimum-trades filter is pooled into one firm book."} {" "}
+          The firm keeps {firmSplit}% of profitable months and absorbs 100% of losing months. Self-reported, gross of fees.
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
