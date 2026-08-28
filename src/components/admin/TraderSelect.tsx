@@ -65,7 +65,7 @@ export function TraderSelect({ options, selected, onChange }: Props) {
             />
             <CommandList>
               <CommandEmpty>No trader found.</CommandEmpty>
-              <CommandGroup heading="Click traders to select / deselect">
+              <CommandGroup heading="Tick a trader to select / deselect">
                 {sorted.map((o) => {
                   const isSelected = selected.includes(o.user_id);
                   return (
@@ -75,12 +75,22 @@ export function TraderSelect({ options, selected, onChange }: Props) {
                       onSelect={() => toggle(o.user_id)}
                       aria-pressed={isSelected}
                       className={cn(
-                        "justify-between cursor-pointer",
+                        "justify-between cursor-pointer gap-2",
                         isSelected && "bg-primary/10 text-primary"
                       )}
                     >
-                      <span className="truncate">{label(o)}</span>
-                      {isSelected && <Check className="h-4 w-4 text-primary shrink-0" />}
+                      <div
+                        className={cn(
+                          "h-4 w-4 rounded border flex items-center justify-center shrink-0",
+                          isSelected
+                            ? "bg-primary border-primary"
+                            : "border-muted-foreground/40"
+                        )}
+                        aria-hidden="true"
+                      >
+                        {isSelected && <Check className="h-3 w-3 text-primary-foreground" />}
+                      </div>
+                      <span className="truncate flex-1">{label(o)}</span>
                     </CommandItem>
                   );
                 })}
