@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Plus, LineChart } from "lucide-react";
+import { Plus, LineChart, Link2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { TradeFormDialog } from "@/components/analytics/trade-form/TradeFormDialog";
@@ -10,12 +10,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { DailyInsightsDialog } from "./insights/DailyInsightsDialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ConnectAccountDialog } from "@/components/broker/ConnectAccountDialog";
 
 export const JournalFilters = () => {
   const navigate = useNavigate();
   const [isTradeFormOpen, setIsTradeFormOpen] = useState(false);
   const [isInsightsOpen, setIsInsightsOpen] = useState(false);
+  const [isConnectOpen, setIsConnectOpen] = useState(false);
   const { user } = useAuth();
+
 
   const handleTradeSubmit = async (tradeData: Trade, isEdit: boolean) => {
     if (!user) return;
@@ -63,23 +66,31 @@ export const JournalFilters = () => {
   };
 
   return (
-    <div className="flex gap-2 justify-start">
-      <Button 
-        variant="outline" 
+    <div className="flex flex-wrap gap-2 justify-start">
+      <Button
+        variant="outline"
+        onClick={() => setIsConnectOpen(true)}
+      >
+        <Link2 className="h-4 w-4 mr-1" />
+        Connect Trading Account
+      </Button>
+
+      <Button
+        variant="outline"
         onClick={() => navigate('/journal-entry')}
       >
         Pre-Session
       </Button>
 
-      <Button 
-        variant="outline" 
+      <Button
+        variant="outline"
         onClick={() => setIsTradeFormOpen(true)}
       >
         <Plus className="h-4 w-4 mr-1" />
         Add Trade
       </Button>
-      
-      <Button 
+
+      <Button
         variant="outline"
         onClick={() => navigate('/journal-entry')}
       >
@@ -115,6 +126,11 @@ export const JournalFilters = () => {
       >
         <></>
       </TradeFormDialog>
+
+      <ConnectAccountDialog
+        open={isConnectOpen}
+        onOpenChange={setIsConnectOpen}
+      />
 
       {/* The DailyInsightsDialog is handled by Journal.tsx */}
     </div>
