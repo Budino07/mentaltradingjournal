@@ -67,19 +67,26 @@ export function PropFirmReturns({ traders }: Props) {
       };
     });
 
-    const yearMap = new Map<string, { firmPnl: number; traderPnl: number; trades: number; pct: number; wins: number; count: number }>();
+    const yearMap = new Map<string, { firmPnl: number; traderPnl: number; trades: number; opening: number; closing: number; wins: number; count: number }>();
     for (const m of months) {
-      const cur = yearMap.get(m.year) ?? { firmPnl: 0, traderPnl: 0, trades: 0, pct: 0, wins: 0, count: 0 };
+      const cur = yearMap.get(m.year) ?? {
+        firmPnl: 0, traderPnl: 0, trades: 0, opening: m.equity - m.firmPnl, closing: m.equity, wins: 0, count: 0,
+      };
       cur.firmPnl += m.firmPnl;
       cur.traderPnl += m.traderPnl;
       cur.trades += m.trades;
-      cur.pct += m.pct;
+      cur.closing = m.equity;
       cur.wins += m.firmPnl > 0 ? 1 : 0;
       cur.count += 1;
       yearMap.set(m.year, cur);
     }
     const years = [...yearMap.entries()]
-      .map(([year, v]) => ({ year, ...v }))
+      .map(([year, v]) => ({
+        year,
+        ...v,
+        // Annual return is based on the year's opening and closing firm equity.
+        pct: v.opening > 0 ? ((v.closing - v.opening) / v.opening) * 100 : 0,
+      }))
       .sort((a, b) => a.year.localeCompare(b.year));
 
     const endEquity = months.length ? months[months.length - 1].equity : capital;
