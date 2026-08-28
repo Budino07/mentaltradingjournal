@@ -207,9 +207,9 @@ const App = () => {
                       <Route path="funnel" element={<AdminFunnel />} />
                       <Route path="monetization" element={<AdminMonetization />} />
                       <Route path="takeaways" element={<AdminTakeaways />} />
-                      <Route path="traders" element={<AdminTraders />} />
-                      <Route path="traders/:userId" element={<AdminTraderDetail />} />
-                      <Route path="users" element={<AdminUsers />} />return
+                      <Route path="traders" element={<CapitalAdminRoute><AdminTraders /></CapitalAdminRoute>} />
+                      <Route path="traders/:userId" element={<CapitalAdminRoute><AdminTraderDetail /></CapitalAdminRoute>} />
+                      <Route path="users" element={<AdminUsers />} />
                     </Route>
                   </Routes>
                 </BrowserRouter>
