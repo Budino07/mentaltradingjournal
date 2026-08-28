@@ -14,6 +14,8 @@ import { ArrowDown, ArrowUp, ArrowUpDown, Info, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fmtMoney, fmtNum, fmtPct } from "@/lib/traderMetrics";
 import { PropFirmReturns } from "@/components/admin/PropFirmReturns";
+import { TraderSelect } from "@/components/admin/TraderSelect";
+
 
 type SortKey =
   | "name" | "trades" | "netPnl" | "winRate" | "profitFactor" | "avgWin" | "avgLoss"
