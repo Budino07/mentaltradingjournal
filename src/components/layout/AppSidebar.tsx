@@ -1,5 +1,5 @@
 
-import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, Notebook, LineChart, List, Gift, Newspaper, Shield } from "lucide-react";
+import { Home, BookOpen, BarChart2, Settings, FlaskConical, Notebook, LineChart, List, Gift, Newspaper, Shield } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -12,15 +12,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useIsAdmin } from "@/hooks/useAdmin";
 
@@ -55,7 +47,6 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const [showMentorDialog, setShowMentorDialog] = useState(false);
   const { setOpenMobile, toggleSidebar, open } = useSidebar();
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -130,32 +121,11 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 )}
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    onClick={() => setShowMentorDialog(true)}
-                    tooltip="Mentor"
-                    className="transition-all duration-200"
-                  >
-                    <UserCog className="h-4 w-4" />
-                    <span>Mentor</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-
-      <Dialog open={showMentorDialog} onOpenChange={setShowMentorDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Restricted Access</DialogTitle>
-            <DialogDescription>
-              Access to this feature is restricted. Only members of Tenacity Group are authorized to use it.
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
