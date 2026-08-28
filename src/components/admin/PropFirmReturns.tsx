@@ -141,20 +141,12 @@ export function PropFirmReturns({ traders }: Props) {
           <div className="space-y-1.5">
             <Label>Return basis</Label>
             <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setCompound(true)}
-                className={cn("flex-1 rounded-md border px-3 py-2 text-sm", compound ? "border-primary bg-primary/10 text-primary" : "border-border/60 text-muted-foreground")}
-              >
+              <Button type="button" variant={compound ? "default" : "outline"} size="sm" className="flex-1" onClick={() => setCompound(true)}>
                 Compounding
-              </button>
-              <button
-                type="button"
-                onClick={() => setCompound(false)}
-                className={cn("flex-1 rounded-md border px-3 py-2 text-sm", !compound ? "border-primary bg-primary/10 text-primary" : "border-border/60 text-muted-foreground")}
-              >
+              </Button>
+              <Button type="button" variant={!compound ? "default" : "outline"} size="sm" className="flex-1" onClick={() => setCompound(false)}>
                 Fixed base
-              </button>
+              </Button>
             </div>
           </div>
           <div className="space-y-1.5">
