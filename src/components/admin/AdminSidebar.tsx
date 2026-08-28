@@ -14,8 +14,11 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useIsCapitalAdmin } from "@/hooks/useTraderAnalytics";
 
-const nav = [
+type NavItem = { title: string; icon: typeof LayoutDashboard; url: string; capitalOnly?: boolean };
+
+const nav: NavItem[] = [
   { title: "Overview", icon: LayoutDashboard, url: "/admin" },
   { title: "Acquisition", icon: Megaphone, url: "/admin/acquisition" },
   { title: "Growth", icon: TrendingUp, url: "/admin/growth" },
@@ -25,6 +28,7 @@ const nav = [
   { title: "Monetization", icon: DollarSign, url: "/admin/monetization" },
   { title: "Users", icon: Users, url: "/admin/users" },
   { title: "Takeaways", icon: Lightbulb, url: "/admin/takeaways" },
+  { title: "Trader performance", icon: ShieldCheck, url: "/admin/traders", capitalOnly: true },
 ];
 
 export function AdminSidebar({ collapsed, setCollapsed }: { collapsed: boolean; setCollapsed: (v: boolean) => void }) {
