@@ -154,7 +154,10 @@ export default function TraderDetail() {
         </CardContent>
       </Card>
 
+      <InvestmentProjection trades={trades} />
+
       <CopyTradeSimulator trades={trades} actual={metrics} actualEquity={curve} />
+
 
       <Card className="bg-card/60 border-border/60">
         <CardHeader><CardTitle>Trade log ({trades.length})</CardTitle></CardHeader>
