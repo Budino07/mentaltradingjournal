@@ -51,7 +51,7 @@ export function AdminSidebar({ collapsed, setCollapsed }: { collapsed: boolean; 
         </Button>
       </div>
       <nav className="flex-1 p-2 space-y-1">
-        {nav.map((item) => {
+        {nav.filter((item) => !item.capitalOnly || capitalAdmin).map((item) => {
           const active = location.pathname === item.url;
           return (
             <Link
