@@ -27,6 +27,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ScrollToTop } from "./components/ui/ScrollToTop";
 import { NotificationsProvider } from "./contexts/NotificationsContext";
 import { useIsAdmin } from "./hooks/useAdmin";
+import { useIsCapitalAdmin } from "./hooks/useTraderAnalytics";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminOverview from "./pages/admin/Overview";
 import AdminGrowth from "./pages/admin/Growth";
@@ -63,6 +64,25 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+/** Trader performance / capital allocation: locked to the single owner account. */
+const CapitalAdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { allowed, loading } = useIsCapitalAdmin();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[40vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!allowed) {
+    return <Navigate to="/admin" replace />;
   }
 
   return <>{children}</>;
