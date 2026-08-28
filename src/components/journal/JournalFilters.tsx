@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Plus, LineChart } from "lucide-react";
+import { Plus, LineChart, Link2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { TradeFormDialog } from "@/components/analytics/trade-form/TradeFormDialog";
@@ -10,12 +10,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { DailyInsightsDialog } from "./insights/DailyInsightsDialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ConnectAccountDialog } from "@/components/broker/ConnectAccountDialog";
 
 export const JournalFilters = () => {
   const navigate = useNavigate();
   const [isTradeFormOpen, setIsTradeFormOpen] = useState(false);
   const [isInsightsOpen, setIsInsightsOpen] = useState(false);
+  const [isConnectOpen, setIsConnectOpen] = useState(false);
   const { user } = useAuth();
+
 
   const handleTradeSubmit = async (tradeData: Trade, isEdit: boolean) => {
     if (!user) return;
