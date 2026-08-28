@@ -27,10 +27,14 @@ export function TraderSelect({ options, selected, onChange }: Props) {
 
   const sorted = useMemo(
     () =>
-      [...options].sort((a, b) =>
-        (a.email || a.full_name || "").localeCompare(b.email || b.full_name || "")
-      ),
-    [options]
+      [...options].sort((a, b) => {
+        // Keep already-selected traders pinned at the top of the list.
+        const sa = selected.includes(a.user_id) ? 0 : 1;
+        const sb = selected.includes(b.user_id) ? 0 : 1;
+        if (sa !== sb) return sa - sb;
+        return (a.email || a.full_name || "").localeCompare(b.email || b.full_name || "");
+      }),
+    [options, selected]
   );
 
   const label = (o: TraderOption) => o.email || o.full_name || o.user_id;
