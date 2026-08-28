@@ -139,7 +139,23 @@ export default function Traders() {
         </Alert>
       )}
 
+      <Card className="bg-card/60 border-border/60">
+        <CardContent className="flex flex-col gap-2 py-4">
+          <div className="text-sm font-medium">Filter traders</div>
+          <TraderSelect
+            options={(data ?? []).map((r) => ({ user_id: r.user_id, email: r.email, full_name: r.full_name }))}
+            selected={selectedIds}
+            onChange={setSelectedIds}
+          />
+          <p className="text-xs text-muted-foreground">
+            Pick specific traders by email — the prop firm book, leaderboard and CSV export all follow this
+            selection. Leave empty to include everyone above the min-trade threshold.
+          </p>
+        </CardContent>
+      </Card>
+
       <PropFirmReturns traders={rows} />
+
 
       {leaders.length > 0 && (
         <div className="grid gap-4 md:grid-cols-3">
