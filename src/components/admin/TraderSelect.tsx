@@ -55,9 +55,11 @@ export function TraderSelect({ options, selected, onChange }: Props) {
                 {sorted.map((o) => (
                   <CommandItem
                     key={o.user_id}
-                    value={`${o.email ?? ""} ${o.full_name ?? ""}`}
+                    // Unique value per row — otherwise cmdk dedupes traders with no email/name.
+                    value={`${o.email ?? ""} ${o.full_name ?? ""} ${o.user_id}`}
                     onSelect={() => toggle(o.user_id)}
                   >
+
                     <Check
                       className={cn(
                         "mr-2 h-4 w-4",
