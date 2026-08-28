@@ -86,11 +86,11 @@ export default function Traders() {
 
   const leaders = useMemo(
     () =>
-      [...(data ?? [])]
-        .filter((r) => r.metrics.trades >= Math.max(minTrades, 10) && r.metrics.netPnl > 0)
+      [...rows]
+        .filter((r) => r.metrics.netPnl > 0)
         .sort((a, b) => (b.metrics.profitFactor ?? 0) - (a.metrics.profitFactor ?? 0))
         .slice(0, 3),
-    [data, minTrades]
+    [rows]
   );
 
   const exportCsv = () => {
