@@ -1,5 +1,5 @@
 
-import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, Notebook, LineChart, List, Gift, Newspaper, Shield } from "lucide-react";
+import { Home, BookOpen, BarChart2, Settings, FlaskConical, Notebook, LineChart, List, Gift, Newspaper, Shield } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -12,15 +12,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useIsAdmin } from "@/hooks/useAdmin";
 
