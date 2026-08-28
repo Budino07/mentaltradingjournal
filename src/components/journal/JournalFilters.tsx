@@ -127,6 +127,11 @@ export const JournalFilters = () => {
         <></>
       </TradeFormDialog>
 
+      <ConnectAccountDialog
+        open={isConnectOpen}
+        onOpenChange={setIsConnectOpen}
+      />
+
       {/* The DailyInsightsDialog is handled by Journal.tsx */}
     </div>
   );
