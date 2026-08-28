@@ -5,6 +5,7 @@ import {
   computeMetrics, equityCurve, monthlyBreakdown, fmtMoney, fmtNum, fmtPct,
 } from "@/lib/traderMetrics";
 import { CopyTradeSimulator } from "@/components/admin/CopyTradeSimulator";
+import { InvestmentProjection } from "@/components/admin/InvestmentProjection";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
