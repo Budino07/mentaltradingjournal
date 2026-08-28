@@ -5,6 +5,7 @@ import {
   computeMetrics, equityCurve, monthlyBreakdown, fmtMoney, fmtNum, fmtPct,
 } from "@/lib/traderMetrics";
 import { CopyTradeSimulator } from "@/components/admin/CopyTradeSimulator";
+import { InvestmentProjection } from "@/components/admin/InvestmentProjection";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -154,7 +155,10 @@ export default function TraderDetail() {
         </CardContent>
       </Card>
 
+      <InvestmentProjection trades={trades} />
+
       <CopyTradeSimulator trades={trades} actual={metrics} actualEquity={curve} />
+
 
       <Card className="bg-card/60 border-border/60">
         <CardHeader><CardTitle>Trade log ({trades.length})</CardTitle></CardHeader>
