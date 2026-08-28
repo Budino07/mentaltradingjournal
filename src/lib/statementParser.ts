@@ -30,7 +30,7 @@ const FIELD_ALIASES: Record<keyof Omit<ParsedTrade, "raw" | "external_id">, stri
   symbol: ["symbol", "instrument", "pair", "item", "market"],
   direction: ["type", "direction", "side", "action", "buysell"],
   volume: ["volume", "size", "lots", "lot", "quantity", "qty"],
-  open_price: ["openprice", "entryprice", "priceopen", "entry", "pricein"],
+  open_price: ["openprice", "entryprice", "priceopen", "price", "entry", "pricein"],
   close_price: ["closeprice", "exitprice", "priceclose", "exit", "priceout"],
   open_time: ["opentime", "entrytime", "timeopen", "opendate", "entrydate", "time", "date"],
   close_time: ["closetime", "exittime", "timeclose", "closedate", "exitdate"],
