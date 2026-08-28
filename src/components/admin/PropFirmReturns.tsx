@@ -18,6 +18,8 @@ import { fmtMoney, fmtPct, sortPoints, type PnlPoint } from "@/lib/traderMetrics
 interface Props {
   /** Every trader currently passing the leaderboard filters. */
   traders: { user_id: string; points: PnlPoint[] }[];
+  /** Names shown to make the active multi-trader pool explicit. */
+  selectedTraderNames?: string[];
 }
 
 const monthLabel = (key: string) => {
