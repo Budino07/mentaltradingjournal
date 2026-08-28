@@ -29,7 +29,7 @@ const monthLabel = (key: string) => {
   });
 };
 
-export function PropFirmReturns({ traders }: Props) {
+export function PropFirmReturns({ traders, selectedTraderNames = [] }: Props) {
   const [capital, setCapital] = useState(1_000_000);
   const [firmSplit, setFirmSplit] = useState(20); // % of trader profits the firm keeps
   const [compound, setCompound] = useState(true);
