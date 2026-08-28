@@ -42,35 +42,53 @@ export function TraderSelect({ options, selected, onChange }: Props) {
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" size="sm" className="justify-between gap-2 min-w-52">
-            {selected.length === 0 ? "All traders" : `${selected.length} trader${selected.length > 1 ? "s" : ""} selected`}
+            {selected.length === 0
+              ? "All traders"
+              : `${selected.length} trader${selected.length > 1 ? "s" : ""} selected`}
             <ChevronsUpDown className="h-3.5 w-3.5 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-80 p-0" align="start">
+        <PopoverContent className="w-96 p-0" align="start">
           <Command>
             <CommandInput placeholder="Search by email or name…" />
             <CommandList>
               <CommandEmpty>No trader found.</CommandEmpty>
-              <CommandGroup>
-                {sorted.map((o) => (
-                  <CommandItem
-                    key={o.user_id}
-                    // Unique value per row — otherwise cmdk dedupes traders with no email/name.
-                    value={`${o.email ?? ""} ${o.full_name ?? ""} ${o.user_id}`}
-                    onSelect={() => toggle(o.user_id)}
-                  >
-
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selected.includes(o.user_id) ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    <span className="truncate">{label(o)}</span>
-                  </CommandItem>
-                ))}
+              <CommandGroup heading="Select any number of traders">
+                {sorted.map((o) => {
+                  const isSelected = selected.includes(o.user_id);
+                  return (
+                    <CommandItem
+                      key={o.user_id}
+                      value={`${o.email ?? ""} ${o.full_name ?? ""} ${o.user_id}`}
+                      onSelect={() => toggle(o.user_id)}
+                      className="gap-2"
+                    >
+                      <span
+                        className={cn(
+                          "flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border",
+                          isSelected
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-muted-foreground/40"
+                        )}
+                      >
+                        <Check className={cn("h-3 w-3", isSelected ? "opacity-100" : "opacity-0")} />
+                      </span>
+                      <span className="truncate">{label(o)}</span>
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             </CommandList>
+            <div className="flex items-center justify-between border-t p-2">
+              <span className="text-xs text-muted-foreground">
+                {selected.length === 0
+                  ? "All traders above the threshold"
+                  : `${selected.length} selected for analysis`}
+              </span>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
+                Done
+              </Button>
+            </div>
           </Command>
         </PopoverContent>
       </Popover>
@@ -83,9 +101,16 @@ export function TraderSelect({ options, selected, onChange }: Props) {
               return (
                 <Badge key={id} variant="secondary" className="gap-1 text-[11px]">
                   <span className="truncate max-w-40">{o ? label(o) : id}</span>
-                  <button type="button" onClick={() => toggle(id)} aria-label="Remove trader">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-4 w-4 rounded-sm p-0"
+                    onClick={() => toggle(id)}
+                    aria-label={`Remove ${o ? label(o) : "trader"}`}
+                  >
                     <X className="h-3 w-3" />
-                  </button>
+                  </Button>
                 </Badge>
               );
             })}
