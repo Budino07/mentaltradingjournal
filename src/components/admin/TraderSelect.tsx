@@ -53,7 +53,7 @@ export function TraderSelect({ options, selected, onChange }: Props) {
             <CommandInput placeholder="Search by email or name…" />
             <CommandList>
               <CommandEmpty>No trader found.</CommandEmpty>
-              <CommandGroup heading="Select any number of traders">
+              <CommandGroup heading="Click traders to select / deselect">
                 {sorted.map((o) => {
                   const isSelected = selected.includes(o.user_id);
                   return (
@@ -61,19 +61,14 @@ export function TraderSelect({ options, selected, onChange }: Props) {
                       key={o.user_id}
                       value={`${o.email ?? ""} ${o.full_name ?? ""} ${o.user_id}`}
                       onSelect={() => toggle(o.user_id)}
-                      className="gap-2"
+                      aria-pressed={isSelected}
+                      className={cn(
+                        "justify-between cursor-pointer",
+                        isSelected && "bg-primary/10 text-primary"
+                      )}
                     >
-                      <span
-                        className={cn(
-                          "flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border",
-                          isSelected
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-muted-foreground/40"
-                        )}
-                      >
-                        <Check className={cn("h-3 w-3", isSelected ? "opacity-100" : "opacity-0")} />
-                      </span>
                       <span className="truncate">{label(o)}</span>
+                      {isSelected && <Check className="h-4 w-4 text-primary shrink-0" />}
                     </CommandItem>
                   );
                 })}
