@@ -1110,6 +1110,37 @@ export type Database = {
           visits: number
         }[]
       }
+      admin_trader_stats: {
+        Args: { p_end?: string; p_start?: string }
+        Returns: {
+          email: string
+          full_name: string
+          missing_exit: number
+          missing_pnl: number
+          missing_stop: number
+          points: Json
+          total_rows: number
+          user_id: string
+        }[]
+      }
+      admin_trader_trades: {
+        Args: { p_user_id: string }
+        Returns: {
+          direction: string
+          entry_price: number
+          entry_ts: string
+          exit_price: number
+          notes: string
+          pnl: number
+          quantity: number
+          setup: string
+          stop_loss: number
+          symbol: string
+          take_profit: number
+          trade_id: string
+          ts: string
+        }[]
+      }
       admin_traffic_sources: {
         Args: { p_end: string; p_start: string }
         Returns: {
@@ -1168,6 +1199,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_capital_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
