@@ -23,19 +23,27 @@ interface Props {
 /** Multi-select of specific traders (by email/name) used to scope the leaderboard + firm book. */
 export function TraderSelect({ options, selected, onChange }: Props) {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
 
   const sorted = useMemo(
     () =>
-      [...options].sort((a, b) =>
-        (a.email || a.full_name || "").localeCompare(b.email || b.full_name || "")
-      ),
-    [options]
+      [...options].sort((a, b) => {
+        // Keep already-selected traders pinned at the top of the list.
+        const sa = selected.includes(a.user_id) ? 0 : 1;
+        const sb = selected.includes(b.user_id) ? 0 : 1;
+        if (sa !== sb) return sa - sb;
+        return (a.email || a.full_name || "").localeCompare(b.email || b.full_name || "");
+      }),
+    [options, selected]
   );
 
   const label = (o: TraderOption) => o.email || o.full_name || o.user_id;
 
-  const toggle = (id: string) =>
+  const toggle = (id: string) => {
     onChange(selected.includes(id) ? selected.filter((s) => s !== id) : [...selected, id]);
+    // Clear the query so the next trader can be searched immediately.
+    setQuery("");
+  };
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
@@ -50,7 +58,11 @@ export function TraderSelect({ options, selected, onChange }: Props) {
         </PopoverTrigger>
         <PopoverContent className="w-96 p-0" align="start">
           <Command>
-            <CommandInput placeholder="Search by email or name…" />
+            <CommandInput
+              value={query}
+              onValueChange={setQuery}
+              placeholder="Search by email or name, then click to add…"
+            />
             <CommandList>
               <CommandEmpty>No trader found.</CommandEmpty>
               <CommandGroup heading="Click traders to select / deselect">
