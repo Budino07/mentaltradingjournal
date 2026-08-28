@@ -48,11 +48,15 @@ export default function Traders() {
   const { data, isLoading, error } = useTraderStats();
   const [search, setSearch] = useState("");
   const [minTrades, setMinTrades] = useState(10);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [sortKey, setSortKey] = useState<SortKey>("netPnl");
   const [asc, setAsc] = useState(false);
 
   const rows = useMemo(() => {
-    let list = (data ?? []).filter((r) => r.metrics.trades >= minTrades);
+    // An explicit trader selection wins over the min-trade threshold.
+    let list = selectedIds.length
+      ? (data ?? []).filter((r) => selectedIds.includes(r.user_id))
+      : (data ?? []).filter((r) => r.metrics.trades >= minTrades);
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
@@ -67,7 +71,8 @@ export default function Traders() {
       }
       return asc ? av - bv : bv - av;
     });
-  }, [data, search, minTrades, sortKey, asc]);
+  }, [data, search, minTrades, selectedIds, sortKey, asc]);
+
 
   const toggle = (key: SortKey) => {
     if (key === sortKey) setAsc(!asc);
