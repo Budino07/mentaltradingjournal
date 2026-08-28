@@ -47,7 +47,6 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const [showMentorDialog, setShowMentorDialog] = useState(false);
   const { setOpenMobile, toggleSidebar, open } = useSidebar();
   const location = useLocation();
   const isMobile = useIsMobile();
