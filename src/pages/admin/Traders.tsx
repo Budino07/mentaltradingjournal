@@ -133,6 +133,8 @@ export default function Traders() {
         </Alert>
       )}
 
+      <PropFirmReturns traders={rows} />
+
       {leaders.length > 0 && (
         <div className="grid gap-4 md:grid-cols-3">
           {leaders.map((r, i) => (
